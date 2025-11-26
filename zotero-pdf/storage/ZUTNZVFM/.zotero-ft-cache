@@ -1,0 +1,772 @@
+Manjit S. Yadav & Paul A. Pavlou
+Marketing in Computer-Mediated Environments: Research Synthesis
+and New Directions
+Although an extensive body of research has emerged on marketing in computer-mediated environments, the literature remains fragmented. As a result, insights and findings have accumulated without an overarching framework to provide structure and guidance to the rapidly increasing research stream, which is detrimental to long-term knowledge development in this area. To address this issue, the authors organize and synthesize findings from the literature using a framework structured around four key interactions in computer-mediated environments: consumer–firm interactions, firm–consumer interactions, consumer–consumer interactions, and firm–firm interactions. The proposed framework serves a valuable organizational function and helps identify a broad spectrum of gaps in the literature to advance the next generation of knowledge development.
+Keywords: computer-mediated environments, Internet marketing, digital marketing strategy, Internet and telecommunication technologies, theory development
+
+Over the past two decades, there has been a veritable explosion of research in marketing on the impact of the Internet and related technologies on consumers, firms, and the marketplace. Although a substantial body of marketing literature has emerged from these scholarly endeavors, the sheer volume of work has created new challenges with respect to knowledge development, and the literature remains fragmented. In particular, the field lacks an overarching framework to provide structure and guidance to the rapidly increasing body of literature. Given the evolution of the marketing literature stream focusing on computermediated environments (CMEs), we believe this is an opportune time for integration to advance the next generation of knowledge development. Such integrative research efforts aimed at synthesis and theory development can have a significant long-term impact (MacInnis 2011; Yadav 2010).
+The main objective of this article is to provide new insights both to scholars pursuing research and pedagogical avenues in this research area and to managers who want to craft digital marketing strategies using collective evidence in the literature. Specifically, by organizing, synthesizing, and
+Manjit S. Yadav is Macy’s Foundation Professor of Marketing, Mays Business School, Texas A&M University (e-mail: yadav@tamu.edu). Paul A. Pavlou is Milton F. Stauffer Professor of Information Technology and Strategy, Fox School of Business, Temple University (e-mail: pavlou@temple. edu). The authors acknowledge the comments and suggestions provided by the following people on previous versions of this article: Len Berry, Donna Hoffman, Venky Shankar, Jagdip Singh, Alina Sorescu, Raji Srinivasan, and Rajan Varadarajan. Discussions with colleagues at Texas A&M University were also very helpful. The constructive guidance of the reviewers significantly improved this article. Christine Moorman served as area editor for this article.
+
+critiquing the rapidly increasing body of evidence, our work aims to advance the marketing literature by offering the following contributions. First, we show that the literature can be organized around four key interactions that occur in CMEs: consumer–firm interactions, firm–consumer interactions, consumer–consumer interactions, and firm–firm interactions. Second, we identify specific research gaps and emerging trends for each of these interactions. Third, we describe theory development opportunities that need to be addressed in each area, and we present new research avenues that rethink the four CME interactions in novel ways and facilitate the development of a more impactful research program. Collectively, we believe these contributions can play an important role in advancing the next generation of knowledge development in this area of increasing significance for marketing.
+CME Interactions: An Organizing Framework
+Structure of the Framework: Four Key Interactions
+Hoffman and Novak (1996, p. 53) characterize a CME as a “dynamic distributed network, potentially global in scope, together with associated hardware and software” that enables consumers and firms to communicate and access hypermedia (i.e., digital) content. Building on this view, our article offers a framework that examines consumer and firm activities in CMEs (see Figure 1 and Tables 1 and 2). Figure 1 depicts a set of interactions, which refer to the technologyfacilitated communication and exchange-related activities of consumers and firms. Technology, in the context of this framework, encompasses a broad range of communication technologies, devices, and infrastructure pertaining to the
+
+© 2014, American Marketing Association
+
+ISSN: 0022-2429 (print), 1547-7185 (electronic)
+
+20
+
+Journal of Marketing Vol. 78 (January 2014), 20–40
+
+FIGURE 1 Research on Marketing in Computer-Mediated Environments: An Organizing Framework
+Consumers Individuals purchasing goods and services for their own end consumption
+Research Focus 3 Consumer–Consumer Interactions
+
+Research Focus 1 Consumer–Firm Interactions
+
+Technology
+Internet technologies, devices, and infrastructure in the computermediated environment
+
+Research Focus 2 Firm–Consumer Interactions
+
+Research Focus 4 Firm–Firm Interactions
+Firms Organizational entities (for-profit and not-for-profit) from manufacturers to intermediaries that compose the value chain
+
+Notes: “Interactions,” in the context of this framework, refer to communication and exchange-related activities as consumers and firms engage with each other. Technology enables all interactions, as the dashed box and arrows depict. The four research foci have distinctive domains and are useful for organizing the literature. For purposes of exposition, the framework distinguishes consumer–firm interactions (in which the research focus is primarily on consumer behavior) and firm–consumer interactions (in which the research focus is primarily on firms’ strategies and tactics). Table 1 provides additional details regarding the four research foci’s domains.
+
+Internet. “Consumers” refer to people who purchase goods and services for their own end consumption. “Firms” represent a broad array of for-profit and not-for-profit organizations ranging from manufacturers to intermediaries that compose the value chain leading to the end consumer. Note that although technology is centrally positioned in the framework to emphasize its enabling role in CMEs, the primary focus of research in marketing is not on technology per se but on the expanded set of technology-enabled activities of consumers and firms in the marketplace. The organizing framework identifies four research foci corresponding to the following interactions in CMEs:
+1. Consumer–firm interactions: Research focusing on consumer behavior in the context of consumers’ interactions with firms in CMEs;
+2. Firm–consumer interactions: Research focusing on firms’ strategies and tactics in the context of firms’ interactions with consumers in CMEs;
+3. Consumer–consumer interactions: Research focusing on consumer behavior in the context of consumers’ interactions with other consumers in CMEs; and
+4. Firm–firm interactions: Research focusing on firms’ strategies and tactics in the context of firms’ interactions with other firms in CMEs.
+
+Scope and Overview of the Article
+Using the organizing framework as a broad guide regarding domain, the synthesis we present focuses on all relevant articles published in four journals widely recognized as leading outlets for marketing scholarship (Hult, Reimann, and Schlike 2009): Journal of Marketing, Journal of Marketing Research, Marketing Science, and Journal of Consumer Research. Given the large number of articles identified (n = 124) in these four journals, we focus this initial synthesis only on work published in these leading marketing journals. We hope that subsequent attempts at synthesizing the literature will focus on additional details of selected subdomains, develop domain-specific propositional inventories, and feature articles from other marketing and nonmarketing journals.1 To
+1From our analysis of online databases, several hundred additional articles can be identified in this manner in an expanded set of general and specialized journals (e.g., Journal of the Academy of Marketing Science, Journal of Retailing, Journal of Interactive Marketing, Management Science). The sheer size of this rapidly increasing literature stream presents numerous research opportunities, but it also underscores the need to carefully delineate the scope of this initial synthesis. These considerations guided our scope-related decisions for this article.
+
+Marketing in Computer-Mediated Environments / 21
+
+22 / Journal of Marketing, January 2014
+
+TABLE 1 Overview of Research Focus and Key Findings
+
+Research Focus, Domain, and Topics
+
+Key Findings
+
+Relevant Articles
+
+Research Focus 1: Consumer–Firm Interactions (46 Articles) Domain: Consumer behavior in the context of consumers’ interactions with firms in CMEs Topics: Network navigation (general online browsing behavior), technology-enabled search (specific search-related activities in the marketplace), and technology-enabled
+decision making (evaluating alternatives and making choices)
+
+Network navigation (18 articles)
+•Clickstream patterns •Impact of interface •Psychological issues
+
+Visitors’ experience level, previous visits, website features, and situational factors affect visit duration, timing, and choices. Browsing patterns tend to persist. Drivers of online trust vary significantly across websites. Subtle changes in website features can affect choices. Flow, a favorable cognitive state during network navigation, does not occur often.
+
+Bart et al. (2005); Bucklin and Sismeiro (2003); Danaher, Mullarkey, and Essegaier (2006); Gorn et al. (2004); Hoffman and Novak (1996); Hui, Fader, and Bradlow (2009); Johnson (2001); Johnson, Bellman, and Lohse (2003); Mandel and Johnson (2002); Mathwick and Rigdon (2004); Moe (2006); Moon (2000); Novak, Hoffman, and Yung (2000); Park and Fader (2004); Sismeiro and Bucklin (2004); Tavasoli (2006); Telang, Boatwright, and Mukhopadhyay (2004); Zauberman (2003)
+
+Technology-enabled search (9 articles)
+•Use of search tools •Search behavior
+
+Search tools can increase or decrease the role of price in consumers’ decision making. Internet users spend more time searching, leading to substantial savings in the case of durable goods. Excessive search may lead to poor choices. Total search time for experience and search goods is similar, but search breadth and depth vary.
+
+Dickson (2000); Diehl (2005); Diehl, Kornish, and Lynch (2003); Hoque and Lohse (1999); Huang, Lurie, and Mitra (2009); Lynch and Ariely (2000); Ratchford, Lee, and Talukdar (2003); Ratchford, Talukdar, and Lee (2007); Zettelmeyer, Morton, and Silva-Risso (2006)
+
+Technology-enabled decision making (19 articles)
+•Use of decision-making tools •Purchase and use behavior •Bidding in online auctions
+
+Decision tools improve consumers’ decision quality and reduce effort, Ariely (2000); Bradlow and Park (2007); Cotte and
+
+although the absence of haptic information remains an important limita- LaTour (2009); Chan, Kadiyali, and Park (2007); Cheema
+
+tion. Consumer readiness is a key determinant of the adoption and use (2008); Chernev (2006); Dholakia and Simonson (2005);
+
+of digital goods/services. In online auctions, bidders’ experience level, Häubl and Trifts (2000); Holzwarth, Janiszewski, and
+
+past outcomes, future expectations, product descriptions, reference Neumann (2006); Kamins, Drèze, and Folkes (2004);
+
+prices, and bidding format affect bidding behavior. Findings regarding Lee et al. (2008); Li, Srinivasan, and Sun (2009); Meuter
+
+seller ratings are mixed. Bidders and sellers jointly determine auction et al. (2005); Park and Bradlow (2005); Peck and
+
+dynamics and outcomes. Explicit price comparisons with other auctions Childers (2003); Schlosser (2006); Sinha and Mandel
+
+decrease bidding frenzy.
+
+(2008); Yao and Mela (2008); Zeithammer (2006)
+
+Research Focus 2: Firm–Consumer Interactions (42 Articles) Domain: Firms’ strategies and tactics in the context of firms’ interactions with consumers in CMEs Topics: Marketing-mix decisions pertaining to the product, integrated marketing communication, pricing, and multichannel management
+
+Product decisions (9 articles)
+•Product recommendations •Customization
+
+Design of recommendation systems must incorporate consumers’
+
+Ansari, Essegaier, and Kohli (2000); Bodapati (2008);
+
+stated and unstated preferences, expert opinions, and product and
+
+Chung, Rust, and Wedel (2009); Fitzsimons and
+
+demographic characteristics. Online browsing patterns are predictive of Lehmann (2004); Han, Chung, and Sohn (2009); Hauser
+
+purchase behavior. Presenting real-time, personalized product offers et al. (2009); Montgomery et al. (2004); Urban and
+
+on the basis of online browsing patterns increases purchase intentions. Hauser (2004); Ying, Feinberg, and Wedel (2006)
+
+Product customization enhances the consumption of digital content
+
+and consumers’ satisfaction. Over time, market acceptance is likely
+
+to be more favorable for specialized digital products that optimize the
+
+performance of a few attributes.
+
+TABLE 1 Continued
+
+Research Focus, Domain, and Topics
+Integrated marketing communication decisions
+(11 articles) •Online advertising •Customer acquisition and retention
+
+Key Findings
+
+Relevant Articles
+
+Online banner ads increase sales. However, repeated ad exposure has Ansari and Mela (2003); Bonfrer and Drèze (2009);
+
+a negative, nonlinear effect on click likelihood. Overall, elasticities of Bradlow and Schmittlein (2000); Campbell and Keller
+
+online and offline advertising are similar in magnitude. A firm’s interac- (2003); Chatterjee, Hoffman, and Novak (2003);
+
+tion orientation enhances performance outcomes. Website investments Manchanda et al. (2006); Prins and Verhoef (2007);
+
+to increase interactivity increase trust in the firm. Customer-initiated Ramani and Kumar (2008); Schlosser, White, and Lloyd
+
+communication is significantly more effective than firm-initiated
+
+(2006); Song and Zinkhan (2008); Villanueva, Yoo, and
+
+communication for acquiring and retaining customers. Personalization Hanssens (2008)
+
+of e-mails significantly increases perceived interactivity and click rates.
+
+Accurate and fast forecasts of click-through rates can be made to
+
+manage e-mail promotions.
+
+Pricing decisions (11 articles)
+•Price customization •Pricing formats and tactics
+
+Price customization increases profitability, but it can also create evaluation difficulties for customers and also trigger perceptions of unfairness. Loyalty-based price promotions are more effective in online versus offline contexts. In the future, there will be increased emphasis on two-tier pricing, price bundling, and advance selling.
+
+Acquisti and Varian (2005); Danaher (2002); Fay (2004); Haws and Bearden (2006); Jank and Kannan (2005); Kannan, Pope, and Jain (2009); Pauwels and Weiss (2008); Spann and Tellis (2006); Xie and Shugan (2001); Zhang and Krishnamurthy (2004); Zhang and Wedel (2009)
+
+Multichannel management decisions (11 articles)
+•Managing multichannel buyers •Multichannel strategy
+
+Buyers at online stores are less price sensitive than those at offline
+
+Alba et al. (1997); Ansari, Mela, and Neslin (2008); Bala-
+
+stores, but online buyers also exhibit less loyalty. Buyers’ preference- subramanian (1998); Chu, Chintagunta, and Cebollada
+
+based drivers of website visits are more resistant to change than habit- (2008); Geyskens, Gielens, and Dekimpe (2002); Lee
+
+driven drivers. Both demand- and supply-side factors will determine the and Grewal (2004); Lehmann and Weinberg (2000);
+
+long-term evolution and performance outcomes of firms’ multichannel Lewis, Singh, and Fay (2006); Moe and Yang (2009);
+
+strategies. Performance gains are likely to be distributed unequally
+
+Srinivasan and Moorman (2005); Wood (2001)
+
+among firms. As multichannel strategies evolve, the speed of adoption
+
+of Internet technologies for communication purposes enhances perfor-
+
+mance. Retailers with moderate experience—online or offline—benefit
+
+the most from investments aimed at managing customers more
+
+interactively.
+
+Marketing in Computer-Mediated Environments / 23
+
+Research Focus 3: Consumer–Consumer Interactions (14 Articles) Domain: Consumer behavior in the context of consumers’ interactions with other consumers in CMEs Topics: Social networks (general characteristics of online communities) and user-generated content (USG; creation and consumption of content in online communities)
+
+Social networks (5 articles) •Social networking patterns •Purchase behavior in social networks
+
+People’s interest in creating an online presence for themselves is generally triggered by an event of personal relevance. Online community participation enhances loyalty and influences new product adoption. Communication originating in online communities has more pronounced long-term effects than firm-initiated communication.
+
+Hennig-Thurau, Henning, and Sattler (2007); Kozinets (2002); Schau and Gilly (2003); Thompson and Sinha (2008); Trusov, Bucklin, and Pauwels (2009)
+
+UGC (9 articles) •Online product reviews •Online complaining
+
+Reviews, particularly their dispersion across heterogeneous customer groups, are predictive of new product success or failure. Evidence regarding valence and volume of reviews is mixed. Firms can shape market opinion by furnishing reviews. Negative word-of-mouth behaviors are motivated primarily by a desire to address a perceived injustice. Their unfavorable impact on stock prices, volatility, and cash flows can be substantial and long term.
+
+Chevalier and Mayzlin (2006); Godes and Mayzlin (2004); Liu (2006); Luo (2009); Mayzlin (2006); Schlosser (2005); Schlosser and Shavitt (2002); Ward and Ostrom (2006); Weiss, Lurie, and MacInnis (2008)
+
+24 / Journal of Marketing, January 2014
+
+TABLE 1 Continued
+
+Research Focus, Domain, and Topics
+
+Key Findings
+
+Relevant Articles
+
+Research Focus 4: Firm–Firm Interactions (22 Articles) Domain: Firms’ strategies and tactics in the context of firms’ interactions with other firms in CMEs Topics: Interorganizational networks (structural features of value chains), competition (intensity of rivalry between firms), and business-to-business (B2B) auctions (firm’s
+procurement activities through online auctions)
+
+Interorganizational networks (8 articles) •Structural shifts •Infomediaries
+
+A shift is occurring from hierarchical to networked organizational structures. Efficiency-related motivations facilitate the development of firms’ expertise in digital, networked environments. Adoption of Internet technologies is affected by firms’ technological opportunism and senior leadership’s future focus. Infomediaries lower prices, but excessive market reach can make them unviable. There is also a potential for collusion between firms.
+
+Achrol and Kotler (1999); Chen, Iyer, and Padmanabhan (2002); Gal-Or and Gal-Or (2005); Grewal, Comer, and Mehta (2001); Iyer and Pazgal (2003); Shaffer and Zettelmeyer (2002); Srinivasan, Lilien, and Rangaswamy (2002); Yadav, Prabhu, and Chandy (2007)
+
+Competition (8 articles) •Consumer factors that affect competition •Firm factors that affect competition
+
+Despite declining search costs, price competition may not increase as much as expected. Firms’ incentives to provide information and facilitate search may be limited. Finer segmentation, product design changes, and behavior-based discrimination potentially increase firms’ power and mitigate competition.
+
+Bakos and Brynjolfsson (2000); He and Chen (2006); Jain (2008); Kuksov (2004); Lal and Sarvary (1999); Pazgal and Soberman (2008); Wu et al. (2004); Zettelmeyer (2000)
+
+B2B auctions (6 articles) •Impact on interorganizational relationships •B2B keyword auctions
+
+Open-bid reverse auction formats can be detrimental to long-term relationships. There is an inverted U-shaped relationship between number of bidders and bidders’ satisfaction. Suppliers with a lower relationship propensity tend to be more aggressive in auctions. Business-to-business auctions for allocating advertising space and position in CMEs must focus on relative, not absolute, valuation of keywords.
+
+Chen, Liu, and Whinston (2009); Jap (2003, 2007); Jap and Haruvy (2008); Jap and Naik (2008); Wilbur and Yi (2009)
+
+Notes: For the purpose of organizing the literature along the four research foci, we took into consideration the primary substantive focus of individual articles. A detailed critique of constructs in the four research foci is beyond the scope of this article. However, to facilitate work related to construct validity issues, we provide the following list of selected constructs: research focus 1 (flow, cognitive lock-in, information control, need for touch, consumer readiness, and online trust); research focus 2 (virtual time, technological opportunism, interaction orientation, and product migration); research focus 3 (UGC valence, UGC dispersion, and protest frames); and research focus 4 (networked organization, behavior-based discrimination, free riding, relationship propensity, and auction price transparency).
+
+TABLE 2 Research Gaps and Opportunities
+
+Research Versus Practice Gaps Consumer–Firm Interactions
+
+Illustrative Practices and Emerging Trends
+
+Theory Development Opportunities
+
+Network navigation: A desktop-centric perspective dominates extant research, but consumers now rely on a significantly expanded set of devices.
+Technology-enabled search: Search criteria and outcomes are no longer limited to textual content.
+Technology-enabled decision tools: Consumers are increasingly making decisions by integrating information not only on one device but across multiple devices.
+Firm–Consumer Interactions
+
+•Interaction with gestures: Kinect (Microsoft) •An overarching theme across the three research gaps is that research has
+
+•Augmented reality eyeglasses: Google Glass not kept pace with the rapid expansion of device types and interaction
+
+(Google X Lab)
+
+modes. In particular, from the perspective of theory development, extant
+
+•Voice-based search: Siri (Apple)
+
+conceptual models and assumptions do not adequately reflect this more
+
+•Location-based mobile search for products:
+
+complex marketplace environment. An expanded typology of consumer–
+
+RedLaser (eBay)
+
+firm interactions can facilitate these theory development efforts.
+
+•Synchronized product information on television •With respect to technology-enabled search and decision tools, there is a
+
+and mobile devices: Watch with eBay (eBay) need to reexamine the structure and underlying assumptions of the tradi-
+
+•Pay with near field communication (NFC)
+
+tional “shopping funnel.” The literature on the formation and updating of
+
+mobile devices: Pay with Square (Square)
+
+consideration sets provides a useful theoretical foundation for this work.
+
+•All three gaps highlight the need to develop finer-grained process models
+
+of consumer–firm interactions in CMEs. Media theories, combined with the
+
+literature on textual and nontextual information processing, can help
+
+develop such models.
+
+Marketing in Computer-Mediated Environments / 25
+
+Product decisions: Digital augmentation of products creates a new class of personalization and recommendation systems that rely on a significantly expanded scope of information.
+Integrated marketing communication decisions: Integrated SoLoMo advertising and promotion campaigns and demands for increased privacy through “do not track” technologies
+Pricing decisions: Customized pricing offers created by a significantly more engaged and empowered customer base
+Multichannel management decisions: Same-day fulfillment strategies and cross-channel optimization
+
+•Branded quick response (QR) product codes •A key change with relevance to all four marketing mix decisions is
+
+for mobile devices: SnapTags (SpyderLynk)
+
+enhanced consumer visibility, firms’ increased ability to capture and
+
+•Real-time apparel recommendations from
+
+manage detailed consumer-related information. How firms use the ability
+
+experts: Go Try It On (Rent the Runway)
+
+to observe consumers to develop and refine marketing strategies, and the
+
+•3-D printing of customized products: Custom performance outcomes of the decisions they make, represent promising
+
+hearing aids (EnvisionTEC)
+
+opportunities for theory development.
+
+•Promotional messaging with SoLoMo mobile •To pursue these theory development opportunities, efforts are needed to
+
+technologies: Instagram-based promotions;
+
+extend Glazer’s (1991) information intensity framework to include CMEs.
+
+Foursquare store check-in; Shopkick
+
+Specifically, the extended framework must provide details related to three
+
+•“Flash sale” sites: HauteLook (Nordstrom); Gilt issues: information generation, information characteristics, and information
+
+Groupe; LuxeYard
+
+valuation. The four CME interactions discussed herein can facilitate
+
+•“Pop-up” shops featuring virtual interfaces in conceptual work related to these issues.
+
+physical environments: eBay; Homeplus
+
+•In addition to the aforementioned CME-related theory development work,
+
+(Tesco)
+
+there is a need to develop integrated models that combine online and offline
+
+•Same-day fulfillment infrastructure and
+
+firm–consumer interactions to inform marketing mix decisions. Research
+
+strategies: Macy’s; Amazon.com
+
+efforts must respond to consumers’ increasing interest in “seamless”
+
+interactions with firms (i.e., across online and offline environments). Alba et
+
+al.’s (1997) framework that specifies touchpoints in CMEs, combined with
+
+Day’s (1994) strategic capabilities framework, can guide these efforts.
+
+26 / Journal of Marketing, January 2014
+
+TABLE 2 Continued
+
+Research Versus Practice Gaps Consumer–Consumer Interactions
+
+Illustrative Practices and Emerging Trends
+
+Theory Development Opportunities
+
+Social networks: Leveraging and monetizing social media assets through “social commerce” initiatives
+UGC: Generation and management of curated multimedia collections that are more complex than textual content
+
+•Social commerce initiatives: Chirpify (Twitter-based selling); sponsored shops (Tumblr); Gift cards (Facebook) •“Social verbs” links in online communities: “Want,” “Own,” and “Like” buttons (eBay; Facebook) •Social sampling: Tweet Shop (Kellogg’s Special K) •Leveraging social information: Social log-in (Facebook) •Curated multimedia collections: Instagram; Pepsi Pulse (PepsiCo); iQ by Intel (Intel) •Curated product collections: Pinterest; Fancy; Facebook Collections; Svpply; Polyvore; LivingSocial Shop; Live (IKEA)
+
+•There is a lack of conceptual clarity regarding the domain, drivers, and outcomes of social commerce. A broader construal of social commerce incorporates both transaction and nontransaction (e.g., brand enhancement) outcomes of activities in social networks. Conceptual and empirical work suggests that product-related contingencies are likely to play an important role in determining the success of firms’ social commerce initiatives. •Our understanding of the creation, consumption, and dissemination of content—especially complex multimedia content—in the context of consumer–consumer interactions is deficient. By addressing the issue of increased psychological distance in social networks, construal theory can help extend existing models of communication. •A theory development opportunity pertaining to both social networks and UGC relates to costs and benefits from the perspective of consumers and firms. A cost–benefit analysis is essential for understanding the long-term evolution and sustainability of the social networking environment. Norman’s (1988) concept of affordances, as applied to human–computer interactions, can facilitate this analysis.
+
+Firm–Firm Interactions
+
+Interorganizational networks: A new generation of B2B intermediaries, with an emphasis on new functionalities and efficiencies, remains unexplored.
+Competition: Implications of platform-based competition between firms
+B2B auctions: Application of online reverse auctions to nonprocurement contexts such as sustainability and environmental protection
+
+•Specialized B2B marketplaces: Joor; Fashion •As CMEs cause the structure of interorganizational networks to shift, there
+
+GPS
+
+is need to understand the scope, pace, and consequences of such shifts.
+
+•Third-party marketplace for increasing market A key factor driving these shifts is the increased visibility of firm–firm
+
+access and addressing compliance issues:
+
+interactions. The rich literature on transaction cost analysis and agency
+
+Wine.com
+
+theory can provide valuable guidance about how increased visibility affects
+
+•Platforms for payments: Square; Google
+
+outcomes such as internal and external coordination costs.
+
+Wallet (Google); Passbook (Apple);
+
+•Competitive contexts in CMEs often involve platforms that can be studied
+
+Samsung Wallet (Samsung)
+
+as two-sided markets. Scholars can extend the theory of two-sided
+
+•Platforms for apps and content: Google Play markets by integrating concepts and evidence related to market-based
+
+(Google); iTunes (Apple)
+
+assets (e.g., brands) from the marketing literature.
+
+•Reverse auctions for controlling water pollution: •As innovative applications of reverse auctions emerge in nonprocurement
+
+NutrientNet (World Resources Institute)
+
+contexts, there is need to understand the drivers of a broader array of
+
+performance outcomes, such as increased participation and efficiency gains.
+
+Notes: Where appropriate, we discuss selected trends and practices in the text. Additional information and updates can be obtained through an online search of firms and brand names mentioned in the table. Because of attrition and changes in the marketplace, the focus of specific products/services and their availability may change over time.
+
+maintain adequate depth with which to discuss individual articles in this expansive literature stream, the scope of this article is research from a period of 15 years, beginning with 1995 (see also Alba et al. 1997; Hoffman and Novak 1996).
+Table 1 provides an overview of major topics and key findings from the literature. Across all four research foci, we expand 12 broad topics into several specialized topics. We extend this overview in Table 2, in which we identify gaps in the literature by juxtaposing current research with marketplace practices and emerging trends. With this overview as a backdrop, we then discuss theory development opportunities and highlight research questions. To streamline the discussion, we combine methodological issues across research areas and present them in a separate section. This approach enables us to conduct an integrated discussion of substantive, conceptual, and methodological domains (see McGrath and Brinberg 1983) pertaining to the literature on CMEs. Further research efforts can build on this synthesis by providing additional details of issues identified in the tables, developing domain-specific frameworks, and making progress toward theoretical integration.
+Research Focus 1: Consumer–Firm Interactions
+Current Research
+The domain of consumer–firm interaction research is consumer behavior in the context of consumers’ interactions with firms in CMEs (see Table 1). Research efforts can be categorized into three main areas: (1) network navigation, (2) technology-enabled search, and (3) technology-enabled decision making.2
+Network navigation. Research related to network navigation has focused primarily on psychological issues pertaining to communication in CMEs (e.g., Hoffman and Novak 1996; Novak, Hoffman, and Yung 2000), modeling of clickstream data (e.g., Bucklin and Sismeiro 2003; Park and Fader 2004), and the impact of online interfaces (e.g., Bart et al. 2005). The concept of flow (Hoffman and Novak 1996), a cognitive state that occurs during network navigation when there is a balance between a person’s task-related skills and perceived difficulty of the navigation task, has significantly influenced research on psychological issues related to CMEs. Modeling of clickstream data has indicated that repeat visitors to a website tend to visit fewer pages (Bucklin and Sismeiro 2003)—a learning-related phenomenon that Johnson, Bellman, and Lohse (2003) refer to as “cognitive lock-in” (for a process account, see Zauberman’s [2003] work on intertemporal dynamics). Clickstream data also reveal consumers’ multistage decisionmaking process (Moe 2006). Online interfaces can facilitate people’s flow states (Novak, Hoffman, and Yung 2000),
+2In this initial synthesis of the literature, we focus on key findings and discuss only an illustrative subset of articles pertaining to these insights. However, for reference, Table 1 provides a complete list of all articles. This presentational approach, which we follow for all four research foci, enables us to introduce an expansive literature stream and discuss research gaps and opportunities.
+
+enhance firms’ perceptions (Bart et al. 2005), and shape choice processes (Mandel and Johnson 2002).
+Technology-enabled search. Declining online search costs pertaining to product quality may lower consumers’ price sensitivity by highlighting the differentiation among brands (Lynch and Ariely 2000). A follow-up study by Diehl, Kornish, and Lynch (2003, p. 68) suggests that because search tools can also make the final choice subset more similar in attractiveness, consumers may be “less willing to pay a large premium to purchase a more preferred option.” The authors also show that marketplace factors (e.g., the nature of price–quality relationship) can play an important role in determining choice-related outcomes. In some situations, the provision of search tools can actually degrade choice quality, as a result of oversearching (Diehl 2005). Regarding broader search patterns in the marketplace, there is evidence that, when aided by online search tools, consumers tend to engage in more search (Ratchford, Lee, and Talukdar 2003; Ratchford, Talukdar, and Lee 2007) and benefit financially from their efforts (Zettelmeyer, Morton, and Silva-Risso 2006). Total search time in CMEs tends to be similar for experience and search goods (Huang, Lurie, and Mitra 2009).
+Technology-enabled decision making. Research in technology-enabled decision making has examined the adoption (e.g., Meuter et al. 2005) and efficacy of different types of online tools for simplifying and enhancing decision making in CMEs. Online decision tools facilitate “information control” (Ariely 2000), reduce the size of consideration sets (Häubl and Trifts 2000), and can enhance decisionrelated quality, memory, and confidence. These benefits, however, are not costless; decision-making tools can also impose additional processing costs (Ariely 2000), and the absence of haptic (“touch”) information in CMEs can reduce consumers’ decision-making confidence (Peck and Childers 2003). Other prominent themes include increased perceived risk and uncertainty in CMEs. Consumers’ readiness (Meuter et al. 2005) to use CMEs is determined by technology factors (e.g., perceived complexity) and individual difference variables (e.g., inertia).
+Online auctions represent a specific decision-making context that has received considerable attention. In general, results have shown that favorable product characteristics and the provision of product images enhance consumers’ willingness to bid (e.g., Bradlow and Park 2007; Li, Srinivasan, and Sun 2009). Evidence regarding the impact of positive and negative seller ratings is mixed (Bradlow and Park 2007; Chan, Kadiyali, and Park 2007; Park and Bradlow 2005). Experienced consumers, and those expecting a product to be auctioned again, tend to bid lower (Chan, Kadiyali, and Park 2007; Zeithammer 2006). Bidding behavior is less aggressive when consumers encounter comparative reference price information in online auctions (Dholakia and Simonson 2005; Kamins, Drèze, and Folkes 2004).
+Research Gaps and Opportunities
+Research versus practice gaps. Against the backdrop of marketplace practices and emerging trends, we identify sev-
+
+Marketing in Computer-Mediated Environments / 27
+
+eral gaps in the literature (see Table 2). In all three subareas of research, but particularly in the case of network navigation, a desktop-centric approach has dominated extant research efforts. However, in recent years, firms have increasingly supplemented the traditional keyboard- and mouse-driven interactions with new interaction modalities that remain unexplored. For example, motion-sensing technology in products such as Microsoft’s Kinect enables people to use gestures to interact with digital content and others. Although this technology is currently focused primarily on gaming, applications of gesture-based navigation in marketing contexts—for example, signage in stores that can be manipulated with gestures (see Hay 2013)—have begun to emerge. Such nontouch interfaces represent a fertile ground for research.
+Current work on information search, from the perspective of both input criteria and search results, has focused exclusively on textual content such as product attributes. The typical research context involves textual, attribute-specific information that consumers use to search for products (e.g., price, size). The intermediate or final results of their search processes are also presented in a textual format (e.g., a tabular presentation of attribute information). This exclusive focus on textual content stems from the aforementioned dominant, desktop-centric research approach. Emerging technologies in mainstream mobile devices (e.g., Apple’s Siri) and experimental products (e.g., Google Glass) highlight the need to expand the research domain to include nontextual information.
+The third research area, technology-enabled decision making, has focused primarily on contexts in which people make decisions using one device. The prototypical decisionmaking situation involves decision making in which a single device presents and processes information within a relatively short time. This decision-making context is no longer completely representative. Increasingly, decision making involves integration of information across multiple synchronized devices. For example, “Watch with eBay” is a tablet-based application that displays product auctions related to a television show that is playing.
+Theory development opportunities. The aforementioned gaps stem primarily from the rapid expansion of device types and interaction modes on which consumers rely to connect with firms. To address these gaps, we discuss three interrelated theory development opportunities: the need to develop (1) an expanded typology of consumer–firm interactions, (2) a more nuanced structure of the “shopping funnel” in CMEs, and (3) finer-grained process models.
+First, research is needed to develop an expanded typology of contexts in which consumers and firms interact with each other. As CMEs continue to evolve and expand, it is necessary to understand the different types of shopping contexts that have been created and the underlying dimensions or factors that may be useful for the purposes of categorization and research (e.g., online vs. offline purchase environments, digital vs. nondigital products, desktop vs. mobile devices). These contexts are likely to vary considerably in terms of interaction modalities (e.g., text, voice, gestures). One particular technological trend—natural user interfaces
+
+in touchless devices such as Microsoft’s Kinect—highlights not only their promising potential but also the need for a deeper understanding of how and when consumers are likely to use them in both store and nonstore environments. A key issue here pertains to the perceived functionality of such devices. Several media theories can provide concepts and models to guide research on these issues in marketing. For example, marketing scholars can use recent theoretical advances related to media synchronicity (Dennis, Fuller, and Valacich 2008) and extended versions of media richness theory (Daft and Lengel 1986) to study the capabilities of these devices and the degree of “fit” with consumers’ information processing needs in various marketing contexts.
+Second, there is a need to investigate the structure of consumers’ shopping funnel. The central idea behind this metaphor—a relatively large number of potential choices that is winnowed down to the final selection—can be traced to some of the earliest theoretical work in consumer behavior (e.g., Howard and Sheth 1969). A more nuanced account of the underlying process has emerged from the literature on consideration set formation. In an influential article on this topic, Shocker et al. (1991) theorize that consideration sets may be quite malleable, expanding and contracting according to a consumer’s external and internal search process. These theoretical advances, unfortunately, have sometimes been overlooked in popular writings on how CMEs affect consumer–firm interactions. For example, drawing on a McKinsey study, Edelman (2010, p. 64) suggests that a completely new “consumer decision journey” is now occurring in the marketplace. In the absence of a compelling body of evidence, such claims are unwarranted. Indeed, a close examination of the process changes Edelman describes—such as consideration sets that are initially small and expand or change substantially in subsequent stages—can be readily accommodated in existing theoretical accounts of how consideration sets are formed and updated. In general, marketing scholars must remain open to the possibility of important shifts in underlying processes related to consumer–firm interactions but also strive for theoretical continuity when feasible.
+Third, theoretical work related to consumer–firm interactions can be enhanced by developing finer-grained process models, an area in which extant research is deficient. With the exception of work on flow (Hoffman and Novak 1996), very little is known about how consumers navigate (and integrate) information from various types of devices/interfaces in CMEs. Finer-grained process models can be helpful in this regard. Process-oriented work is also important because research has indicated that even seemingly minor alterations in interface features can trigger significant changes in terms of how consumers perceive online environments (e.g., trust perceptions; see Bart et al. 2005). Because marketing interfaces feature both textual and nontextual information, process models based on eye-tracking studies of such information (for a review, see Theios and Amrhein 1989) can provide useful insights. More generally, in light of rapid technological change, there is a need to examine more closely how consumers integrate each new generation of CME technologies and products into their
+
+28 / Journal of Marketing, January 2014
+
+lives. Mick and Fournier’s (1998) theoretical framework, built around the notion of paradoxes (i.e., conflicting outcomes) that consumers experience in such contexts, can serve as a useful guide for such work.
+Research Focus 2: Firm–Consumer Interactions
+The domain of the firm–consumer interaction research area includes firms’ strategies and tactics in the context of firms’ interactions with consumers in CMEs (see Table 1). Research efforts have been directed at all marketing mix elements: (1) product decisions, (2) integrated marketing communication decisions, (3) pricing decisions, and (4) multichannel management decisions.
+Current Research
+Product decisions. To alleviate information overload in CMEs, firms can simplify and improve consumers’ choices by offering a subset of products that match their preferences (however, for limits on such potential enhancements, see Kramer 2007). Research on recommendation systems aims to accomplish this by taking into account a consumer’s preferences, the preferences of other consumers, expert opinions, and product and demographic characteristics (e.g., Ansari, Essegaier, and Kohli 2000; Ying, Feinberg, and Wedel 2006). In general, Bayesian preference recommendation systems dominate the literature. Although such systems are viewed as better alternatives to other frequently used methods (e.g., collaborative filtering), limited availability of attribute-level preference data perhaps limits their wider applicability (Ariely, Lynch, and Aparicio 2004; see also Murray and Häubl 2009).
+The second area of emphasis pertains broadly to product design and development issues. Initial evidence (Han, Chung, and Sohn 2009) has indicated that firms’ design strategies regarding digital products must emphasize specialization of a few key functionalities as the product category matures; less specialized, multifunctional product designs are likely to fare better in the early stages. Product designs that allow customization of user interfaces enhance product usage and user experience (Chung, Rust, and Wedel 2009). With respect to new product development, Urban and Hauser (2004) show that automated “virtual advisors” in CMEs can help identify significant new opportunities.
+Integrated marketing communication decisions. The relative ease of delivering online ads has generated research interest aimed at understanding the effects of ad repetition in CMEs. In a study of banner ads (Chatterjee, Hoffman, and Novak 2003), repeated exposure had a negative, nonlinear effect on the likelihood of clicking. However, as the cumulative number of exposures increased, so did the likelihood of clicking. This finding suggests that mere exposure to ads in previous online sessions may have some brandingrelated value. This evidence, when considered in conjunction with other studies (e.g., Campbell and Keller 2003; Manchanda et al. 2006), suggests that although online and offline contexts differ, consumers’ underlying behavioral processes with respect to advertising are likely to be similar.
+
+A second area of emphasis is the use of integrated marketing communication to acquire and retain customers. Ramani and Kumar (2008) conceptualize interaction orientation as a firm’s ability to interact with individual customers, learn from these interactions, and then leverage that learning to enhance profitability through customer acquisition and retention. Greater interaction orientation leads to superior performance outcomes related to customer acquisition and retention. Consistent with this perspective, Ansari and Mela (2003) report that e-mail personalization can increase click rates by up to 62%.
+Pricing decisions. Price customization, which can be implemented more readily in CMEs than in offline environments, enhances profits. Even for a monopolist, customized pricing can be more profitable if there is an opportunity to add enhanced services to existing product offers (Acquisti and Varian 2005). Research has examined a variety of consumer and marketplace variables as a basis for implementing customized pricing strategies: consumers’ variety-seeking behavior (Zhang and Krishnamurthy 2004), brand loyalty (Zhang and Wedel 2009), geographic location (Jank and Kannan 2005), purchase situation (Haws and Bearden 2006), and willingness to pay (Fay 2004; Spann and Tellis 2006).
+Several key insights have emerged from research related to pricing format and tactics in CMEs. First, pricing tactics employed to acquire customers can have a significant long-term impact. For example, Pauwels and Weiss (2008) find that customers acquired with online price promotions make shorter-term commitments, whereas those acquired with informational e-mails or search engine ads lead to longer-term commitments. A second insight is that optimizing the pricing of digital products and services necessitates careful scrutiny of customer heterogeneity. There can be substantial differences across consumers in terms of perceptions of products and services (Kannan, Pope, and Jain 2009) and uncertainty about the utility consumers derive from them (Xie and Shugan 2001).
+Multichannel management decisions. Research on multichannel management has focused primarily on two areas: understanding the behavior of multichannel customers and crafting an effective multichannel strategy. With respect to customer behavior, evidence has suggested that channel migration (offline to online) may be a double-edged sword for firms. For example, customers move to the online channel when incentivized by a retailer, but they also tend to decrease their total purchases from that retailer over the long run (Ansari, Mela, and Neslin 2008). Research has also shown that online shoppers are less price sensitive than offline shoppers and make fewer changes across shopping trips (Chu, Chintagunta, and Cebollada 2008; for a discussion of how firms can leverage such multichannel information, see Zettelmeyer 2000).
+Crafting multichannel strategies necessitates careful attention to the evolution of both demand- and supply-side factors (Alba et al. 1997). Balasubramanian (1998) highlights the long-term dilution of location-specific advantages. Regarding the transition to multichannel formats, an important theme in the literature is that this transition is
+
+Marketing in Computer-Mediated Environments / 29
+
+likely to be fraught with challenges, such as managing customer relationships (Srinivasan and Moorman 2005) and coordinating the timing of product releases in different channels (Lehmann and Weinberg 2000). Controlling shipping costs to maintain profitability is another significant challenge (Lewis, Singh, and Fay 2006; for ways to manage consumers’ perceptions of such costs, see Morwitz, Greenleaf, and Johnson 1998). Nevertheless, despite such challenges, the announcement or addition of online channels has favorable financial outcomes (Geyskens, Gielens, and Dekimpe 2002; Lee and Grewal 2004).
+Research Gaps and Opportunities
+Research versus practice gaps. Extant research has lagged technological advances and developments pertaining to all four marketing-mix elements (see Table 2). In the case of product decisions, technological advances have significantly expanded the amount and types of information that can serve as input for improving recommendations systems. For example, retailers such as Gap and Sephora have experimented with mobile phone initiatives such as “Go Try It On,” with which shoppers can post photos and receive realtime apparel recommendations in line with their profilebased preferences. A related research topic, product customization, is likely to be influenced significantly by the increasing reliability and lower prices of technologies such as 3-D printing (see, e.g., EnvisionTEC’s customized hearing aids, manufactured using 3-D printing technology). It is unclear how much such initiatives will increase consumers’ satisfaction with self-designed products (Moreau and Herd 2010). The long-term impact on product variety in the marketplace is also unclear (see Anderson’s [2008] discussion of the increasing viability of firms’ “long tail” of niche products).
+Marketplace trends and practices in the area of advertising and promotion have advanced much more rapidly than corresponding research efforts. For example, consider developments such as location-based social-local-mobile (SoLoMo) advertising and promotion campaigns and stringent “do not track” technologies for privacy protection. Some of the issues examined in extant research (e.g., banner ads, monitoring the effects of ad repetition, offline ads compared with online ads) provide useful insights in this regard. However, in general, existing research has failed to capture the increasing richness and complexity of firms’ advertising and promotion activities in CMEs—especially in the context of mobile devices.
+With respect to pricing decisions, the trend toward customer-driven customized pricing offers represents a subtle but significant shift that current research has not adequately reflected. Whereas research efforts have focused primarily on how firms can craft customized pricing offers, innovative initiatives are empowering customers to craft their own customized offers. For example, on “flash sale” sites such as LuxeYard, customers make product suggestions, and LuxeYard negotiates best deals for products that generate the most interest. Although it is a collaborative effort, customers play an influential role.
+
+Finally, regarding distribution decisions, we know little about the fulfillment challenges created by many of the innovative digital initiatives that have recently emerged. For example, Tesco’s successful Homeplus experiment in South Korea developed life-size digital shopping aisles in subways. Consumers shopped for groceries using scanners on their mobile phones and selected a specific time for delivery. In general, fulfillment challenges stemming from initiatives such as Homeplus and others deserve more research attention.
+Theory development opportunities. To discuss theory development opportunities, we take an integrative look across gaps in all four marketing-mix elements. This approach enables us to discuss theory development ideas that have broader applicability to all firm–consumer interactions. Theory development work in a subset of these interactions can build on these ideas.
+Overall, we believe that enhanced consumer visibility— firms’ increased ability to capture and manage detailed information about consumers’ activities in CMEs—must be given a more central role in theory development efforts. Firms with greater privileged access to information about consumers’ activities are expected to be in a more advantageous position to create and benefit strategically from changes that occur in CMEs (see Varadarajan, Yadav, and Shankar 2008). In this context, “privileged access” means that the focal firm, by leveraging technological and other resources, is in a position to limit access to CME-related information by other firms (e.g., Facebook’s practice of blocking Google’s search engine from certain pages).
+The theory development work we are advocating is closely tied to Glazer’s (1991) prescient analysis of a firm’s information intensity, which he characterizes broadly as the value of information possessed by the firm. Glazer’s framework provides useful guidance about how and when information becomes valuable to firms (e.g., by enhancing efficiency, effectiveness, new revenue streams). However, this framework generally lacks critical details about how and what type of information can be leveraged for purposes of specific marketing-mix decisions. Because these details are precisely the research gaps highlighted in Table 2, extending Glazer’s (1991) framework to the specific context of CMEs represents a promising theory development opportunity. Developing this extended framework will involve conceptual work on three fronts:
+•Information generation: Glazer’s (1991) framework depicts “transactions” between firms and consumers as the source of information. Replacing transactions with the four interactions developed in this article enables us to extend Glazer’s framework by focusing more specifically on touchpoints at which information is likely to be generated in CMEs. As conceptualized, interactions include (but are not limited to) transactions. Therefore, the extended framework captures a broader array of information generators that are particularly relevant in the context of CMEs.
+•Information characteristics: To extend Glazer’s (1991) framework, we also need to delineate in greater detail characteristics of the information generated from the four interactions in CMEs. Viewing information as “asset stocks,” Dierickx and Cool (1989) note that assets can vary in terms of how quickly they grow (or decline), how interconnected they are, and the
+
+30 / Journal of Marketing, January 2014
+
+extent to which they are characterized by causal ambiguity (i.e., a lack of understanding about how a specific asset can be grown). These factors can be used to specify the characteristics of information resulting from the four interactions in CMEs.
+•Information valuation: In Glazer’s (1991) framework, there are three primary mechanisms for generating value from information: revenue from future transactions, cost reductions, and selling the information. Conceptual work is needed to assess the potential applicability of these mechanisms for marketing-mix decisions in CMEs. Illustrative practices and trends shown in Table 2 suggest that these mechanisms are likely to play an important role.
+Making information central to theory development efforts can help provide a more integrated view of firms’ marketing activities across offline and online environments. Developing this integrative view has become increasingly important as firms embrace so-called omnichannel strategies that seamlessly combine customers’ offline and online shopping activities. Our view is that information can serve as the common link across shopping contexts: by developing integrated conceptual models that follow the information trail, we can understand the full gamut of firms’ marketing activities. To illustrate, Alba et al.’s (1997) framework identifies a range of touchpoints between firms and customers—traditional brick-and-mortar retailers, online retailers, catalogs, and manufacturers. To make the role of information more explicit in this framework, researchers could extend Day’s (1994) strategic capabilities framework to online contexts and combine selected components of the framework with Alba et al.’s analysis. Day’s framework emphasizes the importance of integrating what he refers to as outside-in processes (e.g., market sensing, customer linking, channel bonding), inside-out processes (e.g., integrated logistics), and spanning processes (e.g., customer service). By combining key elements of these two frameworks—four types of touchpoints and three types of external/internal processes—we obtain a rich, useful typology for integrated conceptual analysis.
+Research Focus 3: Consumer– Consumer Interactions
+The domain of consumer–consumer interaction research encompasses consumer behavior in the context of consumers’ interactions with other consumers in CMEs (see Table 1). The main thrust of research efforts in this area has been on social networks and user-generated content (UGC).
+Current Research
+Social networks. Many consumers’ initial interest in online social networks—broadly construed as groups of people who rely on the communication capabilities of CMEs to connect with one another—is usually triggered by an event of some personal significance (e.g., a milestone or an accomplishment; see Schau and Gilly 2003). People are motivated to communicate something about themselves and rely on a range of self-presentation strategies to construct and project their digital likenesses in online communities. Initial evidence has indicated that social networks can
+
+shape consumers’ perceptions and purchase behavior. Thompson and Sinha (2008) study four online brand communities focused on high-tech products and find that consumers’ engagement in an online brand community affects new product adoption. Whereas the likelihood of adopting a new product offering from the community sponsor’s brand increases, the likelihood of adopting a competing brand’s new product decreases. However, when consumers have memberships in multiple online brand communities, increased participation in one community can also increase the likelihood of adopting new product offerings from a rival brand. Further highlighting the strategic significance of online communities is evidence that consumers’ communication activities in these communities are more effective than a firm’s own communication for the purpose of acquiring new customers (Trusov, Bucklin, and Pauwels 2009).
+UGC. There is increasing evidence that UGC (e.g., consumers’ online product reviews) has diagnostic value regarding marketplace outcomes. Illustrative of this stream of research is Godes and Mayzlin’s (2004) study in which they examine ratings of new television shows and find that dispersion of a show’s reviews across more customer groups is a strong predictor of its Nielsen ratings (see also Chevalier and Mayzlin 2006). Dispersion of UGC may be indicative of a show’s broader appeal. The evidence regarding UGC volume and valence is mixed (Godes and Mayzlin 2004; Liu 2006). Research has also examined contextual factors that can influence the generation and impact of online product reviews. Important product information in UGC may be overlooked if the online context is characterized by a high level of interactivity (see Schlosser and Shavitt 2002). Mayzlin (2006) presents troubling evidence that it is feasible for unscrupulous firms to manipulate marketplace sentiments by surreptitiously writing reviews themselves. The multifaceted, often unanticipated ways in which public opinion can shift in the marketplace—for example, even when opinion leaders are not actively involved (see Watts and Dodds 2007)—underscore the need for continued vigilance and monitoring of UGC.
+User-generated content is a double-edged sword in that it contains both positive and negative comments regarding a firm’s product offering. There is compelling evidence linking online (and offline) complaints and firms’ stock prices (Luo 2009), so there is much interest in understanding the underlying sociopsychological factors that drive online complaining behavior. Emerging evidence (Ward and Ostrom 2006) has suggested that dissatisfied consumers may have very different motivations for complaining, ranging from simply highlighting a perceived injustice to articulating an advocacy position. Schlosser (2005) further underscores the significance of consumer heterogeneity by showing that when consumers encounter negative information in online settings, the resulting attitudinal shift can vary significantly.
+Research Gaps and Opportunities
+Research versus practice gaps. The first major gap involves the growing interest in social commerce (see Table 2). Although the precise meaning and domain of social
+
+Marketing in Computer-Mediated Environments / 31
+
+commerce remains unclear (Liang and Turban 2012), the term generally refers to purchases made in social networks. However, as many firms have discovered, developing successful initiatives aimed at “monetizing” social networks has been extremely challenging. Illustrative of the difficulties involved is the experience of the world’s largest social network, Facebook. With an installed base of more than one billion active users, Facebook has stumbled on numerous occasions in its efforts related to social commerce. One of its earliest forays in this area, Beacon, became quickly mired in controversies related to privacy concerns and was discontinued shortly after its introduction in 2007. The first generation of Facebook-based stores turned out to be a fiasco when retailers quickly closed stores after consumers’ tepid response.
+Despite these challenges, firms continue to experiment with a variety of innovative strategies to explore the potential of social commerce (see Table 2). Chirpify is a thirdparty facilitator of social commerce on the Twitter platform. So-called pop-up shops are emerging on social network sites such as Tumblr. Firms are using new types of clickable links (e.g., “want”) to identify potential consumers. In contrast with an explicit selling goal, some firms have experimented with using social networks to promote new products. For example, Kellogg’s Tweet Shop allowed customers in London to pick up a free new product at a convenient location if they posted a product-related message on Twitter. Social commerce is a fertile area for innovation and presents numerous research opportunities that remain unexplored.
+The second gap in the literature pertains to an important shift in the type of content generation that seems to be occurring in social networks. The shift is from primarily text-based UGC to newer types of curated collections that feature more complex multimedia collections. For example, Pinterest allows users to create and share collections of product images. Other initiatives, such as Fancy and Facebook Collections, have attempted to emulate Pinterest’s success. Despite the increasing interest in curated collections, many questions remain about how they can be monetized or leveraged for marketing purposes.
+Theory development opportunities. The theory development gaps in the literature involve monetizing social networks and understanding UGC processes. These gaps suggest three main avenues for further research in this area.
+First, the domain and determinants of social commerce must be clarified. A broader construal of this term that includes purchase and nonpurchase activities in social networks is likely to provide more insights into how firms can leverage social networks for marketing purposes (Yadav et al. 2013). This broader view acknowledges the importance of firm-specific, nontransaction beneficial outcomes that result from consumers’ activities in social networks (e.g., brand awareness that leads to a subsequent purchase in another channel). Emerging analytics tools focusing on “attribution analysis” or “socially influenced” transactions (see Google Analytics) aim to map the process that generates these beneficial outcomes. In addition to these domainrelated issues pertaining to social commerce, theory development work should also delineate factors that determine
+
+the success of firms’ social commerce initiatives. Building on the literature on the migration of products to digital environments (e.g., Yadav and Varadarajan 2005b), Yadav et al. (2013) suggest that product-related contingencies may play an important role. Oestreicher-Singer and Sundararajan (2012) also note the significance of product-related contingencies and report that consumer–consumer interactions (specifically, recommendations) are more likely to elevate demand for niche products than for popular, mainstream products. More work is needed to shed light on how social networks shape product demand in general and new retailing phenomena such as the long tail (Anderson 2008), about which evidence still remains equivocal.
+Second, understanding the creation, consumption, and dissemination of content in social networks—whether it is traditional text-based UGC or complex, curated multimedia collections—should be an important priority. For purposes of theory development on such issues, the classic models of communication (e.g., Berlo 1960) still represent a valuable starting point (Berger 2013). The key components of these models—source, audience, message, channel, and effects— are relevant in mediated digital environments as well (see Berger and Milkman’s [2012] study of online content that goes viral). However, in digital environments, implications of increased distance between the source of communication and the audience need more careful attention. Because online social networks are characterized by temporal and spatial distance between users, the applicability of theoretical perspectives focusing on the consequences of such temporal and spatial influences (e.g., construal theory; see Trope, Liberman, and Wakslak 2007) should be explored. For example, construal theory suggests that increased psychological distance, which can be a function of temporal and spatial factors, leads people to view information more abstractly (i.e., with less attention to concrete attributes). Incorporating such perspectives from construal theory into classic models of communication can advance theoretical work on communication and information processing in different types of social networks featuring a variety of textual and nontextual content.
+The third theory development opportunity relates to the so-called dark side of social networking (see Turkle 2011). Most research efforts have focused on the potential benefits that could accrue to consumers (and firms) who invest time interacting online with other consumers. Yet to what extent do consumers actually benefit from such investments of time and effort? Do they make better choices? More importantly, what are the nonmonetary costs (e.g., time, loss of privacy, intrusion into offline interactions) that stem from social networking? Similar questions regarding costs/benefits can also be posed from the firm’s perspective. To answer these and related questions, theoretical work is needed that delineates such costs and benefits. Norman’s (1988) seminal work on the costs and benefits associated with the use of various technologies, including human– computer interaction devices, provides a useful framework. Extensions of this framework to social networking contexts should be considered. In particular, Norman’s concept of affordances has the potential of providing new insights
+
+32 / Journal of Marketing, January 2014
+
+about social networks. This concept, which Norman (1988, p. 9) describes as the “perceived and actual properties” of a device and “how [that device] could possibly be used” can help delineate the range of activities that social networks can facilitate for consumers. As social networking platforms continue to evolve, a systematic exploration of their current (and future) affordances can help address some of these issues.
+Research Focus 4: Firm–Firm Interactions
+The domain of firm–firm interaction research encompasses firms’ strategies and tactics in the context of firms’ interactions with other firms in CMEs. This domain has developed in three key areas (see Table 1): (1) interorganizational networks, (2) competition, and (3) business-to-business (B2B) auctions.
+Current Research
+Interorganizational networks. Significant reductions in the cost of communication technologies, coupled with strategic imperatives such as globalization, have spurred a structural shift in terms of how firms coordinate their valueadding activities internally and externally (Achrol and Kotler 1999). An increasing research stream has examined one such structural shift: the role of infomediaries (firms that provide information about sellers’ offerings in a given product category and receive compensation for directing online traffic to other firms’ websites).
+Three important insights have emerged. First, evidence regarding firms’ move to online exchanges (Grewal, Comer, and Mehta 2001) has indicated that firms’ goals and resources influence performance outcomes. Firms that want increased efficiency and have adequate information technology resources gain the most. Research that focuses on technology-enabled shifts in interorganizational structures is complemented by research examining factors that influence the adoption and impact of such tools in organizations. Studies in this stream of research have examined a range of issues such as the performance implications of technologyenabled tools and organizational factors that facilitate or impede their adoption (Srinivasan, Lilien, and Rangaswamy 2002; Yadav, Prabhu, and Chandy 2007). The second insight pertains to marketplace outcomes. For example, Chen, Iyer, and Padmanabhan (2002) show that the presence of an infomediary (e.g., eBay) leads to lower overall prices in the marketplace—but only when the infomediary’s reach is below a certain threshold (see also Iyer and Pazgal 2003). The third insight pertains to the power that infomediaries can potentially exercise in the marketplace, which has been the focus of several articles. For example, some infomediaries, by virtue of their ability to control consumers’ access to product-specific information, can potentially facilitate collusion between firms (Gal-Or and Gal-Or 2005). When such information is released, the profitability of entities along the entire value chain, from manufacturers to retailers, can be affected (Shaffer and Zettelmeyer 2002).
+
+Competition. A major thrust of research efforts has been to explore potential mechanisms that can mitigate competition between firms,3 despite lowered search costs in CMEs. Scholars have investigated two classes of mechanisms. First, some consumers may prefer not to search even when search costs are low (He and Chen 2006; Lal and Sarvary 1999), thus dampening competition. Second, firms can engage in a range of strategic and tactical actions to mitigate price competition. For example, Zettelmeyer (2000) shows that as the Internet’s reach expands, firms have opportunities for finer segmentation and can exercise greater market power. Firms can also use a variety of product-related competitive strategies and tactics that focus on how product offerings are redesigned (Kuksov 2004), customized (Pazgal and Soberman 2008), combined to create bundled offerings (Bakos and Brynjolfsson 2000), or legally protected from copying, as in the case of digital offerings (Jain 2008).
+B2B auctions. Research on B2B auctions has focused primarily on firms’ use of online reverse auctions for procurement purposes. The key issue examined is the impact of auction characteristics on firms’ relationships with suppliers. The open-bid format, featuring total price transparency during the auction, increases suppliers’ opportunism suspicions and can thus be detrimental to long-term relationships (Jap 2003, 2007). In contrast, a sealed-bid format, in which bidders cannot see other participants’ bids, does not have these negative effects. Scholars have also studied B2B auctions in the context of how firms purchase keyword-based advertising using systems such as Google Adwords. Two key insights have emerged. First, although Google-like keyword advertising systems dominate the marketplace, structural improvements can be made in these systems (Chen, Liu, and Whinston 2009). Second, the prevailing system of keyword advertising auctions is prone to “click fraud” (Wilbur and Yi 2009)—fraudulent clicks on keyword-driven ads that do not come from legitimate consumers—and thus independent third parties are needed to audit search engines’ algorithms for detecting such fraud.
+Research Gaps and Opportunities
+Research versus practice gaps. Firm–firm interactions in CMEs are undergoing significant changes but have received limited research attention (see Table 2). After the failure of many ambitious initiatives, a new generation of firms is focusing more closely on how CMEs can add value to an existing, complex network of firm–firm interactions. An example of such trends can be found in the wholesale side of the high-end apparel and fashion industry. New firms such as Joor and Fashion GPS have developed sophisticated B2B marketplaces that connect designer brands with wholesale buyers from leading retailers. Although still nascent, these firms have received a warm reception because
+3In this section, we discuss research that focuses primarily on firm–firm interactions. However, because researchers typically conduct investigations of competition in CMEs against a backdrop of significantly changed consumer behavior, some articles discussed previously in the context of consumer–firm interactions are also relevant here (e.g., Lynch and Ariely 2000).
+
+Marketing in Computer-Mediated Environments / 33
+
+of their laser-sharp focus on creating significant gains in efficiency in the wholesale apparel procurement process. As such, they represent a fertile ground for new research on how CMEs are reshaping firm–firm interactions.
+The second gap pertains to the increasingly significant role of the platforms on which many firm–firm interactions now occur.4 Consider, for example, the bevy of recent innovations aimed at controlling point-of-purchase devices that connect credit card companies and merchants in retail establishments. Square, an exemplar of such innovations, began by creating hardware/software that enabled merchants to use relatively inexpensive iPads to process credit cards. Initiatives such as Google Wallet and Samsung Wallet are other app-based interfaces that aim to provide similar functionality. These firms are attempting to create and control emerging platforms for transaction processing in CMEs. Technological infrastructure developments such as cloud computing and third-party platforms have lowered entry costs, enabling a larger array of firms to compete with one another.
+Finally, new ground is being broken in terms of how firms are using reverse auctions to facilitate firm–firm interactions. In a departure from the typical context studied in marketing (i.e., procurement), creative new applications of reverse auctions in the area of sustainability and environmental protection are emerging. For example, World Resources Institute’s NutrientNet system uses online reverse auctions to reduce water pollution. In pilot tests, farmers bid for the opportunity to obtain state-provided funding to reduce pollutants in water runoff from their properties. Thus, NutrientNet serves as a market-based mechanism to identify farmers who can reduce pollutants at the lowest cost to taxpayers. Research in marketing on reverse auctions can be used to further develop these innovative approaches for addressing issues related to sustainability and the environment.
+Theory development opportunities. We identified three gaps in the literature: the emergence of new intermediaries in B2B marketplaces, platform-based competition, and new types of reverse auctions. We next discuss theory development opportunities for each gap.
+First, to address gaps related to interorganizational shifts that result from new types of intermediaries, research needs to focus more closely on concepts such as external and internal coordination costs that lie at the heart of transaction cost analysis and agency theory (Gurbaxani and Whang 1991). These theories have a rich tradition in the marketing literature (Bergen, Dutta, and Walker 1992; Rindfleisch and Heide 1997) and can be productively applied not only to explore the aforementioned issues but also to develop them further. For example, extant transaction cost analysis literature has not adequately studied the effects of transaction frequency (Rindfleisch and Heide 1997). In CMEs, improved data availability can facilitate the study of transaction frequency’s hypothesized effect
+4Firm–consumer interactions also occur on these platforms. We return to this issue when we discuss competition-related issues pertaining to two-sided markets.
+
+(increased reliance on hierarchical governance). Similarly, improved data availability in CMEs can facilitate the application and continued development of agency theory (e.g., an agent’s actions can be monitored more readily and at a lower cost). Collectively, these explorations can provide additional insights into the emergence of new infomediaries, disintermediation (the elimination or significant curtailment of the role played by intermediaries), and marketplace outcomes (see Baye and Morgan 2001).
+The second opportunity pertains to advancing the theory of two-sided markets (Rochet and Tirole 2003) by integrating concepts and evidence from the marketing literature. Two-sided markets (e.g., credit card systems) capture features of competitive contexts frequently encountered in CMEs: a third party creates a platform that facilitates transactions between two groups of entities. Some of the aforementioned emerging digital, platform-based initiatives (e.g., Square) are examples of competitive contexts that researchers can explore from the perspective of two-sided markets. The effective management of a platform requires careful attention to several strategic issues (Eisenmann, Parker, and Van Alstyne 2011): (1) which “side” should be subsidized (on the basis of differences in price sensitivity), (2) the threat of “envelopment” from a rival platform that can usurp customers from one or both sides of an existing platform, and (3) whether multiple platforms can coexist. Although many theory-building opportunities exist, marketing research can advance the study of competition in twosided markets by focusing on the role of market-based assets (see Srivastava, Shervani, and Fahey 1998). Eisenmann, Parker, and Van Alstyne (2011) suggest that the resource-based view can provide insights into a firm’s ability to retain control of a platform. This general argument needs to be fleshed out in greater detail by examining how specific market-based assets discussed in the marketing literature could be applied to study two-sided markets. For example, a platform provider may have specific relational assets (e.g., brands) and intellectual assets (e.g., knowledge about one or both “sides” of the market) that could diminish the likelihood of envelopment by a competing platform.
+Third, in the area of B2B auctions, theory development efforts are needed on three fronts. First, as the use of reverse auctions expands to nonprocurement contexts such as environmental protection, it may be useful to develop a broader array of performance outcomes (e.g., increased participation) that may be more appropriate than those typically examined (e.g., lower procurement prices). Second, to extend current theory development initiatives, a specific research issue is reverse auctions’ ability to direct attention at certain long-term relationships that may have outlived their usefulness. Reverse auctions with price transparency may lead to opportunistic behaviors (Jap 2003, 2007), but a relatively less explored perspective is that such auctions may also bring to the fore certain weaknesses of existing long-term suppliers (e.g., price levels of existing suppliers could be substantially higher for identical products). Third, going beyond relationship considerations, reverse auction research in marketing must also focus on less examined topics such as marketplace efficiency gains (see Tadelis and
+
+34 / Journal of Marketing, January 2014
+
+Zettelmeyer 2010). Such gains result from auctions’ structural features that facilitate a closer match between buyers’ tastes/preferences and sellers’ product offerings, often creating new markets in the process.
+Toward a More Impactful Research Program
+Although much progress has been made, we believe that there is a pressing need to craft a more impactful research program on issues related to CMEs. In general, our field’s appetite to examine questions that have significant longterm implications for the future development of CMEs has been limited. As a result, marketing’s voice in shaping the ongoing dialog about CMEs has also been limited. Consider the deliberations of the U.S. Senate Subcommittee on Communications, Technology and the Internet. Since its inception in 2009, the agenda of this influential subcommittee has contained marketing topics related to CMEs (see www. commerce.senate.gov). However, a perusal of this subcommittee’s expert witness testimonies from 2009 to 2012 indicates that the field of marketing is conspicuous in its absence. A similar situation prevails at the U.S. House of Representatives’ Subcommittee on Communications and Technology. Although participation in these subcommittees is certainly not the sole barometer of an academic discipline’s influence, we strongly believe that our field, by virtue of its research, should strive for visibility in such forums. In this section, we briefly discuss three integrative research imperatives that encompass all four research foci and can serve as cornerstones for crafting a more impactful research program: we encourage the study of (1) the disruptive impact of CMEs, (2) complex interactions in CMEs, and (3) methodological innovations in CMEs.
+Disruptive Impact of CMEs
+Agendas of the aforementioned subcommittees highlight the need for a broader research program in marketing focusing on long-term marketplace changes and disruptions that stem from CMEs. There are growing signs that this issue is worthy of increased research attention. To illustrate, consider the phenomena of showrooming, crowdsourcing, and massive open online course offerings (also known as MOOCs). For example, CME-related trends such as showrooming (evaluating a product in a physical store but buying from a competing online store using a mobile device) have quickly evolved from niche novelties to significant competitive threats (Mattioli and Bustillo 2012). Some brickand-mortar retailers have responded with “geofencing,” which enables them to monitor (and even block) such electronic activity both inside and in the vicinity of their stores. The efficacy of such measures to prevent large-scale disruptions in the marketplace remains unclear. In the area of new product development, crowdsourcing initiatives such as Kickstarter and Quirky are providing entrepreneurs new avenues to solicit ideas and raise funds. The U.S. government has selected a crowdsourcing platform (ChallengePost) to spur and coordinate innovation. In education, massive open online courses are emerging as credible, potentially
+
+disruptive alternatives as a result of well-funded initiatives such as edX, Coursera, and Udacity (Finn 2012). Recent commentaries have suggested that, in general, most incumbent firms are unprepared for the full scope and depth of disruptions that may stem from such initiatives (Rigby 2011). Studying these and other CME-related disruptions in the marketplace should be an important priority. Christensen (1997) provides a useful framework for such work.
+Complex Interactions in CMEs
+In the future, we believe that the set of four dyadic interactions in CMEs (see Figure 1) will need to be expanded to consider more complex multiparty interactions. Indeed, in recent years, marketplace developments involving more complex linkages have begun to emerge. Consider, for example, Procter & Gamble’s (P&G) ambitious “Connect + Develop” initiative (see pgconnectdevelop.com). This initiative leverages CMEs to enhance growth and profitability by facilitating in-depth collaboration with customers, entrepreneurs, and other potential partners (Huston and Sakkab 2006). To implement this initiative, P&G simultaneously deploys not only the two-way linkages that are the focus of most current research effort but also a variety of significantly more complex linkages (e.g., among P&G, partner firms, even competitors). To guide research efforts aimed at understanding shifts toward more complex interactions in CMEs, it will become increasingly important to explore how the dyadic perspective of the organizing framework in the current research and in the extant marketing literature can be further enriched (see Varadarajan and Yadav 2002; Yadav and Varadarajan 2005a).
+A promising way to initiate the exploration of such frameworks is to begin with each of the four interactions depicted in Figure 1 and systematically add more complexity to that linkage. To illustrate, consider the following unexplored research avenues in which scholars can develop impactful new research:
+•Opening the mediated-communication “black box”: A more explicit focus on how technology actually mediates interactions in CMEs would be useful for advancing marketing research. Thus far, the marketing literature has adopted a black box approach to the issue of technology mediation, which means that relatively little attention has been placed on understanding the nature of technology-mediated communication (though extant research on network navigation represents some initial progress in this regard). This lack of emphasis remains a crucial weakness of the literature stream; at its core, research on CMEs is about understanding differences between mediated and nonmediated communication in the marketplace. A rich body of literature in information science (see Nass and Yen 2010; Walther, Anderson, and Park 1994) has remained largely untapped in marketing.
+•Going beyond the dyad: Further research should enrich the study of consumer–consumer interactions in CMEs by adding firm-specific considerations to the dyad. For example, in online brand communities, how should firms manage the right “distance” from consumer–consumer interactions so that the spontaneity of discussions is not affected and firms’ motivations are not questioned? Researchers could further enrich the study of firm–firm interactions in CMEs by adding consumer-specific considerations. For example, how does
+
+Marketing in Computer-Mediated Environments / 35
+
+consumers’ brand loyalty shape platform-based competition in two-sided markets in CMEs?
+•Leveraging constructs within and across CME interactions: As research on CMEs develops further, scholars can facilitate the study of more complex interactions by systematically identifying opportunities to leverage constructs both within and across the four research foci. For example, Ariely’s (2000) “information control” construct and process-related insights (see Diehl, Kornish, and Lynch 2003; Lynch and Ariely 2000) could inform the modeling and strategic analysis of recommendation systems (e.g., Bodapati 2008). The “consumer readiness” construct (Meuter et al. 2005) could help address an unresolved issue in online brand communities: why people participate (or do not participate) in these environments.
+Methodological Innovations in CMEs
+In this article, we highlight a range of research questions for advancing our understanding of CMEs. To facilitate empirical work on these and related research questions, there is a need to develop methodological innovations on three fronts: new data, new designs, and new models.
+•New data: New tools in CMEs can provide increased realtime visibility about consumer- and firm-specific activities in the marketplace (see Brown, Chui, and Manyika 2011). Such tools are likely to shape both the type and the amount of data available to researchers. In general, as industry–academic collaborations continue to evolve, more fine-grained, process-related data regarding consumers’ and firms’ activities in CMEs will become available. In addition, the amount of available data will increase exponentially, creating a phenomenon aptly labeled “big data” (Brown, Chui, and Manyika 2011). These enhanced data capabilities provide numerous methodological advantages (see Johnson 2001) but may also require new designs and models.
+•New designs: Four opportunities are worth noting. First, CMEs can be used to facilitate the efficient implementation of studies based on traditional designs (e.g., Amazon.com’s Mechanical Turk service). Second, researchers can use field experiments to manipulate marketing activities in more real-
+
+istic settings (e.g., on a firm’s website designed for beta testing). Third, multimethod studies (e.g., a clickstream-tracking study combined with netnography methods; Kozinets 2002) can enhance external validity. Fourth, the increased ability to implement longitudinal designs in CMEs (Johnson 2001) offers the ability to track individual people over time and conduct stronger tests of underlying causal mechanisms.
+•New models: Closed-form analytical models (see Moorthy 1993) frequently appear in the literature on CMEs. Such models, where feasible, can continue to be used as needed. However, the availability of large data sets in CMEs suggests other model development and testing possibilities. When a phenomenon is too complex or insufficiently understood to provide the delineation of all relevant variables, large-scale simulations or data-mining techniques can provide valuable insights that can guide subsequent experimentation, theory development, and practice (e.g., Brown, Chui, and Manyika 2011).
+Conclusion
+Although much progress has been made, the literature on marketing in CMEs remains fragmented, and numerous gaps need to be addressed. In this article, we aim to organize, synthesize, and critique the evidence from the extensive, rapidly increasing body of research in marketing that focuses on CMEs. To facilitate this endeavor, we propose a framework that parsimoniously organizes the complex literature. The framework is structured around four major research foci, each pertaining to a specific type of technology-enabled interaction in CMEs. We demonstrate the usefulness of the proposed framework in identifying specific gaps in the literature relative to emerging practices and trends and discuss theory development opportunities that pertain to these trends. Finally, we present a proposal for moving toward an integrative, more impactful research program. Collectively, we believe that these research efforts are essential for advancing the next generation of scholarship in this area of increasing significance for marketing.
+
+REFERENCES
+Achrol, Ravi S. and Philip Kotler (1999), “Marketing in the Network Economy,” Journal of Marketing, 63 (October), 146–63.
+Acquisti, Alessandro and Hal R. Varian (2005), “Conditioning Prices on Purchase History,” Marketing Science, 24 (3), 367–81.
+Alba, Joseph, John G. Lynch, Barton Weitz, Chris Janiszewski, Richard Lutz, Alan Sawyer, et al. (1997), “Interactive Home Shopping: Consumer, Retailer, and Manufacturer Incentives to Participate in Electronic Marketplaces,” Journal of Marketing, 61 (July), 38–53.
+Anderson, Chris (2008), The Long Tail: Why the Future of Business Is Selling Less of More. New York: Hyperion.
+Ansari, Asim, Skander Essegaier, and Rajeev Kohli (2000), “Internet Recommendation Systems,” Journal of Marketing Research, 37 (August), 363–75.
+——— and Carl F. Mela (2003), “E-Customization,” Journal of Marketing Research, 40 (May), 131–45.
+———, ———, and Scott A. Neslin (2008), “Customer Channel Migration,” Journal of Marketing Research, 45 (February), 60–76.
+Ariely, Dan (2000), “Controlling the Information Flow: Effects on Consumers’ Decision Making and Preferences,” Journal of Consumer Research, 27 (2), 233–48.
+
+———, John G. Lynch, and Manuel Aparicio IV (2004), “Learning by Collaborative and Individual-Based Recommendation Agents,” Journal of Consumer Psychology, 14 (1/2), 81–95.
+Bakos, Yannis and Erik Brynjolfsson (2000), “Bundling and Competition on the Internet,” Marketing Science, 19 (1), 63–82.
+Balasubramanian, Sridhar (1998), “Mail Versus Mall: A Strategic Analysis of Competition Between Direct Marketers and Conventional Retailers,” Marketing Science, 17 (3), 181–95.
+Bart, Yakov, Venkatesh Shankar, Fareena Sultan, and Glen L. Urban (2005), “Are the Drivers and Role of Online Trust the Same for All Web Sites and Consumers? A Large-Scale Exploratory Empirical Study,” Journal of Marketing, 69 (October), 133–52.
+Baye, Michael R. and John Morgan (2001), “Information Gatekeepers on the Internet and the Competitiveness of Homogeneous Product Markets,” American Economic Review, 91 (3), 454–74.
+Bergen, Mark, Shantanu Dutta, and Orville C. Walker Jr. (1992), “Agency Relationships in Marketing: A Review of the Implications and Applications of Agency and Related Theories,” Journal of Marketing, 56 (July), 1–24.
+
+36 / Journal of Marketing, January 2014
+
+Berger, Jonah (2013), “Word-of-Mouth and Interpersonal Communication: An Organizing Framework and Directions for Future Research,” working paper, Wharton School, University of Pennsylvania.
+——— and Katherine L. Milkman (2012), “What Makes Online Content Viral?” Journal of Marketing Research, 49 (April), 192–205.
+Berlo, David K. (1960), The Process of Communication: An Introduction to Theory and Practice. New York: Holt, Rinehart and Winston.
+Bodapati, Anand V. (2008), “Recommendation Systems with Purchase Data,” Journal of Marketing Research, 45 (February), 77–93.
+Bonfrer, Andre and Xavier Drèze (2009), “Real-Time Evaluation of E-mail Campaign Performance,” Marketing Science, 28 (2), 251–63.
+Bradlow, Eric T. and Young-Hoon Park (2007), “Bayesian Estimation of Bid Sequences in Internet Auctions Using a Generalized Record-Breaking Model,” Marketing Science, 26 (2), 218–29.
+——— and David C. Schmittlein (2000), “The Little Engines That Could: Modeling the Performance of World Wide Web Search Engines,” Marketing Science, 19 (1), 43–62.
+Brown, Brad, Michael Chui, and James Manyika (2011), “Are You Ready for the Era of ‘Big Data’?” McKinsey Quarterly, (October), (accessed September 26, 2013), [available at http://www.mckinsey.com/insights/strategy/are_you_ready_for _the_era_of_big_data].
+Bucklin, Randolph E. and Catarina Sismeiro (2003), “A Model of Web Site Browsing Behavior Estimated on Clickstream Data,” Journal of Marketing Research, 40 (August), 249–67.
+Campbell, Margaret C. and Kevin Lane Keller (2003), “Brand Familiarity and Advertising Repetition Effects,” Journal of Consumer Research, 30 (2), 292–304.
+Chan, Tat Y., Vrinda Kadiyali, and Young-Hoon Park (2007), “Willingness to Pay and Competition in Online Auctions,” Journal of Marketing Research, 44 (May), 324–33.
+Chatterjee, Patrali, Donna L. Hoffman, and Thomas P. Novak (2003), “Modeling the Clickstream: Implications for WebBased Advertising Efforts,” Marketing Science, 22 (4), 520– 41.
+Cheema, Amar (2008), “Surcharges and Seller Reputation,” Journal of Consumer Research, 35 (1), 167–77.
+Chen, Jianqing, De Liu, and Andrew B. Whinston (2009), “Auctioning Keywords in Online Search,” Journal of Marketing, 73 (July), 125–41.
+Chen, Yuxin, Ganesh Iyer, and V. Padmanabhan (2002), “Referral Infomediaries,” Marketing Science, 21 (4), 412–34.
+Chernev, Alexander (2006), “Articulation Compatibility in Eliciting Price Bids,” Journal of Consumer Research, 33 (3), 329– 41.
+Chevalier, Judith A. and Dina Mayzlin (2006), “The Effect of Word of Mouth on Sales: Online Book Reviews,” Journal of Marketing Research, 43 (August), 345–54.
+Christensen, Clayton M. (1997), The Innovator’s Dilemma: When New Technologies Cause Great Firms to Fail. Boston: Harvard Business School Press.
+Chu, Junhong, Pradeep Chintagunta, and Javier Cebollada (2008), “A Comparison of Within-Household Price Sensitivity Across Online and Offline Channels,” Marketing Science, 27 (2), 283– 99.
+Chung, Tuck Siong, Roland T. Rust, and Michel Wedel (2009), “My Mobile Music: An Adaptive Personalization System for Digital Audio Players,” Marketing Science, 28 (1), 52–68.
+Cotte, June and Kathryn A. LaTour (2009), “Blackjack in the Kitchen: Understanding Online Versus Casino Gambling,” Journal of Consumer Research, 35 (5), 742–58.
+
+Daft, Richard L. and Robert H. Lengel (1986), “Organizational Information Requirements, Media Richness, and Structural Design,” Management Science, 32 (5), 554–71.
+Danaher, Peter J. (2002), “Optimal Pricing of New Subscription Services: Analysis of a Market Experiment,” Marketing Science, 21 (2), 119–38.
+———, Guy W. Mullarkey, and Skander Essegaier (2006), “Factors Affecting Web Site Visit Duration: A Cross-Domain Analysis,” Journal of Marketing Research, 43 (May), 182–94.
+Day, George S. (1994), “The Capabilities of Market-Driven Organizations,” Journal of Marketing, 58 (October), 37–52.
+Dennis, Alan R., Robert M. Fuller, and Joseph S. Valacich (2008), “Media, Tasks, and Communication Processes: A Theory of Media Synchronicity,” MIS Quarterly, 32 (3), 575–600.
+Dholakia, Utpal M. and Itamar Simonson (2005), “The Effect of Explicit Reference Points on Consumer Choice and Online Bidding Behavior,” Marketing Science, 24 (2), 206–217.
+Dickson, Peter R. (2000), “Understanding the Trade Winds: The Global Evolution of Production, Consumption, and the Internet,” Journal of Consumer Research, 27 (1), 115–22.
+Diehl, Kristin (2005), “When Two Rights Make a Wrong: Searching Too Much in Ordered Environments,” Journal of Marketing Research, 42 (August), 313–22.
+———, Laura J. Kornish, and John G. Lynch (2003), “Smart Agents: When Lower Search Costs for Quality Information Increase Price Sensitivity,” Journal of Consumer Research, 30 (1), 56–71.
+Dierickx, Ingemar and Karel Cool (1989), “Asset Stock Accumulation and Sustainability of Competitive Advantage,” Management Science, 35 (12), 1504–1511.
+Edelman, David C. (2010), “Branding in the Digital Age,” Harvard Business Review, 88 (12), 62–69.
+Eisenmann, Thomas, Geoffrey Parker, and Marshall Van Alstyne (2011), “Platform Envelopment,” Strategic Management Journal, 32 (12), 1270–85.
+Fay, Scott (2004), “Partial-Repeat-Bidding in the Name-YourOwn-Price Channel,” Marketing Science, 23 (3), 407–418.
+Finn, Holly (2012), “Watching the Ivory Tower Topple,” The Wall Street Journal, (March 23), (accessed September 26, 2013), [available at http://online.wsj.com/article/SB10001424052702 304636404577293430981335366.html].
+Fitzsimons, Gavan J. and Donald R. Lehmann (2004), “Reactance to Recommendations: When Unsolicited Advice Yields Contrary Responses,” Marketing Science, 23 (1), 82–94.
+Gal-Or, Esther and Mordechai Gal-Or (2005), “Customized Advertising via a Common Media Distributor,” Marketing Science, 24 (2), 241–53.
+Geyskens, Inge, Katrijn Gielens, and Marnik G. Dekimpe (2002), “The Market Valuation of Internet Channel Additions,” Journal of Marketing, 66 (April), 102–119.
+Glazer, Rashi (1991), “Marketing in an Information-Intensive Environment: Strategic Implications of Knowledge as an Asset,” Journal of Marketing, 55 (October), 1–19.
+Godes, David and Dina Mayzlin (2004), “Using Online Conversations to Study Word-of-Mouth Communication,” Marketing Science, 23 (4), 545–60.
+Gorn, Gerald J., Amitava Chattopadhyay, Jaideep Sengupta, and Shashank Tripathi (2004), “Waiting for the Web: How Screen Color Affects Time Perception,” Journal of Marketing Research, 41 (May), 215–25.
+Grewal, Rajdeep, James M. Comer, and Raj Mehta (2001), “An Investigation into the Antecedents of Organizational Participation in Business-to-Business Electronic Markets,” Journal of Marketing, 65 (July), 17–33.
+Gurbaxani, Vijay and Seungjin Whang (1991), “The Impact of Information Systems on Organizations and Markets,” Communications of the ACM, 34 (1), 59–73.
+
+Marketing in Computer-Mediated Environments / 37
+
+Han, Jin K., Seh Woong Chung, and Yong Seok Sohn (2009), “Technology Convergence: When Do Consumers Prefer Converged Products to Dedicated Products?” Journal of Marketing, 73 (July), 97–108.
+——— and Valerie Trifts (2000), “Consumer Decision Making in Online Shopping Environments: The Effects of Interactive Decision Aids,” Marketing Science, 19 (1), 4–21.
+Hauser, John R., Glen L. Urban, Guilherme Liberali, and Michael Braun (2009), “Website Morphing,” Marketing Science, 28 (2), 202–223.
+Haws, Kelly L. and William O. Bearden (2006), “Dynamic Pricing and Consumer Fairness Perceptions,” Journal of Consumer Research, 33 (3), 304–311.
+Hay, Timothy (2013), “A New Game for Microsoft’s Kinect,” The Wall Street Journal, (March 18), (accessed September 26, 2013), [available at http://online.wsj.com/article/ SB10001424127887323393304578362322803980886.html].
+He, Chuan and Yuxin Chen (2006), “Managing e-Marketplace: A Strategic Analysis of Nonprice Advertising,” Marketing Science, 25 (2), 175–87.
+Hennig-Thurau, Thorsten, Victor Henning, and Henrik Sattler (2007), “Consumer File Sharing of Motion Pictures,” Journal of Marketing, 71 (October), 1–18.
+Hoffman, Donna L. and Thomas P. Novak (1996), “Marketing in Hypermedia Computer-Mediated Environments: Conceptual Foundations,” Journal of Marketing, 60 (July), 50–68.
+Holzwarth, Martin, Chris Janiszewski, and Marcus M. Neumann (2006), “The Influence of Avatars on Online Consumer Shopping Behavior,” Journal of Marketing, 70 (October), 19–36.
+Hoque, Abeer Y. and Gerald L. Lohse (1999), “An Information Search Cost Perspective for Designing Interfaces for Electronic Commerce,” Journal of Marketing Research, 36 (August), 387–94.
+Howard, John A. and Jagdish N. Sheth (1969), The Theory of Buyer Behavior. New York: John Wiley & Sons.
+Huang, Peng, Nicholas H. Lurie, and Sabyasachi Mitra (2009), “Searching for Experience on the Web: An Empirical Examination of Consumer Behavior for Search and Experience Goods,” Journal of Marketing, 73 (March), 55–69.
+Hui, Sam K., Peter S. Fader, and Eric T. Bradlow (2009), “Path Data in Marketing: An Integrative Framework and Prospectus for Model Building,” Marketing Science, 28 (2), 320–35.
+Hult, Thomas G., Martin Reimann, and Oliver Schilke (2009), “Worldwide Faculty Perceptions of Marketing Journals: Rankings, Trends, Comparisons, and Segmentations,” GlobalEdge Business Review, 3 (3), 1–23.
+Huston, Larry and Nabil Sakkab (2006), “Connect and Develop: Inside Procter & Gamble’s New Model for Innovation,” Harvard Business Review, 84 (3), 58–66.
+Iyer, Ganesh and Amit Pazgal (2003), “Internet Shopping Agents: Virtual Co-Location and Competition,” Marketing Science, 22 (1), 85–106.
+Jain, Sanjay (2008), “Digital Piracy: A Competitive Analysis,” Marketing Science, 27 (4), 610–26.
+Jank, Wolfgang and P.K. Kannan (2005), “Understanding Geographical Markets of Online Firms Using Spatial Models of Customer Choice,” Marketing Science, 24 (4), 623–34.
+Jap, Sandy D. (2003), “An Exploratory Study of the Introduction of Online Reverse Auctions,” Journal of Marketing, 67 (July), 96–107.
+——— (2007), “The Impact of Online Reverse Auction Design on Buyer–Supplier Relationships,” Journal of Marketing, 71 (January), 146–59.
+——— and Ernan Haruvy (2008), “Interorganizational Relationships and Bidding Behavior in Industrial Online Reverse Auctions,” Journal of Marketing Research, 45 (October), 550–61.
+
+——— and Prasad A. Naik (2008), “BidAnalyzer: A Method for Estimation and Selection of Dynamic Bidding Models,” Marketing Science, 27 (6), 949–60.
+Johnson, Eric J. (2001), “Digitizing Consumer Research,” Journal of Consumer Research, 28 (2), 331–36.
+———, Steven Bellman, and Gerald L. Lohse (2003), “Cognitive Lock-In and the Power Law of Practice,” Journal of Marketing, 67 (April), 62–75.
+Kamins, Michael A., Xavier Drèze, and Valerie S. Folkes (2004), “Effects of Seller-Supplied Prices on Buyers’ Product Evaluations: Reference Prices in an Internet Auction Context,” Journal of Consumer Research, 30 (4), 622–28.
+Kannan, P.K., Barbara Kline Pope, and Sanjay Jain (2009), “Pricing Digital Content Product Lines: A Model and Application for the National Academies Press,” Marketing Science, 28 (4), 620–36.
+Kozinets, Robert V. (2002), “The Field Behind the Screen: Using Netnography for Marketing Research in Online Communities,” Journal of Marketing Research, 39 (February), 61–72.
+Kramer, Thomas (2007), “The Effect of Measurement Task Transparency on Preference Construction and Evaluations of Personalized Recommendations,” Journal of Marketing Research, 44 (May), 224–33.
+Kuksov, Dmitri (2004), “Buyer Search Costs and Endogenous Product Design,” Marketing Science, 23 (4), 490–99.
+Lal, Rajiv and Miklos Sarvary (1999), “When and How Is the Internet Likely to Decrease Price Competition?” Marketing Science, 18 (4), 485–503.
+Lee, Hyun-Jung, Jongwon Park, Jin-Yong Lee, and Robert S. Wyer (2008), “Disposition Effects and Underlying Mechanisms in E-Trading of Stocks,” Journal of Marketing Research, 45 (June), 362–78.
+Lee, Ruby P. and Rajdeep Grewal (2004), “Strategic Responses to New Technologies and Their Impact on Firm Performance,” Journal of Marketing, 68 (October), 157–71.
+Lehmann, Donald R. and Charles B. Weinberg (2000), “Sales Through Sequential Distribution Channels: An Application to Movies and Videos,” Journal of Marketing, 64 (July), 18–33.
+Lewis, Michael, Vishal Singh, and Scott Fay (2006), “An Empirical Study of the Impact of Nonlinear Shipping and Handling Fees on Purchase Incidence and Expenditure Decisions,” Marketing Science, 25 (1), 51–64.
+Li, Shibo, Kannan Srinivasan, and Baohong Sun (2009), “Internet Auction Features as Quality Signals,” Journal of Marketing, 73 (January), 75–92.
+Liang, Ting-Peng and Efraim Turban (2012), “Introduction to the Special Issue on Social Commerce: A Research Framework for Social Commerce,” International Journal of Electronic Commerce, 16 (2), 5–14.
+Liu, Yong (2006), “Word of Mouth for Movies: Its Dynamics and Impact on Box Office Revenue,” Journal of Marketing, 70 (July), 74–89.
+Luo, Xueming (2009), “Quantifying the Long-Term Impact of Negative Word of Mouth on Cash Flows and Stock Prices,” Marketing Science, 28 (1), 148–65.
+Lynch, John G. and Dan Ariely (2000), “Wine Online: Search Costs Affect Competition on Price, Quality, and Distribution,” Marketing Science, 19 (1), 83–102.
+MacInnis, Deborah J. (2011), “A Framework for Conceptual Contributions in Marketing,” Journal of Marketing, 75 (July), 136– 54.
+Manchanda, Puneet, Jean-Pierre Dubé, Khim Yong Goh, and Pradeep K. Chintagunta (2006), “The Effect of Banner Advertising on Internet Purchasing,” Journal of Marketing Research, 43 (February), 98–108.
+Mandel, Naomi and Eric J. Johnson (2002), “When Web Pages Influence Choice: Effects of Visual Primes on Experts and Novices,” Journal of Consumer Research, 29 (2), 235–45.
+
+38 / Journal of Marketing, January 2014
+
+Mathwick, Charla and Edward Rigdon (2004), “Play, Flow, and the Online Search Experience,” Journal of Consumer Research, 31 (2), 324–32.
+Mattioli, Dana and Miguel Bustillo (2012), “Can Texting Save Stores?” The Wall Street Journal, (May 8), (accessed September 27, 2013), [available at http://online.wsj.com/article/ SB10001424052702303978104577362403804858504.html].
+Mayzlin, Dina (2006), “Promotional Chat on the Internet,” Marketing Science, 25 (2), 155–63.
+McGrath, Joseph E. and David Brinberg (1983), “External Validity and the Research Process: A Comment on the Calder/Lynch Dialogue,” Journal of Consumer Research, 10 (1), 115–24.
+Meuter, Matthew L., Mary Jo Bitner, Amy L. Ostrom, and Stephen W. Brown (2005), “Choosing Among Alternative Service Delivery Modes: An Investigation of Customer Trial of SelfService Technologies,” Journal of Marketing, 69 (April), 61– 83.
+Mick, David Glen and Susan Fournier (1998), “Paradoxes of Technology: Consumer Cognizance, Emotions, and Coping Strategies,” Journal of Consumer Research, 25 (2), 123–43.
+Moe, Wendy W. (2006), “An Empirical Two-Stage Choice Model with Varying Decision Rules Applied to Internet Clickstream Data,” Journal of Marketing Research, 43 (November), 680– 92.
+——— and Sha Yang (2009), “Inertial Disruption: The Impact of a New Competitive Entrant on Online Consumer Search,” Journal of Marketing, 73 (January), 109–121.
+Montgomery, Alan L., Li Shibo, Kannan Srinivasan, and John C. Liechty (2004), “Modeling Online Browsing and Path Analysis Using Clickstream Data,” Marketing Science, 23 (4), 579–95.
+Moon, Youngme (2000), “Intimate Exchanges: Using Computers to Elicit Self-Disclosure from Consumers,” Journal of Consumer Research, 26 (4), 323–39.
+Moorthy, K. Sridhar (1993), “Theoretical Modeling in Marketing,” Journal of Marketing, 57 (April), 92–106.
+Moreau, C. Page and Kelly B. Herd (2010), “To Each His Own? How Comparisons with Others Influence Consumers’ Evaluations of Their Self-Designed Products,” Journal of Consumer Research, 36 (5), 806–819.
+Morwitz, Vicki G., Eric A. Greenleaf, and Eric J. Johnson (1998), “Divide and Prosper: Consumers’ Reactions to Partitioned Prices,” Journal of Marketing Research, 35 (November), 453– 63.
+Murray, Kyle B. and Gerald Häubl (2009), “Personalization Without Interrogation: Towards More Effective Interactions Between Consumers and Feature-Based Recommendation Agents,” Journal of Interactive Marketing, 23 (2), 138–46.
+Nass, Clifford and Corina Yen (2010), The Man Who Lied to His Laptop: What Machines Teach Us About Human Relationships. New York: Penguin.
+Norman, Donald (1988), The Design of Everyday Things. New York: Basic Books.
+Novak, Thomas P., Donna L. Hoffman, and Yiu-Fai Yung (2000), “Measuring the Customer Experience in Online Environments: A Structural Modeling Approach,” Marketing Science, 19 (1), 22–42.
+Oestreicher-Singer, Gal and Arun Sundararajan (2012), “Recommendation Networks and the Long Tail of Electronic Commerce,” MIS Quarterly, 36 (1), 65–84.
+Park, Young-Hoon and Eric T. Bradlow (2005), “An Integrated Model for Bidding Behavior in Internet Auctions: Whether, Who, When, and How Much,” Journal of Marketing Research, 42 (November), 470–82.
+——— and Peter S. Fader (2004), “Modeling Browsing Behavior at Multiple Websites,” Marketing Science, 23 (3), 280–303.
+Pauwels, Koen and Allen Weiss (2008), “Moving from Free to Fee: How Online Firms Market to Change Their Business Model Successfully,” Journal of Marketing, 72 (May), 14–31.
+
+Pazgal, Amit and David Soberman (2008), “Behavior-Based Discrimination: Is It a Winning Play, and If So, When?” Marketing Science, 27 (6), 977–94.
+Peck, Joann and Terry L. Childers (2003), “To Have and To Hold: The Influence of Haptic Information on Product Judgments,” Journal of Marketing, 67 (April), 35–48.
+Prins, Remco and Peter C. Verhoef (2007), “Marketing Communication Drivers of Adoption Timing of a New E-Service Among Existing Customers,” Journal of Marketing, 71 (April), 169–83.
+Ramani, Girish and V. Kumar (2008), “Interaction Orientation and Firm Performance,” Journal of Marketing, 72 (January), 27– 45.
+Ratchford, Brian T., Myung-Soo Lee, and Debabrata Talukdar (2003), “The Impact of the Internet on Information Search for Automobiles,” Journal of Marketing Research, 40 (May), 193– 209.
+———, Debabrata Talukdar, and Myung-Soo Lee (2007), “The Impact of the Internet on Consumers’ Use of Information Sources for Automobiles: A Re-Inquiry,” Journal of Consumer Research, 34 (1), 111–19.
+Rigby, Darrell (2011), “The Future of Shopping,” Harvard Business Review, 89 (12), 65–76.
+Rindfleisch, Aric and Jan B. Heide (1997), “Transaction Cost Analysis: Past, Present, and Future Applications,” Journal of Marketing, 61 (October), 30–54.
+Rochet, Jean Charles and Jean Tirole (2003), “Platform Competition in Two-Sided Markets,” Journal of European Economic Association, 1 (4), 990–1029.
+Schau, Hope Jensen and Mary C. Gilly (2003), “We Are What We Post? Self-Presentation in Personal Web Space,” Journal of Consumer Research, 30 (3), 385–404.
+Schlosser, Ann E. (2005), “Posting Versus Lurking: Communicating in a Multiple Audience Context,” Journal of Consumer Research, 32 (2), 260–65.
+——— (2006), “Learning Through Virtual Product Experience: The Role of Imagery on True Versus False Memories,” Journal of Consumer Research, 33 (3), 377–83.
+——— and Sharon Shavitt (2002), “Anticipating Discussion About a Product: Rehearsing What to Say Can Affect Your Judgments,” Journal of Consumer Research, 29 (1), 101–115.
+———, Tiffany Barnett White, and Susan M. Lloyd (2006), “Converting Web Site Visitors into Buyers: How Web Site Investment Increases Consumer Trusting Beliefs and Online Purchase Intentions,” Journal of Marketing, 70 (April), 133–48.
+Shaffer, Greg and Florian Zettelmeyer (2002), “When Good News About Your Rival Is Good for You: The Effect of Third-Party Information on the Division of Channel Profits,” Marketing Science, 21 (3), 273–93.
+Shocker, Allan D., Moshe Ben-Akiva, Bruno Boccara, and Prakash Nedungadi (1991), “Consideration Set Influences on Consumer Decision-Making and Choice: Issues, Models, and Suggestions,” Marketing Letters, 2 (3), 181–97.
+Sinha, Rajiv K. and Naomi Mandel (2008), “Preventing Digital Music Piracy: The Carrot or the Stick?” Journal of Marketing, 72 (January), 1–15.
+Sismeiro, Catarina and Randolph E. Bucklin (2004), “Modeling Purchase Behavior at an E-Commerce Web Site: A Task-Completion Approach,” Journal of Marketing Research, 41 (3), 306–323.
+Song, Ji Hee and George M. Zinkhan (2008), “Determinants of Perceived Web Site Interactivity,” Journal of Marketing, 72 (March), 99–113.
+Spann, Martin and Gerard J. Tellis (2006), “Does the Internet Promote Better Consumer Decisions? The Case of Name-Your-OwnPrice Auctions,” Journal of Marketing, 70 (January), 65–78.
+Srinivasan, Raji, Gary L. Lilien, and Arvind Rangaswamy (2002), “Technological Opportunism and Radical Technology Adoption: An Application to E-Business,” Journal of Marketing, 66 (July), 47–60.
+
+Marketing in Computer-Mediated Environments / 39
+
+——— and Christine Moorman (2005), “Strategic Firm Commitments and Rewards for Customer Relationship Management in Online Retailing,” Journal of Marketing, 69 (October), 193– 200.
+Srivastava, Rajenda K., Tasadduq A. Shervani, and Liam Fahey (1998), “Market-Based Assets and Shareholder Value: A Framework for Analysis,” Journal of Marketing, 62 (January), 2–18.
+Tadelis, Steven and Florian Zettelmeyer (2010), “The Effect of Information on Auction Outcomes: A Large Scale Field Experiment,” working paper, University of California, Berkeley.
+Tavasoli, Fitzsimons (2006), “Spoken and Typed Expressions of Repeated Attitudes: Matching Response Modes Leads to Attitude Retrieval Versus Construction,” Journal of Consumer Research, 33 (2), 179–87.
+Telang, Rahul, Peter Boatwright, and Tridas Mukhopadhyay (2004), “A Mixture Model for Internet Search-Engine Visits,” Journal of Marketing Research, 41 (November), 206–214.
+Theios, John and Paul C. Amrhein (1989), “Theoretical Analysis of the Cognitive Processing of Lexical and Pictorial Stimuli: Reading, Naming, and Visual and Conceptual Comparisons,” Psychological Review, 96 (1), 5–24.
+Thompson, Scott A. and Rajiv K. Sinha (2008), “Brand Communities and New Product Adoption: The Influence and Limits of Oppositional Loyalty,” Journal of Marketing, 72 (November), 65–80.
+Trope, Yaacov, Nira Liberman, and Cheryl Wakslak (2007), “Construal Levels and Psychological Distance: Effects on Representation, Prediction, Evaluation, and Behavior,” Journal of Consumer Psychology, 17 (2), 83–95.
+Trusov, Michael, Randolph E. Bucklin, and Koen Pauwels (2009), “Effects of Word-of-Mouth Versus Traditional Marketing: Findings from an Internet Social Networking Site,” Journal of Marketing, 73 (September), 90–102.
+Turkle, Sherry (2011), Alone Together: Why We Expect More from Technology and Less from Each Other. New York: Basic Books.
+Urban, Glen L. and John R. Hauser (2004), “‘Listening In’ to Find and Explore New Combinations of Customer Needs,” Journal of Marketing, 68 (April), 72–87.
+Varadarajan, P. Rajan and Manjit S. Yadav (2002), “Marketing Strategy and the Internet: An Organizing Framework,” Journal of the Academy of Marketing Science, 30 (4), 296–312.
+———, ———, and Venkatesh Shankar (2008), “First-Mover Advantage in an Internet-Enabled Market Environment: Conceptual Framework and Propositions,” Journal of the Academy of Marketing Science, 36 (3), 293–308.
+Villanueva, Julian, Shijin Yoo, and Dominique M. Hanssens (2008), “The Impact of Marketing-Induced Versus Word-ofMouth Customer Acquisition on Customer Equity Growth,” Journal of Marketing Research, 45 (February), 48–59.
+Walther, Joseph B., Jefferey F. Anderson, and David W. Park (1994), “Interpersonal Effects in Computer-Mediated Interaction: A Meta-Analysis of Social and Antisocial Communication,” Communication Research, 21 (4), 460–87.
+Ward, James C. and Amy L. Ostrom (2006), “Complaining to the Masses: The Role of Protest Framing in Customer-Created Complaint Web Sites,” Journal of Consumer Research, 33 (2), 220–30.
+Watts, Duncan J. and Peter Sheridan Dodds (2007), “Influentials, Networks, and Public Opinion Formation,” Journal of Consumer Research, 34 (4), 441–58.
+
+Weiss, Allen M., Nicholas H. Lurie, and Deborah J. MacInnis (2008), “Listening to Strangers: Whose Responses Are Valuable, How Valuable Are They, and Why?” Journal of Marketing Research, 45 (August), 425–36.
+Wilbur, Kenneth C. and Zhu Yi (2009), “Click Fraud,” Marketing Science, 28 (2), 293–308.
+Wood, Stacy L. (2001), “Remote Purchase Environments: The Influence of Return Policy Leniency on Two-Stage Decision Processes,” Journal of Marketing Research, 38 (May), 157–69.
+Wu, Dazhong, Gautam Ray, Geng Xianjun, and Andrew Whinston (2004), “Implications of Reduced Search Cost and Free Riding in E-Commerce,” Marketing Science, 23 (2), 255–62.
+Xie, Jinhong and Steven M. Shugan (2001), “Electronic Tickets, Smart Cards, and Online Prepayments: When and How to Advance Sell,” Marketing Science, 20 (3), 219–43.
+Yadav, Manjit S. (2010), “The Decline of Conceptual Articles and Implications for Knowledge Development,” Journal of Marketing, 74 (January), 1–19.
+———, Kristine de Valck, Thorsten Hennig-Thurau, Donna Hoffman, and Martin Spann (2013), “Social Commerce: A Contingency Framework for Assessing Marketing Potential,” Journal of Interactive Marketing, 27 (4), 311–23.
+———, Jaideep C. Prabhu, and Rajesh K. Chandy (2007), “Managing the Future: CEO Attention and Innovation Outcomes,” Journal of Marketing, 71 (October), 84–101.
+——— and Rajan Varadarajan (2005a), “Interactivity in the Electronic Marketplace: An Exposition of the Concept and Implications for Research,” Journal of the Academy of Marketing Science, 33 (4), 585–603.
+——— and ——— (2005b), “Understanding Product Migration to the Electronic Marketplace: A Conceptual Framework,” Journal of Retailing, 81 (2), 125–40.
+Yao, Song and Carl F. Mela (2008), “Online Auction Demand,” Marketing Science, 27 (5), 861–85.
+Ying, Yuanping, Fred Feinberg, and Michel Wedel (2006), “Leveraging Missing Ratings to Improve Online Recommendation Systems,” Journal of Marketing Research, 43 (August), 355– 65.
+Zauberman, Gal (2003), “The Intertemporal Dynamics of Consumer Lock-In,” Journal of Consumer Research, 30 (3), 405– 419.
+Zeithammer, Robert (2006), “Forward-Looking Bidding in Online Auctions,” Journal of Marketing Research, 43 (August), 462– 76.
+Zettelmeyer, Florian (2000), “Expanding to the Internet: Pricing and Communications Strategies When Firms Compete on Multiple Channels,” Journal of Marketing Research, 37 (August), 292–308.
+———, Fiona Scott Morton, and Jorge Silva-Risso (2006), “How the Internet Lowers Prices: Evidence from Matched Survey and Automobile Transaction Data,” Journal of Marketing Research, 43 (May), 168–81.
+Zhang, Jie and Lakshman Krishnamurthi (2004), “Customizing Promotions in Online Stores,” Marketing Science, 23 (4), 561– 78.
+——— and Michel Wedel (2009), “The Effectiveness of Customized Promotions in Online and Offline Stores,” Journal of Marketing Research, 46 (April), 190–206.
+
+40 / Journal of Marketing, January 2014
+

@@ -1,0 +1,294 @@
+2019 International Conference on Advanced Computing and Applications (ACOMP)
+
+Differential Privacy in Deep Learning:
+
+An Overview
+
+Trung Ha University of Information Technology
+VNU-HCM, Ho Chi Minh City Vietnam
+trunghlh@uit.edu.vn
+
+Tran Khanh Dang(✉), Tran Tri Dang, Tuan Anh Truong HCMC University of Technology
+VNU-HCM, Ho Chi Minh City, Vietnam {khanh, tridang, anhtt}@hcmut.edu.vn
+
+Manh Tuan Nguyen Advanced Computing Lab HCMUT/VNU-HCM, Vietnam
+tuannm7@gmail.com
+
+Abstract—Nowadays, deep learning has many applications in our daily life such as self-driving, product recommendation, advertisements and healthcare. In the training phase, deep learning models are trained on dataset of which the information privacy is stored locally through model parameters. The information privacy can in some cases be inferred from the parameters of model, and then traced back to uncover sensitive information. The privacy challenges are solved with many different anonymization methods such as k-anonymity, ldiversity, and t-closeness, which may not be sufficient anymore with unstructured data and inference attack. However, we argue that this problem can be solved by differential privacy. Differential privacy provides a mathematical framework that can be used to understand the extent to which a deep learning algorithm remembers information about individuals and be able to evaluate deep learning for privacy guarantees. In this paper, we review the threats and defenses on privacy models in deep learning, especially the differential privacy. We classify threats and defenses, and identify the points in deep learning to add random noises to input samples, gradient or function to protect privacy model.
+Keywords— Differential Privacy, Deep Learning, Neural Network, Threat, Defense, Loss Function, Collaborative Learning, Central Learning.
+I. INTRODUCTION
+In recent years, deep learning has led to impressive successes in a wide range of applications, such as image classification, image recognition, natural language processing, speech recognition, advertising, health risk prediction [19], and authentication biometrics [32]. From public awareness of data breaches and privacy violations in the deep learning model, we now see the necessary conditions for investment in privacy-preserving deep learning and access control models [33].
+Depending on the models of supervised, unsupervised and semi-supervised learning as well as the learning model organization used for solving problems in deep learning. There are two types of learning model organization such as: centralized learning and decentralized learning (collaborative learning) as illustrated in Fig. 1.
+
+personal data to server in many cases [16], and user privacy is not safety guaranteed. Server can infer sensitive information from user’s data, or the adversary attacks server to steal the personal information of user [8]. On the other hand, each client (individual, organization) in collaborative learning trains a batch locally, then receive the gradient from server and calculates the gradient that is applied to its weights to minimize the cost function. Then all the clients or a subset of them send their gradients to the parameter server, which reads all the client’s gradients, optimizes them and updates the model stored in the parameter server. We see that collaborative learning is also based on the idea of collecting and exchanging parameters, which code the raw data but it has the specific characteristics of the client’s dataset. This is a threat which is presented by Generative Adversarial Networks (GANs) [17], specially classified images into categories. GANs are trained to generate similar-looking sample to the training set, without actually having access to the victim data.
+In [30], Ji talked about lots of machine learning algorithms and applied differential privacy to prevent privacy violation, but the privacy in deep learning was told. In [31], Zhang who focused the architecture of collaborative deep learning and the issue one, presented two privacy preserving method such as: differential privacy and homomorphic encryption (homomorphic encryption which is an encryption method, permit arbitrary computations on encrypted data without decrypting it.). The author considers a malicious adversary that can the user, the server or both of all. The adversary attacks in training phase and testing phase. In Zang’s paper, we do not see detail attack scenarios as well as privacy guarantee. In this paper, we will review recent threat and defense research toward differential privacy in deep learning, and we classify some privacy preserving algorithms in deep learning that follow lost function, optimize function and based on the label of the sample.
+The next section reviews background on deep learning and on differential privacy. Section 3 and 4 describe the privacy threats and defenses in deep learning. Section 5 discusses the privacy issues and solutions in the future, and section 6 concludes.
+
+II. BACKGROUND
+
+a. Centralized learning
+
+b. Decentralized learning
+
+Fig. 1. Learning model organization
+
+Each model of learning has some issues, which appear in training and testing processes. In the training phase in centralized learning, server collects data from user to build the model. Users lose control over the data after uploading
+
+Deep learning models work in layers and a typical model at least has three layers which compose of input, hidden, and output layers. Each layer which connects each other, accepts the information from previous and passes it on to the next one. Each layer has many neural networks which find associations between a set of inputs and outputs as illustrated in Fig.2. Each neural network present as shown in equation (1):
+
+ 
+
+8   V ∑
+
+) 
+
+    
+
+978-1-7281-4723-9/19/$31.00 ©2019 IEEE
+
+97
+
+DOI 10.1109/ACOMP.2019.00022
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 02:54:46 UTC from IEEE Xplore. Restrictions apply.
+
+where n is total input; x is the ith input, w which are the ith weights, connect between input and output, σ is the activation function, and Y is the output.
+
+Fig. 2. General deep neural network training process [4]
+
+An input is sent to deep learning model, which response an output. To reach reliable levels of accuracy, models require large datasets (datasets compose of unstructured and structured data) to learn. In order to shield individual privacy in this context, differential privacy method has been used. Definition differential privacy: A randomize mechanism M: D Æ R with domain R and range R satisfies (ε, δ)-differential privacy if for any two adjacent inputs d, d’ ∈ D and for any subset of outputs S ⊆ R it holds that:
+
+ 
+
+5r>0 d   S@ d  H   5r>0 d’   S@   G 
+
+    
+
+where ε is the privacy budget that controls the privacy level, and δ allows for a small probability of failure.
+The smaller ε and δ are determined, the more similar M(d) and M(d’) are required to be as illustrated in Fig.3.[2]
+
+Fig. 4. Inference attack general [22]
+A. Inference Attack
+Inference attacks in deep learning fall into two fundamental categories, including tracing (membership inference) attacks and reconstruction attacks [27].
+In the reconstruction attacks category as illustrated in Fig. 5, the attacker’s objective is to extract training data from outputted model predictions. According to Fredrikson's experiment [8], the constructed model inversion attacks for deep models use the output of the model to infer certain features of the training set. Especially, in the facial recognition, [10] Fredrikson's research has shown that training data can be reconstructed from the model. It means that the principle behind model inversion uses features synthesized from the model to generate an input that maximizes the likelihood of being predicted with a certain label. Furthermore, in [16], the adversary’s objective is to train a substitute model F', that is capable of mimicking a target model F. To build model F’, it is based on leakage of information that is implemented in the extraction time. In model extraction, the adversary only has to access to the prediction API of a target model and query the target model iterative using “natural" or synthetic samples. These samples are specifically crafted to maximize the extraction of information about the model internals from the predictions returned by the model F.
+
+a. The system without the differential privacy framework
+b. The system with the differential privacy framework Fig. 3. Overview of the differential privacy framework
+III. THE THREATS IN DEEP LEARNING There are 2 types to leak personal information in deep learning: inference attacks as show in Fig. 4 and system organization as show in Fig. 8.
+
+Fig. 5. Reconstruction attack [26]
+In tracing attacks category, an adversary, who identifies input and output formats, is given black-box access to a target model without knowing its internal parameters, and wants to infer whether a particular record is included in the training set [20]. The authors transform the membership inference attack into a classification task [27]. There are three steps to implement on this attack, such as queries, collect data and building shadow models. In the first step, the adversary queries the target record t and uses the target classifiers’ predictions on t to infer the membership status of t. For each record t, there are two possible classes: class label “in”, which means that the record is in the training set, and class label “out”, which represents that the record is not in the training set. For the next step, the “shadow” training technique is built to use for the membership classification task. Multiple “shadow models” that are trained by the adversary use the same machine learning algorithm on records sampled from the data in the first step. These shadow models are used to simulate the behavior of the target model and generate a set of
+
+98 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 02:54:46 UTC from IEEE Xplore. Restrictions apply.
+
+training records with labeled membership information. Specifically, the adversary queries each shadow model with two sets of records, including the training set of the shadow model and a disjoint test set. For each record, a new feature vector is generated by concatenating the record’s original attributes with the shadow classifier’s predictions on that record. A new class label is created to reﬂect membership, i.e., “in” for records in the training set, “out” for records in the test set. In the final step, after using the labeled dataset, the adversary trains a model as “attack” classifier and uses it to infer the membership of a target record t as shown in Fig. 6.
+Fig. 6. Tracing attack [16]
+B. System Organization In the system organization, there are two privacy threats in
+deep learning architecture: central and collaborative learning system. For the central system, after companies provide deep learning models and services to the public such as machine learning as a service like Microsoft Azure Learning, Google, Amazon, BigML, etc [9]. Data owner send data to server and public model service to client. The adversary sends an input to public machine learning service and receives an output. Using the inputs and outputs pair, the attacker can train his own local model which is similar to the target model as illustrated in Fig. 7 [3].
+Fig. 7. The model extract attack in central learning system.
+In collaborative learning system, clients train a batch locally, and then calculates the gradient that is applied to its weights to minimize the cost function. Finally, it sends the gradient to the parameter server. If the adversary has taken the role of model server, they receive the client’s gradient. This is called “model steal attack”. In addition, the adversary has taken the role of participant, who attack to steal other participant information from the training set. This attack based on exploiting the real-time nature of model learning, which allows the adversary to train a GAN that generates prototypical samples of the private training set as illustrated in Fig.8 [17].
+
+Fig. 8. The threat in collaborative learning system.
+IV. THE DEFENSES BY DIFFERENTIAL PRIVACY IN DEEP LEARNING
+By applying differential privacy to the deep learning models, the training data can be protected from the inversion attacks or inference attacks when the model parameters are released. There are many research that utilize the differential privacy to deep learning models. Such methods assume that the training datasets and parameters of the model are the database and prove that their algorithms satisfy equation 2. Depending on where the noise is added as illustrated in Fig. 9, such approaches can be divided into three groups: gradientlevel, function-level, label-level.
+Fig. 9. Protect privacy in deep learning model
+A. Gradient-level The gradient level approach which injects noise into the
+gradients of the parameters in the client before sending to server, solve the issue in the collaborative learning as illustrated in Fig. 10 [31]. According to [11], [28], there are two proposed problems to improve Shokri’s approach, a Differential Private Stochastic Gradient Descent (DP-SGD) algorithm and the moment accountant to track the cumulative privacy loss. Specifically, the moment accountant algorithm considers privacy loss as a random variable and estimates the tail bound of it. There are many techniques to be utilized to DP-SGD, such as a differentially private generative model [21] which has a mixture of k generative neural networks such as restricted Boltzmann machine (RBM) [13] and variational autoencoder [7], the differentially private k-means clustering [1] by applying random Fourier features [6], the bathing method for mini-batch SGD [11], and concentrated differential privacy [12] to achieve tighter estimation for many iterations and dynamic privacy budget allocation mechanism to improve the performance.
+
+99 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 02:54:46 UTC from IEEE Xplore. Restrictions apply.
+
+Fig. 10. The collaborator learning architecture with Differential Private Stochastic Gradient Descent. W represents the parameter and G represents
+the gradient information
+B. Function-Level
+
+expansion is utilized to approximate the objective function to the polynomial form [18]. Phan [19] developed a novel mechanism, called Adaptive Laplace Mechanism (AdLM), which applies a functional mechanism that perturbs the objective function. These differential private actions are processed before training the model.
+C. Label-level
+Differently from the gradient and object levels, the labellevel approach injects noise into the knowledge transfer phase of the teacher-student framework as depicted in Fig. 12. For the label-level, it is suggested that the semi-supervised knowledge transfer model - the Private Aggregation of Teacher Ensembles (PATE) mechanism by Papernot [14] proposed. PATE is a type of teacher-student model, and its purpose is to train a differentially private classifier (student) based on an ensemble of non-private classifiers (teacher). Moreover, the moment accountant is utilized to trace the cumulated privacy budget in the learning process by PATE and PATE also ensures safety intuitively and in terms of the DP, respectively.
+
+Fig. 11. Simple schema of a basic Auto-Encoder
+There are many proposed issues related to objective function. For example, the differentially private logistic regression’s parameters of Monteleoni [17] are trained based on the perturbed objective function. Besides that, the deep private auto-encoder (dPA), which is differential private based on the functional mechanism, is proposed by Phan. Autoencoder which is the supervised deep learning, encodes the input values x, using a function f. It then decodes the encoded values f(x), using a function g, to create output values identical to the input values as depicted in Fig. 11. Auto-encoder’s objective is to minimize reconstruction error between the input and output by loss function or object function. This helps auto-encoder to learn important features of the input data. When a representation allows a good reconstruction of its input, then it has retained much of the information present in the input. It said that the sensitive information of the input data hide in the output of the auto-encoder model, and the guarantee privacy data is implemented by noising object function [15]. Phan also showed the private convolutional deep belief network (pCDBN) [5], and the Chebyshev
+
+Later, the PATE was extended to operate on a large scale environment by introducing a new noisy aggregation mechanism by Papernot [23]. It is shown that the improved PATE outperforms the original PATE on all measures and has high utility with a low privacy budget. Furthermore, Triastcyn and Faltings [24] applied the PATE to build the differential private GAN framework. By using PATE as a discriminator of GAN frameworks that a type of classifier determines whether the input data is real or fake, the generator trained with the discriminator is also differential private.
+Fig. 12. The Private Aggregation of Teacher Ensembles (PATE) mechanism
+In the summary, we show the main ideas, advantages and disadvantages of the defenses in order to compare, synthesize and help the later researches for identifying the issues to solve.
+
+TABLE I.
+
+THE MAIN IDEAS, ADVANTAGES AND DISADVANTAGES OF THE DEFENSES
+
+Defense Algorithm
+Approach
+
+Main Ideas
+
+Advantages
+
+Disadvantages
+
+DP-SDG [11]
+
+-To develop new algorithmic techniques for learning and a refined analysis of privacy costs within the framework of differential privacy.
+
+- To track privacy loss. - To automate analysis of the privacy loss. - To analyze of privacy costs.
+
+- Do not apply for more complex deep learning models.
+
+Gradientlevel
+
+DPGAN [25]
+
+- To add designed noise to gradients - To solve the issue in GANs. during the learning procedure for the diﬀerential privacy in GANs.
+
+- To inapplicate to more complex datasets without resorting to unrealistic assumptions, like access to public data from the same distribution.
+
+DPGM [21]
+
+- To show a technique for privately - To perturb the objective functions of these -To apply specific learning
+
+releasing generative models.
+
+autoencoders.
+
+model.
+
+100 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 02:54:46 UTC from IEEE Xplore. Restrictions apply.
+
+dPA [15]
+
+Functionlevel
+
+dCDBN [19]
+
+AdLM [17]
+
+- To model the generator distribution of the training data with a mixture of k generative neural networks.
+
+- Related to enforce H–differential privacy.
+- To perturb the objective functions of the traditional deep autoencoder.
+
+- Do not depend on the number of training epochs in consuming privacy budget.
+- To apply for non-linear activation functions.
+
+- To use only the objective functions – finite polynomials.
+
+- Related to enforcing H-differential privacy
+- To leverage the functional mechanism to perturb the energybased objective functions of traditional CDBNs.
+
+- To add more noise into input features which are less relevant to the model output.
+- Do not depend on the number of training step in the privacy budget comsumption.
+- To apply different activation functions.
+
+- To diminish the model’s accuracy for complex tasks.
+
+- To propose a novel mechanism, called Adaptive Laplace Mechanism (AdLM), to preserve differential privacy in deep learning.
+
+- To add more noise into input features which are less relevant to the model output.
+- Do not depend on the number of training step in the privacy budget comsumption.
+- To apply different activation functions.
+
+Labellevel
+
+PATE [14]
+
+- To provide strong privacy guarantees for training data: Private Aggregation of Teacher Ensembles (PATE).
+
+- Do not depend on the learning algorithm.
+
+-To obligate trust teacher model.
+
+V. DISCUSSION AND FUTURE WORKS In this paper, we review some the privacy issues in the deep learning, which are caused by the adversary in the learning system as depicted in Fig.13. The adversary has taken the role of model user, trainer model or owner model and training model participant. The adversary can use some attack techniques to steal the model and the sensitive information of the user, inference membership or reconstruction an input in the training dataset.
+a. Centralized learning system
+
+b. Collaborative learning system
+Fig. 13. The attacks positions in the learning system
+Depending on the knowledge and the process of participation of the adversary, the type of attack is white-box or black-box as shown in Table II.
+
+TABLE II.
+
+THE CLASSIFICATION ATTACK: BLACK-BOX AND WHITE-BOX
+
+Attack Steal the model
+
+Black-box White-box 3
+
+Reconstruction attack
+
+3
+
+Inference membership attack
+
+3
+
+Steal the sensitive information of the user
+
+3
+
+The defense approaches are used to guarantee privacy from the adversary in learning system as shown in Table III. The purpose of function-level and label-level the approaches noise output, which are suitable for combating data collection attacks and black-box attack such as inference attack, or stealing information. Model stealing attack which is described by Hitaj [17], is white-box attack. To prevent attackers from stealing model, gradient-level approach is used.
+
+TABLE III. THE DEFENSE APPROACH IN THE LEARNING SYSTEM
+
+Defense approach
+
+Algorithm
+
+Gradientlevel
+Functionlevel
+LabelLevel
+
+DP-SDG [11] DPGAN [25] DPGM [21] DP Model Publishing [28] dPA [15] dCDBN [19] AdLM [17] PATE [14] Scale Private Learning [23]
+
+Centralized learning system
+3 3 3 3 3
+
+Collaborative learning system
+3 3 3 3
+3 3 3 3 3
+
+The gradient-level approach has two weaknesses. First, this approach must trust parameter server completely. If the attacker is parameter server, the private information of the victim reveals by collecting and reversing the gradient descents of the members from parameter server in collaboration model [27], [31]. Second, the members in the collaborative learning model use the same model from the server to send. This is a problem which leads to one member being able to know the model architecture of other members.
+
+101 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 02:54:46 UTC from IEEE Xplore. Restrictions apply.
+
+In this case, the adversary is a member in the collaborative learning, who can attack a white-box approach to steal information from other members [17].
+However, we can apply each member in a learning model using a different privacy protection approach, the parameter server can aggregate the members' learning model contribution, and can still protect the privacy of the member’s model. It is similar to the aggregate teacher in the PATE approach, which is a special case in the label-level.
+VI. CONCLUSION
+Deep learning is used to extract useful information from data, while privacy is protected by hiding information, especially sensitive information. However, it seems hard to achieve these two objectives at the same time because the extracting information from data affects the privacy. Therefore, we reviewed the attack and defense techniques related to differential privacy to preserve the revealed information. We categorized the attack scenarios as inference attack and system organization, according to the data population and deep learning architecture. In addition, we also described three defense techniques for privacy model. They help to determine areas to add noise to protect privacy deep learning model.
+ACKNOWLEDGMENT
+This work is supported by a project with the Department of Science and Technology, Ho Chi Minh City, Vietnam (contract with HCMUT No. 08/2018/HĐ-QKHCN, dated 16/11/2018). We also thank all AC and D-STAR Labs members for their great supports and comments during the preparation of this paper.
+REFERENCES
+[1] Blum, A., Dwork, C., McSherry, F., & Nissim, K.: Practical privacy: the SuLQ framework. In Proceedings of the twenty-fourth ACM SIGMOD-SIGACT-SIGART symposium on Principles of database systems (pp. 128-138). ACM (2005).
+[2] Dwork, C.: Differential privacy: A survey of results. In International Conference on Theory and Applications of Models of Computation. Springer, 1–19 (2008).
+[3] Chaudhuri, K., & Monteleoni, C.: Privacy-preserving logistic regression. In Advances in neural information processing systems, pp. 289-296 (2009).
+[4] Bengio, Y.: Learning deep architectures for AI. Foundations and trends® in Machine Learning, vol. 2(1), pp. 1-127 (2009).
+[5] Lee, H., Grosse, R., Ranganath, R., & Ng, A. Y.: Convolutional deep belief networks for scalable unsupervised learning of hierarchical representations. In Proceedings of the 26th annual international conference on machine learning, pp. 609-616, ACM (2009).
+[6] Chitta, R., Jin, R., & Jain, A. K.: Efficient kernel clustering using random fourier features. In 2012 IEEE 12th International Conference on Data Mining, pp. 161-170, IEEE (2012).
+[7] Kingma, D. P., & Welling, M.: Auto-encoding variational bayes. arXiv preprint arXiv:1312.6114, (2013).
+[8] Fredrikson, M., Lantz, E., Jha, S., Lin, S., Page, D., & Ristenpart, T.: Privacy in pharmacogenetics: An end-to-end case study of personalized warfarin dosing. In 23rd Security Symposium, pp. 17-32 (2014).
+[9] Bach, S., Binder, A., Montavon, G., Klauschen, F., Müller, K. R., & Samek, W: On pixel-wise explanations for non-linear classifier decisions by layer-wise relevance propagation. PloS one, vol. 10(7), pp. e0130140, (2015).
+[10] Fredrikson, M., Jha, S., & Ristenpart, T.: Model inversion attacks that exploit confidence information and basic countermeasures. In Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security, pp. 1322-1333, ACM (2015).
+
+[11] Abadi, M., Chu, A., Goodfellow, I., McMahan, H. B., Mironov, I., Talwar, K., & Zhang, L.: Deep learning with differential privacy. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security, pp. 308-318, ACM (2016).
+[12] Bun, M., & Steinke, T.: Concentrated differential privacy: Simplifications, extensions, and lower bounds. In Theory of Cryptography Conference, pp. 635-658, Springer (2016).
+[13] Goodfellow, I., Bengio, Y., Courville, A., & Bengio, Y.: Deep learning. vol. 1. MIT press Cambridge (2016).
+[14] Papernot, N., Abadi, M., Erlingsson, U., Goodfellow, I., & Talwar, K.: Semi-supervised knowledge transfer for deep learning from private training data. arXiv preprint: 1610.05755 (2016).
+[15] Phan, N., Wang, Y., Wu, X., & Dou, D.: Differential privacy preservation for deep auto-encoders: an application of human behavior prediction. In 30th AAAI Conference on Artificial Intelligence (2016).
+[16] Tramèr, F., Zhang, F., Juels, A., Reiter, M. K., & Ristenpart, T.: Stealing machine learning models via prediction apis. In 25th Security Symposium, pp. 601-618 (2016).
+[17] Hitaj, B., Ateniese, G., & Perez-Cruz, F.: Deep models under the GAN: information leakage from collaborative deep learning. In Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security, pp. 603-618, ACM (2017).
+[18] Phan, N., Wu, X., Hu, H., & Dou, D.: Adaptive laplace mechanism: Differential privacy preservation in deep learning. In 2017 IEEE International Conference on Data Mining, pp. 385-394, IEEE (2017).
+[19] Phan, N., Wu, X., & Dou, D.: Preserving differential privacy in convolutional deep belief networks. Journal Machine learning, vol. 106(9-10), pp. 1681-1704, Springer (2017).
+[20] Shokri, R., Stronati, M., Song, C., & Shmatikov, V.: Membership inference attacks against machine learning models. In 2017 IEEE Symposium on Security and Privacy, pp. 3-18. IEEE (2017).
+[21] Acs, G., Melis, L., Castelluccia, C., & De Cristofaro, E.: Differentially private mixture of generative neural networks. IEEE Transactions on Knowledge and Data Engineering, vol. 31(6), pp. 1109-1121 (2018).
+[22] Long, Y., Bindschaedler, V., Wang, L., Bu, D., Wang, X., Tang, H., & Chen, K.: Understanding membership inferences on well-generalized learning models. arXiv preprint: 1802.04889 (2018).
+[23] Papernot, N., Song, S., Mironov, I., Raghunathan, A., Talwar, K., & Erlingsson, Ú.: Scalable private learning with pate. arXiv preprint: 1802.08908 (2018).
+[24] Triastcyn, A., & Faltings, B.: Generating differentially private datasets using gans. arXiv preprint arXiv:1803.03148 (2018).
+[25] Xie, L., Lin, K., Wang, S., Wang, F., & Zhou, J.: Differentially private generative adversarial network. arXiv preprint: 1802.06739 (2018).
+[26] Yeom, S., Giacomelli, I., Fredrikson, M., & Jha, S.: Privacy risk in machine learning: Analyzing the connection to overfitting. In 2018 IEEE 31st Computer Security Foundations Symposium, pp. 268-282, IEEE (2018).
+[27] Nasr, M., Shokri, R., & Houmansadr, A.: Comprehensive privacy analysis of deep learning: Passive and active ưhite-box inference attacks against centralized and federated learning. In IEEE Symposium on Security and Privacy (2019).
+[28] Yu, L., Liu, L., Pu, C., Gursoy, M. E., & Truex, S.: Differentially private model publishing for deep learning. arXiv preprint arXiv:1904.02200 (2019).
+[29] Ji, Z., Lipton, Z. C., & Elkan, C.: Differential privacy and machine learning: a survey and review. arXiv preprint arXiv:1412.7584 (2014).
+[30] Zhang, D., Chen, X., Wang, D., & Shi, J.: A Survey on Collaborative Deep Learning and Privacy-Preserving. In IEEE Third International Conference on Data Science in Cyberspace, pp. 652-658, IEEE (2018).
+[31] Shokri, R., & Shmatikov, V.: Privacy-preserving deep learning. In Proceedings of the 22nd ACM SIGSAC conference on computer and communications security, pp. 1310-1321, ACM (2015).
+[32] Nguyen, T. A. T., & Dang, T. K.: Privacy preserving biometric-based remote authentication with secure processing unit on untrusted server. Journal IET Biometrics, vol. 8(1), pp. 79-91, IET (2018).
+[33] Thi, Q. N. T., & Dang, T. K.: Towards a Fine-Grained Privacy-Enabled Attribute-Based Access Control Mechanism. In Transactions on LargeScale Data-and Knowledge-Centered Systems XXXVI, pp. 52-72, Springer, Berlin, Heidelberg (2017).
+
+102 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 02:54:46 UTC from IEEE Xplore. Restrictions apply.
+

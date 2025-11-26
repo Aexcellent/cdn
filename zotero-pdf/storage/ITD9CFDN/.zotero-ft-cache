@@ -1,0 +1,129 @@
+ 
+ACM Digital Library home 
+ 
+        Sign in 
+ 
+10.1145/3133956.3134053 acmconferences Article/Chapter View Abstract Publication Pages ccs Conference Proceedings conference-collections 
+ccs 
+research-article 
+Public Access 
+Best Paper 
+Authenticated Garbling and Efficient Maliciously Secure Two-Party Computation 
+Share on 
+ 
+    Authors: 
+    Xiao Wang 
+    , 
+    Samuel Ranellucci 
+    , 
+    Jonathan Katz 
+ 
+Authors Info & Claims 
+CCS '17: Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security October 2017 Pages 21–37 https://doi.org/10.1145/3133956.3134053 
+Online: 30 October 2017 Publication History 
+ 
+    48 citation 
+    943 
+    Downloads  
+ 
+    Get Citation Alerts 
+    Save to Binder 
+    Export Citation 
+ 
+    eReader 
+    PDF  
+ 
+    50 References 
+ 
+ABSTRACT 
+ 
+We propose a simple and efficient framework for obtaining efficient constant-round protocols for maliciously secure two-party computation. Our framework uses a function-independent preprocessing phase to generate authenticated information for the two parties; this information is then used to construct a single "authenticated" garbled circuit which is transmitted and evaluated. We also show how to efficiently instantiate the preprocessing phase with a new, highly optimized version of the TinyOT protocol by Nielsen et al. 
+ 
+Our protocol outperforms existing work in both the single-execution and amortized settings, with or without preprocessing: 
+ 
+    In the single-execution setting, our protocol evaluates an AES circuit with malicious security in 37 ms with an online time of 1 ms. Previous work with the best overall time requires 62 ms (with 14 ms online time); previous work with the best online time (also 1 ms) requires 124 ms overall. 
+ 
+    If we amortize over 1024 executions, each AES computation requires just 6.7 ms with roughly the same online time as above. The best previous work in the amortized setting has roughly the same total time but does not support function-independent preprocessing. 
+ 
+Our work shows that the performance penalty for maliciously secure two-party computation (as compared to semi-honest security) is much smaller than previously believed. 
+Supplemental Material 
+xiaowang-authenticatedgarbling.mp4 
+ 
+mp4 
+ 
+5 GB 
+Play stream Download 
+ 
+References 
+ 
+    Arash Afshar, Payman Mohassel, Benny Pinkas, and Ben Riva. 2014. Non-Interactive Secure Computation Based on Cut-and-Choose Eurocrypt 2014 (LNCS), Vol. Vol. 8441. 387--404. Google Scholar Google Scholar 
+    Gilad Asharov, Yehuda Lindell, Thomas Schneider, and Michael Zohner 2013. More efficient oblivious transfer and extensions for faster secure computation ACM CCS 2013. 535--548. Google Scholar Google Scholar 
+    Donald Beaver. 1992. Efficient Multiparty Protocols Using Circuit Randomization Crypto'91 (LNCS), Vol. Vol. 576. 420--432. Google Scholar Google Scholar 
+ 
+Show All References 
+Index Terms 
+ 
+    Authenticated Garbling and Efficient Maliciously Secure Two-Party Computation 
+ 
+        Theory of computation 
+ 
+            Computational complexity and cryptography 
+ 
+                Cryptographic protocols 
+ 
+Comments 
+Please enable JavaScript to view the comments powered by Disqus. 
+ 
+View Table of Contents 
+back 
+Categories 
+ 
+    Journals 
+    Magazines 
+    Books 
+    Proceedings 
+    SIGs 
+    Conferences 
+    Collections 
+    People 
+ 
+About 
+ 
+    About ACM Digital Library 
+    Subscription Information 
+    Author Guidelines 
+    Using ACM Digital Library 
+    All Holdings within the ACM Digital Library 
+    ACM Computing Classification System 
+ 
+Join 
+ 
+    Join ACM 
+    Join SIGs 
+    Subscribe to Publications 
+    Institutions and Libraries 
+ 
+Connect 
+ 
+    Contact 
+    Facebook 
+    Twitter 
+    Linkedin 
+ 
+The ACM Digital Library is published by the Association for Computing Machinery. Copyright © 2022 ACM, Inc. 
+ 
+    Terms of Usage 
+    Privacy Policy 
+    Code of Ethics 
+ 
+ACM Digital Library home 
+ACM home 
+About Cookies On This Site 
+ 
+We use cookies to ensure that we give you the best experience on our website. 
+ 
+Learn more 
+ 
+Got it! 
+ 
+PDF Help 

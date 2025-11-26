@@ -1,0 +1,686 @@
+Ocean Engineering 157 (2018) 73–86 Contents lists available at ScienceDirect
+Ocean Engineering
+journal homepage: www.elsevier.com/locate/oceaneng
+
+Ship arrival prediction and its value on daily container terminal operation
+Jingjing Yu a, Guolei Tang a,*, Xiangqun Song a, Xuhui Yu a, Yue Qi b, Da Li a, Yong Zhang a
+a State Key Laboratory of Coastal and Offshore Engineering, Faculty of Infrastructure Engineering, Dalian University of Technology, Dalian 116023, Liaoning, China b Transport Planning and Research Institute Ministry of Transport, Beijing 100028, China
+
+ARTICLE INFO
+Keywords: Arrival prediction Late/early arrivals Data mining Container terminal operation Berth allocation Quay crane assignment
+
+ABSTRACT
+Effective prediction of ship arrivals should provide the estimated delay or advance of arrival ships with greater accuracy, and improve the performance of container terminal operations. Therefore, taking Gangji (Yining) Container Terminal (GYCT), China, as an example, this paper resorts to data mining approaches to predict ship arrivals and explore the value of such predicted ship arrivals on the container terminal operation. First, this study applies three data mining approaches, including Back-Propagation network (BP), Classiﬁcation and Regression Tree (CART) and Random Forest (RF), to estimate the delay or advance of ship arrivals using the collected data of ship arrivals. Then the predictive performance of these three approaches is compared and discussed, it is concluded that RF performs better than BP and CART, and ETA month and ship length are the most important determinants of ship arrivals in GYCT terminal. Finally, series simulation experiments are conducted to assess the value of the ship arrivals predicted by RF model on the improvement on daily operation planning of berth allocation and quay crane assignment in the GYCT terminal. And the results show that incorporating the predicted ship arrivals by RF model is beneﬁcial to improve the performance of operation planning of GYCT terminal.
+
+1. Introduction
+Planning of container terminal operation (i.e. berth allocation, quay crane assignment, and container handling, transport and storage) are made every day, striving to minimize the port time of ships and resources required to complete handling operations (Brinkmann, 2011). When facing this decision, one main difﬁculty lies in the uncertainty of ship arrivals. Despite the Estimated Time of Arrival (ETA) are sent to the port 24 h in advance according to contractual obligations, there are still a lot of unexpected factors to cause the deviations of arrival times, which would compel the planners to reset operation planning, and result in the ﬂuster and loss of port operations (Fancello et al., 2011; Hartmann et al., 2011; Moorthy and Teo, 2006). Therefore, planners need to be assisted by providing a qualitative estimate of the delay/advance by determining whether or not an incoming vessel is likely to arrive before or after its scheduled ETA, which is able to support the decision-making process.
+In the general planning and layout for a new port, the empirical probability distributions of arrival ships have been widely studied to describe the stochastic of ship arrivals (PIANC, 2014). For example, series of researches demonstrate the number of daily arrival ships and the inter-arrival times between ships generally comply with Poisson
+
+distribution and Negative Exponential distribution respectively (Daganzo, 1990; Kozan, 1997; Shabayek and Yeung, 2002; Demirci, 2003; Quy et al., 2008; PIANC, 2014). Moreover, Du et al. (2013) consider that the ship arrival pattern of container terminals varies with constitute of container liner routes: for the container terminals of Ningbo Port and Guangzhou Port serving various container liner routes, the number of daily arrival ships follows Poisson distribution; while for the container terminals of Shenzhen Port and Yantian Port serving single route, the number of daily arrival ships follows Normal distribution. As one of the most import inputs to master planning and layout for the new port, these empirical probability distributions of ship arrivals have been applied to make decisions on port planning and layout. For example, Kia et al. (2002) employ the computer simulation in evaluating the performance of a container terminal on handling techniques and capacity of terminal, based on inter-arrival times of arrival ships regarded as Negative Exponential distribution. O€ zgüven et al. (2013) focus on the determination of the optimal quay length using a stochastic knapsack model with the arrival pattern of ships taken as Poisson process. Tang et al. (2014, 2016) determine the berth occupancy of a container terminal considering the effect of entrance channel dimensions by an established process-interaction-based simulation model, in which the ship arrivals are described by Negative Exponential distribution.
+
+* Corresponding author. E-mail address: tangguolei@dlut.edu.cn (G. Tang).
+https://doi.org/10.1016/j.oceaneng.2018.03.038 Received 4 September 2017; Received in revised form 30 January 2018; Accepted 11 March 2018 Available online 27 March 2018 0029-8018/© 2018 Elsevier Ltd. All rights reserved.
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+Table 1 Collected data and their description.
+
+Variable type
+
+Variable
+
+Ship feature Ship
+position Ship service
+
+Ship name, ship type, length (m) Last Estimated Arrival Time (YYYY/MM/DD/HH:MM) Actual Arrival Time (YYYY/MM/DD/HH:MM) Route type (Trunk/External feeder/Internal feeder/Barge feeder/ Domestic trade line)
+
+Fig. 1. Locations of Ningbo-Zhoushan Port and its main container terminals.
+While in decision-making process of port operation planning, to reduce the uncertainty of ship arrivals, the Estimated Time of Arrival (ETA) is sent to the port 24 h in advance according to contractual obligations. However, there are still a lot of unexpected factors to cause the deviations of arrival times, which would result in centralized arrival of ships during a short time window (Hartmann et al., 2011). Therefore, to further reduce the uncertainty of ship arrivals, a series of researches have recently resorted to data mining approaches to predict the ship arrivals. For example, Fancello et al. (2011) ﬁrst use Neural Networks (NN) model to predict interval time of ship's arrival, then apply the predicted interval time in the proposed model optimizing human resources allocation, and the promising results are achieved to provide support to planners. Pani et al. (2013, 2014) employ both k-means and Ward's method to cluster the daily records of Cagliari International Container Terminal to divide the delay of arrivals into three levels ﬁrstly, and employ Classiﬁcation and Regression Trees (CART), Random Forest (RF), and Naive Bayes (NB) to obtain an estimate of the delay level, and the results show that RF gives the best results with a relative absolute error of 29% comparing the predictive performance of the three models. Pallotta et al. (2013) propose an unsupervised method, Trafﬁc Route Extraction and Anomaly Detection (TREAD), to automatically learn a statistical model for maritime trafﬁc from AIS data, to detect low-likelihood behaviors and predict future positions of ships. Pani et al. (2015) adopt Logistic Regression (LR), CART, and Random Forest (RF), to estimate the deviation of arrival ships in Cagliari International Container Terminal and PSA-Antwerp terminal. Parolas et al. (2016) apply Support Vector Machines (SVM) and Neural Networks (NN) to predict the ETA of container ships calling to the Port of Rotterdam, and the results indicate that both SVM and NN achieve better predictions than the situation that ETA is based on the ship's agent estimations, and SVM models outperform the NN comparing the Mean Absolute Error of models. All these studies have certain signiﬁcance and the reference value regarding the approaches of data mining on predicting time of arrival ships in some speciﬁc ports.
+Developed on these previous researches, this study aims to investigate the prediction performances of Back-Propagation network (BP), Classiﬁcation and Regression Tree (CART) and Random Forest (RF) on predicting the ship arrivals of Ningbo Ganji (Yining) Container Terminal (GYCT), Ningbo-Zhoushan Port, China. Moreover, this paper also explores the potential improvement of ship arrival predictions on the daily operation of GYCT terminal, to fully evaluate the availability of the ship arrival prediction.
+The remainder of this paper is organized as follows. Section 2 makes a brief introduction of Ningbo-Zhoushan Port and GYCT terminal, and analyzes the characteristics of ship arrivals and delays. Section 3 summarizes the data-mining models applied to predict the delay of ship arrivals, and analyzes the impact of input variables on predictive performance. Section 4 conducts simulation experiments to explore the value of ship arrivals prediction on daily container terminal operation. And the conclusions and further research are addressed in Section 5.
+
+2. Study case and data statistics analysis
+2.1. Background
+Ningbo-Zhoushan Port, located in the intersection of Silk Road Economic Belt and 21st –Century Maritime Silk Road, is the world's fourthlargest container port in terms of throughput. As of July 2017, NingboZhoushan Port owns 236 routes, including 114 ocean trunks like the Mediterranean Sea routes, Europe routes, West America routes, South Africa routes, Middle East routes, 70 near-sea feeder routes like West Asia routes, as well as 20 internal feeder routes and 32 domestic trade routes (NBZC, 2017). Fig. 1 shows the main container terminals in Ningbo-Zhoushan Port, including Ningbo Beilun International Container Terminal (NBCT), Ningbo Second Container Terminal (NBSCT), Ningbo Ganji (Yining) Container Terminal (GYCT), Ningbo Yuandong Container Terminal (YDCT), Ningbo Meishan-Island International Container Terminal (MSICT), China Merchants International Container Terminal (CMICT), and Zhoushan Yongzhou Container Terminals (YZCT). In this study, the GYCT terminal is selected as a study case, due to the integrity and availability of collected data of ship arrivals. The GYCT terminal has ﬁve 150,000-DWT (Deadweight Ton) modern container berths, and the annual container throughput reaches over 5 million TEUs, with total frontage length of 1,700 m, 23 quay cranes and 72 yard cranes. And GYCT terminal uses a three 8-h shift system to meet the demands of port operation in a 24-h workday. The ﬁrst shift also known as day shift starts 8 a.m., and ends 4 p.m.; the second shift, or swing shift, starts when ﬁrst shift ends, which is usually around 4 p.m., and it ends around midnight; and the third shift, or night shift, covers the hours from around 0 a.m.–8 a.m.
+In China, terminal operation planning is performed at ﬁve main sublevels that differ in the type of decision and time horizon, including monthly operation planning, 10-day operation planning, weekly operation planning, daily operation planning and single ship operation planning (Yu, 2007). In this case, we focus on the daily operation planning, which addresses the speciﬁc allocation of resources (berths and quay cranes), and the time horizon is about 24 h. Therefore, to explore the ship arrivals for daily operation planning, we collected data on vessel arrivals from June 1, 2008 to May 31, 2009, including 2066 containerships arriving at GYCT terminal. These attributes of each ship arrival include ship name, ship type, ship length, Estimated Time of Arrival (ETA), Actual Time of Arrival (ATA) and route type. Considering more than 2000 arrivals collected, the available variables are divided into 3 main classes, as listed in Table 1.
+(1) Ship feature (name, length, type). These variables are indicators of the vessel physical structure and directly affect the sailing times. And the length also provides information concerning berth occupancy.
+(2) Ship position (ATA and ETA). These variables give indication about the positions of the vessel from the time it arrives at the pilot point to unberthing time. This variable of ETAs is updated several times, generally, including a month, a week, 48 h and 24 h in advance. This study focuses on the last ETA 24 h before ships arrival. Following the researches of Fancello et al. (2011) and Pani et al. (2014, 2015), the ATAs and ETAs in this study are expressed
+
+74
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+Fig. 2. The number of arrival ships with different lengths and distribution of route types.
+
+Fig. 3. The number of ship arrivals in different work shifts, ATA days, and ATA months.
+
+by the shifts of the day, days of the week (i.e., Monday, Tuesday, Wednesday, Thursday, Friday, Saturday and Sunday) and months of the year (i.e., January, February, March, April, May, June, July, August, September, October, November and December). The shifts of the day include Shift 1 (from 8:00 to 16:00), Shift 2 (from 16:00 to 24:00) and Shift 3 (from 0:00 to 8:00). (3) Ship service (route type). This variable indicates the different service level in terms of the speciﬁc contract terms for different route, such as trunk line, external feeder line, internal feeder line, barge feeder line, and domestic trade line.
+2.2. Statistical analysis on ship arrivals
+According to the data collected, the container ships arriving at GYCT terminal range from 51 m to 366 m in length, and serve 5 types of container liner routes, which are domestic trade line, barge feeder line, internal feeder line, external feeder line and trunk line. For data analysis, the lengths of arrival ships are divided into ten classes based on Chinese mandatory Design Code of General Layout for Sea Ports (MTPRC, 2014). Fig. 2 shows the number of ships with different lengths and the distribution of route types for each tonnage of arrival ships. From the view point of the number of ships serving different rout lines (Fig. 2 (a)), GYCT
+
+terminal mainly focuses on trunk line (63%), the external feeder line (15%) and the internal feeder line (14%), and opens the domestic trade line (2%) and the barge feeder line (1%). As shown in Fig. 2 (b), the ships arriving at the GYCT terminal mainly concentrates on the 1000 DWT (19%), 30000 DWT (18%) and 50000 DWT (21%), whereas the 3000 DWT (1%), 5000 DWT (1%) and 120000 DWT (1%) have the fewer arrival ships.
+As seen in Fig. 3, the ship arrivals are unbalanced in different shifts, days and months, however, they also show certain regularity due to operational costs variance in different ATAs, route lines and location of GYCT terminal. Some useful conclusions are drawn up as follows:
+(1) The number of ship arrivals is the most in the Shift 1 (37%), contrarily, the least is in the Shift 3 (29%). The reason may be that the higher cost of terminal operation in the night shift, so most ships are more likely to arrive at the port during the daytime.
+(2) More than half of ships (53%) prefer to arrive on Friday, Saturday and Sunday. As the operation costs of Chinese ports are lower than ports of the United States and Europe at weekends, the ships serving ocean trunk lines tend to arrive at the GYCT terminal on Friday, Saturday and Sunday to reduce their voyage costs.
+
+75
+
+J. Yu et al.
+
+Table 2 Delay summary statistics of ship arrivals (in hours).
+
+Total arrivals Minimum Mean Median Maximum
+
+2066
+
+À42.7
+
+0.5
+
+À0.02 37.5
+
+Standard deviation 4.0
+
+(3) The number of ship arrivals is the smallest in February (6%) and the ship arrivals are regularly distributed over the other months. As the Spring Festival, an important Chinese festival, is usually in February, the number of ship arrivals would decrease during this period.
+2.3. Statistical analysis on ship delays
+To make daily terminal operation planning, the last ETAs 24 h in advance inform to the port authority (Yu, 2007). However, even with the latest ETAs, the early and delay of arrival ships still occurred, for example, in this case, less than 20% of ships arrived at the port at ETAs, and the remaining 80% arrived late or early considering the collected 2066 statistical units. Table 3 shows the summary statistics of the delay values. The delay of ship arrival is the difference between the ATA and the ETA. And the positive delays indicate that the ship arrived later than expected, whereas the negative delays indicate that ship arrived earlier than expected.
+3. Data-mining based prediction of ship arrivals
+3.1. Prediction models and their assessment criteria
+Following the researches of Fancello et al. (2011) and Pani et al. (2014, 2015), we apply the Back-Propagation network (BP), Classiﬁcation and Regression Tree (CART) and Random Forest (RF) to predict the delay time of arrival ships. The following content provides a brief introduction of these models, and their assessments for evaluating predictive performance of models.
+3.1.1. Data mining models Neural network models have been widely developed and applied in
+mathematical and computational ﬁelds (Rojas, 1996) since the 1940s. Among them, Back-Propagation neural network (Rumelhart et al., 1986) or its transformation is one of the most popular artiﬁcial neural network models. BP model carries out the learning process by transferring the training errors backward and revising the weights of each neuron in the network forward constantly. Considering the advantages of BP, it has successfully been applied in signal processing, computer network, process control, speech recognition, function approximation, pattern recognition, and data compression, etc. (Wu et al., 2001; Kermani et al., 2005; Gandhiraj and Sathidevi, 2007; Ravi et al., 2008; Al-Allaf, 2010; Balabin and Smirnov, 2011; Wang et al., 2012).
+Classiﬁcation and regression tree (Breiman et al., 1984) is a recursive partitioning method, which is used for classiﬁcation and regression purposes (Felicisimo et al., 2013). CART is constructed by splitting subsets of dataset at each node using a greedy algorithm that applies a homogeneity measure to calculate the homogeneity of the outcome variable and stops the splitting process if the improvement of homogeneity is not signiﬁcant. And for classiﬁcation tree, the Gini coefﬁcient is used as a homogeneity measure, while for the regression tree, variance or entropy
+
+Ocean Engineering 157 (2018) 73–86
+
+are used as the homogeneity measure (Malinowska, 2014). Compared with ID3, C4.5 and other early decision tree algorithms, CART has the advantages of dealing with the non-numerical data, and has been widely applied in fraud identiﬁcation, text mining, time series prediction, data processing, and information mining, etc. (De'Ath and Fabricius, 2000; Liou et al., 2008; Tran et al., 2009; Pandey and Ravi, 2012; Rutkowski et al., 2013).
+Random Forest (Breiman, 2001) is an ensemble learning method for classiﬁcation, regression and other tasks, which operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classiﬁcation) or mean prediction (regression) of the individual trees. Theoretical and practical researches have shown that the RF has a high prediction accuracy, and has good tolerance for outliers and noises, in addition, the over-ﬁtting can be effectively avoided in RF. With these great advantages, RF has been widely used in bioinformatics, ecological classiﬁcation and prediction, prediction of soil parent material mapping, gene recognition and remote sensing geography, automatic learning of language, prediction of customer loss, credit risk assessment and other ﬁelds (Prasad et al., 2006; Cutler et al., 2007; Rodriguez-Galiano et al., 2012; Idris et al., 2013; Charles et al., 2014; Eng et al., 2014; Gupta et al., 2014; Heung et al., 2014; Malekipirbazari and Aksakalli, 2015).
+
+3.1.2. Model assessment Two common performance metrics are adopted to assess the predic-
+tive capability of the employed classiﬁers: the predictive accuracy (ACC) and the kappa statistic (Pani et al., 2015). The predictive accuracy is the percentage of delay time of ship arrivals that models correctly classify, the value of which is calculated by formulae (1). The kappa statistic, proposed by Cohen (1960), is used to measure the agreement between the raters. And the value of kappa statistic ranges from zero (no better prediction than what occurs by chance) to one (perfect prediction). According to the scale proposed by Landis and Koch (1977), the evaluation criteria can be generally expressed as follows: the value 0 as no agreement, 0.01–0.20 as none to slight, 0.21–0.40 as fair, 0.41–0.60 as moderate, 0.61–0.80 as substantial, and 0.81–1.00 as almost perfect agreement, and the calculation of the kappa statistic is given by formulae (2).
+
+ACC
+
+¼
+
+TP
+
+þ
+
+TP FP
+
+þ þ
+
+TN TN
+
+þ
+
+FN
+
+(1)
+
+Kappa
+
+¼
+
+TPþTN N
+
+À
+
+TPþFP N
+
+Â
+
+TNþFN N
+
+1
+
+À
+
+TPþFP N
+
+Â
+
+TNþFN N
+
+(2)
+
+Where N is the total number of delay time classiﬁed, and TP (true positive) and TN (true negative) are the number of delay time that are correctly classiﬁed, and FP (false positive) and FN (false negative) are the number of delay time incorrectly classiﬁed.
+
+3.2. Data preparation
+Through the preliminary statistical analysis of ship arrivals in Section 2, this study selects Ship length, Route type, ETA shift, ETA day and ETA month as the predictor variables, and the arrival delay as the response variable. According to Pani et al. (2015), data preparation is implemented using the following steps before data mining.
+
+Table 3 The discretization of ship lengths according to MTPRC (2014).
+
+No.
+
+Length interval boundary (m)
+
+DWT (t)
+
+No.
+
+Length interval boundary (m)
+
+DWT (t)
+
+No.
+
+Length interval boundary (m)
+
+DWT (t)
+
+1
+
+L 98
+
+2
+
+98 < L 113
+
+3
+
+113 < L 131
+
+4
+
+131 < L 162
+
+1000
+
+5
+
+162 < L 212
+
+3000
+
+6
+
+212 < L 267
+
+5000
+
+7
+
+267 < L 296
+
+10000
+
+8
+
+296 < L 323
+
+20000 30000 50000 70000
+
+9
+
+323 < L 356
+
+10
+
+356 < L 382
+
+11
+
+L > 382
+
+100000 120000 150000
+
+76
+
+J. Yu et al.
+
+Table 4 The interval boundaries for each delay interval width.
+
+No.
+
+wd (hours)
+
+Nd
+
+No.
+
+wd (hours)
+
+Nd
+
+1
+
+1
+
+49
+
+4
+
+4
+
+13
+
+2
+
+2
+
+25
+
+5
+
+6
+
+9
+
+3
+
+3
+
+17
+
+6
+
+8
+
+7
+
+Note: As observations with extremely high or low values of delay are removed, retaining the data range within [-24, 24] hours. Taking wd ¼ 8 h for an example, nd ¼ 7 and the interval boundaries are [-24, À16), [-16, À8), [-8, 0), 0, (0, 8], (8, 16] and (16, 24], and the characteristic values for each interval boundary are À20, À12, À4, 0, 4, 8 and 20. It is worth noting that the ship arriving at the expected time is represented by "0".
+
+Table 5 Prediction performance for different delay interval widths and data mining models.
+
+Delay Interval width (hours) ACC (%)
+
+Kappa statistic
+
+BP
+
+CART RF
+
+BP
+
+CART RF
+
+wd ¼ 1 wd ¼ 2 wd ¼ 3 wd ¼ 4 wd ¼ 6 wd ¼ 8
+
+63.0 58.3 66.0 0.53 0.43 0.58 57.0 57.0 62.0 0.43 0.41 0.54 60.0 58.7 62.0 0.60 0.49 0.65 61.7 57.3 63.3 0.59 0.53 0.63 66.0 62.7 67.3 0.60 0.55 0.65 69.0 65.3 68.3 0.63 0.60 0.69
+
+(1) Eliminating the records missing values and outliers. For example, only records with a delay ranging from À24 h to 24 h are kept in the dataset considering that ship arrival prediction will be used in daily terminal operation, and other delays are not considered as being realistic or considered as errors in the collected data, then the ship observations result in a new dataset with 1979 entries.
+(2) Discretizing the lengths of arrival ships into Ns classes according to the dimensions of design ships established by Design Code of General Layout for Sea Ports (MTPRC, 2014). In this study, the lengths of arrival ships are divided into 11 design ships as shown in Table 3.
+(3) Splitting ETA into three predictor variables including ETA shift (i.e., Shift 1, Shift 2 and Shift 3), ETA day (i.e., Monday, Tuesday, Wednesday, Thursday, Friday, Saturday and Sunday) and ETA month (i.e., January, February, March, April, May, June, July, August, September, October, November and December).
+(4) Discretizing the ship delay time into Nd bins using equal width binning method. The width of delay intervals determines the accuracy of prediction results (Lustgarten et al., 2008). In this study, we will investigate 6 available delay interval widths (wd) to explore the prediction performance, i.e., Wd ¼ {1, 2, 3, 4, 6, 8} hours, and the responding Nd for each delay interval width are given in Table 4.
+3.3. Prediction results and discussion
+3.3.1. Prediction performance Table 5 shows the prediction performance of ship arrival delays with
+BP, CART and RF algorithms by using WEKA (WEKA, 2017). Since the parameters of the data mining models have signiﬁcant inﬂuence on the prediction performance, a series of sensitive experiments have been carried out to determine the appropriate parameters for BP, CART and RF algorithms, which are presented in Appendix A. And a 10-fold cross-validation is applied to evaluate the generalization performance of the three methods. As shown in Table 5, RF performs better than BP and CART, considering the evaluation of both ACCs and the kappa statistic. Taking wd ¼ 1 as an example, the value of ACC for RF is 66.0%, larger than 63.0% for BP and 58.3% for CART. Likewise, the value of the kappa statistic for RF is 0.58, which is also larger than 0.53 for BP and 0.43 for
+
+Ocean Engineering 157 (2018) 73–86
+
+Table 6 Prediction performance of ship arrivals for GYCT terminal and the port of Cagliari and the port of Antwerp (Pani et al., 2014, 2015).
+
+Case study
+
+Level
+
+Valid data
+
+ACC (%)
+
+Kappa statistic
+
+GYCT Cagliari Antwerp
+
+Terminal Terminal Terminal Port
+
+1979 1625 1298 9857
+
+64.8
+
+0.62
+
+68.5
+
+0.21
+
+83.0
+
+0.63
+
+84.0
+
+0.72
+
+CART. Moreover, the values for RF ranging from 0.58 to 0.69 indicate a substantial degree of agreement, while the values for both BP and CART less than 0.60, indicate a moderate degree of agreement.
+As the RF algorithm shows the best performance in predicting the ship arrivals, we will focus on discussing the structure and application of the prediction model by using RF algorithm. According to the prediction performance in Table 5, the available optimal interval widths discretizing the ship delay time are the intervals of wd ¼ {1, 6, 8} hours for RF model.
+In addition, we compare the prediction performance of ship arrivals for GYCT terminal and the port of Cagliari and the port of Antwerp (Pani et al., 2014, 2015), and listed in Table 6. From the prediction performance, it is concluded the RF model distinctly shows the best performance in predicting the ship arrivals of both GYCT terminal and the port of Antwerp except for the port of Cagliari. Moreover, the RF model performs better for the Antwerp data than GYCT terminal and the port of Cagliari, because less information is available due to the limited size of the dataset (Pani et al., 2015). Although this conclusion should be tested for more case-studies, it is an inspiration that increasing the size of dataset to help improve the prediction performance in the future study.
+3.3.2. Prediction model structure Generally, the Gini coefﬁcient is used to express the purity of seg-
+mentation nodes, and the higher Gini coefﬁcient, the lower purity. The average decrease in purity of the segmentation nodes of all the variables that are used as predictors are measured with the Mean Decrease Gini (MDG), and the variables with higher MDG have the greater importance. The importance-plots of the RF (Fig. 4) for different interval widths show the most discriminating variables on the x-axis, and their importance on the y-axis. As shown in Fig. 4, the variables do not have the same predictive power, and ETA month, Ship length, ETA day, ETA shift and Route are chosen as predictors for GYCT terminal. The relationship between the predictors and ship arrivals is interpreted below.
+(1) ETA month is one of the most important determinants of ship arrivals, as to some extent it is an indicator representing seasonal characteristic of weather/sea conditions. In fact, the weather/sea conditions strongly affect the navigation time, and hence the arrival time. Therefore, in the further study, the data of weatherrelated variables along the whole shipping routes should be collected to improve the prediction performance, including the directions and speeds of winds and currents, and the directions, heights and periods of waves.
+(2) Ship length is chosen as an important indicator of the ship's features because as compared to the other variables of the same group, it also provides vital information concerning berth occupancy. Variable related to the physical structure of container ships can directly affect both the speed of handling operations in previous ports (cranes on board, crane intensity) and navigation (ability to withstand adverse weather and sea conditions) (Pani et al., 2015).
+(3) ETA day and ETA shift underline the fact that the reliability of the ETA may depend on the moment in which it was sent (Pani et al., 2015).
+(4) Route type considers the different service contract terms for container ships running global trunk line, external feeder line, internal feeder line, barge feeder line, and domestic trade line. As
+
+77
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+Fig. 4. Importance of variables as predictors for different internal width with RF algorithm.
+
+Fig. 5. The scatter plot of observed and predicted ship delay time using RF model (wd¼1 hour).
+
+their distances from previous ports are longer, the ships running trunk line tend to arrive early/late more often than the ships running shorter lines.
+To conclude, the variables of “ETA month” and “Ship length” are the most important determinants of ship arrivals in GYCT terminal, which conﬁrms the conclusion of Pani et al. (2015), of which the variables related to the weather conditions and the physical structure of ships have the most important inﬂuence on the prediction results. Therefore, to obtain the better prediction performance, more effort should be put to the collection of such data related to weather conditions and ship physical structure in the further study.
+3.3.3. Detailed analysis and discussion In this section, we will analyze the accuracies of prediction results in
+
+detail, especially the inﬂuence of ETA month, ship length and route type on prediction accuracy. The notations used for the detailed analysis are as follows.
+d_obs and d_prd represent the observed and predicted value of ship delay time, and d_ res is the difference between the predicted and the observed value (i.e., d_res¼d_obs–d_prd). Besides, P represents the total prediction accuracy of ship delay time, which is the proportion of correctly predicted instances (i.e., d_obs ¼ d_prd), Ps,k is the prediction accuracy of ship arrival state with the condition of jd_resj k.
+Fig. 5 presents the scatter plot of observed versus predicted ship delay time using RF model in the condition of wd ¼ 1. As illustrated in Fig. 5, the correct predicted results (i.e., d_res ¼ 0) account for 66%. Generally, to absorb the uncertainty of ship arrivals, a buffer time is retained between the two successive ships allocated to the same berth (Wu et al., 2015; Xu et al., 2012). For example, the buffer time is set to 8 h for daily
+
+78
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+Fig. 6. Theprediction accuracies of ship arrivals in each month. Fig. 7. Frequency distribution of delay time in each month.
+
+Fig. 8. Theprediction accuracies of ship arrivals for different ship’s DWT.
+
+container terminal operation of Dalian Port (Wu et al., 2015). Therefore, we also analyze the prediction results with limited deviation versus observed results. As shown in Fig. 5, the predicted results with jd_resj 1 and jd_resj 2 approximately account for 73% and 80%; and the predicted results with jd_resj 4 and jd_resj 8 account for as high as 90% and 97% respectively. Therefore, from a statistical point of view, the prediction of ship arrivals is noteworthy.
+3.3.3.1. ETA month. Fig. 6 shows the prediction accuracies P and Psk of ship arrivals in each month. According to the values of P, the data from the twelve months are divided into three datasets: (a) The ﬁrst dataset, of which the P is not larger than 60%, includes November (58%), June (58%) and October (60%); (b) The second dataset with the P is within 60%–65% includes September (61%), May (61%), December (62%),
+
+March (63%), July (63%) and January (65%); (c) The third dataset with the P larger than 65%, includes April (66%), August (70%) and February (79%). And the delay distributions in the three datasets are shown in Fig 7. From the perspective of the distribution, it seems that the predicted performance of the unimodal dataset would be better than the bimodal dataset, and the unimodal dataset with larger gradient would be predicted more accurately than the unimodal dataset with smaller gradient. And the similar conclusions are found in terms of the value of Ps,t, except that May has the lowest Ps,t (63.6%) instead of November (64.7%). Investigations on local weather conditions revealed that May is the season of fog in Ningbo, which makes it too hard to predict the arrival times of ships in May. Therefore, for the month with low predicted accuracies, the predicted model should be integrated with weather and sea conditions relevant to shipping, and dynamic tracks of ships from AIS to improve the
+
+79
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+Fig. 9. The prediction accuracies of ship arrivals for different route lines.
+
+prediction performance.
+3.3.3.2. Ship length. Fig. 8 shows the prediction accuracies of ship arrivals for different ship lengths/DWTs. The 50000-DWT and 30000-DWT ships have the lowest values of P (56%), since the number of the two ships is large and most of them serving trunk lines (as shown in Fig. 2), the ships from the trunk lines would rather arrive early or late due to the longer sailing distance. On the contrary, the larger containerships larger than or equal to 120000 DWT have the highest value (83.3%), due to the smaller quantity and more ﬁxed planned arrival times in each week (Hartmann et al., 2011). From the view point of Ps,t, the same results are obtained that the 50000-DWT and 30000-DWT ships have the lowest values, while the ships larger than or equal to 120000 DWT have the highest values. Therefore, when applying this prediction model to predict the arrival times of 30000 DWT and 50000 DWT ships, the other information concerning shipping should be necessary to improve the predicted accuracies, and then obtain reliable arrival times.
+3.3.3.3. Route type. As shown in Fig. 9, both the results from P and Ps show that it is a little hard to predict the delay of arrival ships from trunk liners, whereas the delays of the ships serving barge feeder lines are predicted in a satisfying percentage. One reason of the results is the long sailing distance in trunk liners, which result in increasing uncertainty of ship arrivals. Another reason that cannot be ignored is the number of arrival ships serving each route type. As mentioned in Section 2, the number of trunk ships is the most, while the number of barge feeder ships is the least, and we can ﬁnd that the presented predicted accuracies in Fig. 9 varies inversely with the number of ships from each route type. This can be interpreted that the route with larger number of arrival ships would have more complex situations of arrival times, and the training samples may be difﬁcult to include all the situations, and hence it would result in a ﬁnal error of the extrapolation prediction. In view of this, for
+
+the ships from trunk lines, more information in terms of shipping should be added as input predictors to train the prediction model and make better predictions.
+4. Evaluation of ship arrival prediction on daily terminal operation
+To explore whether these predicted ship arrival delays can make a better decision in the daily operation of berth allocation and quay crane assignment in GYCT terminal, simulation experiments are carried out using the actual ship arrivals and predicted ship arrivals by RF algorithm.
+4.1. Optimization model and its resolution approach
+The optimization model for daily berth allocation and quay crane assignment in this study references the model established by Lee and Wang (2010). The objective of this model is to minimize the total port time of all the ships during the scheduling horizon, and the Genetic Algorithm (GA) is used to solve this mixed-integer programming problem. Since this optimization model is not the highlight in this paper, the detailed description of the state variables and decision variables is presented in Appendix B.
+To guarantee the efﬁciency of the GA approach, sensitivity experiments are carried out to determine appropriate control parameters of GA, including the crossover probability, mutation probability and population size. Fig. 10 (a) shows the optimal results with crossover and mutation probabilities changing from 0 to 1. As illustrated in Fig. 10 (a), for better optimization results, the optimal crossover probabilities range from 0.6 to 0.95, and the optimal mutation probabilities from 0.05 to 0.15. Therefore, we set the crossover and mutation probability as 0.6 and 0.1 respectively. Fig. 10 (b) presents the optimal results and uptime with population size changing from 10 to 300. When the population size is
+
+Fig. 10. Variation curves of GA performance versus change of relevant parameters. 80
+
+J. Yu et al.
+
+Table 7 Optimal results under different scenarios of November (in hours).
+
+No.
+
+Notation
+
+Ship arrivals inputted in optimization model
+
+1
+
+ETA-PAD1
+
+Predicted arrival delay by RF with wd ¼ 1 added to ETA
+
+2
+
+ETA-PAD2
+
+Predicted arrival delay by RF with wd ¼ 2 added to ETA
+
+3
+
+ETA-PAD3
+
+Predicted arrival delay by RF with wd ¼ 3 added to ETA
+
+4
+
+ETA-PAD4
+
+Predicted arrival delay by RF with wd ¼ 4 added to ETA
+
+5
+
+ETA-PAD6
+
+Predicted arrival delay by RF with wd ¼ 5 added to ETA
+
+6
+
+ETA-PAD8
+
+Predicted arrival delay by RF with wd ¼ 6 added to ETA
+
+7
+
+ETA-BTþ0.5
+
+Half-an-hour buffer time added to ETA
+
+8
+
+ETA-BTÆ4
+
+Buffer time ranging from À4 to 4 h added to ETA
+
+9
+
+ETA
+
+Expected time of ship arrivals
+
+10
+
+ATA
+
+Actual time of ship arrivals
+
+small, GA would converge to the local optimal solution, and when the population is large, it would take longer time to computation. So considering both optimization results and uptime in Fig. 10 (b), the population size set as 50 is appropriate in this paper.
+4.2. Simulation experiments
+In the simulation experiments, all predicted ship arrivals by RF model with different delay interval width, i.e., Wd ¼ {1, 2, 3, 4, 6, 8} hours, are taken as the inputs of the optimization model to evaluate the availability of the ship arrival prediction. Meanwhile, the optimal wd could be determined from the view point of performance of practical terminal operation planning. In addition to predicted ship arrivals, the ETAs and ETAs with t-hour buffer time are also taken as the inputs of the optimization model. The buffer time is added to the ETA of each ship to give room for uncertain delay/advance of ship arrivals. In this study, Æ4-h and half-an-hour buffer times are considered according to the standard deviation and mean value of the advance/delay time of all ship arrivals from statistical analysis on ship delays in Table 2. Finally, the ATAs of ship arrivals are also taken as the inputs to explore the potential improvement in performance of daily terminal operation. Therefore, these ten cases of ship arrivals are considered as inputs of the optimization model in the simulation experiments as listed in Table 7.
+Before the ship arrivals, the optimal daily planning of berth allocation and quay crane assignment is made for all these ten cases of ship arrivals by running the optimization model. Then the ships will arrive at the port at ATAs, and the berths together with quay cranes are allocated to each ship according to the obtained optimal operation planning in each case. Finally, the total time in the port of all the arrival ships is calculated and used to measure the effect of ship arrivals on the performance of terminal operation in each case.
+To evaluate the impact of incorrect predictions on the decision of the following days, the simulation time is set to a month, so the optimal daily
+
+Ocean Engineering 157 (2018) 73–86
+operation planning will be updated day by day according to the ETAs of the day. And the simulation experiments are conducted for three representative months (e.g., November, March and February) with different prediction accuracies as shown in Section 3.3.3.
+5. Results and discussions
+Running the simulation experiments in Section 4.2, the performance of optimal operation planning based on different cases of ship arrivals is shown in Fig. 11 for November, March and February. From the Fig. 11, some conclusions are drawn up as follows:
+(1) Operation planning made by ETAs with t-hour buffer time (ETABT) performs better than that by ETAs (ETA), which shows incorporating buffer time is beneﬁcial for terminal operating planning. As illustrated in Fig. 11, the average total time of ETABTþ0.5, ETA-BTÆ4, and ETA planning for November, Marth and February is 1264, 1249 and 1299 h. Obviously, the buffer time added to ETAs to give room for uncertainty of ship arrivals, allows a reduction in the total time of arrival ships, and ETA-BTÆ4 is better than ETA-BTþ0.5 for the GYCT terminal. Therefore, a reasonable buffer time for the uncertainty of ship arrivals is beneﬁcial when making the terminal operation planning.
+(2) Operation planning made by ETAs with predicted ship arrival delays (ETA-PAD) performs better than ETA-BTÆ4, when wd < 4. As shown in Fig. 11, for wd ¼ {1, 2, 3}, even for wd ¼ 4 h in February, the operation planning performances of ETA-PADs are better than those of ETA-BTs. And more encouragingly, when wd ¼ 1, the total time of arrival ships is close to the planning made by ATA in March and February. Therefore, adding the predicted ship delays with certain accuracies is obviously beneﬁcial for improving performance of terminal operation.
+(3) From the improvement in terminal operation, the operation planning made by ETA-PAD1 is the best among those made by other ETA-PADs. For wd ¼ {6, 8}, even if they have better prediction performance than that of wd ¼ {2, 3, 4} in terms of ACC and kappa statistic, the improvement in performance of operation planning is not as good as that of wd ¼ {2, 3, 4}. Therefore, when the prediction method is employed to assist to make operation planning in practice, the smaller wd may be more appropriate, and considering the prediction performance, the wd ¼ 1 is the best option for the GYCT terminal.
+To sum up, incorporating the arrival times of ships predicted by RF model into making daily terminal operation planning, substantially improves the performance of terminal operation, and wd ¼ 1 is an appropriate value of wd for the GYCT terminal. Therefore, although the
+
+Fig. 11. The performance of optimal operation planning based on different cases of ship arrivals input. 81
+
+J. Yu et al.
+predictive accuracies remain within 60%–70%, the improvement in making better decisions for operation planning is still noteworthy. However, the risk introduced by uncertainty in ship delay prediction should be considered and explored in the future study, for example, employing predictive probabilities of ship arrival prediction (Tang et al., 2010) or setting up buffer time (Xu et al., 2012) to absorb the uncertainty of ship arrivals prediction, and establishing a robust optimization model considering the uncertainty of vessel arrival explicitly (Rodrigues-Molins et al., 2014).
+6. Conclusions
+Ship arrival uncertainty in ports, i.e., deviations from the expected times of arrival (ETA), causes a series of inconveniences that often impact on the efﬁciency of terminal operations, especially in the daily planning scenario. In this study, to further reduce the arrival uncertainty in Ganji (Yining) Container Terminal (GYCT), China, we employ three data mining approaches including Back-Propagation network (BP), Classiﬁcation and Regression Tree (CART) and Random Forest (RF) to predict the time of ship arrivals in GYCT terminal. The prediction results show that the RF model outperforms BP and CART models, and the ETA month and ship length are the most important determinants of ship arrivals, and then the ETA day, ETA shift and route type. To investigate whether the predicted ship arrivals could improve
+
+Ocean Engineering 157 (2018) 73–86
+the performance of container terminal operation, we also conduct series of simulation experiments, and the results show that incorporating the arrival times of ships predicted by RF model into making daily terminal operation planning substantially improves the performance of GYTC terminal operation.
+These results that are obtained provide the basis for further research. For example, to further improve the predictive accuracy of ship arrival times, we will incorporate more meteorological and walrus data, as well as the AIS data concerning shipping and dynamic tracks of ships. However, there are still unexpected factors to cause the deviations of arrival times, so that the risk introduced by uncertainty in the prediction of ship arrival times should also be considered and explored in the decision making of terminal operation. Therefore, to obtain more reliable workload for daily operation planning, a robust optimization model should be proposed by incorporating both the predicted arrival times and the uncertainty in the prediction of ship arrival times.
+Acknowledgement
+This research is supported by the National Natural Science Foundation of China (Grant No. 51579035), Science and Technology Foundation of Liaoning Province, China (Grant No. 20170540150), and Support High-Level Talents Innovation and Entrepreneurship Projects, Dalian, China (Grant No. 2016RQ024).
+
+Appendix A
+This section provides the determination of parameters of BP, CART and RF algorithms by a series of sensitive experiments. And in each experiment, the prediction performance is evaluated by the values of ACC and kappa statistic.
+As for the BP model, the parameters are taken into account, including the learning rate (lr), the momentum (m), the number of hidden nodes per hidden layer (nnd) and the number of hidden layers (nl). Fig. A-1 and Fig. A-2 show the prediction performance for different values of papermakers when wd ¼ 1, based on which the appropriate parameters are determined: lr ¼ 0.1, m ¼ 0.25, nl ¼ 2 and nnd ¼ 7.
+As for the CART model, this study considers the minimum number of samples of each leaf node (minNumObj), which has crucial impact on the tree pruning to avoid over-ﬁtting. Fig. A-3 shows the prediction performance for different values of minNumObj when wd ¼ 1, and according to the results in Fig. A-3, the most appropriate parameter is taken as minNumObj ¼ 40.
+And for the RF model, it is designed to overcome the shortcoming which is a single tree is easier to over-ﬁtting, and the ﬁnal result is determined according to the voting results by all the trees in the RF model, so this paper mainly considers the number of trees of the RF model (numTrees). Fig. A-4 shows the prediction performance of different values of numTrees when wd ¼ 1, and the most appropriate parameter for the RF model in this study is taken as numTrees ¼ 400.
+Appendix B
+This section describes the optimization model of integrated berth allocation and quay crane assignment in details. Assumption:
+(1) All ships can be served once regardless of the effect of typhoon and tide; (2) Each berth can only serve one ship at a time, and the condition of the berth should meet the requirements of the ships including the depth and the
+length; (3) A safety distance should be maintained between two adjacent quay cranes; (4) The move time of quay cranes is neglected; (5) All quay cranes have the same productivity; (6) The quay cranes assigned for each ship may not start service simultaneously. And when the loading and discharging containers of the ship are
+completely handled, the quay cranes should ﬁnish service at the same time; (7) The number of quay cranes assigned for ship is not larger than the maximum number of quay cranes. Sets:
+i 2 B Set of berths, i ¼ (1, …,B) j 2 V Set of ships, j ¼ (1, …,V) p 2 P Set of service orders at berth i, p ¼ (1, …,V-Bþ1) k 2 C Set of quay cranes, k ¼ (1, …,C) q 2 Q Set of service orders for quay crane k, q ¼ (1, …,V) Parameters:
+Ti The time when berth i becomes idle for the ﬁrst time in the scheduling horizon
+82
+
+J. Yu et al.
+Aj The arrival time of ship j dj The draft of ship j lj The length of ship j Di The depth of berth i Li The length of berth i Cj The number of containers need loading and discharging of ship j Qjmax The maximum number allowed of quay cranes for ship j Qjmin The minimum number allowed of quay cranes for ship j Ek The productivity of quay crane k per unit time Si The number of ships served at berth i; Decision variables:
+
+Ocean Engineering 157 (2018) 73–86
+
+xijp 1 if ship j is served at berth i as the pth ship, and 0 otherwise yjkq 1 if ship j is served by quay crane k as the qth ship, and 0 otherwise Auxiliary variables:
+
+Oijp The idle time of berth i between start of service of ship j as the pth ship, and the departure of its immediate predecessor Cij The handling time of ship j at berth i Vjkq The starting time of ship j served by quay crane k as the qth ship Ujkq The ending time of ship j served by quay crane k as the qth ship Tjkq The handling time of ship j served by quay crane k as the qth ship Objective function:
+
+Subject to
+
+XXXÈÂ
+
+Ã
+
+É
+
+minF ¼
+
+ðSi À p þ 1ÞOijp þ Ti À Aj xijp þ ðSi À p þ 1ÞCij
+
+i2B j2V p2P
+
+XX xijp ¼ 1 8j
+i2B p2P
+
+X xijp
+j2V
+
+1 8i; p
+
+X Si ¼ V
+i2B
+
+XX hj xijp
+i2B p2P
+
+Hi 8j
+
+XX li xijp
+i2B p2P
+
+Li 8j
+
+X yjkq
+q2V
+
+1 8j; k
+
+Qmj in
+
+XX yjkq
+k2K q2Q
+
+Qmj ax 8j
+
+Oijp ! 0 8i; j; p
+
+XX
+
+À
+
+Á
+
+ðOimn þ CimximnÞ þ Oijp ! Aj À Ti xijp 8i; j
+
+m6¼j2V n<p2P
+
+È
+
+ÉX
+
+Cij ¼ max Tjkqyjiq; q ¼ 1; 2; …; V xijp 8i; j
+
+p2P
+
+X XV EkTjkq ¼ Cj 8j
+k2C q¼1
+
+XV
+
+XV
+
+XV
+
+yjðkÀ1Þq À yjkq þ yjðkþ1Þq ¼ fÀ1; 0; 1g 8j; k
+
+q¼1
+
+q¼1
+
+q¼1
+
+(3) (4) (5) (6) (7) (8) (9) (10) (11) (12) (13) (14)
+
+83
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+xijp ¼ f0; 1g 8i; j; q
+
+(15)
+
+yjkq ¼ f0; 1g 8i; j; q
+
+(16)
+
+The objective function is used to minimize the total time for ships in the port including the waiting time and handling time. Constraint (3) ensures that all ships must be served at a berth as a speciﬁc number. Constraint (4) ensures that each berth can only serve one ship at a time. Constraint (5) is used to ensure the sum number of ships served at all berths should be equal to the total number of ships arriving at the port. Constraint (6) and (7) ensure to meet the physical conditions for ship berthing. Constraint (8) ensures each ship can only be served once by the same quay crane. Constraint (9) ensures the number of quay cranes assigned for a ship should be controlled within the range of requirement. Constraint (10) ensures the interval time between ships served at the same berth should not be less than 0. Constraint (11) ensures that each ship is served after its arrival. Constraint (12) deﬁnes the handling time of ship is equal to the longest working time of the quay crane assigned to the ship. Constraint (13) ensures the quay cranes should be assigned to meet the requirement of the handling operation. Constraint (14) ensures that quay cranes could not work cross. And constraint (15) and (16) deﬁne the 0–1 variables (xijp, yjkq).
+
+Fig. A-1. the ACC of each experiment for BP model.
+
+Fig. A-2. the kappa statistic of each experiment for BP model.
+Fig. A-3. The prediction performance of each experiment for CART model. 84
+
+J. Yu et al.
+
+Ocean Engineering 157 (2018) 73–86
+
+Fig. A-4. The prediction performance of each experiment for RF model.
+
+References
+Al-Allaf, O.N.A., 2010. Improving the performance of backpropagation neural network algorithm for image compression/decompression system. J. Comput. Sci. 6 (11), 1347–1354.
+Balabin, R.M., Smirnov, S.V., 2011. Variable selection in near-infrared spectroscopy: benchmarking of feature selection methods on biodiesel data. Anal. Chim. Acta 692 (1–2), 63–72.
+Breiman, L., 2001. Random forest. Mach. Learn. 45 (1), 5–32. Breiman, L., Friedman, J., Stone, C.J., Olshen, R.A., 1984. Classiﬁcation and Regression
+Trees. Wadsworth Belmont, California. Brinkmann, B., 2011. Operations system of container terminals: a compendious
+overviews. In: Bo€se, J.W. (Ed.), Handbook of Terminal Planning. Springer, Berlin, Germany, pp. 25–39. Charles, J., Pﬁster, T., Everingham, M., Zisserman, A., 2014. Automatic and efﬁcient human pose estimation for sign language videos. Int. J. Comput. Vis. 110 (1SI), 70–90. Cohen, J., 1960. A coefﬁcient of agreement for nominal scales. Educ. Psychol. Meas. 20 (1), 37–46. Cutler, D.R., Edwards, T.C., Beard, K.H., Culter, A., Hess, K.T., Gibson, J., Lawler, J.J., 2007. Random forests for classiﬁcation in ecology. Ecology 88 (11), 2783–2792. Daganzo, C.F., 1990. Crane productivity and ship delay in ports. Transport. Res. Rec. 1–9. De'Ath, G., Fabricius, K.E., 2000. Classiﬁcation and regression trees: a powerful yet simple technique for ecological dataanalysis. Ecology 81 (11), 3178–3192. Demirci, E., 2003. Simulation modelling and analysis of a port investment. Simulation 79 (2), 94–105. Du, P.C., Wang, W.Y., Tang, G.L., Guo, Z.J., 2013. Study on the ship arrival pattern of container terminals. Appl. Mech. Mater. 409–410, 1197–1203. Eng, C.L.P., Tong, J.C., Tan, T.W., 2014. Predicting host tropism of inﬂuenza a virus proteins using random forest. BMC Med. Genet. 73 (S1). Fancello, G., Pani, C., Pisano, M., Serra, P., Zuddas, P., Fadda, P., 2011. Prediction of arrival times and human resources allocation for container terminal. Marit. Econ. Logist. 13 (2), 142–173. Felicisimo, A., Cuartero, A., Remondo, J., Quiros, E., 2013. Mapping landslide susceptibility with logistic regression, multiple adaptive regression splines, classiﬁcation and regression trees, and maximum entropy methods: a comparative study. Landslides 10 (2), 175–189. Gandhiraj, R., Sathidevi, P.S., 2007. Auditory-based wavelet packet ﬁlterbank for speech recognition using neural work. In: Proceedings of the 15th International Conference on Advanced Computing and Communications. IEEE Computer Society, pp. 666–673. Gupta, A., Christensen, R.G., Bell, H.A., Goodwin, M., Patel, R.Y., Pandey, M., Enuameh, M.S., Rayla, A.L., Zhu, C., Thibodeau-Beganny, S., Brodsky, M.H., Joung, J.K., Wolfe, S.A., Stormo, G.D., 2014. An improved predictive recognition model for Cys(2)-His(2) zinc ﬁnger proteins. Nucleic Acids Res. 42 (8), 4800–4812. Hartmann, S., Pohlmann, J., Scho€nknecht, A., 2011. Simulation of container ship arrivals and quay occupation'. In: Bo€se, J.W. (Ed.), Handbook of Terminal Planning. Springer, Berlin, Germany, pp. 135–154. Heung, B., Bulmer, C.E., Schmidt, M.G., 2014. Predictive soil parent material mapping at a regional-scale: a Random Forest approach. Geoderma 214–215, 141–154. Idris, A., Khan, A., Lee, Y.S., 2013. Intelligent churn prediction in telecom: employing mRMR feature selection and RotBoost based ensemble classiﬁcation. Appl. Intell. 39 (3), 659–672. Kermani, B.G., Schiffman, S.S., Nagle, H.T., 2005. Performance of the LevenbergMarquardt neural network training method in electronic nose applications. Sensor. Actuator. B Chem. 110 (1), 13–22. Kia, M., Shayan, E., Ghotb, F., 2002. Investigation of port capacity under a new approach by computer simulation. Comput. Ind. Eng. 42 (2–4), 533–540. Kozan, E., 1997. Comparison of analytical and simulation planning models of seaport container terminals. Transport. Plann. Technol. 20 (3), 235–248.
+
+Landis, J.R., Koch, G.G., 1977. Measurement of observer agreement for categorical data. Biometrics 33 (1), 159–174.
+Lee, D.H., Wang, H., 2010. Integrated discrete berth allocation and quay crane scheduling in port container terminals. Eng. Optim. 42 (8), 747–761.
+Liou, F., Tang, Y., Chen, J., 2008. Detecting hospital fraud and claim abuse through diabetic outpatient services. Health Care Manag. Sci. 11 (4), 353–358.
+Lustgarten, J.L., Gopalakrishnan, V., Grover, H., Visweswaran, S., 2008. Improving classiﬁcation performance with discretization on biomedical datasets. In: Proceedings of the 33rd American Medical Informatics Association (AMIA) Annual Symposimu, pp. 445–449.
+Malekipirbazari, M., Aksakalli, V., 2015. Risk assessment in social lending via random forests. Expert Syst. Appl. 42 (10), 4621–4631.
+Malinowska, A., 2014. Classiﬁcation and regression tree theory application for assessment of building damage caused by surface deformation. Nat. Hazards 73 (2), 317–334.
+Ministry of Transport of the People's Republic of China (MTPRC), 2014. Design Code of General Layout of Seaport. JTS 165–2013. China Communications, Press Beijing.
+Moorthy, R., Teo, C., 2006. Berth management in container terminal: the template design problem. OR Spectrum 28 (4), 495–518.
+NBZC: NBZC. http://www.portnbzs.com.cn/Index/index/(Accessed from August 2017) O€ zgüven, E.E., Altinel, I.K., Güllü, R., Otay, E., 2013. Quay length optimization using a
+stochastic knapsack model. J. Waterway, port, coastal. Ocean Eng. 139 (5), 424–435. Pallotta, G., Vespe, M., Bryan, K., 2013. Vessel pattern knowledge discovery from AIS
+data: a framework for anomaly detection and route prediction. Entropy 15 (6), 2218–2245. Pandey, M., Ravi, V., 2012. Detecting phishing e-mails using text and data mining. In: Proceedings of the 2012 IEEE International Conference on Computational Intelligence and Computing Research (ICCIC), pp. 249–254. Pani, C., Fadda, P., Fancello, G., Frigau, L., Mola, F., 2013. Delay prediction in container terminals: a comparison of machine learning methods. In: Proceedings of 13th World Conference on Transport Research (WCTR). Rio de Janeiro, Brazil. Pani, C., Fadda, P., Fancello, G., Frigau, L., Mola, F., 2014. A data mining approach to forecast late arrivals in a transhipment container terminal. Transport 29 (2), 175–184. Pani, C., Vanelslander, T., Fancello, G., Cannas, M., 2015. Prediction of late/early arrivals in container terminals - a qualitative approach. Eur. J. Transport Infrastruct. Res. 15 (4), 536–550. Parolas, I., Tavasszy, L., Kourounioti, I., Duin, R.V., 2016. Prediction of vessel's estimated time of arrival (ETA) using machine learning-a port of Rotterdam case study. In: Proceedings of the 96th Annual Meeting of the Transportation Research. PIANC MarCom Working Group 121, 2014. Harbour Approach Channels - Design Guidelines. MarCom Report 121. Prasad, A.M., Iverson, L.R., Liaw, A., 2006. Newer classiﬁcation and regression tree techniques: bagging and random forests for ecological prediction. Ecosystems 9 (2), 181–199. Quy, N.M., Vrijling, J.K., Van Gelder, P.H.A.J.M., 2008. Risk- and simulation-based optimization of channel depths: entrance channel of cam pha coal port. Simulation 84 (1), 41–55. Ravi, V., Kurniawan, H., Thai, P.N.K., Kumar, P.R., 2008. Soft computing system for bank performance prediction. Appl. Soft Comput. 8 (1), 305–315. Rodriguez-Galiano, V.F., Ghimire, B., Rogan, J., Chica-Olmo, M., Rigol-Sanchez, J.P., 2012. An assessment of the effectiveness of a random forest classiﬁer for land-cover classiﬁcation. Isprs J. Photogramm 67, 93–104. Rodrigues-Molins, M., Ingolotti, L., Barber, F., Salido, M.A., Sierra, M.R., Puente, J., 2014. A genetic algorithm for robust berth allocation and quay crane assignment. Prog. Artif. Intell 2 (4), 177–192. Rojas, R., 1996. Neural Networks. Springer, Berlin. Rumelhart, D.E., Hinton, G.E., Williams, R.J., 1986. Learning representations by backpropagating errors. Nature 323 (6088), 533–536. Rutkowski, L., Pietruczuk, L., Duda, P., Jaworski, M., 2013. 'Decision trees for mining data streams based on the McDiarmid's bound'. IEEE Trans. Knowl. Data Eng. 25 (6), 1272–1279.
+
+85
+
+J. Yu et al.
+Shabayek, A.A., Yeung, W.W., 2002. A simulation model for the Kwai Chung container terminals in Hong Kong. Eur. J. Oper. Res. 140 (1), 1–11.
+Tang, G., Wang, W., Guo, Z., Yu, X., Wang, B., 2014. Simulation-based optimization for generating the dimensions of a dredged coastal entrance channel. Simulation 90 (9), 1059–1070.
+Tang, G., Wang, W., Song, X., Guo, Z., Yu, X., Qiao, F., 2016. Effect of entrance channel dimensions on berth occupancy of container terminals. Ocean Eng. 117, 174–187.
+Tang, G., Zhou, H., Li, N., Wang, F., Wang, Y., Jian, D., 2010. Value of medium-range precipitation forecasts in inﬂow prediction and hydropower optimization. Water Resour. Manag. 24 (11), 2721–2742.
+Tran, V.T., Yang, B., Tan, A.C.C., 2009. Multi-step ahead direct prediction for the machine condition prognosis using regression trees and neuro-fuzzy systems. Expert Syst. Appl. 36 (5), 9378–9387.
+WEKA: WEKA. http://www.cs.waikato.ac.nz/ml/weka/(Accessed from August 2017)
+
+Ocean Engineering 157 (2018) 73–86
+Wang, L., Wang, X., Kong, L., 2012. Automatic authentication and distinction of Epimedium koreanum and Epimedium wushanense with HPLC ﬁngerprint analysis assisted by pattern recognition techniques. Biochem. Systemat. Ecol. 40, 138–145.
+Wu, D., Wang, N., Wu, N., Zhang, J., 2015. Arrival discipline of late ﬂight based on container liner operation and its application. J. Dalian Marit. Univ. 41 (1), 77–82.
+Wu, S.Q., Er, M.J., Gao, Y., 2001. A fast approach for automatic generation of fuzzy rules by generalized dynamic fuzzy neural networks. IEEE Trans. Fuzzy Syst. 9 (4), 578–594.
+Xu, Y., Chen, Q., Quan, X., 2012. Robust berth scheduling with uncertain vessel delay and handling time. Ann. Oper. Res. 192 (1), 123–140.
+Yu, R., 2007. Modern container terminal management. China communication, beijing.Alallaf, O.N.A., (2010). 'Improving the performance of backpropagation neural network algorithm for image compression/decompression system. J. Comput. Sci. 6 (11), 1347–1354.
+
+86
+

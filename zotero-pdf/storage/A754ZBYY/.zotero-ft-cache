@@ -1,0 +1,664 @@
+EJTIR
+
+Issue 18(1), 2018 pp. 76-90
+ISSN: 1567-7141 http://tlo.tbm.tudelft.nl/ejtir
+
+Application of aggregate container terminal data for the development of time-of-day models predicting truck arrivals
+
+Ioanna Kourounioti1
+Delft University of Technology, Faculty of Technology Policy and Management, Delft, The Netherlands.
+Amalia Polydoropoulou2
+University of the Aegean, Department of Shipping Trade and Transport, Chios, Greece.
+Workload forecasting related to truck arrivals is of essential importance not only for optimal
+resource allocation but also for encountering delays and bottlenecks in the landside operations of terminals. In order to increase their efficiency, some ports have tried to implement various methods such as Truck Appointment Systems (TAS) but, in general, information on the arrival times of trucks to pick up containers remains unreliable and scarce. This paper sought to develop pick-up time-of-day models for import containers using data easily retrieved from Terminal Operating Systems (TOS). Model results indicate that the receiver of goods and container characteristics are among the main factors affecting pick-up time-of-day. Differentiation is observed between the different days of the week. The developed Time-Of- Day (TOD) models can be used to calculate the probability of drayage truck arrival times. The application of the proposed methodology proves helpful when reliable information of truck arrivals is unavailable, and can also be used alongside TAS implementation to assist terminal operators.
+Keywords: aggregate data, drayage trucks, import containers, time-of-day models, seaport container terminal.
+
+1. Introduction
+Maritime transportation is considered the backbone of international trade, with over 80% of global merchandise trade by volume transported by sea (UNCTAD, 2015). Due to the everincreasing volume of maritime freight, the efficient handling of vessels and containers has never been more critical. Today ports are gearing up to meet the challenge of handling mega-vessels capable of carrying up to 18,000 Twenty feet Equivalent Units (TEUs) by getting equipped with the latest technologies. Under this challenging global environment, terminal operators are trying to attract more carriers by automating handling equipment and providing added value services. Thus, in order to win a leading place in the international competition, operators must utilize available resources, such as human resources, berths, container yards, quay cranes, and yard equipment more efficiently (Vacca et al., 2010).
+The difficulties inherent in managing port operations require that planners to be assisted at each stage by tools that support their decision making process and help them efficiently utilize terminal resources. Avoidance of over-providing or, conversely, underproviding equipment and manpower would have major cost and efficiency implications. Accurate workload forecasting is
+
+1 A: Jaffalaan 5, 2628BX Delft, The Netherlands T: +31 152 782 015 F: +31 152 788 546 E: i.kourounioti-1@tudelft.nl 2 A: Korai2A, 82100 Chios, Greece T: +30 227 103 5248 F: +30 227 103 5213 E: polydor@aegean.gr
+
+EJTIR 18(1), 2018, pp.76-90
+
+77
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+considered fundamental information for day-to-day operations planning (Kourounioti et al, 2015). Such forecasting allows port operators to provide enough resources (manpower, equipment, yard crane allocation, etc.) to increase terminal efficiency (Linn et al, 2003). Excess resources result in unproductive operations and resultantly higher operating cost. Insufficient resources can cause long queues to build up, and create congestions inside or even outside the terminal, leading to unhappy customers. In addition, Sharman and Roorda (2011) identify the absence of tools that predict the effects of policy making on goods movement patterns.
+Conversely, the adoption of sustainable practices in terminal operations has lately emerged as a crucial goal in the promotion of efficient integration of ports to the hinterlands in their vicinity. Long queues at gates and inside container terminals often result in increased traffic congestion in the surrounding road network, long waiting times, delayed shipments and dissatisfied clients. In addition, idle trucks waiting to be served inside and outside the terminal are responsible for increased pollution levels in the port neighborhood (Huynh and Watson, 2011).
+With the above in mind, the present study seeks to provide workload information by developing Time-Of-Day (TOD) models that predict the arrival time of drayage trucks to pick-up import containers from deep sea container terminals. Aggregate data collected from a container terminal in the Middle East were utilized and based on the developed models the probability for a truck to arrive to pick-up a particular container was calculated. Given the fact that freight behaviourrelated data are usually commercially sensitive and difficult to acquire, the application of such data to develop behavioural prediction models is considered as one of the major contributions of this research. Moreover, current knowledge regarding the application of TOD models into freight related studies is limited and the results of the utilization of such methodologies would be of great interest to the scientific community.
+The non-exhaustive literature overview conducted in Section 2 reveals both the importance and lack of accurate information on truck arrivals and describes the methods applied by terminal operators to tackle this issue, while Section 3 provides a brief review of the TOD models. Section 4 describes the methodological framework and explains model development. Section 5 presents the data input for the model development. Section 6 discusses the model specification and estimation results. Lastly, Section 7 presents concluding remarks and future research directions.
+
+2. Background
+Because trucks remain the predominant means of transportation to- and-from container terminals, during the last several years an extended literature has addressed the efforts made by terminal operators to cope with issues related to gate operations. The adopted strategies aiming to control truck arrival rates either do so by implementing Truck Appoint Systems (TAS) or by modifying operating and monetary policies such as extended gate hours (Huynh, 2005).
+Past research conducted by Zhao and Goodchild (2010) aimed at identifying the effect of reliable information availability on the terminal productivity. The number of Unproductive Moves (UPMs) during the import container retrieval process was used to measure terminal productivity. The results of this research highlighted the importance of accurate information on truck arrivals in reducing UPMs up to 50% (Zhao and Goodchild, 2010). An alternative measure is to provide real time information on truck arrivals through gate web-cameras (Sharif et al., 2011).
+Chen et al. (2013) define TAS as a system where “a terminal operator announces opening hours and entry quota within each hour through a proprietary web-based information system where truckers can choose an entry hour as they prefer”. The first TAS was implemented in Hong Kong International Terminal in order to enable the terminal operator to better exploit the limited yard area (Murty et al., 2005). The ports of Los Angeles and Long Beach have implemented TAS in order to deal with congestion and air pollution (Giuliano and O’Brien, 2007; Giuliano et al., 2000).
+
+EJTIR 18(1), 2018, pp.76-90
+
+78
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Elsewhere, Morais et al. (2006) report successful implementation of TAS in the ports of Vancouver and Southern California through the mandatory compliance of trucking companies to use the TAS.
+An extensive literature exists on developing methods to design the optimal TAS for each container terminal. A heuristic algorithm was applied to calculate the optimal number of trucks that can be assigned in a particular time window by Huynh and Walton (2008). Furthermore, Huynh (2011) proved via simulation that the equal distribution of truck arrivals throughout the day can decrease total truck turnaround time. The benefits of assigning individual appointments to truckers on the elimination of unnecessary truck queues were highlighted by Huynh and Walton (2011). A mixed integer linear programming model proposed by Zehendner and Feillet (2014) optimized the number of appointments to offer that would minimize total turnaround time. Zang et al. (2014) treated container drayage as a dynamic problem with flexible orders where available information is updated during different time horizons. A popular Chinese method to manage truck arrivals is based on Vessel Dependent Time Windows (VDTW) (Zhang et al., 2003). Trucks that are dropping off or picking-up a container are assigned time windows related to the arrival and departure of a specific vessel. Although the VDTW is effective in decreasing the number of UPMs and alleviating traffic congestion, it causes customer dissatisfaction because of the inflexible time windows set to serve the trucks (Zhang et al., 2003).
+Road pricing has also been applied by terminal operators to provide incentives for truck drivers to shift their arrivals to off-peak times, thereby increasing terminal efficiency and productivity. In the Ports of Los Angeles and Long Beach, however, terminal operators preferred TAS to extended gate hours due to the high cost of employees working night shifts (PierPASS, 2016). Boile et al. (2013) simulated gate traffic operations under different scenarios such as truck congestion and delays in order to evaluate various policies and strategies. The results indicated that in order to provoke a shift of truck arrivals to off-peak hours, terminal operators should impose monetary penalties such as congestion pricing.
+In summary, many efforts have been made to predict and distribute pick-up truck arrivals during the day. Most of the research concerns the implementation of TAS, gate extended hours, and pricing policies. The literature has highlighted the importance of policy measures taken by operators and authorities in regulating truck arrivals. In addition, the majority of the studies address the issue by using simulation methods to predict the TOD a truck arrives at the terminal. One of the innovations of this study is, therefore, the utilization of behavioral discrete choice models to predict the time arrival time of trucks to pick-up import containers.
+
+3. Time-Of-Day Models
+The research conducted on the methods applied by container terminals to predict the daily workload related to truck arrivals revealed the absence of predictive models. In addition, a lack of implementation of behavioral methodologies in terminal related studies has been observed. Thus, TOD methodologies in this paper were applied to predict the distribution of truck arrivals to pick-up import containers.
+Time-of-day models are applied in passenger transport to understand time related choices. In addition, TOD choice models account for the difference between the desired time to make a trip and the actual time a trip has taken place, known as schedule delay. The methodologies applied to develop TOD models involve both discrete choice models (Wang, 1996; van Vuren et al., 1999) and continuous choice models (Small, 1989). In the field of discrete choice modelling various model configurations are used that include simple logit or nested logit models (Brownstone and Small, 1989), ordered generalized extreme value models (Small, 1987), probit models (Liu and Mahmassani, 1998; Lempetal., 2011), error components logit (Hess et al. 2007; Holyoak 2007;
+
+EJTIR 18(1), 2018, pp.76-90
+
+79
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Kristoffersson and Engelson 2008) and cross-nested logit models (Lemp et al. 2010). The data used for TOD model development include different sources such as revealed preference surveys (Bhat, 1998; RAND Europe, 2005) and stated preference experiments (de Jong et al. 2003). TOD constitutes a family of discrete choice models that arises many methodological challenges.
+The most important issues faced when modeling time related decisions, is the discretization of the continuous time in smaller (discrete) choice intervals (Ben-Akiva and Abou-Zeid, 2013). For this purpose, continuous functions are inserted in the place of the utility constants. These functions are used to transform the discrete time intervals and the dummy variables into continuous. For example, Hess et al. (2005), apply logarithmic, trigonometric and empirical functions as constants in the utility equations. Cyclical trigonometric functions are used by Lemp et al. (2010). Finally, Carrier (2008) applies trigonometric functions in TOD models in order to study the time choices of airline passengers. On the other hand, various time intervals are applied for the discretisation of time that varies from a small number of long intervals to a large number of short ones. For example, the studies of RAND Europe (2005), Hess et al., (2007), Kristofferson and Engelson (2005), and Popuri et al. (2008) use small one hour to 15 minutes intervals for model development.
+The second issue in modeling time preferences is to satisfy the time cyclicality property. Specifically, the utility of a choice made in time t is equal to the utility of a choice made in time t+24 (Ben-Akiva and Abou-Zeid, 2013). For example, Carrier (2008) incorporated cyclicality in his models on airline itinerary choices by estimating the cycle lengths which were calculated to be 16h for overnight bookings and 9h for day trips.
+Taking into consideration the different models categories and the proposed solutions to the methodological issues inherent to this model types we developed the TOD models presented in the next sections.
+
+4. Methodology
+Behavioral models with freight applications capture how shippers and truckers make a selection among the available freight choices. These models enable researchers to depict the complex interactions created between the stakeholders that drive freight demand (Ben-Akiva et al, 2013). Data necessary to capture freight behavioral interactions, however, are usually commercially sensitive and difficult to acquire. For the development of this study, aggregate data on import containers that are available through the TOS were collected.
+4.1 Data collection One year data (January 2014- December 2014) were collected from a terminal in the Middle East for the first year of its operations. The information presented below was requested and retrieved from the terminal TOS.
+1. Container characteristics:
+ ISO code (if it was a 20’ft or a 40’ft container)
+ Reefer (if it was a refrigerated container or not)
+ Shipping line of the container
+ Port of origin
+ Weight
+2. Consignee data:
+ Name of the receiver of the container
+
+EJTIR 18(1), 2018, pp.76-90
+
+80
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+3. Pick-up data:
+ Exact time and date a container was picked-up from the terminal
+The database contained 214,567 observations and was cleaned from missing and bad quality data (for example, negative times). Corrections were made to dates and pieces of information that were not entered in an appropriate format. The consignee information was typed in many ways resulting in the same name being written in different formats. Extensive editing was done to the recipient's name in order to be written only in one single format. Terminal operations were normalised during the last four months so we used only data from September 2014-December 2014.
+The new clean database consisted of 17,872 observations. Dummy variables were created to indicate the pick-up day and month, the container ISO and reefer containers. All the consignees (approximately 3,546) included in the data set were considered. For the modelling purposes, we have included 7 consignees representing more than 2% of the containers as dummy variables and created a separate dummy variable for all the rest of the consignees (which is actually used as the base case).
+Due to confidentiality issues the TOS data were not easily available for research purposes. All the above mentioned information, however, can be easily retrieved from any terminal TOS and by used internally by the operators to develop predictive models.
+
+4.2 Model specification This research considers import containers and makes the assumption that pick-ups are not linked with an export drop-off. Prior to model development we interviewed professionals in the port who provided insights on the parameters that usually influence pick-up time. Based on our a priori expectations on alternative factors affecting TOD several models were estimated. Other factors included in the modelling effort such as port of origin, shipping line and weight, which were found statistically insignificant and were not included in the final model. The following parameters were found statistical significant and we expect that they would influence TOS as explained below:
+4. Container characteristics such as dimension, if it is a reefer or not. Especially reefer containers that are subject to time restrictions are expected to present different pick-up TOD patterns.
+5. Consignee, i.e. the receiver of the container. The only available information on the receiver of goods was their name, which was encoded for confidentiality purposes. Each consignee depending on the location of the company facilities, the company operations, the type of handled products, the company needs may present different TOD preferences.
+6. Day of the week in which the pick-up was realized. This variable reflects the constraints imposed by local authorities that forbid trucks to use the highways during specific time slots. Road conditions such as congestions are also represented by this variable and are expected to influence TOD utilities.
+Based on these assumptions we insert the above variables in the choice models in order to validate and quantify their impact on the pick-up TOD.
+In order to define the probability of truck arriving to pick-up a container on a specific time slot a Multinomial Logit Model (MNL) was developed, with i denoting a time slot and n representing a container. The objective was to model the percentage of containers being picked up on time slot i. We defined Xn as the matrix with as many rows as there are time slots, where Xin corresponds to the ith row of Xn . Xin is a row vector that contains the restrictions of time slot i and the characteristics of the container n. We defined F(i| Xn; β) as a function that predicts the probability
+
+EJTIR 18(1), 2018, pp.76-90
+
+81
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+that a container n is being picked-up in time slot i where β is a vector of unknown parameters. The number of alternative time slots is denoted as J.
+
+We assumed that a container is being picked-up on the time slot with the highest utility. The utility of time slot i for container n is:
+
+𝑈𝑖𝑛 = 𝑋𝑖𝑛 ∙ 𝛽 + 𝜀𝑖𝑛
+
+(1)
+
+where εin is an error term that accounts for measurement errors. The explanatory variables were
+
+inserted in the model through a linear relationship Xinβ. The error terms, εin, i=1, ….., J, were
+
+assumed to be independently and identically distributed standard random variables (Ben-Akiva
+
+et al, 2013).
+
+The probability for a container n to be picked-up at a time slot i was given by the following
+
+equations (Ben-Akiva and Leerman, 1985).
+
+𝑃𝑛(𝒊) =
+
+𝒆𝑽𝒊𝒏 ∑ 𝒋∈𝑪𝒏𝒆𝑽𝒋𝒏
+
+(2)
+
+where Cn is the feasible choice set given in each individual; and
+
+Uin= Vin + εin
+
+(3)
+
+Where Vin = 𝑋𝑖𝑛 ∙ 𝛽 is the systematic utility.
+
+In order to account for time discontinuities, alternative specific constants and coefficients as continuous function of time were used (Popuri et al, 2007). The following trigonometric function v(th) that is based on Fourier series and was presented by Ben-Akiva and Abou-Zheid (2013).
+
+𝑣(𝑡)
+
+=
+
+𝑣(𝑡ℎ)
+
+=
+
+(
+
+𝑎1
+
+sin
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎2
+
+sin
+
+(4𝜋𝑡ℎ)
+24
+
++
+
+⋯
+
++
+
+𝑎𝑘
+
+sin (2𝐾𝜋𝑡ℎ) +
+24
+
+𝑎𝑘+1
+
+cos
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎𝑘+2
+
+cos
+
+(4𝜋𝑡ℎ)
+24
+
++
+
+⋯
+
++
+
+𝑎2𝑘
+
+cos
+
+(2𝐾𝜋𝑡ℎ))
+24
+
+(4)
+
+For sufficient large K, equation (4) can be used to approximate any cyclical function. The
+
+coefficients a1….. a2k were calculated from the data. Time can be divided into different time
+
+intervals where 𝑡ℎ is the midpoint of each time interval. To account for the intervals’ unequal length the size variable ln(Δα) was inserted in the systematic utility. Ben-Akiva and Abou-Zheid
+
+(2013) proved that in TOD models that the logarithm of the length of the time period can be
+
+added to the systematic utility by constraining its size variable equal to 1.
+
+5. Data Analysis
+One of the main contributions of this research is the acquisition and analysis of aggregate data collected from the TOS of container terminals. Table 1 summarizes the variables inserted in the models.
+In addition, around 35% of the analyzed containers were 20ft and only 23.6% of imported boxes were reefers. The majority of containers were picked up during the weekend.
+5.1 Description of pick-up time-of-day distributions The local authorities have imposed limitations in truck traffic on the highway that leads to the city. Trucks are able to pick –up containers during and drive to different destinations. The road restrictions included the following:
+ On Sunday, Monday, Tuesday, Wednesday, Thursday the road is closed from 06:00 to 09:00 and from 12:00 to 22:00;
+ On Friday the road is closed from 15:00 to Saturday 03:00; and
+ On Saturday from 16:00 to 22:00.
+
+EJTIR 18(1), 2018, pp.76-90
+
+82
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Table 1. Data Analysis
+
+Variable 20’ft
+Reefers Monday Tuesday Wednesday Thursday Friday Sunday Saturday Consignee_1 Consignee _2 Consignee_3 Consignee _4 Consignee _5 Consignee _6 Consignee_7 Other Consignees
+
+Values 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No) 1 (Yes)/ 0 (No)
+
+Percentage 35.35% 23.63% 18% 5.07% 4.43% 3.87% 7.36% 32.37% 28.90% 8.18% 3.63% 3.09% 2.94% 2.79% 2.02% 2.00% 75,35%
+
+In Figure 1, the line with the rhombus represents hourly pick-ups from Sunday to Thursday, the line with the square denotes Friday, and the line with the triangle is used for Saturday. In general, trucks tended to pick up containers during the traffic-restricted times in order to be ready to drive to their destination after road limitations were lifted. From Sunday to Thursday, the peak pick-up time was around 17:00. On Fridays, almost 11% of pick-ups took place around 1:00 am. From 00:00 Saturday until 13:00 the pick-up process increased, and fell at 15:00 during the restriction time before rising to a peak around 17:00.
+Hourly distribution of pick-ups per day 12%
+10%
+8%
+6%
+4%
+2%
+0%
+
+MonSdaatuy-rTdhauyrsday Thursday
+Figure 1. Hourly distribution of pick-ups
+
+- Friday
+
+Saturday
+
+EJTIR 18(1), 2018, pp.76-90
+
+83
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Overall, the restrictions imposed from the road operator to truck movements was expected to determine the pick-up time-of-day.
+
+6. Model Estimation Results
+This section presents the model results for calculating the probability of a container to be picked up in a specific time slot. The methodology of TOD models was presented in the previous section. Road restrictions imposed by local authorities are also taken into consideration.
+The examined terminal operates 24 hours, 7 days per week. For model development, each day was divided into nine different intervals that take into account the restrictions imposed to truck movements (Table 2).
+Table 2. Time intervals inserted in the choice model
+
+Interval Nr 1 2 3 4 5 6 7 8 9
+Total
+
+Interval 00:00-3:00 3:01-6:00 6:01-9:00 9:01-12:00 12:01-14:00 14:01-16:00 16:01-20:00 20:01-22:00 22:01-00:00
+
+Duration 3hours 3hours 3hours 3hours
+2hours 2hours 4hours 2hours 2hours 24hours
+
+Interval Midpoint 1:30 4:30 7:30 10:30 13:00 15:00 18:00 21:00 23:00
+
+Nr of pick-ups 3053 (17.08%) 1697 (9.50%) 2,144 (12.00%) 1,835(10.27%) 1,808 (10.12%) 1,960 (10.97%) 2,911 (16.26%) 1,191 (6.66%) 1,273 (7.12%) 17,872 pick-ups
+
+The ln (Δα) terms are the log-size measure introduced to account for the unequal size of the time slots. Continuous time functions were made by the sum of the cos and the sin trigonometric function. Specifically, the utility function used for mode development was:
+
+𝑈𝑖(𝑡) = ∑𝑗𝑖 𝑣𝑖(𝑡) ∗ 𝑥𝑗 + ln(𝛥𝛼) + 𝜀𝑖
+
+(5)
+
+where
+
+ 𝑣(𝑡ℎ) function is used for the discretisation of continuous time and 𝑡ℎ is the midpoint of the choice time interval.
+
+𝑣(𝑡) = 𝑣(𝑡ℎ) =
+
+(
+
+𝑎1
+
+sin
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎2
+
+sin
+
+(4𝜋𝑡ℎ
+24
+
+)
+
++
+
+⋯
+
++
+
+𝑎𝑘
+
+sin
+
+(2𝐾𝜋𝑡ℎ)
+24
+
++
+
+𝑎𝑘+1
+
+cos
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎𝑘+2
+
+cos
+
+(4𝜋𝑡ℎ)
+24
+
++
+
+⋯
+
++
+
+𝑎2𝑘
+
+cos
+
+(2𝐾𝜋𝑡ℎ
+24
+
+)
+
+(6)
+
+EJTIR 18(1), 2018, pp.76-90
+
+84
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+where,
+ Ui the utility equation i,
+ 𝑣𝑖(𝑡ℎ) equation to discretize the continuous time,
+ 𝑡ℎ midpoint of the time interval,
+ xj the explanatory variables (dummy variables),
+ 𝜀𝑖 error term,
+ 𝑙𝑛(𝛥𝛼) the interval size variable.
+The available data were inserted in the model. Expected results included that the pick-up profiles of twenties and reefers containers would be different compared to forty feet and non-reefer containers. In addition, it was expected that each consignee would have different profiles on the time chosen to send trucks to pick-up containers. Finally, it was expected that the particular days would have an influence on the pick-ups. In this study, the introduction of the days of the week is very important because they reflect the road restrictions imposed by the terminal operators. For model simplification a dummy variable was created for the pick-ups made from Monday to Thursday because during these days the same restrictions are imposed.
+The following explanatory variables were inserted in the models: x1 = dummy variable for twenties, x2 = dummy variable for reefers, x3 = dummy variable for pick-ups made by the most frequent consignee (Consignee_1), x4 = dummy variable for pick-up made by the second most frequent consignee (Consignee_2), x5 = dummy variable for pick-up made by the most frequent consignee (Consignee_4), x6 = dummy variable for pick-ups made by the second most frequent consignee (Consignee_5), x7 = dummy variable for pick-ups made by the most frequent consignee (Consignee_6), x8 = dummy variable for pick-ups made by the second most frequent consignee (Consignee_7), x9 = dummy variable for pick-ups made on Friday, x10 = dummy variable for pick-ups made on Saturday, x11= dummy variable for pick-ups made from MondayThursday. Various model specifications were tested in order to find the best values for K. The values selected were K=1 and K=2.
+
+Table 3. TOD model results
+
+Variables Time function
+Cos (2π*𝒕𝒉/24) Cos (4π*𝒕𝒉/24) Sin (2π*𝒕𝒉/24) Sin (4π*𝒕𝒉/24) Twenties * Time function 20’ft * Cos (2π*𝑡ℎ/24) 20’ft * Cos (4π*𝑡ℎ/24) 20’ft * Sin (2π*𝑡ℎ/24) 20’ft * Sin (4π*𝑡ℎ/24) Reefer * Time function
+Reefer * Cos (2π*𝑡ℎ/24) Reefer * Cos (4π*𝑡ℎ/24) Reefer * Sin (2π*𝑡ℎ/24) Reefer * Sin (4π*𝑡ℎ/24)
+
+Parameters
+𝑎1 𝑎2 𝑎3 𝑎4
+𝑎11 𝑎21 𝑎31 𝑎41
+𝑎12 𝑎22 𝑎32 𝑎42
+
+Values
+-1.81 -1.78 -0.739 -1.38
+-0.222 0.185 0.131 -0.117
+0.700 0.164 -0.593 -0.261
+
+tstat
+-26.81 - 23.87 -7.80 -19.09
+-2.57 0.096 0.122 -1.25
+6.63 1.40 -3.85 -2.33
+
+EJTIR 18(1), 2018, pp.76-90
+
+85
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Variables Consignee_1 * Time function
+Consignee_1* Cos (2π*𝑡ℎ/24) Consignee_1 * Cos (4π*𝑡ℎ/24) Consignee_1 * Sin (2π*𝑡ℎ/24) Consignee_1* Sin (4π*𝑡ℎ/24) Consignee_2 * Time function
+Consignee_2 * Cos (2π*𝑡ℎ/24) Consignee_2 * Cos (4π*𝑡ℎ/24) Consignee_2 * Sin (2π*𝑡ℎ/24) Consignee_2* Sin (4π*𝑡ℎ/24) Consignee_3 * Time function Consignee_3 * Cos (2π*𝑡ℎ/24) Consignee_3 * Cos (4π*𝑡ℎ/24) Consignee_3 * Sin (2π*𝑡ℎ/24) Consignee_3* Sin (4π*𝑡ℎ/24) Consignee_5 * Time function
+Consignee_5 * Cos (2π*𝑡ℎ/24) Consignee_5 * Cos (4π*𝑡ℎ/24) Consignee_5 * Sin (2π*𝑡ℎ/24) Consignee_5* Sin (4π*𝑡ℎ/24) Consignee_6 * Time function
+Consignee_6 * Cos (2π*𝑡ℎ/24) Consignee_6 * Cos (4π*𝑡ℎ/24) Consignee_6 * Sin (2π*𝑡ℎ/24) Consignee_6* Sin (4π*𝑡ℎ/24) Consignee_7 * Time function
+Consignee_7 * Cos (2π*𝑡ℎ/24) Consignee_7 * Cos (4π*𝑡ℎ/24) Consignee_7 * Sin (2π*𝑡ℎ/24) Consignee_7* Sin (4π*𝑡ℎ/24)
+Friday * Time function Friday * Cos (2π*𝑡ℎ/24) Friday * Cos (4π*𝑡ℎ/24) Friday * Sin (2π*𝑡ℎ/24) Friday * Sin (4π*𝑡ℎ/24) Saturday * Time function
+Saturday * Cos (2π*𝑡ℎ/24) Saturday * Cos (4π*𝑡ℎ/24) Saturday * Sin (2π*𝑡ℎ/24) Saturday * Sin (4π*𝑡ℎ/24) Monday-Thursday * Time function
+Monday-Thursday * Cos (2π*𝑡ℎ/24) Monday-Thursday * Cos (4π*𝑡ℎ/24) Monday-Thursday * Sin (2π*𝑡ℎ/24)
+
+Parameters
+𝑎13 𝑎23 𝑎33 𝑎43
+𝑎14 𝑎24 𝑎34 𝑎44
+𝑎15 𝑎25 𝑎35 𝑎45
+𝑎16 𝑎26 𝑎36 𝑎46
+𝑎17 𝑎27 𝑎37 𝑎47
+𝑎18 𝑎28 𝑎38 𝑎48
+𝑎19 𝑎29 𝑎39 𝑎49
+𝑎110 𝑎210 𝑎310 𝑎410
+𝑎111 𝑎211 𝑎311
+
+Values
+0.136 0.721 -0.195 -0.582
+-0.526 -0.473 -0.655 -0.0952
+-0.052 -0.769 0.969 -0.331
+-0.240 1.30 -0.386 -0.943
+-0.622 -0.896 1.05 0.155
+-2.68 -1.03 0.470 1.44
+0.149 0.524 0.369 0.477
+-0.319 -0.838 0.277 -0.484
+0.0937 0.157 -0.0973
+
+tstat
+0.84 3.97 -0.75 -3.24
+-1.91 1.56 -1.88 -0.33
+-0.24 -3.23 2.86 -1.43
+-0.47 2.29 -0.58 -1.70
+-2.06 -2.81 2.66 0.49
+-3.43 -1.37 0.58 1.93
+1.42 4.65 2.69 4.04
+-0.14 -4.32 1.15 -2.78
+0.93 2.41 -0.65
+
+EJTIR 18(1), 2018, pp.76-90
+
+86
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Variables Monday-Thursday * Sin (4π*𝑡ℎ/24)
+Size variable Nr of observations
+Final log (L) Initial log (L) Adj. Rho Square
+
+Parameters 𝑎411
+ln(Δα)
+
+Values -0.110
+1 17,872 -33,133.142 -39,268.798 0.255
+
+tstat -1.86
+
+The typical logit estimation software Biogeme release 2.4 (Bierlaire, 2003 and Bierlaire, 2015) was used for model estimation. The first time interval was used as base interval and the utility in this interval was taken equal to 0.
+
+To better interpret the parameter presented in Table 3 we calculated and plotted the relative
+
+utilities as presented in the Figures 2 and 3. For each parameter the utility was calculated as the
+
+sum of the constant component and the alternative specific coefficient for each parameter, for
+
+example
+
+for
+
+reefer
+
+containers
+
+(
+
+𝑎1
+
+sin
+
+(2𝜋𝑡ℎ
+24
+
+)
+
++
+
+𝑎2
+
+sin
+
+(4𝜋𝑡ℎ)
+24
+
++
+
+𝑎3
+
+cos
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎4
+
+cos
+
+(4𝜋𝑡ℎ)
+24
+
++
+
+𝑎11
+
+sin
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎21
+
+sin
+
+(4𝜋𝑡ℎ
+24
+
+)
+
++
+
+𝑎31
+
+cos
+
+(2𝜋𝑡ℎ)
+24
+
++
+
+𝑎41
+
+cos
+
+(42𝜋4𝑡ℎ)).
+
+The
+
+relative
+
+utility
+
+function
+
+was
+
+calculated by dividing the utility components as described above with the utility function value
+
+at time 10:30 (interval 4).
+
+Figure 2 compares the relative utilities of the reefers and twenties. The pick-up utility of twenties decreased until 5:00 and then increased until it reached a maximum at around 10:30. Reefers’ utility reached a peak at around 22:00 and then decreased and took on negative values until 16:00. Increased reefer utilities during late night hours can be explained by the fact that sensitive products are to be delivered in the morning. Traffic restrictions are imposed in the movement of trucks; however, during these constrained intervals pick-ups from the container terminal gates were being executed. Drivers tended to pick up containers during the constrained intervals in order to be able to deliver after restrictions were lifted. For this reason, from Sunday until Thursday the maximum pick-up utility can be observed in the midpoint of restricted intervals. On Saturdays, relative utility reaches one peak at 3:00, just before the lift of the restriction, another one at 10:00 and a final peak time inside the constrained interval -around 19:00 in the evening. Finally, on Fridays the traffic was particularly high during the morning hours as truck drivers tried to collect imports prior to the twelve-hour traffic disruption.
+
+Significant differentiations were observed in the pick-up times chosen by each consignee (Figure 3). For example, the sixth and the fourth consignee presented higher utilities during the morning hours while the first and fifth consignee tended to pick-up more containers around noon. Unfortunately, there was no more information available about the consignees (company type size, etc.) to enable further interpretation of the results. Application results showed that the proposed model can predict around 65% of the truck arrival times. However, collecting disaggregate data on the consignees and combining the two datasets is expected to increase the predictability of the models.
+
+EJTIR 18(1), 2018, pp.76-90
+
+87
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting truck arrivals
+
+Figure 2. Relative utilities for 20’s and Reefers and days of the week. Figure 3. Relative utilities per consignee.
+
+EJTIR 18(1), 2018, pp.76-90
+
+88
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+7. Conclusions
+Since trucks remain the dominant transportation mode that connects ports with their hinterlands, workload forecasting related to truck arrivals is of essential importance not only for optimal resource allocation inside the terminal, but also for encountering delays and bottlenecks outside the gates caused by large truck queues. To cope with gate congestion and environmental pollution caused by idle vehicles, terminal operators have tried to implement a wide range of technologies and strategies, such as TAS, tolls, congestion pricing and extended gate hours.
+In the context of this study, TOD models are applied in order to forecast container truck arrivals to pick-up import containers from deep sea container terminals One of the most important contributions of the research is the application of data available directly from terminals’ TOS to develop modes that explicitly capture the influence of container characteristics, day of the week, and consignees at the distribution of drayage truck arrivals for import container pick-ups. During model specification we consulted with the professionals in the port who provided insights on the parameters that usually influence pick-up time. The port of origin and the shipping line were found statistically insignificant. Commodity and the combination of a container pick-up with a container drop off are also additional parameters that could influence TOD. Unfortunately this information was not available. The interviews with the experts revealed “empty containers” represent totally different behaviour, therefore it was decided not to include empty containers in the analysis of this paper. For converting continuous time into a discrete choice, trigonometric functions were utilized. Although consignees –information not easily available - presented different behavior, there was no additional data to explicitly capture these behavioral modifications. The lack of consignee specific information limits the predictability of the models since TOD patterns can be attributed only to the specific consignees. More information on the characteristics of the recipients of goods can provide interesting insights regarding behavioral issues; for example, it can quantify how specific characteristics such as company type, size or distance from the terminal can affect TOD related decisions.
+The utilities estimated in this research permit the calculation of the probability of a container to be picked up on a specific time-slot. Furthermore, the application of the methodology described above can be implemented in container terminals and provide an insight of the daily imports pick-ups when reliable information is not available. It can also be used alongside with TAS to compensate for the unknown pick-up times of the containers without appointments.
+The proposed models can be inserted into a Decision Support System that will help terminal operators to predict hinterland workloads, achieve optimal staff and equipment allocations, and design and implement effective stacking policies (Tavasszy, 1998). Regarding future research, additional historical data can be acquired. It is believed that with a larger data set, some of the variables that were found insignificant might become significant. Furthermore, similar models can be developed with data from other container terminals and compare the results. Finally, the collection innovative stated preference data, and their combination with the data is expected to increase the predictability of the time-of-day models.
+
+References
+Ben-Akiva, M. and Abou-Zeid, M. (2013). Methodological issues in modelling time-of-travel preferences. Transportmetrica A: Transport Science, 9 (9) ,846-859. Ben-Akiva, M., Bolduc, D. and Park, J. (2013). Discrete Choice Analysis of Shippers’ Preferences. In Ben-Akiva, M., Meersman, H. and van de Voorde, E. (ed) Freight Transport Modeling, Emerald Group Publishing Limited, United Kingdom. Βen-Akiva, M. and Lerman, S. (1985). Discrete choice analysis. MIT Press, Cambridge, Massachussetts.
+
+EJTIR 18(1), 2018, pp.76-90
+
+89
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Bhat, C.R. (1998). Accommodating flexible substitution patterns in multi-dimensional choice modeling: formulation and application to travel mode and departure time choice. Transportation Research Part B, 32(7), 455–466. Bierlaire, M. (2003) BIOGEME: A free package for the estimation of discrete choice models. Presented at the 3rd Swiss Transport Research Conference, Ascona. Bierlaire, M. (2015). BisonBiogeme: estimating a first model, Technical report TRANSP-OR 150720. Transport and Mobility Laboratory, ENAC, EPFL. Boile M., Theofanis S., Golias M., Dougherty P. and Sdoukopoulos, E. (2013). Gate strategies impacts on marine container terminal access network using simulation. Paper presented at the 13th World conference of Transportation Research, July 2013, Rio de Janeiro, Brazil. Brownstone, D. and Small, K.. (1989). Efficient estimation of nested logit models. Journal of Business and Economic Statistics, 7, 67–74. Carrier, E. (2008). Modeling the choice of an airline itinerary and fare product using booking and seat availability data. Massachusetts Institute of Technology :Thesis (PhD). Chen, G., Govindan, K. and Yang, Z. (2013). Managing truck arrivals with time windows to alleviate gate congestion at container terminals. International Journal of Production Economics, 141 (1), 179-188. de Jong, G., Daly, A., Pieters, M., Vellay, C., Braddley, M. and Foffman, F. (2003). A model for time of day and mode choice using error components logit. Transportation Research Part E, 39(3), 245–268. Giuliano, G., O’Brien, T., Hayden, S. and Dell'Aquila, P. (2000). The terminal gate appointment system at the ports of Los Angeles and Long Beach: an assessment. Report of the Center for International Trade and Transportation, California State University, 1000, Studebaker. Giuliano, G. and O’Brien, T. (2007). Reducing Port-Related Truck Emissions: The Terminal Gate Appointment System at the Ports of Los Angeles and Long Beach. Transportation Research: Part B, 12(7), 460-473. Hess, S., Daly, A., Rohr, C. and Hyman, G. (2007). On the development of time period and mode choice models for use in large scale modelling forecasting systems. Transportation Research Part A, 41(9), 802–826. Hess, S., Polak, J.W. and Bierlaire, M., (2005). Functional approximations to alternative specific constants in time period choice-modelling. Paper presented at the 16th international symposium on transportation and traffic theory, University of Maryland. Holyoak, N. (2007). Modelling the trip departure timing decision and peak spreading policies. Paper presented at the European Transport Conference, Netherlands. Hernadez, P. and Unnikrish, A. (2015). An accident Analysis and Prevention. A Time of Day Analysis of Crashes Involving Large Trucks in Urban Areas. Accident Analysis and Prevention, 75, 155–163. Huynh, N. (2005). Methodologies for Reducing Truck Turn Time at Marine Container Terminals. Ph.D. Dissertation, The University of Texas, Austin. Huynh, N. (2009). Reducing Truck Turn Times at Marine Terminals with Appointment Scheduling. Transportation Research Record: Journal of the Transportation Research Board , 2100, 47-57. Huynh, N. and Walton, C.M. (2011). Improving Efficiency of Drayage Operations at Seaport Container Terminals Through the Use of an Appointment System. In Böse, J.W (ed) Handbook of Terminal Planning, Springer, New York:. Kourounioti, I. and Polydoropoulou, A. (2015). Understanding Freight Forwarders Time-of-Day Choice Decision Making Framework- A Greek Case Study. Paper presented at the 94th Transportation Research Board, January 2015, Washington DC. Kristoffersson, I. and Engelson, L. (2008). Estimating preferred departure times of road users in areallife network. Paper presented at the European Transport Conference, Netherlands. Lemp, J.D., Kockelman, K.M. and Damien, P. (2010). The continuous cross-nested logit model: formulation and application for departure time choice. Transportation Research Part B, 44 (5), 646–661. Linn, R., J. Liu, Y. Wan, C, Zhang C. and Murty, K., (2003). Rubber Tired Gantry Crane Deployment for Container Yard Operation. Computers & Industrial Engineering, 45(3), 429–442. Liu, Y. and Mahmassani, H.S. (1998). Dynamic aspects of departure time and route decisionbehavior under ATIS: modeling framework and experimental results. Paper presented at the 77th Transportation Research Board, January 1998, Washington DC..
+
+EJTIR 18(1), 2018, pp.76-90
+
+90
+
+Kourounioti and Polydoropoulou
+
+Application of aggregate container terminal data for the development of time-of-day models predicting
+
+truck arrivals
+
+Morais, P. and Lord, Ε. (2006). Terminal appointment system study. Transportation Development Centre of Transport Canada: TP14570E. Murty, K.G., Liu, J., Wan, Y.-W. and Linn, R. (2005). A decision support system for operations in a container terminal. Decision Support Systems, 39(3), 309–332. PierPASS. Pierpass Terminals Embrace Appointment Systems at Ports of Los Angeles and Long Beach to Control Congestion. http://www.pierpass.org/uncategorized/pierpass-terminals-embraceappointment-systems-at-ports-of-los-angeles-and-long-beach-to-control-congestion [Last accessed on 8th July, 2016]. Popuri, Y., Ben-Akiva, M. and Proussaloglou, K. (2008). Time-of-day modeling in a tour-based context: Tel Aviv experience. Transportation Research Record, 2076, 88–96. RAND Europe, (2005). Departure time and mode choice: analysis of three stated preference data sets. Report prepared for the Department for Transport, United Kingdom. Sharif, O, Huynh, H. and Vidal, J. (2011). Application of El Farol Model for Managing Marine Terminal Gate Congestion. Research in Transport Economics, 32(1), 81-89. Sharman, B. and Roorda, M. (2011). Analysis of Freight Global Positioning System Data Clustering Approach for Identifying Trip Destinations. Transportation Research Record: Journal of the Transportation Research Board, 2246, 83–91. Small, K. (1987). A discrete choice model for ordered alternatives. Econometrica, 55(2), 409–424. Tavasszy, L., Smeenk, B. and Ruijgrok, C. (1998). A DSS For Modelling Logistic Chains in Freight Transport Policy Analysis. International Transportation Operational Research, 5(6), 447- 459. UNCTAD. Review of Maritime Transport 2015. http://unctad.org/en/pages/PublicationWebflyer.aspx?publicationid=1374 [Last accessed on the 10th May, 2016). Vacca, I., Bierlaire, M. and Salan, M. (2010). Optimization of operations in container terminals: hierarchical vs integrated approaches. Swiss Transport Research Council, STRC. van Vuren, T., Carmichael, S., Polak, J., Hyman, G. and Cross, S. (1999). Modelling peak spreading in continuous time. Paper presented at the European Transport Conference, September 1999, Cambridge. Wang, J. (1996). Timing utility of daily activities and its impact on travel. Transportation Research Part A, 30(3), 189–206. Zehendner, E. and Feillet, D. (2014). Benefits of a truck appointment system on the service quality of inland transport modes at a multimodal container terminal. European Journal of Operational Research, 23, 461-469. Zhang, G., Smilowitz, K. and Erera, E. (2011). Dynamic planning for urban drayage operations. Transportation Research: Part E, 47(5), 764–777. Zhnag X., Zeng, Q. and Chen, W. (2013). Optimization model for truck appointment in container terminals. Procedia- Social and Behavioral Sciences, 96, 1938-1947. Zhang , R., Lu, J.C. and Wang, D. (2014). Container drayage problem with flexible orders and its near real-time solution strategies. Transportation Research: Part E, 61, 235 – 241. Zhao W., and Goodchild A. (2010). The impact of truck arrival information on container terminal rehandling. Transportation Research Part E, 46(3), 327-343.
+

@@ -1,0 +1,629 @@
+Article
+Integrated Scheduling of Rail-Mounted Gantry Cranes, Internal Trucks and Reach Stackers in Railway Operation Area of Container Terminal
+Baicheng Yan1, Xiaoning Zhu1, Li Wang1, and Yimei Chang1
+
+Transportation Research Record 1–12 Ó National Academy of Sciences: Transportation Research Board 2018 Reprints and permissions: sagepub.com/journalsPermissions.nav DOI: 10.1177/0361198118782754 journals.sagepub.com/home/trr
+
+Abstract In this paper, the integrated scheduling of handling equipment at the railway handling area in container terminals is studied, where rail-mounted gantry cranes, internal trucks, and reach stackers are deployed. In the course of the handling operation, loading and unloading containers are handled simultaneously. The handling process is first studied and some scheduling schemes are put forward. Based on the analysis, the problem is formulated as a mixed-integer programming model, with the objectives of minimizing the makespan and the total waiting time of all equipment. Then, to solve the problem, a genetic algorithm is employed, where the first available machine rule is applied in the selection of trucks and reach stackers. Sets of numerical experiments are conducted to verify the effect of the proposed algorithm. Based on the results of experiments, some key indicators are calculated and the effects of different equipment configuration schemes are studied.
+
+In 2015, the Chinese government proposed the ‘‘Belt and Road’’ as an important development strategy. According to the development plan, railroads will cover around 80% of the major ports in China before 2018 to shorten the transfer time of containers between trains and vessels.
+In China’s railway container terminals, the storage yards are usually set under rail-mounted gantry cranes (RMGs) and no more than three loading–unloading tracks are laid, which are normally longer than 900 m. Nevertheless, in container terminals, the length of the loading–unloading tracks is limited, and more tracks need to be introduced under RMGs. Consequently, if the storage yards are set under RMGs, their capacity may be insufficient. Moreover, inland and outland containers have to be inspected, but the storage yards under RMGs are unsuitable for customs inspection. Therefore, blocks of storage yards in container terminals are used, and containers are transferred between areas by internal trucks (ITs).
+Although rubber-tired gantry cranes (RTGCs) are widely deployed in container terminals, the movement of RTGCs between yards can be time consuming. Because of the smaller volume of sea–rail intermodal containers, reach stackers (RSs), which are cheaper and more flexible than RTGCs, are used in storage yards. In this paper, equipment configuration schemes consisting of RMGs,
+
+ITs, and RSs are studied, and the integrated scheduling of equipment is addressed.
+The remainder of this paper is organized as follows. Relevant literature is first summarized. Then, the integrated scheduling problem is described and formulated as a mixed-integer programming (MIP) model, and a genetic algorithm (GA)-based optimization is proposed. Numerical experiments are conducted to evaluate the effectiveness of the proposed solution methods, and conclusions and future research are discussed in the last section.
+Literature Review
+To date, there have been many studies focusing on the equipment scheduling problem of container terminals. The scheduling of quay cranes (QCs), yard cranes (YCs), and yard trucks (YT) has been widely studied (1, 2). Most of these studies focus on improving the efficiency and throughput of the aprons and storage blocks of
+1School of Traffic and Transportation, Beijing Jiaotong University, Beijing, P. R. China
+Corresponding Author: Address correspondence to Xiaoning Zhu: xnzhu@bjtu.edu.cn
+
+2
+
+Transportation Research Record 00(0)
+
+container terminals by selecting the makespan and the vessels’ leaving time as objectives.
+As the most important equipment in container terminals, the scheduling of QCs has been studied by many researchers. The work of Kim and Park has been widely cited when the scheduling of QCs is discussed (3). They formulated the QC scheduling as an m-parallel machine scheduling problem with the goal of minimizing the completion time of all QCs. To solve the problem effectively, a heuristic search algorithm was proposed. Lee et al. studied the handling sequence of QCs (4). A MIP model considering the interference between QCs was proposed. The problem of the double cycling of QCs was addressed by Goodchild and Daganzo (5). Strategies for adjusting the port’s operation to support double cycling were proposed. In addition to the interference between QCs, some other constraints were taken into consideration. The stability of vessels was considered by Wang et al., and a MIP model regarding the stability of vessels and scheduling of QCs was proposed (6). Li et al. studied the problem of the disruption recovery of integrated berth allocation and QC assignment (7).
+For the scheduling of YCs, the scheduling of straddle cranes was studied by Kim and Kim, where the total travel distance was optimized (8, 9). The dynamic deployment of RTGCs among blocks was studied by Zhang et al., with the aim of minimizing the total delayed workload (10). To solve the problem, a MIP model was formulated and the Lagrangian relaxation model was developed. The problem of bay allocation and scheduling of YCs for transshipment containers was addressed by Lee et al. (11). With the development of automated container terminals (ACT), research related to automated YCs is getting more attention. Hu et al. studied the problem of the sequencing and routing of automated lifting vehicles in ACT (12). The interference between stacking cranes is formulated by analyzing the minimal temporal intervals between any two tasks.
+For the scheduling of YTs, the deployment of automated guided vehicles (AGVs) was analyzed by Vis et al., where the optimum number of AGVs in a semiautomated terminal and the fleet size of AGVs were calculated (13, 14). The routing of yard trailers was studied by Nishimura et al., and GA was employed to solve the problem (15). The sharing of trucks among container terminals has been studied by He et al., with the aim of the minimization of the total overflowed workloads and total transferring costs (16). The rolling-horizon approach was employed for the immediate scheduling.
+The problem of the integrated scheduling of different types of handling equipment has also been addressed in recent years. A problem including storage allocation, dispatch of vehicles, and scheduling of cranes was studied by Bish et al., and a heuristic algorithm was developed
+
+(17). Chen et al. studied the integrated scheduling of handling equipment in container terminals, which was formulated as a hybrid flow shop problem, and Tabu Search was employed (18). The integrated scheduling of crane handling and truck transportation in container terminals was further studied by Chen et al., where a crane scheduling plan, truck routing plan, and a complete solution were constructed separately by a threestage algorithm (19). The scheduling of ITs, YCs, and QCs in container terminals was addressed by He et al. (20). A MIP model considering the minimizing of total departure delay of vessels and energy consumption was developed, and a GA-based algorithm proposed.
+The scheduling of RSs, which are widely used in railway container terminals, has not been well studied. Moreover, the handling operation for sea–rail intermodal container transportations is scarcely studied, and existing research related to intermodal transportation has mainly focused on the coordination of different modes (21), network planning (22), and evaluation (23). Therefore, the integrated scheduling of the RMGs, RSs, and ITs in container terminals for sea–rail intermodal transportation is studied in this paper.
+Problem Description and Formulation
+Railway Handling Area Configuration
+The configuration of the railway handling area considered in this paper consists of railway handling lines, connecting area, and container yard (Figure 1). RMGs span several parallel railway tracks and driving lines for trucks. A waiting area is established beside the tracks, for waiting ITs before handling operations are started. Also, a floor storage area is set in the waiting area for the temporary depositing of intermediate containers that cannot be immediately loaded onto ITs.
+RSs are used in container yards, and each of them operates in a specific block during the handling process. For the movement and handling operation of RSs within the block, each block is divided into several sub-blocks. Transfer areas are set near the blocks, where the handling operations between RSs and trucks can be conducted. There is a connecting area between the railway handling lines and container yard. In practice, the connecting area can be the road between container yards and railway handling area, whose length can influence the makespan.
+Equipment Scheduling Scheme
+To organize handling operations efficiently, some scheduling rules are proposed in practice. In this paper, as ITs are shared within the area and each block is served by more than one RS, the scheduling of handling
+
+Yan et al
+
+3
+
+Figure 1. Configuration of railway handling area in container terminal.
+
+equipment can be very complicated. Therefore, a scheduling scheme is given. First of all, several assumptions are proposed.
+1. The locations of containers are given, including their locations on the train and corresponding slots in container yards.
+2. Only 40ft containers are discussed, which means that only one container can be loaded on each wagon.
+3. Import and export containers are stacked in different sub-blocks.
+4. The reshuffle and housekeeping operations in the container yard are not considered, which means that during the handling operation, RSs serve the loading and unloading of the containers only.
+5. The conflict between RSs and traffic congestion caused by ITs are not considered.
+
+operations of RMGs are similar in the unloading operation. However, when a loading operation is conducted, as the specified wagon may be occupied, the container on the wagon needs to be stored in the floor storage area first and transferred to the corresponding ITs later in the process.
+For the scheduling of RSs and ITs, the first available equipment is selected according to the time that containers arrive at the specific area. In the unloading operation, as the arrival time of the ITs can be calculated, RSs that can be used first are selected. Then, RSs move to the specified positions with containers and stack them in the assigned slots. In the loading process, RSs handle the containers according to the operation sequences of QCs, and the RSs that can arrive at the slots first are selected. The containers will then be transferred to the transfer areas, and the ITs are selected according to the arrival time.
+
+Based on the above assumptions, the scheduling scheme can be elaborated as follows. The operating range for each of the RMGs is fixed and interference between them can be avoided. Specifically, during the loading operation, the RMG moves to the specific location of the task and waits for the arrival of the container. After the IT arrives, the RMG transfers the container to the specified wagon and then moves to the next position. The
+
+Formulation
+Parameters and Decision Variables
+Parameters. T = The set of all tasks to be handled (indexed by i), where i = 0 denotes a virtual container, jTj = n;
+
+4
+
+Transportation Research Record 00(0)
+
+O = The set of all RMGs that can be scheduled (indexed by r), jOj = m1;
+G = The set of all ITs that can be scheduled (indexed
+by k), jGj = m2; B = The set of blocks in which containers stacked
+(indexed by b), jBj = mb; Yb = The set of all RSs that can be scheduled in block
+b (indexed by rsb), jYbj = m3b; W = The set of wagons that be assigned to tasks,
+denoted by wi; xri = 2 f0, 1g, 1—if task i is conducted by RMG r,
+otherwise xri = 0; li = The slot of task i in container yards and
+li = fl1i, l2i, l3i, l4i, l5ig, which represent the block number, the sub-block number, the bay number, the stack num-
+ber and the tier number of container i respectively; drri0i = The traveling distance of RMG r from task i0
+to task i; drr0i = The traveling distance of RMG r from its orig-
+inal position to the wagon of task i;
+dsi0i = The traveling distance of reach stacker rsb from the end position of task i0 to the start position of task i in
+block b;
+ds0i = The distance of reach stacker rsb from its original position to the original position of task i in block b;
+dsi = The traveling distance of reach stacker rsb for task i in the block;
+dtki0i = The distance of IT k from the destination of task i0 to the origin of task i, where the destination and
+origin mean the wagon number or the block number of
+the container, respectively; dtk0i = The distance of IT k from its original position
+to the origin of task i; dtki = The distance of IT k from the origin to the des-
+tination of task i, where the destination and origin mean
+the wagon number or the block number of the container,
+respectively;
+vre = The running speed of RMGs in unloaded condition;
+vrl = The running speed of RMGs in loaded condition;
+vse = The running speed of RSs in empty condition; vsl = The running speed of RSs in loaded condition; vte = The velocity of ITs in unloaded condition; vtl = The velocity of ITs in loaded condition; pi = The handling time of container i by RMGs; p1i = The handling time of transfer container i from IT to wagon or in reverse;
+p2i = The handling time of transfer container i from wagon to floor storage area;
+p3i = The handling time of transfer container i from floor storage area to IT;
+t1i = The handling time of task i by a reach stacker at transfer area;
+
+t2i = The handling time of task i by a reach stacker in the block;
+li = 2 f0, 1g, 1 if task i is a loading operation; li = 0 otherwise;
+M = A large positive number;
+
+Decision Variables. hi = 2 f0, 1g, 1 if container i needed to be stored in the floor storage area first, 0 otherwise;
+ari0i = 2 f0, 1g, 1 if RMG r conducts task i right after i0, 0 otherwise;
+brsb i0i = 2 f0, 1g, 1 if reach stacker rsb conducts task i right after i0, 0 otherwise;
+gki0i = 2 f0, 1g, 1 if IT k travels from the destination of container i0 to the origin of container i, 0 otherwise;
+mi0i = 2 f0, 1g, 1 if task i0 is completed before task i, 0 otherwise;
+cri = The completion time of task i by RMG, where i 2 T;
+csi = The completion time of task i by RS; cti = The completion time of task i by IT; atri = The time that IT arrives at the wagon location of task i;
+atbi = The time that IT arrives at the transfer area of task i;
+
+The Integrated Scheduling Model
+
+Objectives. The minimization of makespan and total waiting time are included in objectives. The waiting time for the handling operation includes the waiting time between RMGs and ITs and the waiting time between RSs and ITs. The waiting time is mainly determined by the arrival time of the interfacing equipment. Therefore, the waiting time of ITs can be calculated as
+
+X
+
+wtki = max(0, xri Á ari À
+
+gki0i Á atri)
+
+X
+
+i02G, i06¼i X
+
++ max(0,
+
+bri0sib Á asi À
+
+gki0i Á atbi) ð1Þ
+
+i02G, i06¼i
+
+i02G, i06¼i
+
+8i 2 T , r 2 O, k 2 G, rsb 2 Yb
+
+The waiting time of RMGs can be calculated as
+
+X
+
+wrri = max(0,
+
+gki0i Á atri À xri Á ari),
+
+i02G, i06¼i
+
+ð2Þ
+
+8i 2 T , r 2 O, k 2 G
+
+The waiting time of RSs can be calculated as
+
+X
+
+X
+
+wsrsb i = max(0,
+
+gki0i Á atbi À
+
+bri0sib Á asi),
+
+i02G, i06¼i
+
+i02G, i06¼i
+
+ð3Þ
+
+8i 2 T , rsb 2 Yb, k 2 G
+
+Yan et al
+
+5
+
+ari and asi are the time that RMGs and RSs arrive at the corresponding points, which can be calculated as
+
+,
+
+X
+
+X
+
+ari =
+
+ari0i Á cri0 +
+
+ari0i Á dri0i vre, 8i 2 T , r 2 O
+
+i02G, i06¼i
+
+i02G, i06¼i
+
+ð4Þ
+
+X
+
+asi =
+
+csi0 Á bri0sib
+
+i02G, i06¼i
+
+,
+
+X
+
++
+
+(1 À li0 )dsi0 Á bri0sib vse, 8i 2 T , rsb 2 Yb
+
+i02G, i06¼i
+
+ð5Þ
+
+The integrated scheduling problem in this paper can be formulated as a MIP model. Based on the calculation of waiting time, two objective of this problem can be formulated as follow.
+
+min f1 = max(li Á cri + (1 À li) Á csi), 8i 2 T ð6Þ
+
+XX
+
+XX
+
+XX X
+
+min f2 =
+
+wtik +
+
+wrir +
+
+wsri sb
+
+i2T k2G
+
+i2T r2O
+
+i2T b2B rsb2Yb
+
+ð7Þ
+
+The first objective of the model is the minimization of the makespan of all tasks. The second objective is the minimization of the waiting time of all equipment, which will guarantee a smaller unproductive time.
+
+Constraints. The constraints of the integrated scheduling problem can be divided into several parts: the constraints related to time, the constraints related to operation sequence, and the constraints related to the range of value.
+
+  Constraints related to time
+
+hi (1Àli) Á M 8i 2 T
+
+ð8Þ
+
+pi = (1Àhi) Á p1i + hi Á p3i 8i 2 T
+
+ð9Þ
+
+cri À (dri0i=vre + pi + hi Á p2i) + (1 À ari0i)M ! cri0 , 8i, i0 2 T, i 6¼ i0, r 2 O, i0 = 0
+
+ð10Þ
+
+cri À (dri0i=vre + pi + hi Á p2i) + (1 À ari0i)M ! cri0 , 8i, i0 2 T, i 6¼ i0, r 2 O, i0.0
+ð11Þ
+
+ti = t1i + t2i, 8i 2 T
+
+ð12Þ
+
+csi À (dsi0i=vse + ti + dsi=vsl) + (1 À brsb i0i)M ! csi0 ,
+
+8i, i0 2 T, i 6¼ i0, rsb 2 Yb, Yb 2 B, i0 = 0
+
+ð13Þ
+
+csi À (dsi0i=vse + ti + dsi=vsl) + (1 À brsb i0i)M ! csi0 ,
+
+8i, i0 2 T, i 6¼ i0, rsb 2 Yb, Yb 2 B, i0.0
+
+ð14Þ
+
+atri + (1 À gki0i)M ! (cti0 + dti0i=vtl) Á (1 À li), 8i, i0 2 T, i 6¼ i0, k 2 G, i0 = 0
+
+ð15Þ
+
+X
+
+atbi + (1 À
+
+gki0i)M
+
+!
+
+(atri
+
++
+
+i0
+pi
+
+2T,
++
+
+i0 6¼i
+dtk
+
+i
+
+  vtl
+
+)
+
+Á
+
+(1
+
+À
+
+li),
+
+ð16Þ 8i 2 T, k 2 G
+
+atbi + (1 À gki0i)M ! (cti0 + dti0i=vtl) Á li, 8i, i0 2 T, i 6¼ i0, k 2 G, i0 = 0
+
+ð17Þ
+
+atri
+
++ (1
+
+À
+
+zki )M
+
+!
+
+(atbi
+
++ t1i
+
++
+
+dtk
+
+  i vtl
+
+)
+
+Á
+
+li,
+
+8i, i0 2 T, i 6¼ i0, k 2 G, i0 = 0
+
+ð18Þ
+
+cri ! atri + pi, 8i 2 T csi ! atbi + t1i + (dsi=vsl + t2i) Á (1 À li),
+
+ð19Þ 8i 2 T
+ð20Þ
+
+Constraint 8–20 are related to the time of operation. Constraint 8 defines the relationship between hi and li, which means only the unloading containers can be temporarily stored in the floor storage area. Constraint 9 defines the handling time of RMGs. Constraints 10 and 11 indicate the relationship between cri and cri0 when RMGs conduct task i and task i0 continuously. Constraint 10 defines the completion time of the first task of each RMG. Constraints 12–14 are constraints related to the operation time of RSs. Constraint 12 defines the handling time ti of RSs. Constraint 13 defines the completion time of the first task. Constraint 14 shows the relationship of the completion time of two successive tasks conducted by the same RS, which indicates that the time interval between csi and csi0 satisfies the time requirement for transferring tasks. Constraints 15– 18 define the arrival time of ITs and completion time of RMGs and RSs. Constraints 15 and 17 mean that for unloading and loading operations, the time intervals that ITs transfer between tasks satisfies the minimum running time between different locations. Constraints 16 and 18 indicate the relationship between atbi and atri, in which the operation time and running time are considered. Constraint 19 guarantees that the completion time of task i by RMG is later than the arrival time of IT. Constraint 20 ensures that for RSs the completion time of task i is later than the sum of ITs’ arrival time, the handling time of RSs, and the running time of RSs inside the block.
+
+  Constraints related to operation sequences
+
+XX ari0i = 1,
+r2O i06¼i, i02T
+
+8i 2 T, i 6¼ 0
+
+ð21Þ
+
+6
+
+XX ari0i = 1, 8i0 2 T, i0 6¼ 0
+r2O i06¼i, i2T
+X ar0i 1, 8i 2 T, i 6¼ 0
+r2O
+X ar0i = 1, 8r 2 O
+i2T, i6¼0
+X ari0 1, 8i 2 T, i 6¼ 0
+r2O
+X ari0 = 1, 8r 2 O
+i2T, i6¼0
+
+ð22Þ ð23Þ ð24Þ ð25Þ ð26Þ
+
+ari0i + arii0 1, 8i, i0 2 T, r 2 O
+
+X
+
+X
+
+ari0i =
+
+arii00 , 8i 2 T, i 6¼ 0, r 2 O
+
+i02T, i06¼i
+
+i002T, i006¼i
+
+XX brsb i0i = 1, 8i 2 T, Yb 2 B
+
+rsb2Yb i06¼i, i02T
+XX brsb i0i = 1,
+
+8i0 2 T, Yb 2 B
+
+rsb2Yb i06¼i, i2T
+X brsb 0i 1,
+
+8i 2 T, i 6¼ 0, Yb 2 B
+
+rsb 2Yb
+X brsb 0i = 1,
+
+8rsb 2 Yb, Yb 2 B
+
+i2T, i6¼0
+
+X brsb i0 1, 8i 2 T, i 6¼ 0, Yb 2 B
+
+rsb 2Yl1i
+X brsb i0 = 1,
+
+8rsb 2 Yl1i , Yb 2 B
+
+i2T, i6¼0
+
+ð27Þ ð28Þ ð29Þ ð30Þ ð31Þ ð32Þ ð33Þ ð34Þ
+
+brsb i0i + brsb ii0 1, 8i, i0 2 T, rsb 2 Yb, Yb 2 B
+
+X
+
+X
+
+brsb i0i =
+
+brsb ii00 , 8i 2 T,
+
+i06¼i, i2T
+
+i006¼i, i2T
+
+i 6¼ 0, rsb 2 Yb, Yb 2 B XX gki0i = 1, 8i 2 T, i 6¼ 0
+k2G i02T, i6¼i0
+XX gki0i = 1, 8i0 2 T, i 6¼ 0
+k2G i2T, i6¼i0
+X gk0i 1, 8i 2 T, i 6¼ 0
+k2G
+X gk0i = 1, 8k 2 G
+i2T, i6¼0
+X gki0 1, 8i 2 T, i 6¼ 0
+k2G
+X gki0 = 1, 8k 2 G
+i2T, i6¼0
+
+ð35Þ ð36Þ ð37Þ ð38Þ ð39Þ ð40Þ ð41Þ ð42Þ
+
+gkii0 + gki0i 1, 8i, i0 2 T, i 6¼ i0, k 2 G ð43Þ
+
+Transportation Research Record 00(0)
+
+X
+
+X
+
+gk i0i =
+
+gk ii00 ,
+
+i02T, i6¼i0
+
+i002T, i6¼i00
+
+8i 2 T, i 6¼ 0, k 2 G ð44Þ
+
+Constraints 21–44 are related to the operation sequence of different equipment, in which constraints 21–28, constraints 29–36, and constraints 37–44 are related to the operation sequences of RMGs, RSs, and ITs, respectively. As the operation area of each RMGs is given and the safety distance between RMGs can be guaranteed, the constraints related to operation sequence of RMGs, RSs, and ITs are similar in expressions and meaning. Therefore, only constraints related to RMGs are discussed, as the meanings of other constraints are similar. Constraint 21 ensures that for each task i exactly one RMG and one preceding task can be assigned. Similarly, constraint 22 guarantees that for each task i0 exactly one RMG and one succeeding task can be assigned. Constraint 24 means that each RMG conducts one task after it leaves its initial position. Constraints 23 and 25 ensure that for each task i there is at most one inflow or outflow arc connecting the virtual start or end position of RMGs. Constraint 26 guarantees that each RMG conducts one task as its last task. Constraint 27 ensures the operation sequence between task i and i0. Constraint 28 ensures that each RMG can conduct tasks continuously.
+
+  Constraints related to ranges of decision variables
+
+hi, ari0i, brsb i0i, gk i0i 2 f0, 1g, 8i, i0 2 T, i 6¼ i0,
+
+ð45Þ
+
+r 2 O, k 2 G, rsb 2 Yb, Yb 2 B
+
+cri, csi, cti, atri, atbi ! 0, 8i 2 T, i 6¼ 0 ð46Þ
+
+Constraint 45 defines the binary variables and constraint 46 defines the integer variables.
+
+Genetic Algorithm
+The integrated scheduling of handling equipment at container terminals can be formulated as a hybrid flow shop scheduling problem, where QCs, ITs, and YCs are the machines of different stages and the loading and unloading processes for containers are jobs that need to be completed (18); this is well known as a non-deterministic polynomial hard problem (NP-hard). As a block is served by several RSs, the integrated scheduling of RMGs, ITs, and RSs can be very complicated. Therefore heuristic algorithms are widely used to obtain near-optimal scheduling plans (24). To solve the problem efficiently, the following GA was designed.
+
+Framework of the GA
+The integrated scheduling of handling equipment in container terminals can be divided into two steps: the
+
+Yan et al
+
+7
+
+Figure 2. Flowchart of the GA-based optimization algorithm.
+allocation of tasks and the calculation of the operation sequence. To solve these problems effectively and efficiently, heuristic rules are adopted. Generally, two rules are adopted in the equipment scheduling problem: first come first service and first available machine (FAM) (18). As the minimization of total waiting time of all equipment is considered, the FAM rule is applied. The GA procedure here is illustrated in Figure 2.
+Representation
+The main purpose of the chromosome is to give the operation sequences of all RMGs. In the proposed GA, the operation sequences of RMGs are represented as a onedimensional chromosome, whose genes are the number of the tasks. For example, when 8 tasks are handled by 2 RMGs, the chromosome can be denoted as f83415762g. When tasks for RMGs are given, for example, tasks 1–4 are assigned to RMG 1 and tasks 6–8 are assigned to RMG 2, the operation sequences of the two RMGs can be obtained as f3412g and f8576g.
+For unloading operations, the start time is mainly influenced by the RMGs’ operation sequences. When the operation sequences of RMGs are given, ITs and RSs can be chosen according to FAM. For loading operations, the start time of the loading operations is mainly affected by the completion times of preceding tasks. When the completion times of the preceding tasks are
+
+known, the earliest start time of RMGs for loading tasks can be calculated, which can be further used in the assignment of tasks.
+
+Evaluation and Selection
+To integrate the makespan and total waiting time, normalization of the objectives is adopted, which is shown as function 47, where f1max, f1min, f2max and f2min represent the maximum and minimum value of the makespan and total waiting time, respectively. a1 and a2 are the weights of makespan and waiting time, where a1 + a2 = 1. In the selection operation, as the original objective has been transferred to the maximization of the normalization value, fi can be used as the fitness value and roulette selection is applied.
+
+fi = max
+
+a1
+
+Á
+
+f1max À f1i f1max À f1min
+
++ a2
+
+Á
+
+f2max À f2i f2max À f2min
+
+ð47Þ
+
+Crossover
+In this paper, partially mapping crossover (PMX) is adopted in the crossover operation. An example of the crossover operation is shown in Figure 3. During the operation, the chromosomes are divided into the operation sequences of RMGs. Then, for each RMG, crossover positions are generated randomly and PMX is
+
+8
+
+Transportation Research Record 00(0)
+
+Figure 3. An example of the crossover operation.
+
+conducted to obtain new operation sequences. Lastly, the new operation sequences are used to replace the original sequences to obtain the offspring.
+
+SRSC4535GC of SANY. The parameters related to the ITs are set according to the Hova tractors of SINOTRUK.
+
+Mutation
+The mutation operation in this paper consists of both reverse operator and swap operator. For reverse operator, two positions of the operation sequence are generated randomly and the tasks between them are reversed. For swap operator, several positions are selected randomly and the tasks at these positions are swapped.
+Numerical Experiments
+To evaluate the effectiveness of the proposed model and algorithm, a series of experiments were conducted. First, the effectiveness of the algorithm was verified with a case of 40 tasks (20 loading and 20 unloading) and the values of a1 and a2 were determined. Then, experiments of large size were conducted, and cases with different equipment number compared. All experiments were run on a computer with Intel Core i5-4210M @ 2.3GHz processors, 8 GB RAM, and 64 bit operation system.
+Parameters of the Experiment
+The key parameters of the experiment are set as shown in Table 1. The parameters related to RMGs and RSs are taken from the parameters of SRMG5507 and
+
+Small-Size Problems Study
+As the minimization of makespan cannot guarantee a reduced waiting time, to evaluate the effect of different weights, several sets of experiments with different values of a1 are conducted, in which 40 tasks are handled by 3 RMGs, five ITs, and 4 RSs (two in each block). For each pair of weights, the experiment is conducted 10 times. The population size (pop), maximum generations (MAXGEN), probability of crossover (pc), probability of mutation (pm), and gap (GAP) between generations are set to be 100, 500, 0.8, 0.2 and 0.9, respectively.
+The performance comparison of different weights is shown in Figure 4, in which the number below represents the value of a1 and a2; for example, ‘‘0307’’ means a1 = 0:3 and a2 = 0:7, respectively. It is clear that, when a1 = 0:6 and a2 = 0:4, a better result can be achieved. Therefore, to achieve a better optimization effect, the multi-objective approach is adopted and the weights of makespan and waiting time are set as 0.6 and 0.4, respectively.
+Equipment Configuration Schemes Study
+To verify the effect of different equipment configuration schemes, sets of large-scale experiments (240 tasks) were
+
+Yan et al
+Table 1. Key Parameters of the Experiments
+Name of parameter
+Gantry traveling speed of RMG (Full Load) Trolley traversing speed of RMG Hoisting speed of RMG (Empty Load) Hoisting speed of RMG (Full Load) Hoisting height of RMG Travel speed of IT (Empty Load) Travel speed of IT (Full Load) Travel speed of reach stacker (Empty Load) Travel speed of reach stacker (Full Load) Lifting speed of reach stacker (Empty Load) Lifting speed of reach stacker (Full Load) Length of the wagon Length of the container (including the space between containers) Height of the container Maximum number of the layers in sub-block Maximum number of containers in one bay Distance between railway lines Distance between railway handling area and container yard
+
+Range
+30–100 m /min 50–100 m /min 30–80 m /min 15–40 m /min
+9.5–21.2 m <39 km/h <39 km/h <25 km/h <21 km/h <420 mm/s <250 mm/s
+—— ——
+—— —— —— —— ——
+
+9
+Value
+50 m/min 50 m/min 30 m/min 20 m/min
+10 m 21.6 km/h 18 km/h 25 km/h 20 km/h 250 mm/s 250 mm/s
+15 m 12.5 m
+2.5 m 4 16
+6.5m 800m
+
+Figure 4. The performance comparison of different weights.
+
+conducted and key indicators, including makespan and types of unproductive time, compared. The pop, MAXGEN, pc, pm, GAP, a1, and a2 in the GA are set as 200, 500, 0.8, 0.2, 0.9, 0.6, and 0.4 respectively. Each set of experiment was conducted 10 times and the mean value calculated. To evaluate the general effects of different schemes and the efficiency variances of equipment, both the total and mean unproductive time were calculated and compared.
+The comparison of the makespan and the sum of unproductive time for each kind of equipment among different schemes is shown in Figure 5, in which the schemes on the x-axis represent the number of RMGs,
+
+RSs in each block, and ITs separately. For example, 3-39 means that, in this case, three RMGs, three RSs (each block), and nine ITs are deployed. It can be observed that, first, compared with 3-3-9, the increase of the RSs and ITs can decrease the makespan of all tasks and the unproductive time of RMGs. However, when more equipment is deployed, the unproductive time of the handling process, of which waiting time accounts for a great proportion, increases significantly; this can result in higher operation costs and greater fuel consumption.
+Specifically, on the one hand, compared with 3-3-9, increasing RS (3-4-9) shows a better effect than increasing IT (3-3-9), because of the decrease in the total empty
+
+10
+
+Transportation Research Record 00(0)
+
+Figure 5. Comparison of the total value of key indicators.
+
+time. Moreover, the increase of RSs is beneficial to the operational efficiency of ITs and RMGs. On the other hand, in this case, increasing ITs is helpful to the further utilization of the capabilities of the handling equipment. At a cost of greater waiting time of ITs, deploying more ITs can effectively reduce the unproductive time of RMGs and RSs; this means that, in schemes 3-3-9 and 34-9, the operational capabilities of RSs and RMGs have not been fully utilized.
+When more equipment is used, the workloads for each can be different. Therefore, it is necessary to compare their mean unproductive time, as shown in Figure 6. The time variations are the changes of mean unproductive time between schemes. For instance, ‘‘No.1—No.2’’ means the mean unproductive time increases of 3-3-12 compared with 3-3-9.
+It can be observed that, first, deploying more ITs and RSs can greatly improve the working efficiency of RMGs because the empty and waiting time of RMGs decrease significantly. Second, deploying more ITs and RSs shows different effects on the other operations. When more RSs are deployed, the empty time of ITs reduces, especially in the comparative group of No.2–No.4. In consideration of the distance differences between block–block and block–tracks, reduced empty time means that ITs are more likely to transfer the loading and unloading containers jointly. However, the increase of ITs does not show an obvious effect on the mean empty time of RSs. Third, the increase of equipment can result in greater equipment waiting time, which means that their
+
+operational efficiency is greatly affected. In this case, comparing the effects of increasing RSs with increasing ITs, the former shows a better effect on the handling operation because the mean waiting time of RSs is not significantly increased.
+Conclusions and Future Research Directions
+As sea–rail intermodal transportation gradually receives more attention (25), the significant problem of the integrated scheduling of RMGs, RSs, and ITs in the railway handling area of container terminals was studied here. First, the handling area configuration and equipment scheduling schemes was analyzed. Then, a MIP model with the objective of minimizing the makespan and total waiting time of the handling operations was proposed. To solve the problem efficiently, a GA was developed that takes FAM rules into consideration. Last, sets of experiments were conducted to validate the effect and efficiency of the model and algorithm. In this paper, a set of experiments for 240 tasks was analyzed to differentiate the effects of various equipment configuration schemes on the handling operation. The unproductive time of equipment was adopted as a main indicator for system performance. The results reveal that, although the increase of equipment can shorten the makespan effectively, more RSs and ITs can also result in more unproductive time, especially waiting time, which means a higher handling cost and greater fuel consumption.
+
+Yan et al
+
+11
+
+Figure 6. Comparison of the mean value of key indicators.
+
+Moreover, increasing ITs and RSs results in different effects on the overall handling process. In this case, increasing RS produces a better effect. In practice, enterprises can choose the best equipment configuration based on their time, fuel consumption, and cost requirements.
+This research can be further extended in several ways, as here only 40ft containers are studied. In practice, the handling of 20ft containers is common, which means the operation sequences can be greatly affected because the loading tasks can only be conducted after all containers in the wagon are unloaded. In addition, the operation time of the equipment is calculated via equipment indicators, which is deterministic. However, the operation time can be affected by factors related to the operators.
+Acknowledgments
+This work was supported by the Major Research Plan of the National Natural Science Foundation of China [grant number 71390332], the Fundamental Research Funds for the Central Universities [grant number 2017YJS100] and Major Project of Civil Aviation Science and Technology Project [project number 201501].
+Author Contributions
+The authors confirm contribution to the paper as follows: study conception and design: Baicheng Yan, Xiaoning Zhu, Li Wang; data collection: Baicheng Yan, Yimei Chang; analysis and interpretation of results: Baicheng Yan; draft manuscript preparation: Baicheng Yan. All authors reviewed the results and approved the final version of the manuscript.
+
+References
+1. Steenken, D., S. Voß, and R. Stahlbock. Container Terminal Operation and Operations Research - a Classification and Literature Review. Or Spectrum, Vol. 26, No. 1, 2004, pp. 3–49.
+2. Stahlbock, R., and S. Voß. Operations Research at Container Terminals: A Literature Update. Or Spectrum, Vol. 30, No. 1, 2008, pp. 1–52.
+3. Kim, K. H., and Y. Park. A Crane Scheduling Method for Port Container Terminals. European Journal of Operational Research, Vol. 156, No. 3, 2004, pp. 752–768.
+4. Lee, D.-H., H. Q. Wang, and L. X. Miao. Quay Crane Scheduling with Non-interference Constraints in Port Container Terminals. Transportation Research Part E: Logistics and Transportation Review, Vol. 44, No.3, 2008, pp.124–135.
+5. Goodchild, A. V., and C. F. Daganzo. Crane Double Cycling in Container Ports: Planning Methods and Evaluation. Transportation Research Part B Methodological, Vol. 41, No. 8, 2007, pp. 875–891.
+6. Wang, J., H. Hu, and Y. Song. Optimization of Quay Crane Scheduling Constrained by Stability of Vessels. Transportation Research Record: Journal of the Transportation Research Board, 2013. 2330: 47–54.
+7. Li, M. Z., J. G. Jin, and C. X. Lu. Real-Time Disruption Recovery for Integrated Berth Allocation and Crane Assignment in Container Terminals. Transportation Research Record Journal of the Transportation Research Board, 2015. 2479: 49–59.
+8. Kim, K. H., and K. Y. Kim. Routing Straddle Carriers for the Loading Operation of Containers Using a Beam Search Algorithm. Computers & Industrial Engineering, Vol. 36, No. 1, 1999, pp. 109–136.
+
+12
+
+Transportation Research Record 00(0)
+
+9. Kim, K. H., and K. Y. Kim. A Routing Algorithm for a Single Straddle Carrier to Load Export Containers Onto a Containership. International Journal of Production Economics, Vol. 59, No. 1–3, 1999, pp. 425–433.
+10. Zhang, C., Y. W. Wan, J. Liu, and R. J. Linn. Dynamic Crane Deployment in Container Storage Yards. Transportation Research Part B, Vol. 36, No. 6, 2002, pp. 537–555.
+11. Lee, D.-H., J. G. Jin, and J. H. Chen. Integrated Bay Allocation and Yard Crane Scheduling Problem for Transshipment Containers. Transportation Research Record: Journal of the Transportation Research Board, 2011. 2222: 63–71.
+12. Hu, Z. H., J. B. Sheu, and J. X. Luo. Sequencing Twin Automated Stacking Cranes in a Block at Automated Container Terminal. Transportation Research Part C, Vol. 69, 2016, pp. 208–227.
+13. Vis, I. F. A., de R. Koster, K. J. Roodbergen, and L. W. P. Peeters. Determination of the Number of Automated Guided Vehicles Required at a Semi-automated Container Terminal. Journal of the Operations Research Society, Vol.52, No. 4, 2001, pp. 409–417.
+14. Vis, I. F. A. Minimum Vehicle Fleet Size Under Time-window Constraints at a Container Terminal. Transportation Science, Vol. 39, No. 2, 2005, pp. 249–260.
+15. Nishimura, E., A. Imai, and S. Papadimitriou. Yard Trailer Routing at a Maritime Container Terminal. Transportation Research Part E: Logistics and Transportation Review, Vol. 41, No. 1, 2005, pp. 53–76.
+16. He, J. L., W. M. Zhang, Y. F. Huang, and W. A. Yan. A Simulation Optimization Method for Internal Trucks Sharing Assignment Among Multiple Container Terminals. Advanced Engineering Informatics, Vol. 27, No. 4, 2013, pp. 598–614.
+17. Bish, E. K., T. Y. Leong, C. L. Li, J. W. C. Ng, and D. Simchi-Levi. Analysis of a New Vehicle Scheduling and Location Problem. Naval Research Logistics, Vol. 48, No. 5, 2001, pp. 363–385.
+18. Chen, L., N. Bostel, P. Dejax, L. Xi, and J. Cai. A Tabu Search Algorithm for the Integrated Scheduling Problem
+
+of Container Handling Systems in a Maritime Terminal. European Journal of Operational Research, Vol. 181, No. 1, 2007, pp. 40–58. 19. Chen, L., A. Langevin, and Z. Q. Lu. Integrated Scheduling of Crane Handling and Truck Transportation in a Maritime Container Terminal. European Journal of Operational Research, Vol. 225, No. 1, 2013, pp. 142–152. 20. He, J., Y. Huang, W. Yan, and S. Wang. Integrated Internal Truck, Yard Crane and Quay Crane Scheduling in a Container Terminal Considering Energy Consumption. Expert Systems with Applications, Vol. 42, No. 5, 2015, pp. 2464–2487. 21. Xie, Y., X. Liang, L. Ma, and H. Yan. Empty Container Management and Coordination in Intermodal Transport. European Journal of Operational Research, Vol. 257, No.1, 2016, pp. 223–232. 22. Caballini, C., S. Fioribello, S. Sacone, and S. Siri. An MILP Optimization Problem for Sizing Port Rail Networks and Planning Shunting Operations in Container Terminals. IEEE Transactions on Automation Science & Engineering, Vol. 13, No. 4, 2016, pp. 1492–1503. 23. La¨ mmel, G., M. Chraibi, A. U. K. Wagoum, and B. Steffen. Hybrid Multimodal and Intermodal Transport Simulation. Transportation Research Record Journal of the Transportation Research Board, 2016. 2561: 55–64. 24. Kang, L., J. Wu, H. Sun, X. Zhu, and B. Wang. A Practical Model for Last Train Rescheduling with Train Delay in Urban Railway Transit Networks. Omega, Vol. 50, 2015, pp. 29–42. 25. Kang, L., Q. Meng, and Q. Liu. Fundamental Diagram of Ship Traffic in the Singapoe Strait. Ocean Engineering, Vol. 13, No. 147, 2018, pp. 340–354.
+The Standing Committee on Intermodal Freight Terminal Design and Operations (AT050) peer-reviewed this paper (18-03371).
+

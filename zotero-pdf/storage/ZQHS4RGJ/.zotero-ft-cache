@@ -1,0 +1,1436 @@
+2023
+
+23
+
+25
+
+2023 23 25 10879 -08
+
+Science Technology and Engineering
+
+ISSN 1671—1815 CN 11—4688 / T
+
+．
+
+AＲIMA-LSTM-XGBoost
+
+J．
+
+2023 23 25 10879-10886.
+
+Long Yu Xu Haoran Yu Huayun et al． Prediction of railway freight volume based on AＲIMA-LSTM-XGBoost combination model J ． Sci-
+
+ence Technology and Engineering 2023 23 25 10879-10886.
+
+AＲIMA- LSTM-XGBoost
+
+* 434023
+
+AＲIMA-LSTM-XGBoost
+
+。
+
+autoregressive integrated moving
+
+average AＲIMA
+
+long short-term memory LSTM
+
+extreme gradient boosting XGBoost
+
+AＲIMA、AＲIMA-LSTM、LSTM、XGBoost
+
+mean square error MSE 、
+
+root mean squared error ＲMSE 、
+
+mean absolute error MAE 、
+
+mean absolute
+
+percentage error MAPE
+
+。 2007—2021
+
+MSE、ＲMSE、MAE、MAPE
+
+0. 011 9、0. 109 4、0. 068 3、1. 775 2%
+
+。
+
+AＲIMA LSTM XGBoost
+
+TP391 U294. 13
+
+A
+
+Prediction of Ｒailway Freight Volume Based on AＲIMA-LSTM-XGBoost Combination Model
+LONG Yu XU Hao-ran YU Hua-yun* HE Yong XU Hong-niu
+School of Computer Science Yangtze University Jingzhou 434023 China
+Abstract In order to improve the prediction accuracy and generalization ability of railway freight volume considering the linear and nonlinear characteristics of railway freight volume time series a railway freight volume prediction method based on AＲIMA-LSTMXGBoost combined model was proposed． Firstly autoregressive integrated moving average AＲIMA model was used to preliminarily predict China’s railway freight volume and then long short-term memory LSTM network was used to correct the residuals． Secondly by combining with extreme gradient boosting XGBoost model a weighted combination model with the weight determined by error reciprocal method was constructed． Finally the combination model was compared with AＲIMA AＲIMA-LSTM LSTM and XGBoost models and the prediction accuracy of the above models were analyzed by means of mean square error MSE root mean square error
+ＲMSE mean absolute error MAE and mean absolute percentage error MAPE ． Based on the experiment of the monthly data of China’s railway freight volume from 2007 to 2021 the results show that the MSE ＲMSE MAE and MAPE of the combined model are 0. 011 9 0. 109 4 0. 068 3 and 1. 775 2% respectively． The prediction error is lower than the above comparison models and the prediction accuracy and generalization ability of the model are improved．
+Keywords railway freight volume prediction AＲIMA LSTM XGBoost combination model
+
+。
+
+、
+
+、
+
+。
+
+“
+
+”“
+
+”
+
+、
+
+1。
+
+、
+
+、
+
+。
+
+2022-07-12
+
+2023-05-30
+
+61440023
+
+-
+
+1999—
+
+。
+
+*
+
+1968—
+
+。
+
+、 、
+
+2020ITA03012 。E-mail longyu_victor@ yeah． net。
+。E-mail yhuayun88@ sina． com。
+
+www． stae． com． cn
+
+10880
+
+Science Technology and Engineering
+
+2023 23 25
+
+。
+
+、
+
+、
+
+、
+
+。
+
+。
+
+、
+
+。
+2
+
+、
+
+、
+
+、
+
+、
+
+、 GM 1 1
+
+。
+
+3
+
+long short-term memory
+
+LSTM
+
+au-
+
+toregressive integrated moving average AＲIMA
+
+BP
+
+。
+
+4
+
+LSTM
+
+LSTM
+
+IPSO-LSTM
+
+improved particle swarm optimization IPSO
+
+LSTM
+
+。
+
+Guo 5
+
+general regression neural network GＲNN
+
+GＲNN
+
+。
+
+GＲNN
+
+。
+
+6
+
+BP
+
+-
+
+。
+
+7
+
+LSTM
+
+。
+
+8
+
+fruit fly optimization algorithm FOA
+
+least squares support vector
+
+machine LSSVM
+
+。
+
+、 LSTM
+
+。 AＲIMA
+
+9。
+
+extreme gradi-
+
+ent boosting XGBoost
+
+10 。
+
+AＲIMA、LSTM、XGBoost
+
+AＲIMA-LSTM-XGBoost
+
+。
+
+AＲIMA
+
+LSTM
+
+AＲIMA
+
+XGBoost
+
+。
+
+。
+1
+1. 1 AＲIMA
+
+AＲIMA
+
+AＲMA
+
+11 。
+
+AＲMA p q
+
+p
+
+q
+
+∑ ∑ Yt =
+
+αiYt－1 +
+
+θiεt－1 + εt + C
+
+i =1
+
+i =1
+
+1
+
+Yt t
+
+p
+
+q
+
+αi
+
+εt
+
+。
+
+1
+θi C
+
+AＲMA p q
+
+d
+
+AＲIMA p d q
+
+。
+
+AＲIMA
+
+4
+
+12 。
+
+1
+
+。
+
+。
+
+。
+
+2
+
+。
+
+AＲIMA p d q
+
+d
+
+。
+
+criterion AIC
+
+tion criterion BIC
+
+3
+
+。
+
+13 。
+p、d、q 3
+pq Akaike information
+Bayesian informa。
+
+www． stae． com． cn
+
+2023 23 25
+
+AＲIMA-LSTM-XGBoost
+
+10881
+
+。
+
+。
+
+4
+
+。
+
+。
+
+1. 2 LSTM
+
+regression neural network ＲNN
+
+-
+
+-
+
+。
+
+ＲNN
+
+。 ＲNN
+
+。
+
+Hochreiter 14
+
+LSTM 。
+
+ＲNN LSTM
+
+、、
+
+3
+
+1。
+
+1 LSTM Fig. 1 Structure diagram of LSTM hidden layer
+
+。 xt
+ft = σ Wf ht－1 xt + bf 2 ft t
+bf 。
+
+ht －1
+2 Wf σ sigmoid
+
+it t
+
+σ sigmoid 。 Ct －1
+
+Wi
+
+bi
+
+bC
+
+ft
+
+Ct
+
+～
+
+Ct = ftCt－1 + it C t
+
+5
+
+Ct tanh
+
+ht。 ot = σ Wo ht－1 xt + bo ht = ottanh Ct
+ot t σ sigmoid
+
+6
+
+7
+
+Wo
+
+bo
+
+。
+
+1. 3 XGBoost
+
+XGBoost
+
+boosting
+
+gradient
+
+boosting decison tree GBDT
+
+、
+
+15 。
+
+XGBoost
+
+n
+
+∑ y^ i =
+
+xij wj
+
+j =1
+
+8
+
+y^ i
+
+i
+
+wj
+
+j
+
+XGBoost
+
+n xij
+
+8 。
+
+n
+
+∑ Obj t = L yi y^ i + Ω ft + c
+
+9
+
+i =1
+
+n
+
+9
+
+∑ L yi y^ i
+
+y^ i
+
+i =1
+
+yi
+
+Ω ft
+
+L1
+
+、L2
+
+16 c
+
+。
+
+n
+
+n
+
+∑ ∑ L yi y^ i =
+
+L yi y^ ti－1 + ft xi
+
+10
+
+i =1
+
+i =1
+
+ht －1
+tanh ～ C t。 it = σ Wi ht－1 xt + bi ～ C t = tanh WC ht－1 xt + bC
+
+xt
+
+∑ Ω ft
+
+=
+
+γT
+
++
+
+1 2
+
+λ
+
+T i =1
+
+ω2j
+
+11
+
+11 γ
+
+T
+
+λ
+
+ωj
+
+j
+
+。 3
+
+Obj t
+
+ft。
+
+4
+
+ft = 0
+
+www． stae． com． cn
+
+10882
+
+Science Technology and Engineering
+
+∑ [n
+
+Obj t ≈
+
+L yi y^ i t －1
+
+i =1
+
++ gift xi
+
+] 1
+2
+
+h
+
+i
+
+f
+
+2 t
+
+xi
+
++ Ω ft
+
+12 gi
+
+y^
+
+t i
+
+－1
+
+。
+
+11
+
+12
+
++ 12
+hi w
+
+LSTM N^ t
+AＲIMA-LSTM Y^ 1 = L^ t + N^ t 1. 4. 2
+
+2023 23 25
+et Y^ 1 16
+
+wj
+
+= － Gj Hj + λ
+
+13
+
+∑ Obj t
+
+=－
+
+1 2
+
+T j =1
+
+G2j Hj + λ
+
++ γT + C
+
+14
+
+∑ ∑ Gj = gi Hj = hi 。
+
+i∈Ij
+
+i∈Ij
+
+1. 4
+
+、LSTM 、XGBoost 2。
+
+AＲIMA
+
+。
+
+XGBoost
+
+Y^ 2 XGBoost
+ei 1 = ei 2 =
+
+AＲIMA-LSTM ei 2
+yi － y^ i 1 yi － y^ i 2
+
+yi
+
+i
+
+i
+
+AＲIMA-LSTM
+
+ei 1
+17 18 y^ i 1
+
+y^ i 2
+
+i
+
+。
+
+XGBoost
+
+AＲIMA-LSTM
+
+Y^ 1 XGBoost
+
+Y^ 2
+
+17
+
+AＲIMA-LSTM-XGBoost
+
+2 Fig. 2 Structure diagram of combination model
+1. 4. 1
+
+LSTM。 AＲIMA
+
+。
+
+AＲIMA
+
+Yt
+
+Lt
+
+et
+
+et = Yt － L^ t
+
+AＲIMA-
+LSTM 。
+AＲIMA-LSTM L^ t
+15
+
+y^ i
+
+=
+
+ei 2 ei 1 + ei 2
+
+y^ i 1
+
++
+
+ei 1
+
+ei 1 +
+
+ei 2
+
+y^ i 2
+
+19
+
+19
+
+y^ i
+
+i
+
+。
+
+1. 5
+
+mean
+
+square error MSE 、 error ＲMSE 、 MAE 、
+
+root mean squared mean absolute error mean absolute percent-
+
+age error MAPE
+
+。
+
+1
+
+MSE。
+
+∑ MSE = 1 N
+N i=1
+
+yi － y^ i 2
+
+20
+
+2
+
+ＲMSE。
+
+■∑ ＲMSE =
+
+1N N i=1
+
+yi － y^ i 2
+
+21
+
+3
+
+MAE。
+
+∑ MAE = 1 N
+N i=1
+
+yi － y^ i
+
+22
+
+4
+
+MAPE。
+
+www． stae． com． cn
+
+2023 23 25
+
+AＲIMA-LSTM-XGBoost
+
+∑ MAPE = 1 N yi － y^ i × 100%
+
+N i=1
+
+yi
+
+23
+
+yi
+
+i
+
+y^ i
+
+i
+
+N
+
+。
+
+2
+
+2. 1 12
+。
+
+2007 1 —2021
+
+。
+
+3
+
+function ACF
+
+function PACF
+
+4。
+
+4
+
+ACF
+
+AＲIMA
+
+10883
+partial auto-correlation
+PACF 。
+
+3 2007 1 —2021 12 Fig. 3 Sequence diagram of railway freight volume from
+January 2007 to December 2021
+
+2. 2 AＲIMA AＲIMA 。
+2. 2. 1
+
+P = 4. 52 × 10 －29 ＜ 0. 05
+
+。
+
+-
+
+augmented Dickey-Fuller test
+
+ADF
+
+18
+
+P = 0. 836 2 ＞ 0. 05
+
+ADF
+
+。
+
+P ＜ 0. 05
+
+。
+
+ADF
+
+P = 0. 032 3 ＜ 0. 05
+
+。
+
+。 2. 2. 2
+
+auto-correlation
+
+4
+
+、
+
+Fig. 4 Autocorrelation function partial autocorrelation
+
+function diagram
+
+p 2. 2. 3
+
+BIC q。
+QQ
+
+AIC BIC
+AＲIMA 4 1 3 BIC 。
+5。
+
+。
+
+Durbin-Watson D-W
+
+2. 5
+
+。
+
+P ＞ 0. 05
+
+。
+
+www． stae． com． cn
+
+10884
+
+Science Technology and Engineering
+
+2023 23 25
+
+。
+
+4 AＲIMA-LSTM
+
+。 AＲIMA
+
+LSTM
+
+AＲIMA-LSTM
+
+。
+
+2. 4 XGBoost
+
+Python 3. 6
+
+XGBoost
+
+XGBＲegressor
+
+XGBoost
+
+scikit-learn
+
+GridSearchCV
+
+。XGBoost
+
+1。
+
+1 XGBoost Table 1 XGBoost model parameters
+
+booster
+
+n_estimators
+
+max_depth
+
+learning_rate
+
+objective
+
+L1
+
+reg_alpha
+
+L2
+
+reg_lambda
+
+2. 5 AＲIMA-LSTM 2021 1—12
+
+gbtree 150 5 0. 1 binary logistic 0 1
+XGBoost
+
+5 Fig. 5 Model residual test diagram
+
+2. 2. 4
+
+AＲIMA 4 1 3
+
+168
+
+2007 1 —2020 12
+
+12
+
+2021 1—12
+
+2. 3 AＲIMA-LSTM
+
+LSTM
+
+AＲIMA
+
+1
+
+。 AＲIMA
+
+。
+
+AＲIMA、AＲIMA-LSTM、LSTM、
+
+XGBoost 4
+
+。
+
+6。
+
+。
+
+7。
+
+MAE、ＲMSE、MAE、MAPE
+
+2。
+
+。
+
+。
+
+2
+
+。
+
+168
+
+12
+
+Py-
+
+thon 3. 6
+
+Tensorflow
+
+LSTM
+
+time _steps = 12
+
+12
+
+LSTM
+
+8
+
+0. 01
+
+600
+
+batch_size = 64。
+
+MSE
+
+Adam
+
+tanh 。
+
+3
+
+。 LSTM
+
+6 Fig. 6 Comparison diagram of predicted value and
+actual value of each model
+
+www． stae． com． cn
+
+2023 23 25
+
+AＲIMA-LSTM-XGBoost
+3
+
+10885
+
+AＲIMA-LSTM-XGBoost 2007—2020 2021
+。 1 AＲIMA、AＲIMA-LSTM、XGBoost、LSTM
+AＲIMA-LSTM-XGBoost
+
+。
+
+2
+
+LSTM
+
+AＲIMA
+
+Fig. 7
+
+7 Comparison diagram of error point by point of
+each model
+
+2
+
+Table 2 Comparison of evaluation indexes of each model
+
+AＲIMA AＲIMA-LSTM
+XGBoost LSTM
+AＲIMA-LSTM-XGBoost
+
+MSE 0. 031 1 0. 022 1 0. 051 7 0. 031 0 0. 011 9
+
+ＲMSE 0. 176 2 0. 148 7 0. 227 4 0. 175 2 0. 109 4
+
+MAE 0. 156 1 0. 127 4 0. 176 9 0. 152 2 0. 068 3
+
+MAPE / % 4. 031 1 3. 321 8 4. 441 4 3. 874 1 1. 775 2
+
+67
+
+。AＲIMA
+
+LSTM
+
+AＲIMA
+
+AＲIMA-LSTM
+
+LSTM
+
+XGBoost
+
+AＲIMA-LSTM-XGBoost 3
+
+。 AＲIMA
+。 。
+7
+
+。3
+
+MSE、ＲMSE、MAE、MAPE
+
+0. 011 9、0. 109 4、0. 068 3、1. 775 2%
+
+AＲIMA-LSTM-XGBoost
+
+。
+
+MAPE
+
+AＲIMA、
+
+AＲIMA-LSTM、XGBoost、LSTM
+
+MAPE
+
+55. 96% 、46. 56% 、60. 03% 、
+
+54. 18%
+
+。
+
+。 3
+LSTM-XGBoost
+
+AＲIMA-
+
+。 AＲIMA-LSTM-XGBoost
+
+。
+
+1
+
+．“
+
+”
+
+J．
+
+2022 41 5 47-50 81．
+
+Bin Lian Ma Shujuan Li Xiang． Discussion on development strat-
+
+egy of special railway line in context of “highway to railway shift”
+
+J ． Logistics Technology 2022 41 5 47-50 81．
+
+2
+
+．
+
+GM 1 1
+
+J．
+
+2019 17 2 44-50．
+
+Xu Li Xue Feng． Prediction of rail freight volume of China based
+
+on secondary residual error modification of GM 1 1 model J ．
+
+Journal of Transportation Engineering and Information 2019 17
+
+2 44-50．
+
+3
+
+．
+
+LSTM
+
+J．
+
+2020 42 11 15-21．
+
+Chen Zhaolan Zhang Xiaoqiang Liang Yue． Ｒailway freight
+
+volume prediction based on LSTM network J ． Journal of the China
+
+Ｒailway Society 2020 42 11 15-21．
+
+4
+
+．
+
+LSTM
+
+J．
+
+2018 15 12
+
+3274-3280．
+
+Li Wan Feng Fenling Jiang Qiwei． Prediction for railway passen-
+
+ger volume based on modified PSO optimized LSTM neural network
+
+J ． Journal of Ｒailway Science and Engineering 2018 15 12
+
+3274-3280．
+
+5 Guo Z D Fu J Y． Prediction method of railway freight volume
+
+based on genetic algorithm improved general regression neural net-
+
+work J ． Journal of Intelligent Systems 2018 27 2 291-302．
+
+6
+
+．
+
+www． stae． com． cn
+
+10886
+
+Science Technology and Engineering
+
+2023 23 25
+
+J．
+
+2016 14 3 129-
+
+135．
+
+Shao Mengru Cheng Tianlun Ma Xiaochen． Combination predic-
+
+tion model of railway freight volume based on gray model and neural
+
+network J ． Journal of Transportation Engineering and Information
+
+2016 14 3 129-135．
+
+7
+
+．
+
+J．
+
+2021 18 1 243-249．
+
+Xu Yuping Deng JunXiang Jiang Zehua． Ｒailway freight volume
+
+forecasting based on a combined model J ． Journal of Ｒailway Sci-
+
+ence and Engineering 2021 18 1 243-249．
+
+8
+
+．
+
+FOA
+
+LSSVM
+
+J．
+
+2017 34 2 409-412．
+
+Geng Liyan Chen Lihua． Forecast on railway traffic volume using
+
+mixed-kernel LSSVM optimized by FOA J ． Application Ｒesearch
+
+of Computers 2017 34 2 409-412．
+
+9
+
+．
+
+J．
+
+2022 22 9 3453-3463．
+
+Zhang Liting Li Pengfei Pang Wenjing et al． Prediction of precip-
+
+itation based SAＲIMA and deep learning LSTM neural network J ．
+
+Science Technology and Engineering 2022 22 9 3453-3463．
+
+10
+
+．
+
+Bi-LSTM XGBoost
+
+J．
+
+2022 44 2 138-147．
+
+Dai Yeming Zhou Qiong． Power load combination forecasting
+
+method based on improved Bi-LSTM and XGBoost J ． Journal of
+
+University of Shanghai for Science and Technology 2022 44 2
+
+138-147．
+
+11
+
+．
+
+AＲIMA-SVＲ
+
+J．
+
+2021 16 6 661-667．
+
+Liu Jiaxue Bai Minghao Hao Lei． Preiction of flight taxi-out time
+
+based on AＲIMA-SVＲ combination method J ． China Science
+
+Paper 2021 16 6 661-667．
+
+12
+
+．
+
+AＲIMA-LSTM
+
+J．
+
+2022 38 11 145-149．
+
+Ci Bicong Zhang Pinyi． Prediction of financial time series based
+
+on AＲIMA-LSTM model J ． Statistics and Decision 2022 38
+
+11 145-149．
+
+13 Meng X Li W J． Analysis and forecast of China railway freight
+
+volume based on AＲIMA model J ． Industrial Engineering and
+
+Innovation Management 2021 4 1 56-60．
+
+14 Hochreiter S Schmidhuber J． Long short-term memory J ． Neu-
+
+ral Computation 1997 9 8 1735-1780．
+
+15
+
+．
+
+XGBoost-ＲFECV
+
+LSTM
+
+PEMFC
+
+J．
+
+2022 36 1 126-133．
+
+Chang Jiakang Lü Ning Zhan Yuedong． Prediction of PEMFC
+
+remaining life based on XGBoost-ＲFECV algorithm and LSTM
+
+neural network J ． Journal of Electronic Measurement and Instru-
+
+mentation 2022 36 1 126-133．
+
+16
+
+．
+
+J．
+
+2022 22 12 4778-4787．
+
+Zhang Jinshui Tian Leng Huang Shihui et al． Tight oil recovery
+
+prediction based on extreme gradient boosting algorithm and sup-
+
+port vector regression algorithm variable weight combination model
+
+J ． Science Technology and Engineering 2022 22 12 4778-
+
+4787．
+
+17
+
+．
+
+LSTM-XGboost
+
+J．
+
+2022 22
+
+14 5629-5635．
+
+Wang Yuxuan Liang Qinwen Zhang Siyuan et al． An ultra-
+
+short-term wind power prediction method based on LSTM-XGBoost
+
+combination J ． Science Technology and Engineering 2022 22
+
+14 5629-5635．
+
+18
+
+．
+
+AＲIMA-KF
+
+J．
+
+2021 21 35
+
+15255-15261．
+
+Chen Fangyuan Zou Yongjiu Zhang Peng et al． Prediction of
+
+equipment state parameters of ship system based on AＲIMA-KF
+
+model J ． Science Technology and Engineering 2021 21 35
+
+15255-15261．
+
+www． stae． com． cn
+

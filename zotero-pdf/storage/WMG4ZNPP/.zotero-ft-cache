@@ -1,0 +1,2203 @@
+Benny Chory
+
+Private Information Retrieval
+Oded Goldreichz Eyal Kushilevitzx June 29, 1997
+
+Madhu Sudan{
+
+Abstract
+Publicly accessible databases are an indispensable resource for retrieving up to date information. But they also pose a signi cant risk to the privacy of the user, since a curious database operator can follow the user's queries and infer what the user is after. Indeed, in cases where the users' intentions are to be kept secret, users are often cautious about accessing the database. It can be shown that when accessing a single database, to completely guarantee the privacy of the user, the whole database should be downloaded , namely n bits should be communicated (where n is the number of bits in the database).
+In this work, we investigate whether by replicating the database, more e cient solutions to the private retrieval problem can be obtained. We describe schemes that enable a user to access k replicated copies of a database (k 2) and privately retrieve information stored in the database. This means that each individual database gets no information on the identity of the item retrieved by the user. Our schemes use the replication to gain substantial saving. In particular, we have
+A two database scheme with communication complexity of O(n1=3). A scheme for a constant number, k, of databases with communication complexity O(n1=k). A scheme for 31 log2 n databases with polylogarithmic (in n) communication complexity.
+
+A preliminary version of this paper appeared in Proc. of 36th IEEE Conference on the Foundations of Computer Science (FOCS), pp. 41-50, October 1995.
+yComputer Science Dept., Technion, Haifa, Israel. Email: benny@cs.technion.ac.il zComputer Science and Applied Math. Dept., Weizmann Institute of Science, Rehovot, Israel. Supported by grant No. 92-00226 from the Israel{US Binational Science Foundation (BSF), Jerusalem, Israel. Email:
+
+oded@wisdom.weizmann.ac.il
+
+xComputer Science Dept., Technion, Haifa, Israel.
+
+Email:
+
+eyalk@cs.technion.ac.il
+
+http://www.cs.technion.ac.il/ eyalk
+
+{IBM Research Division, T.J. Watson Research Center, P.O. Box 218, Yorktown Heights, NY 10598. Email:
+
+madhu@watson.ibm.com
+
+0
+
+1 Introduction
+
+Consider a user that makes a query in a database. A lot of research was devoted to methods that protect the database against a \curious" user. For example, methods that do not allow a user to ask queries to a statistical database in a way that enables him to reconstruct the value of particular entities (e.g., 2, 9, 10, 11, 18] and 19, Section 10.5]).
+It may seem surprising at rst glance that there are no methods to protect the privacy of the user. For example, an investor that queries the stock-market database, for the value of a certain stock, may wish to keep private the identity of the stock he is interested in. However, it is not di cult to prove (see Appendix A.1) that if the user wants to keep its privacy then essentially the only thing he can do is to ask for a copy of the whole database. Clearly, this is too much communication overhead, which makes it practically unacceptable.
+The rapid development of distributed databases (see 8]) and all kind of data-services (\information highways") results in many scenarios in which the same database is replicated in several sites. This raises hope to get around the di culty of achieving privacy in the single database scenario. It may be possible to make queries to several databases such that from the answers the desired information can be obtained, while from each query no information is given as to the information the user is interested in, hence its privacy is maintained.
+Before going any further let us make the problem more concrete. We view the database as a binary string x of length n. Identical copies of this string are stored in k 2 sites. The user has some index i, and he is interested in obtaining the value of the bit xi.
+We present various schemes that solve the retrieval problem with signi cantly smaller communication complexity than the obvious n-bit solution (i.e., asking for a copy of x). In particular we obtain the following:
+
+A two-database scheme with communication complexity of O(n1=3).
+
+A scheme for a constant number, k, of databases with communication complexity O(n1=k).
+
+A scheme for log2 log2(2n).
+
+13 log2
+
+n
+
++
+
+1
+
+databases
+
+with
+
+total communication
+
+complexity
+
+1 3
+
+(1
+
++
+
+o(1))
+
+log22 n
+
+We remark that some of our schemes can be modi ed (with a small penalty in the communication complexity) so as to guarantee a higher degree of privacy: for t k 1, knowing t of the queries still gives no information as to what is the value of i that the user is interested in. We also remark that some of our schemes are based on exclusive-or (linear summations, or sum) queries; this type of queries is very common and is actually implemented in several \real-world" databases (see 9, 11, 19]).
+
+1.1 Related Work
+For the case of k = 2 (i.e., two databases), a rst indication that something better than the user asking for a copy of x can be done is given by a recent result of Pudlak and Rodl 16]. With a complexity-theory motivation in mind they studied the following question. There are three players: D1 that holds a string x and an index j, D2 that holds the same string x and an index `, and U that knows both j and `. The goal is for D1 and D2 to send a single message each to U so that he will be able to compute the bit xj+` modn. They show that this can be done using o(n) bits (more
+
+1
+
+precisely, user of a
+
+Oda(tnalboags2elocga2nnb=elocgo2nns)t)r.ucUtseidngasthfeoilrlopwrso:toTcohle,
+
+a scheme which guarantees privacy user chooses uniformly at random
+
+to the a pair
+
+of indices j; ` such that j + ` = i mod n. He sends j to the rst database, ` to the second and
+
+the three of them execute the protocol. This solves the problem with o(n) bits while maintaining
+
+privacy.
+
+Independently of our work, Babai, Kimmel, and Lokam 5] studied the following problem related
+
+to the one studied in 16] (where, again, the motivation comes from complexity theory). There are
+
+k+1 Each
+
+ppllaayyeerrsDDj 1;h:o:ld: ;sDakn
+
+and U. n = 2`
+
+The bit
+
+player string
+
+U x
+
+holds k indices (common to all
+
+i1; of
+
+: : :; ik (each them) and
+
+is all
+
+an ` the
+
+bit string). indices but
+
+ij. The goal is for each Dj to send a single message to U so that U will know the value of the
+
+bttbrhiiattasntxsaiif1s1orfimo2lelodwisink:t,ioktwh=aehepiur.rseieHvraetcethhhoieenornfesoesrdsemenunadnotsiitfoetonosrmrtbehliyttewriajei-stvteahrlaednxscadchtlouaemsmbiaveksee-wionairtdl.lhictAeahsnep(ialrnododgdti2ocitecnisoolbnbiafutoltrsctiotrjshi,ntiasgonsfpd)rkiot(1hbk;el:e:md:a;1ti)cakalbonsagus2bcenhes
+
+execute the protocol. Babai et al. 5] obtain the following the total communication is O(knH2(1=(k+1))) (where H2( ) is
+
+results: for the Binary
+
+E2ntrokpy<Fulongc2tinonp)l,ayaenrds
+
+for k hence
+
+thelopgr2invattheeintfootraml actoimonmruentricieavtaiolnscihse2mleo)g2unse.s
+
+For example, O(nH2(1=3))
+
+for k = 2 their O(n0:92). For k
+
+protocol (and = c log2 n the
+
+communication is polylogarithmic (note however, that the transformation into a private information
+
+retrieval scheme will 5] one can get much
+
+bcoesttteardpdriitviaotnealincf2olromga32tniobnitrsetirnietvhailssccahseem).esTtohacnontchlousdee,thuastincganthbee
+
+results of obtained
+
+using 16], but still not as good as the schemes constructed in our paper.
+
+In 17, 1, 6, 7] the instance hiding problem is introduced and studied. In this problem, a
+
+computationally bounded player U that holds an instance i wishes to compute a known function f
+
+on input i. The function f may be hard to compute, so U can query k computationally unbounded
+
+oracles to achieve this task (each oracle can compute f(j) for any j). Still, the player wants to
+
+keep its instance i hidden from the oracles. In a sense, this problem can be viewed as if the
+
+oracles have a string f(1)f(2) : : :f(n) and U wants to obtain the ith bit of this string, which is
+
+the value f(i), while keeping i private. In this sense the instance hiding model is related to the
+
+model of private information retrieval. Some of the techniques used in 6, 7] are relevant to our
+
+problem, especially the use of low degree polynomials, introduced by Beaver and Feigenbaum 6],
+
+and further developed by Beaver, Feigenbaum, Kilian and Rogaway 7]. In particular, the scheme
+
+of 6] From
+
+ftohre1c+onlsotgr2unctidoantaibnas7e]s
+
+is it
+
+essentially is possible
+
+the one we to derive a
+
+use as our starting point in Subsection 4.1. private information retrieval scheme for k
+
+(constant) databases with O(n1=(k 1)) communication (see Remark 5.2 in 7]). In fact the scheme
+
+shown here in Subsection 4.2 can be considered an improved variant of their construction.
+
+It should be emphasized that despite these similarities, there are substantial di erences between
+
+the models and between the quality of the results. In our model the value n is considered a feasible
+
+quantity, while in the instance hiding model n is exponential in the length of the instance, so it
+
+is an infeasible quantity. Consequently, the instance-hiding model is aimed towards poly(jij)-time
+
+computations for U, allowing only solutions in which the communication between the user and the
+
+databases is poly-logarithmic in n. In contrast, the main thrust of our work is the case with small
+
+number of databases (speci computation (where " > 0 is
+
+cally, smaller a constant),
+
+atnhdaninlopga2rnti)c.ulWaresdenodaallnowd
+
+the user to perform n" receive messages longer
+
+time than
+
+polylog(n).
+
+2
+
+1.2 Organization
+In Section 2 we introduce notations and basic de nitions. In Section 3 we develop several schemes where every reply is an exclusive-or of a subset of the database's bits. In Section 4 we introduce methods based on low degree polynomial interpolation. Section 5 contains numeric results on the communication complexity for relevant numbers and sizes of databases. Section 6 extends the problem to the case where we are interested in retrieving a block of bits (and not only a single bit). Section 7 describes a generalization, which guarantees privacy against coalitions of more than a single database. Conclusions and open problems can be found in Section 8. Finally, Appendix A provides some simple lower bounds for private retrieval schemes with a single database and for schemes with more databases but very restricted types of queries.
+
+2 Preliminaries and De nitions
+
+We use the following notations throughout the paper:
+
+U { the user.
+
+DB1; x{a
+
+: : :; DBk
+string in
+
+{ the databases.
+f0; 1gn which is
+
+the
+
+(identical)
+
+content
+
+of
+
+the
+
+databases.
+
+im{]t=4hefi1n;d2e;x:::i;nmxg.in which the user U is interested.
+
+Next, we de ne the notion of privacy. We want that for every database DB`, for every possible
+
+content of the database, x, and any two indices i and j the database will not be able to distinguish
+
+between the case that the user holds index i and the case that the user holds index j. That is, the
+
+communication between the user and DB` should be equally distributed, regardless of the index i.
+
+Notation for Section 3:
+
+For
+
+a set S
+
+S a
+
+an(d
+=4
+
+an element
+S fag if S n fag if
+
+a a a
+
+let
+2= S 2S
+
+Notation for Section 4: We use nite elds, denoted GF(q), where q is a prime power. For
+notational simplicity, we denote the q elements of GF(q) by 0; 1; :::; q 1. Whenever adding or multiplying eld elements it is understood that these operations are the eld's operations.
+
+3 The Linear-Summation Scheme
+In this section we describe various schemes that are of the \linear summation" type. In these
+schemes, the user sends queries in the form of subsets S f1; : : :; ng, and the database replies with j2S xj .
+3.1 A Basic Two-Databases Scheme
+We start by describing a very simple scheme that allows the user U to privately obtain the bit xi by receiving a single bit from each of two databases. The user uniformly selects a random set S n] (i.e., each index j 2 n] is selected with probability 1=2). The user sends S to DB1 and S i to
+
+3
+
+DB2.
+is the
+
+Each of these databases, when receiving exclusive-or of the bits with indices in I
+
+the message I (i.e., DB1 replies
+
+n], replies with j2S
+
+with a single bit
+xj whereas DB2
+
+which replies
+
+with j2S ixj). The user exclusive-ors the answers it has received, thus retrieving the desired bit
+
+xi. Clearly, none of the databases has obtained any information regarding which index was desired
+
+by the user (as each of the databases obtains a uniformly distributed subset of n]).
+
+Although the above scheme is less obvious than a solution in which one database sends all n
+
+bits to the user, it is not superior as far as the total amount of communication goes. Indeed each
+
+database sent only a single bit, but the messages sent by the user (specifying arbitrary subsets of
+
+n]) are n bits long. Yet, this simple scheme serves as a basis for more e cient ones.
+
+3.2 A Multi-Database Scheme
+
+In this subsection, we present a scheme for any number k 2 of databases available. Later, in
+
+Section 4, we present a better scheme for the case of large k (i.e., k > 4). However, the scheme
+
+presented here, together with the covering codes method that we present in the next subsection
+
+leads to the best upper bounds we have for small values of k (the number of databases) and in
+
+particular for the interesting case k = 2.
+
+The scheme presented in this subsection allows the user to obtain the desired bit by asking
+
+queries to k = 2d databases, for any d 1, and requires total communication of 2d (d n1=d + 1).
+
+The key idea is to associate n] with the d-dimensional cube `]d and generalize the simple scheme of
+
+Subsection 3.1, which may be viewed as the 1-dimensional case (i.e., d = 1). In the generalization,
+
+each of the 2d databases is queried for the exclusive-or of the bits in a uniformly distributed subcube.
+
+As in the basic scheme, the di erent subcubes are related, and this allows to retrieve the desired bit.
+
+The saving in communication comes from the fact that subcubes can be described more succinctly
+
+than general subsets.
+
+We assume, without loss of generality that n = `d. We embed x in a d-dimensional cube,
+
+associating each position j 2 particular, the index i of the
+also be convenient to associate
+
+n] with a desired bit the k = 2d
+
+d-tuple (j1; :::; jd) 2 `]d, in the
+
+is associated with a d-tuple databases with strings in f0;
+
+1(ig1d;.:
+
+natural manner. In
+: :; id) 2 `]d. It will
+The scheme works as
+
+follows.
+
+1. sTUkuh=bcehsseo2etods2sddeitsastuduanebbisfaenosteresmssalaUryneoasptneahndiedrriesndddoeinnspeuetbnshsudeebetnnsseattoltyufprdea`rl]rawpbnyaadiyroS;,m11ncao=smrurbSeesls10yep,tos(nSSid11010i;;n;SSSg211120)t;=;o:::t:S:h:;20;eS(dS0nad0i;m2S;e:`d1]:).o:.f;BTStaohd1seee=dadcaoShtnd0aotbfhatesihsdeee.. Namely, for every = 1 d 2 f0; 1gd, the user sends the subsets S11; S22; : : :; Sdd to DB .
+
+2.
+
+Upon receiving the d subsets S11; S22; exclusive-or of the subcube de ned by
+
+:t:h:e;sSedsdu,btsheetsd. aNtaabmaesley,(iD.eB.,
+
+M
+
+xj1;:::;jd :
+
+DB
+1
+
+1
+d
+
+repdl)iersepwliitehs
+
+with the the bit
+
+j12S1 1 ;:::;jd2Sdd
+
+3. The user exclusive-ors the k = 2d bits it has received. The correctness of the above scheme can be easily veri ed. For example, this can be done by induction on d. Alternatively, one may consider the contribution of each bit xj1;:::;jd to the sum computed
+
+4
+
+by the user (in Step 3). This contribution depends on the number of subcubes (corresponding to
+
+the queries directed to the 2d databases) which contain the position (j1; :::; jd). It is not hard to
+
+aisteneaeptvhpeaentarn(sui1mi;n:b::ae;risdio)nfgissluetbhscueubbocneuslby: esp.aoyEsiajttcioh6=noiwft,hthticheheonit,shfceoorrn(etjva1ei;nr:ye::d;
+
+in an odd jd)'s (i.e., 1; :::; d,
+
+number
+those 6=
+
+of subcubes; actually (i1; :::; id)) appears in
+
+(j1; :::; jd) 2 S11
+
+St t 11 St0 St+t+11
+
+Sd d
+
+if and only if
+
+(j1; :::; jd) 2 S11
+
+St t 11 St1 St+t+11
+
+Sd d
+
+The privacy of the above scheme follows by observing that each database receives a sequence
+
+of d uniformly and independently chosen subsets of `]. Thus, the queries to each database are
+
+distributed in the same way, for each possible value of i = (i1; : : :; id).
+
+The communication involved in the above scheme consists of sending a sequence of d subsets
+
+in is
+
+`] k
+
+to (d
+
+each `+
+
+database, 1) = 2d
+
+and (d
+
+prdence+ivi1n)g.
+
+a single bit back. Hence the total communication complexity We note that the communication in the present scheme is
+
+not balanced. The user sends d n1=d bits to each database, and receives a single bit from each in
+
+response. Interestingly, the improvement in Section 3.3 results by balancing the communication (in a way speci c to the above scheme). A generic balancing technique is presented in Section 4.3.
+
+3.3 The Covering Codes Scheme
+
+In this subsection we describe a method based on covering codes (from coding theory). This
+
+method (essentially) maintains the total communication complexity of the schemes described in
+
+the previous subsection but reduces the number of participating databases. It is especially useful
+
+when the number of databases (i.e., k) is small (i.e., k = 2 and k = 4).
+
+We start with an example. For d = 3, the scheme of the previous subsection consists of a
+
+user and 2d = 8 databases whose names are associated with the binary strings of length d = 3.
+
+The user sends exclusive-or of
+
+a subcube de ned the bits residing in
+
+by the sets (S11; S22 this subcube. Thus
+
+;3Sp33 3n)
+
+btiotsDaBre1
+
+s2en3t
+
+which from
+
+replies with the the user to each
+
+database, which replies with a single bit. The key idea in the improvement is that DB000, which pbgqDsDd3aeuaenBBmttesoa00rIbe10nynbti00tehafg(saeeasSoesmencfnh1qs0dou;eiuforwoSrleraDnar2rie0tml,ty;sB,ehpSDt0(DSo30h1tSB1n)3o0eB1,0,0dt;00aasaiS01nbeln1j2n0gocdc,;atavoStfsnelmtooe30otr\t)emhtt,emDsiihmusocnuBeanmguwln0ialpce0i3aDtla1ptlenj.tBirrioobS2o1epnd1nopqo"1futuesh1cccemisroi;eimebD2meaclut;cBeaph:lora:l0lo:lqene1t;ydlxu0esp,a3iiedtdatiDnrityeenvigepBrdke.iOseln0nynD1T(gow1dpws,Bh3hashusnDi1locol0s)Srh0Bn.(t.D10p13tcs0WBTahotn1nreu0he)ia0dl2una0dnnsgbpSdc,oihoa2wl0tbiasDnetyhsavyiBtnieebclhmtd1eihbola1tiu0ttitec,tcilieonaeoinwatnstgvleteesisfaDsrooeDgirnntBtekBhtsot(n0eS0o0ttoa002ho1sw1e;teesxsbrSDmcipayhn3t1Buenh)egsn.ls0masae0wstnt1ieivene.dSrefi3D1fonIttn0rgomBo;t1ttt1uwl0hhhges0oeeettd,
+
+by few d-bit long string, where each string may cover itself and all strings at Hamming distance
+
+1 from it. In other words, we consider the problem of covering f0; 1gd by balls of radius 1 (in the
+
+Hamming geometry).
+radius 1 for f0; 1gd is
+
+This is a well known problem in
+a collection Cd = fc1; c2; : : :; ckg
+
+coding theory.
+f0; 1gd, such
+
+A covering code, that the balls of
+
+Cd, with radius 1
+
+around the codewords cover the space; namely,
+
+f0; 1gd cj2CdB(cj; 1)
+
+5
+
+dimension
+
+# codewords volume total
+
+(databases) (lower) communication
+
+(i.e., d) 2d (i.e., k) bound
+
+38
+
+2
+
+2
+
+12n1=3
+
+4 16
+
+4
+
+4
+
+28n1=4
+
+5 32
+
+7
+
+6
+
+60n1=5
+
+6 64 12
+
+10
+
+124n1=6
+
+7 128 16
+
+16
+
+224n1=7
+
+8 256 32
+
+29
+
+480n1=8
+
+Figure 1: Covering Codes and Protocols
+
+where B(c; 1) is the set of all d-bit long strings which di er from c in at most one position.
+
+Given a (radius method to derive a
+
+1) covering code, Cd k-database protocol of
+
+= fc1; c2; : : :; ckg (for f0; 1gd), we communication complexity O(d k
+
+use the n1=d).
+
+emulation The user,
+
+Sbtoone10iencogbidi1tie;n)wStaeo21rnre=ddstcStehd20(ei.iedn.ia,2pt;(ao:Sbs:1ia:t1;si;oeS:sn:d1:;c=iSor=dSrde)d0(sipw1o;hin:de:d.:r;eiTnidcgh),e=tpouiscte1khrsesuewnnodidrf)sod.rstmoEcloaDyvcBheSrc10eD;(dcBSb202cy;r:Cet:phd:)l;eiSetcshd0oebdyseuwebnomc1ru=uddbl]ac,etai(cnnio.gderr.,iestsenspte1sol=fndS(db11ii.niet=.gs,
+
+per each such database). All these answers allow the user to compute the answer it would have
+
+received in the protocol for 2d databases, and consequently retrieve the desired bit. The privacy of
+
+the original 2d-databases scheme is clearly preserved. As for the communication complexity of the
+
+new protocol, we note that d n1=d bits are sent from U to each database and that the total number
+
+of bits sent back is k + (2d k) n1=d (note that only the emulation of databases corresponding to
+
+non-codewords requires n1=d bits and that it su ces to emulate/cover each such database once1).
+
+Thus, the total communication equals (dk + 2d k) n1=d + k, and we get
+
+Theorem 1: Let d and k be integers so that there is a k-word covering code (of radius 1) for f0; 1gd.
+Then there exists a private information retrieval schemes for k databases, each holding n bits of data, so that the communication complexity of the scheme is k + (2d + (d 1) k) n1=d.
+
+Clearly, k in the above theorem need not be greater than 2d. On the other hand, since every radius 1
+
+ball contains exactly d+1 points in volume bound cf., 13]). This lower
+
+bf0o;u1ngdd,isthneontuamlwbaeyrsoaftctoadineawbolred. sTkhseactoisnsetsrukctiodn2+d1giv(tehnisaibsotvhee,
+
+for d = 3, uses the fact that f(0; 0; 0); (1; 1; 1)g is a covering code with radius 1 of f0; 1g3. For d = 4
+
+there exist covering codes with four codewords (e.g., f(0; 0; 0; 0); (1; 1; 1; 1); (1; 0; 0; 0); (0; 1; 1; 1)g)
+
+but not with fewer codewords (due to the volume bound). In Figure 1 we list the best known
+
+covering codes for d up to 8, the corresponding volume bounds, and the communication complexity
+
+of the resulting protocol (i.e., (2d + (d 1)k) n1=d, ignoring the additive term of k). We note that
+
+all these covering codes are optimal (minimum size) 14]. For d = 3 and d = 7, these are Hamming
+
+Codes which are perfect codes (all balls are disjoint).
+
+As one can see from this table, the improvement derived by the emulation method (over the
+
+simpler method of Section 3.2 which requires 2d databases) is quite meaningful for small values of
+
+d. Covering codes with larger radii (say 2 or 3) are also applicable in principle. For example, a k
+
+1Formally, we consider a xed exact cover of f0; 1gd by sets (S cj)'s so that (S cj) (B cj; 1), for every j = 1; :::; k.
+
+6
+
+word radius 2 covering code of f0; 1gd
+Reviewing the parameters of the best
+
+would codes
+
+yield 14],
+
+communication complexity they turn out to be inferior
+
+kfordonur1=pd +urkposd2es
+
+n2=d. than
+
+the radius 1 codes.
+
+The results using the covering codes methods are most appealing for the cases of 2 and 4
+
+databases. These cases are summarized in the next corollary to Theorem 1.
+
+Corollary 2: There are private information retrieval schemes for n bits data, with the following
+parameters:
+For two databases (i.e., k = 2), the communication complexity is 12p3 n + 2. For four databases (i.e., k = 4), the communication complexity is 28p4 n + 4.
+
+As noted above, for d dimensional space the communication complexity is (2d + (d 1)k) n1=d. As 2d=(d + 1) k 2d, this implies that d log k + log(d + 1) log k + log log k. Expressing the communication complexity of the covering code method as a function of k, the number of databases, we get O(k log kn1=(logk+loglogk)). For k ! 1, the results obtained in Section 4 have better asymptotic behavior.
+
+4 The Polynomial Interpolation Scheme
+
+In this section we describe an information retrieval scheme which requires O(n1=k) communication
+
+bits for k databases, where k = O(1) is a constant, and O(log22 n log2 log2 n) The scheme is based on the method of low-degree polynomial interpolation,
+
+boritigs iwnahteirnegkfr=om13
+
+log2 n. 6] and
+
+extensively used thereafter (see for example 15, 3, 4, 12]). We start by presenting a simple version
+
+for k = log2 n + 1 databases. This version is essentially the one used for log2 n + 1 oracles in 6].
+
+An improved and more general scheme is developed in Subsection 4.2. This scheme is a variant of
+
+the one presented in 7].
+
+4.1 A Simple Scheme For log2 n + 1 Databases
+
+Supposing that n = 2s, we associate the set n] f0; 1gs with the set of functions from s] to f0; 1g.
+
+Thus j 2 n] is associated with the function j : s]7!f0; 1g so that, for every ` = 1; 2; :::; s, the value
+
+j(`) is the `-th least signi cant bit in the binary expansion of j. Let i;j be the Kronecker function:
+
+i;j
+
+=4
+
+(
+
+1 0
+
+if i = j otherwise
+
+We are currently interested in a scheme allowing U to retrieve the ith bit of x = x1 xn 2 f0; 1gn
+
+using s + 1 databases. In what follows we shall de ne a sequence of functions constructed with the
+
+value of i in mind.
+
+Let GF(q) be a nite eld with at least s+2 elements. Consider a function, de ned over GF(q),
+
+of the following form:
+
+F i;x(z) = X fji(z) xj
+
+j2 n]
+
+where
+
+7
+
+P1 the fji's are polynomials (in z) of degree at most s; and
+
+PpBoy2ly(nfPjoi2(m0),)iaF=l io;xfj(;di0,e)gfo=rreePeaajct2hmnj]of2sjit(0sn)](.inxjz)=.
+
+P Thju2sn, ]ifjU;i
+
+xj = xi. On the is given the value
+
+other hand, by of Fi;x( ) at s +
+
+(P1), F i;x 1 points, it
+
+is a can
+
+easily value
+
+retrieve Fi;x(0) of F at point p
+
+by interpolation. So
+6= 0, without yielding
+
+if U can obtain from information about i,
+
+each then
+
+DBp (p = 1; 2; :::; s + 1) the
+we are done. We describe a
+
+scheme which achieves this goal at low cost.
+
+The user selects uniformly and independently s elements in the eld GF(q), denoted by r1; :::; rs, and de nes s functions g`(z) =4 r` z + i(`) for ` = 1; 2; :::; s:
+
+For every j 2 n] and ` 2 s] we de ne the degree 1 polynomial
+
+fji;`(z) =4 j(`) g`(z) + (1 j(`)) (1 g`(z)):
+
+The polynomial fji(z) is now de ned as the product of the fji;`(z)'s, namely fji(z) = fji;1(z) fji;2(z) : : : fji;s(z) :
+
+to
+
+cTomhepuutseerFsie;xn(dps),theevevnaltuheosugg1h(pit);d::o:;egssn(po)t
+
+to DBp (for p = 1; 2; :::; s + 1). DBp uses these know i, as follows. First, for every j and ` (1
+
+s
+
+values j n,
+
+1
+
+`
+
+s), DBp computes the vfaji;l`u(ep)f=ji;`((p)g(b1`y(ps)egt`t(ipn)g)
+
+if j(`) = 1 otherwise
+
+Now, for every j 2 n], DBp computes
+
+fji(p) = fji;1(p) fji;2(p) : : : fji;s(p)
+
+and
+
+F i;x(p) = Xn fji(p) xj :
+
+j=1
+
+This computation takes O(s n) operations in GF(q). The value Fi;x(p) is sent to the user. This
+
+way, U obtains the value
+interpolates and obtains
+
+of the polynomial F i;x(0) = xi.
+
+F i;x(z)
+
+at
+
+the
+
+s
+
++
+
+1
+
+points
+
+1;
+
+2;
+
+:
+
+:
+
+:;
+
+log2
+
+n
+
++
+
+1.
+
+The
+
+user
+
+by
+
+We
+U to
+
+rst assert
+DBp (p 6=
+
+that the scheme provides privacy. This is because the values 0) are uniformly and independently distributed in the eld,
+
+g1(p); :::; gs(p) sent regardless of i. To
+
+see that the scheme yields the correct answer it su ces to verify properties (P1) and (P2) above.
+
+By de nition, each of the polynomials (P1) follows. Property (P2) holds since
+for each ` 2 s], and thus
+
+ffjjii;`i(sz)a
+
+product of s linear = j(`) g`(z)+(1 j
+
+polynomials, and thus property (`)) (1 g`(z)) and g`(0) = i(`),
+
+fji(0) = Ys fji;`(0) = `Y=s1 (j(`) i(`) + (1 j(`)) (1 i(`)))
+`=1
+= i;j :
+
+8
+
+Finally, we consider the communication complexity of the above scheme. The communication
+
+between the user and each database consists of s eld elements sent from the user to the database
+
+and one eld element sent in response. Thus, the total communication amounts to (s + 1) (s + 1)
+
+lso+g21q,nwohne-zreeroq
+
+is the size of points), and
+
+the can
+
+nite eld always be
+
+GF(q). This found in the
+
+q must range
+
+be at least s + 2; 2s].
+
+s+ We
+
+with s + 1 = log2 n + 1 databases, the communication complexity is (1 + o(1))
+
+2 (to accommodate hloagv22enslo=g2lloogg22n(2,ns)o.
+
+4.2 The General Case
+
+To handle the general case of k databases, where k log2 employ a di erent representation of integers in the range 1
+
+n, we use the same through n. Instead
+
+basic idea, but of the \dense"
+
+binary representation, we consider s-bit long binary sequences with exactly k 1 occurrences of
+
+1 in them2. We take sequence with s + 1
+
+the minimum k zeroes and
+
+s k
+
+satisfying 1 ones.
+
+s
+Wk e1
+
+n. Every 1 j order these sequences
+
+n is represented by a in lexicographic order,
+
+and represent j by the j-th sequence in this list. We now associate every j 2 n] with a function
+
+j : s]7!f0; 1g so that, for every ` = 1; 2; :::; s, the value j(`) is the `-th entry in the j-th sequence.
+
+Let GF(q) be a nite eld with at least k + 1 elements. Let i be the bit position which U wants
+
+to retrieve. Again, consider a polynomial
+
+F i;x(z) = X fji(z) xj
+
+j2 n]
+
+where
+
+P1 the fji's are polynomials of degree at most k 1. P2 fji(0) = j;i, for each j 2 n]. By arguments identical to those used in Subsection 4.1, the value of Fi;x( ) at k points enables U
+to interpolate and retrieve xi = Fi;x(0). We now describe the protocol. The user selects uniformly and independently s elements in the eld GF(q), denoted by r1; :::; rs,
+and de nes s functions g`(z) =4 r` z + i(`) for ` = 1; 2; :::; s: The user sends the values g1(p); :::; gs(p) to DBp (for p = 1; 2; :::; s+1). For every j 2 n] and ` 2 s] we de ne the degree 1 polynomial
+
+fji;`(z) =4 j(`) g`(z) + (1 j(`)) (1 g`(z)):
+
+The next step, however, is di erent. The analog de nition would fji;1(z) through fji;s(z), which is a polynomial of degree s. This points, more than the number of databases we have. We want the k 1, with j;i as its free term. To achieve this, we de ne
+
+bweoutoldtarekqeufirjie(zs) polynomial fji(z)
+
+as + to
+
+the product 1 evaluation be of degree
+
+fji(z) = Y fji;`(z) :
+
+`:j(`)=1
+
+2The scheme from 7] is also similar in spirit and can be thought of as using a representation of integers with s-bit long sequences which are divided into k 1 blocks of length (s= k 1) and any block having a single 1.
+
+9
+
+There are that each
+
+exactly fji;`(z) is
+
+k of
+
+1 indices degree 1),
+
+awnidthsoj(p`)ro=pe1rt.yT(Phe1r)efhoorledsf.ji(Pzr)oipserotfyd(ePg2re)ehaotldms osisntcke
+
+fji(0) = Y fji;`(0) = `:jY(`)=1 (j(`) i(`) + (1 j(`)) (1 i(`)))
+
+`:j(`)=1
+
+1 (recall
+
+If j = i then the last expression equals
+Y i2(`) + (1 i(`))2 :
+`:j(`)=1
+
+Each one `
+
+multiplicand we have j(`)
+
+equals 1, and therefore the = 1 and i(`) = 0 (since both
+
+product, j( ) and
+
+if(ii)(0h)a,veeqeuaaclhs
+
+1. If j 6= exactly k
+
+i,
+
+then for 1 entries
+
+at of
+
+least value
+
+1). For this `, the multiplicand
+
+(j(`) i(`) + (1 j(`)) (1 i(`)))
+
+is
+
+0, and With
+
+therefore the product, this modi cation, the
+
+fpjir(o0t)o,ceoqluparlsoc0e.eds
+
+similarly
+
+to
+
+the
+
+previous
+
+one.
+
+The
+
+user
+
+sends
+
+to DBp the values g1(p); g2(p); : : :; gs(p). The arguments for correctness and privacy are the same
+
+too. The communication complexity, however, is slightly di erent. As before, the user sends each
+
+database s eld elements and receives one eld element in response. However, here, the overall
+
+communication equal to s + 1).
+
+complexity is Recall that s
+
+khas(sto+s1a)tisfloyg2kqs
+
+1
+
+k
+
+(s + 1) (1 n. We get
+
++
+
+log2
+
+k)
+
+(and
+
+k
+
+is
+
+not
+
+necessarily
+
+Theorem
+there exists
+
+3: Let s,
+a private
+
+k and n be information
+
+irnettergieevraslssochthemateskfso1r
+
+k
+
+n, and let databases,
+
+q each
+
+k + 1 be a prime holding n bits of
+
+power. Then data, so that
+
+the communication consists of one round in which the user sends s receives log2 q bits in return (from each database).
+
+log2 q bits to each database and
+
+To exactly analyze the complexity, we separately consider di erent values of the parameters k and
+
+s. One
+s s=2
+
+point along this
+
+p2ss, we get
+
+s k1
+
+curve is s = > n. Thus,
+
+log2 n + log2 log2 n
+
+and
+
+k
+
+=
+
+s 2
+
++
+
+1.
+
+Using
+
+the
+
+approximation
+
+Corollary 4:
+each holding n
+
+There are private information retrieval schemes for bits of data, so that the communication complexity
+
+1
+2is
+
+(21lo(g12
+
++n+o(l1o)g)2
+
+lloogg222
+
+n)+1 databases, n log2 log2(2n).
+
+This is less3 than the communication complexity of the scheme of Subsection 4.1, while the number
+
+of databases is slightly over a half of curve is k constant. Here s is O(n1=(k
+
+the 1))
+
+(loagct2una+lly1,
+
+sda=takbap1se(sk
+
+used there. 1)! (n +
+
+The k
+
+1o)th<er(kext1r)emkep1onn
+
+the +k
+
+su ces), and the resulting communication complexity is also O(n1=(k 1)) (which is strongly skewed
+
+towards the user-to-database direction). This complexity can be brought down to O(n1=k), using a
+
+generic balancing technique that is presented next.
+
+3speci cally about one half
+
+10
+
+4.3 A Generic Balancing Technique
+
+Consider an arbitrary scheme for privately retrieving information from several databases in which
+
+the communication is carried out in one round (i.e., the user simultaneously queries each database
+
+and receives answers from which it computes the desired bit). Given such a scheme for databases
+
+containing n bits, one can derive a scheme for databases containing m n bits by repeating the scheme in parallel as follows. The user views the m n bits as a m-by-n matrix of bits. To retrieve the (j; i)-th bit in the matrix, U executes the n-bit scheme with i being the desired bit (ignoring,
+
+for the time being, the value of j). Now, each database views itself as participating in m di erent
+
+executions of the n-bit scheme, each one with a di erent row (an n-bit string). Namely, in the j-th execution (j = 1; :::; m), the database computes its response with respect to the j-th row. Thus, the user privately retrieves the entire i-th column of the matrix, from which it nds the desired (j; i)-th bit. Let us compare the communication complexity of the original n bits scheme with the resulting m n bits scheme. The communication from the user to each database remains unchanged,
+
+while the communication in the database-to-user direction increases by a factor of m.
+
+We now apply the balancing technique to the protocol in Theorem 3. To this end, we view the
+
+string x as an m-by-(n=m) matrix of bits. Thus, we use the protocol of Theorem 3 for strings of
+
+length
+
+mn and so s should now satisfy
+
+s k1
+
+mn .
+
+Theorem
+there exists
+
+5: Let k,
+a private
+
+n; m and s information
+
+breetrinietveaglesrschseomthesatforkks 1databmnasaensd,
+
+q each
+
+k + 1 be a prime holding n bits of
+
+power. Then data, so that
+
+the communication complexity is k (m +
+
+In m
+
+=paprktnicu(wlahr,ichsetistinnogt
+
+s = k p1 (k
+optimal), we
+
+1)! get
+
+s) log2 ((n=m)
+
+q. +
+
+k)
+
+satis
+
+es
+
+the
+
+condition
+
+s k1
+
+mn . Setting
+
+Corollary 6: Let k and n be integers and q k + 1 be a prime power. Then there exists a private
+
+information retrieval schemes for k databases, each holding n bits of data, so that the communication
+
+complexity is
+
+k s + pk n + k log2 q
+
+where s =4 k p1 (k 1)! k p1 n(k 1)=k + k. We may also use
+
+s =
+
+q k q1 (k
+k 1 (k
+
+1)! pk n + k p1 k 1)! pk n + k p1 k!
+
+Speci cally, and for k
+
+for k 5 we
+
+=2 may
+
+this use
+
+yields s s = (k
+
+=1p) npk+n2.;
+
+for
+
+k
+
+=
+
+3,
+
+s
+
+=
+
+p2
+
+p3 n + 3; for k = 4, s = p3 6
+
+p4 n + 3;
+
+This result is asymptotically (for n ! 1) better than the covering codes schemes of Subsection 3.3,
+
+except for the cases k = 2 and k = 4. For k = 2, we get here O(n1=2) communication, while we
+
+had O(n1=3) communication there. For k = 4, both methods give O(n1=4) complexities (and also
+
+the constant in the O-notation are comparable4).
+
+4Actually, the constant here, 4 codes.
+
+(1 + p3 6)
+
+log2 5
+
+26:165, is slightly better than the constant, 28, for the covering
+
+11
+
+4.4 Further improving the general case
+
+In this subsection we further improve the polynomial interpolation method of subsection 4.2. While
+
+this optimization does not improve the asymptotic behavior of the communication for any xed
+
+number of databases, it does achieves signi cant saving when the number of databases is logarith-
+
+mic.
+
+As usual, let k denote the number of databases. Again the starting point for the improved
+
+scheme is a di erent representation of integers in the interval from 1 to n. Instead of considering
+
+f0; 1g-sequences with k 1 occurrences of 1 in them (as in Subsection 4.2), we consider this time
+
+sequences of non{negative integers that sum up to exactly k 1. We associate with every j 2 n],
+
+wttrhhiieetshfjus-ant+thcrrltesi1oaeqns,tuajeknn:d+cseh]1,e7!anencleedfm0wPe;en:s`:t=ws:1.;iljkl(p`)ic1=kg,tkshoe
+
+that for every ` = 1; : : :; s, the value j(`) is the `-th entry in
+
+1. The number of sequences of length s whose sum equals
+
+minimum s so that
+
+s+k 2 k1
+
+n. Let GF(q) be a nite eld
+
+Suppose vector over
+
+the GF
+
+(uqs)ergiUvewnisbhyes^ito=re(tir(i1e)v;e:
+
+the i-th : :; i(s)).
+
+bit xi The
+
+of the database. Let ^i be the s-dimensional user starts by uniformly picking a vector
+
+w^ = (w(1); : : : vectors v^1 and
+
+; w(s)) v^2, the
+
+2 GF(q)s. notation v^1
+
+For p = 1; :::; k, the user + v^2 is simply the vector
+
+sends ^i + sum, and
+
+pw^ for
+
+atoscDalBarp.a
+
+(Here for two and vector v^,
+
+the notation av^ denotes the vector obtained by multiplying each coordinate of v^ by a.)
+
+Consider a xed multivariate polynomial G(y^) and a polynomial F(z) = G(^i + zw^) with the
+
+following properties:
+
+P1 G is a polynomial on s variables of total degree at most k 1 and F is a univariate degree
+k 1 polynomial.
+
+P2
+
+For any j 2 G(^i) = xi.
+
+n],
+
+G(^j) =
+
+xj, where
+
+^j denotes
+
+the
+
+vector (j(1); : : :; j(s)).
+
+In
+
+particular,
+
+F(0) =
+
+TFh(2e),da: :ta:,bFas(ek)DaBnpd
+
+responds with the value interpolates for F(0).
+
+F (p)
+
+=
+
+G(^i + pw^).
+
+The
+
+user
+
+views
+
+the
+
+values
+
+F (1),
+
+It remains to show that a polynomial G as described above exists. Let fk;j(y^) be the polynomial
+
+fk;j(y^)
+
+=
+
+Ys
+`=1
+
+j(Y`) 1
+p=0
+
+y(`) j(`)
+
+pp :
+
+Then fk;j(y^) has obviously true if
+
+jd=egjre0 easPas`l=l 1tejr(m`)s
+
+= in
+
+k the
+
+1 and above
+
+it satis product
+
+es the equal
+
+condition fk;j(j^0) = 1; on the other hand,
+
+ijf;jj0.6=(Tj0htihseins
+
+since the sum of elements in both vectors ^j and j^0 is the same (i.e., k 1) there exists an index `
+
+for which j0(`) < j(`). The term corresponding to this value ` and to p = j0(`) equals 0 and hence
+
+the whole product is 0 as needed.) Now de ne
+
+G(y^) = Xn fk;j(y^)xj;
+j=1
+
+where the fk;j's are polynomials of most k 1. Furthermore, for any i the following theorem.
+
+2degnr]e,eGa(^ti)m=osPt njk=1
+
+f1k;ja(s^i)axbjo=veP. Injt=i1s
+
+clear that j;ixj = xi.
+
+G has Thus
+
+degree at we obtain
+
+12
+
+number of method
+
+asymptotic communication total communication bits
+
+databases k = 2 covering codes k = 2 polynomial interpolation k = 4 covering codes k = 4 polynomial interpolation
+
+c26o612:m:32814p7lppe34px2pnn4intny
+
+n = 220 n = 230 n = 240 1,224 12,300 123,864 6,493 207,745 6,647,815 924 5,096 28,700 827 4,635 26,136
+
+k = 4 improved interpolation k = 7 covering codes k = 7 polynomial interpolation
+
+8a36s:08a7bp5opvn7en
+
+809 4,616 26,118 1,020 3,900 15,420 651 1,638 4,326
+
+k = 7 improved interpolation k = 16 covering codes k = 16 polynomial interpolation
+
+48a25s2:4a5bpo71vp6nen
+
+546 1,533 4,221 1,792 4,480 11,872 1,635 2,224 3,205
+
+k = 16 improved interpolation
+
+as above
+
+720 1,308 2,289
+
+Figure 2: Comparison of some concrete schemes
+
+Theorem
+Then there
+
+7ex:isLtsetasp,rkivaatnedinnfobrme aintitoengerrestrsioevtahlastchesm+kke1s2for
+
+n, and let q k databases,
+
+k each
+
++ 1 be holding
+
+a prime power. n bits of data,
+
+so that the communication consists of one round in which and receives log2 q bits in return (from each database).
+
+the
+
+user sends
+
+s
+
+log2 q
+
+bits to each database
+
+The improvement provided by the above is
+
+example, if we where H2( ) is
+
+take k = the binary
+
+13entlroogp2ynfuanndctison=.
+
+quite signi cant for values of
+
+T2 h+isloimg2pnli,esw,e have
+
+s+k 2 k1
+
+k
+
+that are 2H2(1=4) 43
+
+log(2long>2 nn).1:F08o1r,
+
+Corollary 8:
+n bits of data,
+
+There so that
+
+are the
+
+private information retrieval communication complexity
+
+schemes for 1+
+
+is
+
+1 3
+
+(1 + o(1))
+
+31lologg222nn
+
+databases, each log2 log2(2n).
+
+holding
+
+Employing the balancing technique of Subsection 4.3, we get
+
+Theorem 9: Let
+power. Then there
+
+k, n, m exists a
+
+parnidvastebienfionrtmegaetrisonsoretthriaetvals+kskch1e2mems for
+
+n, and let q k databases,
+
+k + 1 be a each holding
+
+prime n bits
+
+of data, so that the communication consists of one round in which the user sends s database and receives m log2 q bits in return (from each database).
+
+log2 q bits to each
+
+For xed k and growing n ! 1, this result leaves the asymptotic communication complexity as it was, O(n1=k). Similarly, for relatively small k (w.r.t. n) this result has little e ect on the actual numbers. However, for relatively larger k (for example k = 16 and n = 240) the saving is
+
+meaningful. The next section provides a sample of numeric results.
+
+5 Numeric Results
+
+Figure 2 summarizes the communication costs required for private retrieval of a single data bit. We include a sample of databases numbers (k = 2; 4; 7; 16)5 and sizes (n = 220; 230; 240). For the
+
+5Except for k = 12, these are the only values for which covering-code schemes exist. For other values of k one can
+
+only utilize k0 databases, where k0 < k is the largest integer for which a covering code exists. For example, to get a
+
+scheme
+
+for
+
+k
+
+=
+
+6
+
+databases,
+
+we
+
+use
+
+0
+k
+
+=
+
+4.
+
+13
+
+polynomial interpolation method, we included both the \basic" results and the improved ones.
+
+(Except the case k = 2, where s and m satisfy (s + 1)m n in the improved method, instead of
+
+sm n, which results in a meaningless improvement). It is readily seen from this table that for
+
+k = 2 the covering codes method is superior to the polynomial interpolation method. For k = 4,
+
+k of
+
+= n.
+
+7 and k For the
+
+= 16, the polynomial interpolation method is superior, especially for large interpolations schemes the asymptotic expression is obtained by setting m
+
+=valpukens
+
+(as in Corollary 6) (optimized) choice
+
+whereas the of m (which
+
+actual gures in is slightly larger
+
+tthheanlaspkt nt)h.reFeocrobluomthnsvearrseioonbstaoifntehdevpiaolaynboemttiearl
+
+interpolation scheme, for k = 2; 4; 7; 16 we use nite elds with q = 3; 5; 8; 17 elements, respectively.
+
+Except q = 8, these are not powers of 2. To encode them e ciently by binary strings we pack
+
+umsueldFtiiipnnlaetllhlyee,ttwteaerbslreetmo(graeerptkhreetsrhe.antTtawhtuihosennwbpeyrcidvalanotger2leyqperreebstiertnisetvciGanuFgse(aqa)lanerolgenemr-nebenlgtolscigkbibyolfeudsdainetggara(lofdogar2tqeioxnba)imt.sp, lew,h2ic10h
+
+was con-
+
+secutive bits), the resulting communication is smaller than simply the communication for single
+
+bit multiplied by the block size. This is achieved by using the balancing technique, tuned to the
+
+block size. The improvement is applicable for both the linear summation codes and the polynomial
+
+interpolation method. The incurred overhead, compared to non-private retrieval, is substantially
+
+smaller for this more realistic case than for the single bit case. For example, the improved interpo-
+
+lation method for k = 4 databases communicates 11; 238 bits for retrieving a block of 210 bits from
+
+a database of size n = 230 (bits), and 26; 768 bits for retrieving the same block from a database
+
+with n = 240. So the communication overhead is about 11 and 26 bits per one information bit,
+
+respectively. For a general discussion, see Section 6.
+
+6 Private Information Retrieval of Blocks
+
+In this section we consider a more realistic model of private information retrieving in which the
+
+data is partitioned into blocks (or records) rather than single bits. For simplicity, we assume that
+
+each block/record contains the same number of bits, `. We denote by PIRk(n; `) the problem of
+
+retrieving privately an (`-bit long) information block from k databases, each holding the same n
+
+blocks (notice that the overall contents is n ` bits).
+
+Clearly e cient
+
+PreIdRuckt(inon; `s)ocfaPnIbReks(o;l`v)edtobPy
+
+` invocations IRk( ; 1).
+
+PorfePviIouRsks(encti`o;n1s),h6abvue tdetahletrewiatrhe PmIuRchk (nm;o1r)e.
+
+We start by noting that the Generic Balancing Technique of Section 4.3 actually provides such
+
+a reduction. Speci cally,
+
+ePsevrneodrysp`os>ki(tn1io), nPbiI1tsR0t:ko(Sneu;ap`cp)hocsdaeanttahbbaeatssPoelvIaenRddkb(rynec;ae1io)vnecsea-nrokbu(ennd)sopblvritoestdoincboyrleaitnuorwnneh-(ircforhuonmthdeepaurcsohetrodcsatoitllalibnsaewsnedh)si.chTkth(hneen),ubsfioetsrr
+to each database and receives ` k(n) bits in return (from each database).
+
+In Section 4.3 we emphasized the asymmetric e ect the generic balancing transformation has on the communication complexity { increasing the communication from the databases to the user while maintaining the communication complexity in the other direction. We now present an \asymmetric" transformation in the opposite direction.
+
+6In fact, PIRk(n; `) can be easily solved by ` invocations of PIRk(n; 1) just by considering in the j-th invocation
+only the j-th bit of each of the n blocks.
+
+14
+
+Proposition 11: Suppose that PIRk(n; 1) can be solved by a one-round protocol in which the user
+
+issesuelenptmdhpseoesnmetkse(tonshsfa)atsgboeitmthsoeetbotuanseieiantrceehdredfetrarloditemav(beoaDsfseBcthaapre,ndditdnheraeseliicrtfeeypidv'asetisnamfroekor(masntrab)2tibtiorkitan(snry)bi)ni,trxseubetdymurmcfnuoan(mtfcritpooiunomtniisnsegadmcoghan(pedPpaoitkpnva=geb1rabfstipenh()ais.rpyF))eus,ltrdrtwihnahegnresdmreigonrteiops,
+
+an homomorphism the desired bit nor
+
+of on
+
+the the
+
+eld onto GF(2). (We stress that randomness used by U.) Then, for
+
+both g and every m >
+
+1t,hePfIpR'sk(mmay
+
+not (n
+
+depend on 1); 1) can
+
+be solved by a one-round protocol in which the user sends m k(n) bits to each database and receives
+
+k(n) bits in return (from each database).
+
+We note that all \pure" schemes (i.e., before \optimizing via balancing") presented in previous
+
+sections meet the hypothesis of the proposition. Furthermore, the proposition can be generalized
+to PIRk( ; `) schemes (in which each bit in the block is computed as conditioned above).
+
+Proof: For simplicity, we
+transformations. Our solution
+
+rst assume that
+to PIRk(m (n
+
+the fp's mentioned 1); 1) follows. We
+
+in the hypothesis are partition the N =4 m
+
+identity (n 1)
+
+bits, in each database, into m strings each holding n 1 bits and augment each of these strings
+
+by a dummy position set to zero. Bit positions in N] are represented as pairs in m] n 1] in
+
+the natural manner. in parallel m times.
+
+The user, In the jth
+
+wishing instance
+
+to
+U
+
+retrieve behaves
+
+i = i1; i2] 2 m]
+as when asking
+
+for
+
+n 1], employs P position i2 if j =
+
+IRk(n; i1, and
+
+1) as
+
+asking for position n otherwise. Each database adds together the answers it would have sent in each
+
+of the m invocations of PIRk(n; 1)
+answers it has obtained and applies
+
+and sends this g as it would
+
+sum have
+
+as its done
+
+only message. The user in a single invocation of
+
+just adds
+PIRk(n;
+
+all 1).
+
+We emphasize that each database sends only one k(n)-bit long string rather than m such strings.
+
+The new scheme clearly satis es the privacy requirement. Correctness follows from associativity of
+
+addition, the hypothesis that g is a homomorphism, and the fact that the dummy position (i.e.,
+
+pknosoiwtiotnhant)gi(sPsept
+
+to pj)
+
+0. That is, let
+equals xi (xi 2
+
+fp0j ;b1eg)thifejd=esiig1n, aatnedd
+
+answer of DBp in the
+0 otherwise. Thus,
+
+jth
+
+invocation.
+
+We
+
+g 0@Xk Xm
+
+1 pjA
+
+=
+
+g
+
+0@Xm
+
+Xk
+
+1 pjA
+
+=
+
+Xm
+
+g
+
+Xk
+
+!
+pj = xi
+
+p=1 j=1
+
+j=1 p=1
+
+j=1 p=1
+
+It is left to extend the protocol to the general case. We observe that the hypothesis regarding
+ttr2rhepaskeuin(nnlst)feitonlehdrlgemesmoPaizretIeiingoRtiannslk.lao(alnwTllp;osh1rwiou)sstssoistatcootodilseom.nnTeocesdohbdiutfyheyss,emtUihhtaeysmkpoeiyonrletgigsmhuiDenemsanBis-ltpusPapsubIetsonRhivndeekg.(tnhp0T;e'ks1(hm)n(er)pea-asrbtssohiastteugormlecootnphlgtp0asiono=4sntatrhfpitnpahp(gtalytaap)ltntlhhdrteeahttfehhpeuef'lsrsid'stmhhrasaaartisne)ntaiasadtenienndnmdtttioinhhtsygeet
+communication complexity of the original protocol. Combining the above two propositions, we obtain.
+
+Corollary 12: Let PIRk(n; 1) be as in Proposition 11 and `; m > 1. Then, PIRk(m (n 1); `)
+
+can be solved by a one-round protocol in
+
+receives ` times the
+
+k(n) bits complexity
+
+in of
+
+return (from each
+PIRk(n` + 1; 1).
+
+which the database).
+
+user sends m In particular,
+
+P
+
+IkR(nk)(nb;i`t)s
+
+to each database and can be solved within `
+
+15
+
+In some settings the number of records is not substantially bigger than the length of individual records. In these settings the overhead introduced by private information retrieval is quite small, compared to non-private information retrieval. We exemplify two such cases { one with n `, the other with n `2=4. We exhibit simple linear schemes for these two cases, with constant multiplicative overhead, using k = 2 and k = 4 databases, respectively. The rst example, with n `, employs the basic two-databases scheme (of Section 3.1), and the total communication overhead is just a factor of 4.
+
+Corollary 13: Let n
+nication complexity 4 `.
+
+`, then PIR2(n; `) can be solved by a one-round protocol of total commu-
+
+The above is to be compared to ` + log n bits required in \non-private" retrieval of an `-bit long
+
+block (from a database holding n such blocks).
+
+Proof: We use the PIR2(n; 1) scheme (of Section 3.1) in which U sends 2(n) = n bits to each
+
+database (indicating XOR of these bits).
+
+a subset of the bits in Using Proposition 10,
+
+the we
+
+database), and
+get a PIR2(n;
+
+`re)csecihveems e2w(nit)h=to1tbailtcformommueancicha(ttiohne
+
+2( 2(n) + ` 2(n)) = 2n + 2` 4`
+
+Corollary 14: Let n `2=4, then PIR4(n; `) can be solved by a one-round protocol of total
+communication complexity 8 `.
+
+Proof: We use the PIR4(n; 1) scheme (of Section 3.2, d = 2) in which U sends 4(n) = 2pn
+bits to each database (indicating a \two dimensional subcube" of the bits in the database), and
+
+receives scheme
+
+4(n) = 1 with total
+
+bit from each (the communication 4(
+
+XOR 4(n)
+
++of`th4e(sne)b) i=ts)8.pUnsi+ng4`Prop8o`.sition
+
+10,
+
+we
+
+get
+
+a
+
+P
+
+IR4(;
+
+`)
+
+Of course larger values of d may be used to yield constant overhead schemes with n = O(`d) and
+
+k = 2d databases. However, we believe the two schemes presented above are the ones of interest
+
+for realistic size databases. For example, the two database scheme is applicable to records of sizes
+
+215 and 220 for databases containing 230 and 240 bits, respectively. The four database scheme is
+
+applicable to records of sizes 210 and 214 for databases containing 230 and 240 bits, respectively.
+
+Note that unlike the
+PIR1(n; 1)) in which
+
+PIR2(n; 1) scheme
+each database sends
+
+(of its
+
+Section 3.1), the obvious PIR2(n; 1) (or actually
+contents to the user who then retrieves the desired
+
+bit, does not satisfy the hypothesis of Proposition 10.
+
+7 Privacy With Respect to Coalitions
+
+Our results so far concerned the privacy of the user with respect to any single database. It is not
+
+hard to verify that in all the schemes described so far, any two databases get some information
+
+about the desired index i from their joint queries (and in some of the schemes can even recover
+
+it). In this section we consider the scenario where the goal is to guarantee the privacy of the user
+
+with respect to any coalition of no more than t databases. The de nition of privacy follows the one
+
+given in Section 2 but considers the joint probability distribution of communication seen by any
+
+t0 t databases. We present a modi cation of the protocol in Subsection 4.2 to this scenario.
+
+Given the parameter t (maximum number of databases in a coalition) and n (input length), let
+
+k k
+
+aansdins4s.a2t)i.sfWy ekcso1nsidenr.
+
+The number of databases the same representation of
+
+we use here is
+numbers j 2
+
+t(k n] as
+
+1) + 1 (for t sequences of
+
+= 1 this length s
+
+gives with
+
+16
+
+k 1 ones and s k + 1 zeroes. Let GF(q) be a nite eld with at least t(k 1) + 1 elements. Let
+xi be the bit U wants to retrieve. AgaFini;,x(czo)ns=ideXr afpjio(zly)noxmj ial
+j2 n]
+
+where now
+
+P1 the fji's are polynomials of degree at most t(k 1).
+
+P2 fji(0) = j;i, for each j 2 n].
+
+By arguments which are familiar by now, the value of Fi;x( ) at t(k 1) + 1 points enables U to
+
+interpolate and retrieve xi = Fi;x(0).
+
+The rst part of the protocol is di erent. The user selects s random independent polynomials
+
+of degree t user sends
+
+in GF(q), the values
+
+where g1(p);
+
+the free :::; gs(p)
+
+term of
+to DBp
+
+the (for
+
+`-th p=
+
+p1;o2ly;n::o:;msi+al1, )g.`(Fzo)r,
+
+is i(`) every
+
+(` = 1; j 2 n]
+
+2; : : and
+
+:; s). The ` 2 s] we
+
+de ne the degree-t polynomial
+
+fj;`(z) =4 j(`) g`(z) + (1 j(`)) (1 g`(z)):
+
+The de nition of the polynomials fj(z), as well as rest of the protocol, is identical to 4.2, and we
+
+will not repeat it.
+
+It is clear that the new property (P1) holds, and (P2) is unchanged. This proves the correctness
+
+of the protocol. To show that it is t-private, we observe that, for any ` and any t non-zero points
+
+in GF(q), the values of the polynomial g`( ) at these t points are uniformly distributed in GF(q).
+
+Furthermore, the values of the s polynomials g`(z) (` = 1; 2; : : :; s) at these t points are independent,
+
+and so any t databases receive t s values that are uniformly distributed in GF(q).
+
+The communication complexity is as in Subsection 4.2: the user sends each database s eld
+
+elements and receives one eld element in response. The number of databases is t(k 1) + 1, so
+
+the overall communication complexity is (t(k of Subsection 4.3 can be applied here as well in
+
+a1)s+tra1i)gh(tsfo+rw1a)rdlowga2yq. .TTo hseumbamlaanrcizine,g
+
+techniques
+
+Theorem 15:
+
+Let t and d be integer functions and c > 1 be a constant so that d(n) = c t(n). Then there caoremtp(le)x-pitryiviastOe (itn(fno)rmpactnio)n. retrieval schemes for d( ) databases, in which the communication
+
+Let t be retrieval
+
+ascnhienmteegserfofrudnc(t)iodnaotafbnasaensdwdit(hn)co=mtm(nu)nilcoagti2onn.cTomhepnletxhietyrepaorleylto(g)(-np)rivta(tne)i.nformation
+
+We comment that the latter result is about the best we can hope given our state of knowledge with respect to 1-private schemes (e.g., Corollary 6). This is because of
+Proposition 16: Let 1 < t < d. The communication complexity of a t-private information retrieval
+scheme for d databases is at least as the communication complexity of a 1-private information retrieval scheme for dd=te databases.
+Proof: Given a t-private scheme for d databases we construct a 1-private scheme for dd=te
+databases by letting each database in the new scheme emulate t databases in the original scheme. Since the communication seen by any single database in the new scheme is identical to the communication seen by some set of t databases in the original scheme, the 1-privacy follows.
+
+17
+
+8 Conclusions and Open Problems
+
+We have presented several techniques for constructing private (i.e., 1-private) information retrieval
+
+schemes. Our feeling is that the scheme for 2 databases is essentially the best one can hope for (with
+
+respect to communication complexity). More generally, we conjecture that private information
+
+rsec(htreki+mep1veansl)wscchohimcehmm, eufsonrifcokart>iaon2c.,ounEssveteaOnnt(ipfkntnuh)miscbocemor,nmjkeu,cntoiucfraetdiaiostnat.bruaese, si,t
+
+each holding leaves a gap
+
+n bits of data, require towards our k database
+
+In an attempt to develop lower bounds for the problem, we considered the very simple case
+
+in which there are two databases and the user makes a single linear summation query to each of
+
+them. In this simple case we were able to show (Appendix A.2 below) that privacy requires the
+
+user to send long messages (i.e., of length linear in the length of the database). This lower bound
+
+is very restricted with respect to what we want, but on the other hand it provides yet another
+
+demonstration of the strength of the privacy condition.
+
+Acknowledgment
+We wish to thank Muli Safra, Sha Goldwasser, Don Coppersmith and Joe Kilian for helpful discussions regarding related issues, and Amos Beimel and Ehud Hausman for their comments on earlier drafts of this paper. We are grateful to Tuvi Etzion for providing us some pointers to the known results on covering codes, and to Oded Shmueli for pointers to the database literature.
+
+References
+1] Abadi M., J. Feigenbaum, and J. Kilian. On Hiding Information from an Oracle. JCSS, 39:1, pp. 21|50, 1989.
+2] N. Adam, and J. Wortmann. Security Control Methods for Statistical Databases: A Comparative Study. ACM Computing Surveys, 21:4, pp. 515|555, 1989.
+3] L. Babai, L. Fortnow, and C. Lund. Non-deterministic exponential time has two-prover interactive protocols. Computational Complexity, v. 1, pp. 3-40, 1991.
+4] L. Babai, L. Fortnow, L. Levin, and M. Szegedy. Checking computations in polylogarithmic time. STOC, 1991.
+5] L. Babai, P. Kimmel, and S. V. Lokam. Simultaneous Messages vs. Communication. STACS, 1995.
+6] D. Beaver and J. Feigenbaum. Hiding Instances in Multioracle Queries. STACS, 1990. 7] D. Beaver, J. Feigenbaum, J. Kilian and P. Rogaway. Security with Low Communica-
+tion Overhead. CRYPTO, 1990. 8] S. Ceri and G. Pelagatti. Distributed Database Principles & Systems. McGraw Hill, 1984. 9] F. Chin. Security Problems on Inference Control for SUM, MAX, and MIN Queries. JACM,
+33:3, pp. 451|464, 1986.
+
+18
+
+10] D. Denning. Cryptography and Data Security. Addison-Wesley, 1982. 11] D. Dobkin, A. K. Jones, and R. J. Lipton. Secure Databases: Protection Against User
+In uence. ACM Transactions on Database Systems, 4:1, pp. 97|106, 1979. 12] U. Feige, S. Goldwasser, L. Lovasz, S. Safra, and M. Szegedy. Approximating clique
+is almost NP-Complete. FOCS, 1991. 13] R. G. Gallager. Information Theory and Reliable Communication. John-Wiley and Sons,
+New-York, 1968. 14] I. S. Honkala. Modi ed Bounds for Covering Codes. IEEE Transactions on Information
+Theory, 37:2, pp. 351|365, 1991. 15] C. Lund, L. Fortnow, H. Karloff, and N. Nisan. Algebraic Methods for Interactive
+Proof Systems. FOCS, 1990. 16] P. Pudlak, and V. Rodl. Modi ed Ranks of Tensors and the Size of Circuits. STOC, 1993. 17] R.L. Rivest, L. Adleman, and M.L. Dertouzos. On Data Banks and Privacy Homomor-
+phisms, Foundations of Secure Computation (eds., R. DeMillo, D. Dobkin, A. Jones, and R. Lipton). Academic Press, 1978. 18] P. Tendick, and N. Matloff. A Modi ed Random Perturbation Method for Database Security. ACM Transactions on Database Systems, 19:1, pp. 47|63, 1994. 19] J. D. Ullman. Principles of Database Systems. Second edition, 1982.
+
+A Lower Bounds
+The question of proving lower bounds on private information retrieval schemes remains one of the most intriguing open problems of this paper. The only obvious lower bound is log n bits which holds for any number of databases (this follows from communication complexity considerations without using any privacy argument). In this appendix we prove lower bounds for schemes of very restricted form.
+
+A.1 The Single Database Case
+
+In this section we prove that if there is only one copy of the database available then n bits must be
+
+exchanged and hence the trivial solution is optimal in this case. The lower bound holds even if the
+
+communication between the user and the database allows interaction (i.e., not only a single query
+
+and an answer to it). Also, note that the proof must make use of the privacy constraint; otherwise,
+
+log2 n + 1 bits are We say that a
+
+obviously enough communication C
+
+(U sends i
+is possible
+
+and gets for (x; i)
+
+back xi). if when the
+
+database
+
+content
+
+is
+
+x
+
+and
+
+the
+
+user is interested in the i-th bit there is a positive probability for C to be the communication. We
+
+say that a communication C is possible for i if it is possible for some pair (x; i). Now, x a value i
+
+and assume towards a contradiction that the number of possible communications for i is less than
+
+2n. This implies that there exist x 6= y and C such that C is possible for both (x; i) and (y; i)
+
+19
+
+(otherwise, if for all x's the possible communications on (x; i) are disjoint then we have at least 2n such communications). Let j be an index such that xj 6= yj. We claim that C is possible also for (x; j) and (y; j). If j = i this is obvious; otherwise, it follows from the privacy requirement (that is, if C is impossible for (x; j) then this implies that DB can distinguish between (x; j) and (x; i); similarly, if C is impossible for (y; j) then this implies that DB can distinguish between (y; j) and (y; i)). This gives a contradiction as U when interested in index j and seeing the (possible) communication C output some value b; however, as xj 6= yj he is wrong at least for one of these strings (x or y).
+
+A.2 Linear Summation Queries with 1-bit Answers
+
+In this section we consider the case of k = 2 databases. We restrict our attention to schemes in
+
+which each of the two databases is asked a query and answers with a single bit. Moreover, we
+
+insist that the scheme is of the \linear summation" type. That is, each query is just a name of a
+
+vector (set) q and the answer is (respectively) and computes b1
+
+i:qbi2=.1
+
+xi. The user Recall that
+
+takes the two bits in Section 3.1 we
+
+b1; b2 received from DB1;
+proved the existence of
+
+DB2
+such
+
+a scheme in which each of the queries sent by the user is n-bit long. We now show that this is
+
+essentially optimal.
+
+Consider some query q to DB1. The rst observation is that if q is possible (i.e., has positive
+
+probability to be asked) when the user is interested in index i then q is also possible when the user
+
+is interested in any other di erent j. Otherwise, the privacy of the scheme is immediately violated.
+
+This implies that, for every i, possible linear query for DB2.
+
+the query q0 The reason
+
+=q+ is that
+
+ei q
+
+(where ei denotes is a possible query
+
+the i-th to DB1
+
+unit vector) is when the user
+
+a is
+
+qewinvuoteeerrrdryyess,vttieeofcdqtDoiinrBs 2iain.npdaAoensxssoiiybd.mldeTmqhhueaetmerroimycnlitaynorgglDiudnBmies1ateratnnhtqceuheneorfelrydvoesmtrhyfoaqvrteiwsDctiBpollor2s.aisnlilTbohlwheaemfrroeemrcfooiDnrnegBs,t2drifuiasctqntadininscgeevpxeo1risyfsirisobvmelqec+tqfooreirsii.nDaIBpanon1sosettihvhbeeelnner
+
+hamming database
+
+distance from q is has cardinality at
+
+possible least 2n
+
+f1o,rrDeqBu1ir.inTghias
+
+implies that the set of possible query description length of at
+
+queries least n
+
+for 1
+
+each bits.
+
+In fact, the upper bound of Section 3.1 can be improved so that n 1 bits (instead of n) are sent
+
+to each database. This is done by choosing a random subset S of even cardinality with uniform
+
+distribution among these subsets. Send S to DB1, and S i to DB2. The subset S i is uniformly
+
+distributed among odd cardinality subsets. To specify even (or odd) sets, n 1 bits su ce.
+
+20
+

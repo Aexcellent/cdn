@@ -1,0 +1,318 @@
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+
+1703
+
+Blockchain-Based Federated Learning With Secure Aggregation in Trusted Execution Environment for Internet-of-Things
+Aditya Pribadi Kalapaaking , Ibrahim Khalil , Mohammad Saidur Rahman , Mohammed Atiquzzaman , Senior Member, IEEE, Xun Yi , and Mahathir Almashor
+
+Abstract—This article proposes a blockchain-based federated learning (FL) framework with Intel Software Guard Extension (SGX)-based trusted execution environment (TEE) to securely aggregate local models in Industrial Internet-of-Things (IIoTs). In FL, local models can be tampered with by attackers. Hence, a global model generated from the tampered local models can be erroneous. Therefore, the proposed framework leverages a blockchain network for secure model aggregation. Each blockchain node hosts an SGX-enabled processor that securely performs the FL-based aggregation tasks to generate a global model. Blockchain nodes can verify the authenticity of the aggregated model, run a blockchain consensus mechanism to ensure the integrity of the model, and add it to the distributed ledger for tamper-proof storage. Each cluster can obtain the aggregated model from the blockchain and verify its integrity before using it. We conducted several experiments with different CNN models and datasets to evaluate the performance of the proposed framework.
+Index Terms—Blockchain, deep learning, federated learning (FL), Intel Software Guard Extension (SGX), Internet-of-Things (IoT), secure aggregation, trusted execution environment (TEE).
+I. INTRODUCTION
+T HE Internet-of-Things (IoT) explosion has made it an integral component of various intelligent applications. Intelligent applications include but are not limited to health
+Manuscript received 10 January 2022; revised 8 February 2022 and 27 March 2022; accepted 12 April 2022. Date of publication 26 April 2022; date of current version 13 December 2022. This work was supported by the Australian Research Council Discovery Project under Grant DP210102761. Paper no. TII-22-0156. (Corresponding author: Mohammad Saidur Rahman.)
+Aditya Pribadi Kalapaaking, Ibrahim Khalil, Mohammad Saidur Rahman, and Xun Yi are with the School of Computing Technologies, RMIT University, Melbourne, VIC 3000, Australia (e-mail: aditya. pribadi.kalapaaking@student.rmit.edu.au; ibrahim.khalil@rmit.edu.au; mohammadsaidur.rahman@rmit.edu.au; xun.yi@rmit.edu.au).
+Mohammed Atiquzzaman is with the School of Computer Science, University of Oklahoma, Norman, OK 73019 USA (e-mail: atiq@ou.edu).
+Mahathir Almashor is with the CSIRO’s Data61 and Cyber Security Cooperative Research Centre, Marsﬁeld, NSW 2122, Australia (e-mail: mahathir.almashor@data61.csiro.au).
+Color versions of one or more ﬁgures in this article are available at https://doi.org/10.1109/TII.2022.3170348.
+Digital Object Identiﬁer 10.1109/TII.2022.3170348
+
+care, manufacturing, critical system infrastructure, agriculture, and transportation. IoT devices enable the collection of a large volume of data and act autonomously in an intelligent system, thanks to machine learning algorithms. The large volume of IoT data plays an essential role in training a machine learning algorithm system. In general, IoT devices are resource-constrained and cannot execute machine learning algorithms independently. Edge computing technology is gaining acceptance at a tremendous rate to form intelligent networks in conjunction with IoT and machine learning. An edge device (referred to as an edge server throughout the article) and IoT devices within the network form a cluster. In an intelligent system, edge devices can host a machine learning algorithm that uses a locallybuilt dataset and produce a trained model. IoT devices generate data and receive control instructions depending on the type of IoT device. Later, the trained model can be used to make an intelligent decision in the system.
+Although an edge and IoT-based system conﬁguration with machine learning capability can manage different system tasks automatically, the level of accuracy impedes its success. For example, a trained model produced by an edge server with local data might not consider many features that could be absent in the local dataset. The accuracy can be improved if the edge device can collaborate with other edge servers that have produced their trained model based on their local datasets. This learning method is called distributed collaborative machine learning [1]. Traditional distributed collaborative machine learning (see Fig. 1) allows different clusters to send their locally trained model and datasets to a centralized server, such as the cloud. Cloud aggregates all locally trained models using datasets from different sources and produces an aggregated trained model shared with all clusters to improve decision-making accuracy.
+Distributed collaborative learning suffers from two signiﬁcant issues: privacy and trust [2]. A new form of distributed collaborative learning, called federated learning (FL) [3], enables different clusters to build a trained model with their local data, called a local model, and to share only the local model with other participants for the purpose of aggregation. The aggregated model is known as a global model. Data privacy is ensured because the global model is generated without the data being shared with other participants. Nevertheless, the global model cannot be fully trusted as internal or external attackers can
+
+1551-3203 © 2022 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+1704
+
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+
+Fig. 2. Possible threat on collaborative learning architecture.
+
+Fig. 1. Traditional collaborative learning application scenario.
+launch several security attacks during the model aggregation and the dissemination of the global model. Hence, a trustworthy framework is required to ensure the privacy of sensitive data and the trustworthiness of the generated global model. Moreover, the receiver of the global model (e.g., edge server) should verify the integrity of the global model before using it.
+A. Contributions
+In this article, we propose a complete framework for FL that simultaneously safeguards the privacy of IoT data and ensures security during the generation of aggregated trained models. In addition, the proposed framework guarantees trustworthy storage and sharing of the outcomes of any training. The proposed framework comprises a convolutional neural FL architecture that combines an Intel Software Guard Extension (SGX)-based trusted execution environment (TEE) and blockchain platform. We assume that multiple IoT and edge devices clusters produce locally trained models based on their local dataset and send the local model to the blockchain network for aggregation. In this framework, each blockchain node hosts an SGX-enabled processor that individually performs the FL-based aggregation tasks to generate an aggregated model. Once SGX-enabled processors of blockchain nodes perform the aggregation, each node can verify the authenticity of the aggregated model, run a blockchain consensus mechanism to ensure the integrity of the model, and add it to a blockchain for tamper-proof storage. An edge server from each cluster can collect the latest aggregated model from the blockchain and verify its integrity before using it. The key contributions of our work are summarized below.
+1) The proposed framework introduces a new FL architecture for IoT to ensure secure generation of the aggregated model using Intel SGX-powered TEE.
+
+2) We propose the hosting of an SGX processor by a blockchain node that is responsible for the FL model aggregation task.
+3) A blockchain-powered trustworthy aggregated model storage and sharing model is proposed for FL-based learning in IoT applications.
+B. Organization
+The rest of this article is organized as follows. Section II describe the problem scenario in collaborative learning. Section III discuss some of the closely related work. The proposed framework is described in Section IV. Section V presents the experimental results and evaluates various performance aspects of the proposed framework. Finally, Section VI concludes this article.
+II. PROBLEM SCENARIO
+To demonstrate and discuss the problem that exists with traditional collaborative machine learning, we use an IoT-enabled smart warehouse scenario (see Fig. 2). Assume that several smart warehouses are geographically dispersed. Each warehouse receives multiple prepacked boxes of various garments (for both men and women), including shirts, trousers, shoes, jackets, and bags for storage. Each warehouse uses machine learning and an IoT-enabled camera to automatically sort the boxes according to the type of garment they contain. The camera scans the generic photo of the garment, which is shown on the box. However, IoT-enabled cameras are resourced-constrained and cannot execute the machine learning algorithm. Hence, each warehouse is equipped with an edge server with access to the local dataset and hosts the machine learning algorithm to train a model for recognizing garment items based on the local dataset. Nevertheless, the accuracy of a training model derived from the local dataset may not be good. Therefore, the edge server of each warehouse participates in a cloud-based collaborative
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+KALAPAAKING et al.: BLOCKCHAIN-BASED FEDERATED LEARNING WITH SECURE AGGREGATION
+
+1705
+
+machine learning platform to share its local dataset and the trained model. The cloud-based collaborative machine learning platform produces an aggregated model based on the received local datasets and models. The aggregated model is sent to all edge servers to achieve higher accuracy in recognizing the garment items.
+Although the aforementioned collaborative learning scenario improves overall accuracy, it suffers from the following security risks.
+1) Risks of data privacy: Sending local datasets to the cloud introduces the risk of a privacy breach. For example, a dishonest employee from the cloud service provider can act as an internal attacker and collect the warehouse’s sensitive product information and share it with a business competitor for ﬁnancial gain. Hence, there is the need for an aggregation model that would not require local datasets to generate an aggregated model.
+2) Risks of generating biased aggregated trained model: The aggregated model produced by a cloud service provider can be biased, as a cloud-based platform cannot be trusted. For instance, an internal attacker can generate a biased aggregated model not using the given local models or inject a faulty trained model to interrupt the generation of aggregated models. Therefore, a secure environment is required to prevent biased model generation.
+3) Risks of receiving alteration or faulty aggregated trained model: In the traditional cloud-based collaborative learning environment, an internal attacker of the cloud platform can interfere with disseminating the aggregated model. For example, an attacker can alter some part of the aggregated model before the cloud sends it to the edge servers. The traditional method does not allow a receiver of the aggregated model (i.e., edge server) to verify its integrity before using it. Hence, a trustworthy platform is required for sharing the aggregated model with edge servers.
+III. RELATED WORK
+This section discusses several studies that are closely related to our work.
+Privacy-preserving FL: Several works on privacy-preserving federated learning have been presented recently. Yin et al. [4] and Liu et al. [5] proposed an FL framework where the training is performed on each node and only the model is sent to the central server to perform the model aggregation. Wei et al. [6] and Zhao et al. [7] proposed a framework where data privacy is improved by means of differential privacy (DP). However, the use of DP will slow down the training process and reduce accuracy. In [8] the author proposed anonymous FL by adding a proxy layer and DP to the data. However, the proxy layer will add communication overhead, and the result shows that the DP decreases the ML accuracy. Li et al. [9] leveraged SMPC-based FL to secure aggregation. Hence, their framework relies on a centralized server to arrange the secret sharing. This could be a problem since all the models can be seen in plaintext after the cloud collects the secret share. FL is delicate to an attacker that can launch backdoor attacks. Bagdasaryan et al. [10] found
+
+that a backdoor can compromise the FL and poison the machine learning model. Our framework will create a secure end-to-end FL process to overcome this problem by securing the machine learning model and the aggregation process.
+TEE-based machine learning: Recently, TEE has gained popularity in the ﬁeld of privacy-preserving machine learning. Ohrimenko et al. [11] investigated centralized machine learning processes in an SGX-enabled data center to improve data privacy and avoid data leaks. In his framework, the server requests the dataset from all the participants and computes it in a centralized server. Tramer et al. [12] and Juvekar et al. [13] proposed a secure inference process inside of the TEE. Hynes et al. [14] and Hunt et al. [15] demonstrated centralized privacy-preserving machine learning by running all the CNN processes inside the enclave.
+The available frameworks use a single deep learning model, and none of them performs within the FL setup. The current work also shows that the time cost is signiﬁcantly increased when the training process is performed in the TEE. Hence, we run the aggregation process inside the enclave to maximize the performance and reduce time consumption.
+Blockchain-based FL: Blockchain was ﬁrst launched as a cryptocurrency technology. However, it has now been expanded for data storage across multiple computational nodes in a distributed fashion. Blockchain is structured as a linked list of blocks holding a set of transactions. Ali et al. [16] proposed a method to ensure the privacy and security of health care systems using blockchain. Their approach focuses mainly on securing patient data from active collision attacks by leveraging novel smart contracts and encryption algorithms. Nowadays, many studies are incorporating blockchain into their FL methodologies because FL is based on a centralized server, which is vulnerable to attack. Zhao et al. [17] designed a system where each of the clients will sign the model after the training process and send it to the blockchain. However, if this model has many clients, the computation cost will be very high. In recent works, Qu et al. [18], Lu et al. [19], and Feng et al. [20] proposed a framework where the model is stored in the blockchain node, and FL is performed. However, in their architecture, the model is not totally encrypted. Also, the aggregation is performed by an untrusted party. Kim et al. [21] proposed a method where they deploy the blockchain on the edge devices. The disadvantage of this method is that the edge devices will require a lot of computation power. Kumar et al. [22] proposed a blockchain architecture to collect the locally trained model weights collaboratively from different sources for health care scenarios. However, the local model that is stored in the blockchain is not protected by any privacy measure. In this case, other parties can see the model, thereby raising privacy issues.
+Samuel et al. [23] proposed blockchain-based FL for health care system. Their proposed framework protects the local model training with DP. The central server aggregates the global model and stores it in the blockchain. However, the global model accuracy is lower than the locally trained model. The use of DP in this framework can preserve privacy while sacriﬁcing accuracy. Alsamhi et al. [24] and Otoum et al. [25] proposed an edge intelligence over smart environments with the support
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+1706
+
+TABLE I SUMMARY OF RELATED WORKS
+
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+TABLE II NOTATIONS
+
+of FL and blockchain. Their proposed architectures leverage drones as an edge intelligence to perform the aggregation in FL. The aggregation process on a drone is vulnerable to tampering attacks and poisoning attacks. Since drones are deployed on the ﬁeld and open networks, hardware security such as TEE can secure the aggregation process.
+In Table I, we summarize some of the works to identify their research gaps and discuss how our proposed method differs from them. As shown in the table, existing works are mostly unsecured, inefﬁcient, and have low accuracy. Hence, we deploy the blockchain on the server-side to reduce training model storage costs and leverage TEE to ensure secure and trustworthy model aggregation before sending it to the blockchain.
+IV. PROPOSED FRAMEWORK
+In this section, we present the proposed blockchain-based FL with TEE-powered secure aggregation framework. First, we present an overview of the system architecture. Next, we discuss in detail the various components of our proposed framework. The summary of notations used in the methodology can be seen on Table II.
+A. System Architecture
+We consider an FL-based collaborative learning model in this system that leverages TEE for secure aggregation and blockchain for tamper-proof data sharing and storage.
+We assume that there are p warehouses equipped with several IoT cameras to scan product photos and recognize the type of products. Because IoT cameras are resource-constrained when running machine learning algorithms, each warehouse uses an edge server to host and execute a machine learning algorithm.
+
+As a result, IoT cameras and the edge server form a cluster Ci(1 ≤ i ≤ p). Initially, the edge server trains a model based on the local dataset and generates a trained model called a local model, denoted as ML. However, if the size of the local dataset is small, the accuracy of ML might not be high. Hence, the edge server of a cluster Ci joins in FL involving multiple clusters of similar warehouses by sending its ML to generate an aggregated model known as a global model, denoted as MG. In our proposed scenario, we adopt federated averaging (FedAVG) [27] algorithm for generating the global model, which will be discussed in Section IV-C.
+A typical FL approach involves three steps: initialization, aggregation, and update. Unlike the traditional FL approach where ML are aggregated in a centralized server (e.g., a cloud server), our proposed framework uses a blockchain platform for the aggregation of ML. Multiple nodes form a blockchain network, and each node receives all ML and individually aggregates ML to produce their own copy of a MG. We assume that each blockchain node has a TEE host. To ensure the security during the aggregation process, each blockchain node performs the aggregation in its TEE host and produces a MG. Blockchain nodes execute a consensus mechanism to ensure that all nodes have identical MG. Once the consensus has been reached, each blockchain node stores the MG in its respective blockchain. Finally, the blockchain network sends MG to all edge servers. Edge servers validate MG once received and update their initial model with MG. Edge servers use the MG for product recognition in the warehouse.
+Fig. 3 gives an overview of the proposed framework, which consists of three main phases: local model generation, secure TEE-enabled aggregation, and blockchain-based global model storage. The following subsections describe each phase in detail.
+B. Local Model Generation
+The local model generation (LMG) phase is performed in each cluster to generate a locally trained model similar to the initialization phase of the original FL. An overview of the LMG phase is given in Fig. 4. In the proposed system, we assume that the edge servers of different clusters train models using convolutional neural network (CNN)-based image classiﬁcation in which model parameters are retrieved from the global model stored in the tamper-proof storage. Example of the CNN models are AlexNet [28], LeNet [29], and VGG16 [30].
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+KALAPAAKING et al.: BLOCKCHAIN-BASED FEDERATED LEARNING WITH SECURE AGGREGATION
+
+1707
+
+the ML model using its dataset in every FL round r as follows:
+
+MLr+i 1 = MGr − η∇F (MGr , Di)
+
+(1)
+
+where MLr+i 1 denotes the updated local model of client i, MGr is the current global model, η is the local learning rate, ∇ is used
+to refer to the derivative with respect to every parameter, and F is the loss function. Later, Ei send MLr+i 1 to the blockchain network and aggregated iteratively into a joint global model MG.
+To ensure the security of the local model, Ei leverages symmetric key encryption algorithm, such as advanced encryp-
+tion standard (AES), to encrypt MLi before sending it to the blockchain nodes. We assume that the AES secret key between Ei and the blockchain network is established using a secure key establishment mechanism, such as Difﬁe–Hellman key ex-
+change mechanism. We do not discuss this process in detail as
+we leverage the state-of-the-art mechanism for encrypting the
+local model.
+
+Fig. 3. Overview of the proposed framework.
+Fig. 4. Local model generation.
+In general, CNN image classiﬁcation takes an input image, processes it and classiﬁes it under certain categories of t objects. An edge server Ei of cluster Ci has a local image dataset Di. The edge server sees an input image as an array of pixels, and it depends on the image resolution. Based on the image resolution, it will see h × w × d (h = height, w = width, d = dimension). For example, an image of 6 × 6 × 3 array of a matrix of RGB (3 refers to RGB values) and an image of 4 × 4 × 1 array of a matrix of a grayscale image. Technically, the deep learning CNN model works via different layers to train and test a local model. The layers are convolution layers with ﬁlters (kernels), pooling, and fully connected (FC) layers. In the end, CNN applies the SoftMax function to classify an object according to probabilistic values between 0 and 1. In each edge server, Ei locally trained the machine learning model MLi. An edge server Ei updates
+
+C. TEE-Enabled Secure Model Aggregation
+Once different local models are received by a blockchain node, a TEE is used to securely aggregate all models. For TEE, we use Intel SGX [31] in this framework. SGX is a set of CPU extensions, which can provide isolated execution environments, named enclaves, to protect the conﬁdentiality and integrity of the data against all other software, even a compromised OS, on the platform. When a platform is equipped with an SGXenabled CPU (such as a blockchain node in our framework), as an enclave, the memory, BIOS, I/O, and even power are treated as potentially untrustworthy. First, the encrypted data are transmitted into an enclave for decryption. Then the decrypted data will be the input of function f . Finally, the output of f will be encrypted and then sent to the outside of the enclave.
+Using the same principle, FL’s local model aggregation task is performed in the SGX-enabled CPU. We assume that there are b blockchain nodes in the blockchain network, and each blockchain node Bi(1 ≤ i ≤ b) in the blockchain network is equipped with an SGX-enabled CPU Si. A blockchain node Bi cannot access the code and data within its SGX-enabled CPU Si.
+Assume that a blockchain node Bi receives the set ML of local models from all clusters which can be denoted as ML = {ML1, ML2, . . . , MLp}. Bi sends MLi(1 ≤ i ≤ Ci) to Si. The secure aggregation tasks of all local models in ML is done using multiple operations which are discussed below.
+1) Generation of Encrypted Local Models: The SGX enclave receives only encrypted data to ensure security. Hence, Bi needs to encrypt MLi before sending it to Si. Let, E(., K) be a symmetric encryption (SE) algorithm E(., Ki) with a secret key Ki that is shared between Bi and its Si. The shared secret key Ki is established by leveraging a secure key exchange protocol such as Difﬁe–Hellman key exchange protocol.
+Bi generates an encrypted local model E(MLi, Ki). Bi sends E(MLi, Ki) to Si.
+2) Remote Attestation: The remote attestation allows the veriﬁcation of the integrity of the aggregated model (i.e., global model) generated by the SGX enclave. In this framework, the
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+1708
+
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+
+Fig. 5. Remote attestation of local model.
+
+SGX enclave acts as the attestator, and the software module
+of a blockchain node Bi that is responsible for interfacing between SGX enclave and the blockchain network plays the
+role of a veriﬁer of the attestation. First, the SGX enclave Si receives the set MLE of p encrypted local models which can be denoted as MLE = {E(ML1, K1), . . . , E(MLp, Kp)}. Si decrypts each E(MLi, Ki)(1 ≤ i ≤ p) with the shared secret key ki to retrieve the plaintext set of local learning models MLi. Second, Si performs the aggregation using the federated averaging (FedAVG) [27] algorithm to generate the global model
+MG as follows:
+
+MGr+i 1 =
+
+n
+
+|Di| N
+
+MLr+i 1,
+
+N
+
+=
+
+n
+
+|Di|
+
+(2)
+
+i=1
+
+i=1
+
+where MGr+i 1 denotes the updated global model, n is a number of clients on the FL round r, |Di| is the number of data items (images) owned by Ei to train local model MLr+i 1, and N the total number of data used to train all of the local models. MG is ﬁnal updated global model MGr+i 1.
+Third, Si generates a remote attestation, called report Ri = Sign(MGi, AKi). Here, Sign(., AKi) is a signature function and AKi is the attestation key of Si. The generated report enables a veriﬁer (i.e., blockchain node) to verify the MGi. The pseudocode of the overall aggregation and remote attestation
+is illustrated in Algorithm 1. The algorithm takes encrypted
+trained models as input and outputs aggregated global models,
+and its remote attestation report All tasks of Algorithm 1 are
+executed under a running enclave of the SGX. SGX uses a
+quoting enclave to verify reports produced by the application
+enclave and signs as a quote. The quoting enclave is used to
+determine the trustworthiness of the platform. Later, the quote
+is sent to another party for veriﬁcation. In our scenario, each Bi will have one Si and works as an aggregator and veriﬁer of attestation reports. Fig. 5 shows the details of the quoting
+enclave process.
+
+D. Blockchain-Based Tamperproof Global Model Storage and Distribution
+In this phase, the blockchain network receives all remote attestations produced by SGX enclaves and runs a consensus mechanism. The consensus mechanism veriﬁes the remote attestations of a global model produced by the SGX enclaves. If
+
+Fig. 6. Blockchain-based global model storage.
+all remote attestations are veriﬁed, and the majority hashes of corresponding models are the same, the blockchain nodes in the blockchain network add the global model MG as a block in the blockchain. Also, the global model is sent to all edge servers as the update operation FL. An overview of this step is given in Fig. 6.
+1) Verifying Attestation Reports by a Blockchain Node: Assume that each blockchain node is equipped with a quoting enclave and has an attestation key AKj to sign a remote attestation report Ri produced by Si. Ri is signed with Akj to generate a quote Qi. A quote contains the identity of the attesting enclave Si, execution mode details (e.g., security version number level Si), and additional metadata. The function that is
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+KALAPAAKING et al.: BLOCKCHAIN-BASED FEDERATED LEARNING WITH SECURE AGGREGATION
+
+1709
+
+used to generate Qi can be shown as: Qi = Sign(Ri, AKj). Qi is encrypted using the public key P KIAS of Intel attestation service (IAS) and generates E(Qi, P KIAS). P KIAS is embedded in the quoting enclave of all SGX-enabled processors. Each Si shares its E(Qi, P KIAS) to other SGX-enabled processors of the blockchain network. Once all encrypted quotes are received from SGX-enabled processors of all n blockchain nodes, Bi creates a collection of Encrypted Quotes received from all which is denoted by QE={E(Q1, P KIAS), E(Q2, P KIAS), . . . , E(Qn, P KIAS)}.
+A blockchain node Bi veriﬁes each encrypted quote with the help of IAS and determines if the quote is correct and the corresponding remote attestation enclave has created it. The veriﬁcation is done using a function verif y(E(Qi, P KIAS), P RIAS), where P RIAS is the private key of IAS. Once the quotation is veriﬁed, Q is broadcast to the blockchain network to obtain a consensus for the global model. Algorithm 2 provides an overview of this step.
+2) Consensus by Blockchain Network: The consensus mechanism has several steps. First, a blockchain node Bi checks the validity of each quote and the authenticity of the quotegenerating enclave. Second, the global model is extracted from each quote, and their hashes are veriﬁed. If the hashes of all global models are the same, the consensus is achieved. If all hashes are not the same, the blockchain node Bi determines the global model MGk that has maximum matched hash values, where k ≤ p. Third, Bi proposes MGk to the blockchain network to add in the blockchain. Finally, if MGk is the same for the majority of the node’s global model, the consensus is achieved and added to the blockchain. Algorithm 3 shows the pseudocode and Fig. 7 provide an overview of of consensus mechanism. The blockchain data structure of global models is illustrated in Fig. 8.
+V. RESULTS AND DISCUSSION
+In this section, we report on several experiments conducted to evaluate the performance of our proposed framework. Experimental setup, and dataset and model are discussed in Sections VA and V-B, respectively. Section V-C shows experimental results and evaluates the performance.
+
+Fig. 7. Overview of the consensus mechanism.
+Fig. 8. Data structure of the global model blockchain.
+A. Experimental Setup In our experiments, both the server and participant applica-
+tions were run on an Azure Cloud. We used the DCsv2 series VM with 4 vCPU and 16 GB memory. This DC series from Azure provides conﬁdentiality and integrity of the data and code while they are being processed in the public cloud. DCsv2-series using Intel Software Guard Extensions was used, which enables the end-user to use secure enclaves for protection. These machines are backed by 3.7 GHz Intel Xeon E-2288 G (Coffee Lake) with SGX [31] technology. We built our FL application based on PyTorch [32] and PySyft [33]. To run the PyTorch application in the SGX environment, we build our application on GrapheneOS [34].
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+1710
+
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+
+TABLE III DATASETS SPECIFICATIONS
+
+Fig. 9. Processing time of secure aggregation process with and without SGX using various machine learning models and datasets considering batch size = 128. (a) LeNet - Fashion MNIST. (b) VGG16 CIFAR-10. (c) AlexNet - CIFAR 10. (d) LeNet - MNIST.
+
+B. Datasets and Model
+For the experiments, we selected three datasets popularly used for the machine learning process: Fashion MNIST [35], CIFAR-10 [36], and MNIST [37]. These datasets are commonly used for benchmarking in the machine learning framework. Therefore, we have used them to evaluate the performance of our proposed approach. The dataset is used to train and test the local model on the client-side in the proposed FL-based approach. For all our experiments, we split the training and testing sets. Based on the number of participants, we evenly distribute the training and test sets among all participants. Fashion MNIST [35] is a collection of datasets containing fashion images. The training set comprised 60 000, and 10 000 images were used as a test set. Each image had a 28 × 28-pixel grayscale, and nine different classes were represented (trousers, dress, bag, etc.). MNIST [37] is a dataset consisting of handwritten digits (60 000 images in the training set and 10 000 in the test set). Each image is a 28 × 28-pixel image of a handwritten digit. CIFAR-10 [36] consists of 50 000 images in the training set and 10 000 in the test set. It comprises ten different classes (such as cars, dogs, planes), and there are 6000 images in each class, where each image contains 32 × 32-colored pixels. Table III shows the overview of the dataset used in the experiments.
+We consider three models for our experiment. First, the LeNet model was used, which was proposed by LeCun et al. [29]. The model contains two convolutional layers and two fully connected layers. This model is suitable for running experiments using the Fashion MNIST and MNIST datasets. Second, the AlexNet [28] model is used with ﬁve convolutional layers and three fullyconnected layers. This model can use batch normalization layers
+
+for stability and efﬁcient training. AlexNet is suitable for testing on the CIFAR-10 datasets. Finally, the VGG16 [30] model is used that has 16 layers and about 138 million parameters. This machine learning model is also suitable for CIFAR 10 datasets.
+C. Experimental Results and Performance Evaluation
+First, we evaluate the performance of our framework for the global model aggregation process(see Fig. 9). This experiment shows the time cost difference when performing the secure aggregation process with enclaves and without enclaves with various numbers of edge devices ranging from 2 to 40. Results show the aggregation times required by LeNet, AlexNet, and VGG16 for a batch size of 128. In Fig. 9(a) and (d), we show the LeNet model with Fashion MNIST and MNIST dataset, respectively. The experimental results show that the LeNet model exhibits a similar trend when used on Fashion MNIST and MNIST datasets. The time is consistently stable when it has 20 edge devices, and the time cost rises a little bit when it reaches 30 edge devices during the aggregation in the TEE. The average additional time cost is 1.2 s. Fig. 9(b) and (c) shows the results of AlexNet and VGG-16 models with CIFAR-10 dataset. When we perform the VGG-16 model with 40 edge devices, the aggregation process without SGX requires 19.1 s. The aggregation process is higher with SGX, which is 21.8 s. The required time to aggregate local training models of VGG-16 is the highest due to the involvement of 16 layers. Nevertheless, it is only 2.7 s slower than the time cost of aggregation without SGX. Fig. 9 shows that the aggregation time cost is 1.3 s higher on an average in SGX due to the paging mechanism and memory limitation of SGX.
+In Fig. 10, we test the performance of our framework using different machine learning models and datasets. The experiment is conducted within and outside the enclave with different batch sizes (1, 8, 16, and 20), and the time costs of the training
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+KALAPAAKING et al.: BLOCKCHAIN-BASED FEDERATED LEARNING WITH SECURE AGGREGATION
+
+1711
+
+TABLE IV COMPARISON OF MACHINE LEARNING MODEL ACCURACY IN FEDERATED
+LEARNING PROCESS WHEN USING NORMAL CPU AND SGX
+
+Fig. 10. Processing time of training process with and without SGX for different number of batch size using various machine learning models and datasets. (a) LeNet - Fashion MNIST. (b) VGG16 - CIFAR-10. (c) AlexNet - CIFAR 10. (d) LeNet - MNIST.
+Fig. 11. Processing time (a) for the federated learning process using LeNet model [29] with Fashion MNIST datasets [35] with different number of nodes, and (b) for adding the global model to the blockchain with different number of blockchain nodes.
+processes are shown in Fig. 10(a). The time cost of the LeNet machine learning model with Fashion MNIST datasets running outside the enclave starts from 7.2 s for one batch size. The time cost increases linearly to 8.7 s for 16 batch size. Fig. 10(b) shows the time costs of VGG-16 with CIFAR 10 datasets. The time cost is 1.1 s for batch size is 1 and 2.2 s for batch size 16. The time costs increase slightly, keeping the same linear characteristics when the experiments are performed inside the enclave with the same settings. The LeNet model requires 8.1 to 9.4 s, while VGG-16 requires 1.5–2.9 s. The experiment results show that the time cost increases for both inside and outside enclave training when all the machine learning models use 20 batch sizes. The time costs also increase if the number of images in a batch increases.
+Fig. 11(a) shows the required time for the FL process with different numbers of edge servers. In this experiment, we performed multiple FL processes that use normal aggregation and SGXbased secure aggregation. We used pre-processed the Fashion MNIST dataset and the LeNet machine learning model with 128 batch sizes for the experiment. We consider different number of edge servers ranging from 2 to 40. Results indicate that the time
+
+cost increases gradually for the FL process with and without SGX-based aggregation. When comparing the results of normal CPU and SGX based approach, the time differs about 70 ms with 10 edge servers and 91 ms with 40 edge servers.
+Fig. 11(b) shows the time required to execute both the veriﬁcation and deployment of the global model in our blockchain network. In this experiment, the TEE aggregates all the models from the edge server to form a global model. The global model is then veriﬁed and deployed in the blockchain network. Our simulation tested the performance using several blockchain nodes ranging from 5 to 20. The deployment phase requires roughly 100 ms (with 5 blockchain nodes) to 230 ms (with 20 blockchain nodes). The veriﬁcation phase is faster than the deployment phase and requires 60 ms and 180 ms with 5 and 20 blockchain nodes, respectively. The processing times of both phases increase linearly with the increment of blockchain nodes.
+Table IV shows the results of testing our framework to see the effect when we apply the machine learning model in a federated way inside the enclave and standard CPU. In this experiment, all the datasets have 28 × 28 pixels and 128 batch size. We ran the experiment with 50 training iterations. The experimental results show that the differences in the accuracy of the proposed methodology and two benchmark methods proposed in [14] and [15]. Initially, we record the accuracies of our proposed method with and without SGX. The accuracies of the aforementioned methods are obtained by applying various CNN models on different datasets. According to the results, the accuracies are reduced by 2.2% to 2.9% when SGX is used. Later, we measure the accuracies of Myelin [14] and Chiron [15] with and without SGX. Results show that accuracies of the Myelin and Chiron are lower than our proposed method. Moreover, the accuracies of Myelin and Chiron are reduced around 5.1% and 7.4% with SGX, respectively. Hence, our method has better accuracy compared to Myelin and Chiron.
+D. Discussion
+In this section, we summarize the performance of our proposed method. As discussed in Section V-C, we conducted a series of experiments to evaluate the efﬁcacy of our proposed method. Based on the empirical results, the following conclusions can be drawn.
+1) Privacy of local dataset: FL allows computational parties to collaboratively learn a shared model while preserving all training data locally, separating the machine learning process from the storage of data in the central server.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+1712
+
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+
+The method is unlike traditional centralized machine learning where local datasets are stored in one central server. Therefore, FL can ensure the privacy of the client’s sensitive data. 2) Privacy of local training model: In our framework, the local training model is encrypted using a shared key before it is sent to the blockchain node. The shared key is established using a secure key-exchange protocol. Later, the local training model will be decrypted inside the enclave for secure aggregation. As the local model is encrypted, model inversion attacks [39], and parameter stealing [40] cannot be performed on a local model by an adversary. 3) TEE-based secure aggregation: In FL, aggregation is typically performed on a normal server. Several researchers [6], [7] have proposed a differential privacy (DP) method to secure the model during the aggregation process. However, DP will signiﬁcantly reduce the accuracy of the global model. Table IV shows that the use of secure TEE-based aggregation can overcome this problem while maintaining the privacy of the model. As the aggregation is performed in the TEE, adversaries cannot tamper with or steal the model parameters during the aggregation process. As blockchain technology is being used with emerging technologies, such as drones [41]–[43], the proposed blockchain and TEE-based model aggregation in FL would enhance the trust in applications where drones are used as edge intelligence in FL [24], [25]. 4) Resilience of the global model: Blockchain is a decentralized technology that can maintain data integrity by means of an extensive network that can withstand security breaches from untrusted parties. In the proposed framework, we use blockchain to store the global model after the aggregation process in the TEE. This decentralization makes it almost impossible for an adversary to compromise the network. Moreover, model updates are protected by digital signatures and hashes. Hence, the adversary cannot tamper with or contaminate the global model since this will change the hash value. 5) Model performance: Although our proposed method can ensure the privacy of the model and the security of the aggregation process, performance is still a crucial metric for measuring the quality of the framework. The experimental results show that the performance of the proposed framework is better than that of the baseline model. Our proposed framework is different from Tramer et al.[12], Juvekar et al. [13], Hynes et al. [14], and Hunt et al. [15] where the whole training process occurs inside the enclave for a single deep-learning model. On the other hand, our framework uses an FL setup, and only the aggregation is performed inside the enclave. We also examine the reduction of our model’s accuracy when we leverage TEE. Our proposed method has only up to 3% accuracy reduction compared to Myelin [14], and Chiron [15] that have more than 5% and 7% accuracy reduction, respectively. In other words, our proposed framework achieves a good balance between privacy and model performance.
+
+VI. CONCLUSION
+In this article, a blockchain and TEE-enabled FL framework was proposed for IoT. The main objective of this framework was to ensure the trustworthy aggregation of local models to obtain a global model. The aggregation was done within the blockchain network. The proposed framework leveraged the Intel SGXbased TEE to ensure secure aggregation where each blockchain node executed the aggregation task. In this framework, each blockchain node was equipped with an SGX-enabled processor that securely generates a global model to ensure trustworthiness. Later, the global model was veriﬁed by the blockchain network via a consensus mechanism before it was added to the blockchain, thereby maintaining tamperproof storage. Users of the global model could access it and veriﬁed its integrity only through the blockchain network. We used different CNN-based algorithms with several benchmark datasets to generate local models and aggregate them under FL settings. We conducted several experiments that showed that our proposed framework’s processing time was almost similar to that of the original FL model. In addition, our framework had only around 2% less accuracy compared to the original FL model. It was essential to mention that this framework had leveraged a hash-based consensus mechanism to ensure the model’s integrity. In the future, we intend to develop an efﬁcient consensus mechanism for the proposed TEE and blockchain-based FL framework in order to make it more practical. In this article, we assumed that all participants performed homogeneous tasks and used same approach to generate their respective local models. Each participant used their own private dataset and the FL architecture to obtain a global model. However, we plan to extend our current work in the future to support heterogeneous tasks in blockchainbased federated learning with TEE-based secure aggregation.
+REFERENCES
+[1] M. Alazab, S. P. RM, M. Parimala, P. K. R. Maddikunta, T. R. Gadekallu, and Q.-V. Pham, “Federated learning for cybersecurity: Concepts, challenges and future directions,” IEEE Trans. Ind. Inform., vol. 18, no. 5, pp. 3501–3509, May 2022.
+[2] L. Melis, C. Song, E. De Cristofaro, and V. Shmatikov, “Exploiting unintended feature feakage in collaborative learning,” in Proc. IEEE Symp. Secur. Privacy, 2019, pp. 691–706.
+[3] T. Li, A. K. Sahu, A. Talwalkar, and V. Smith, “Federated learning: Challenges, methods, and future directions,” IEEE Signal Process. Mag., vol. 37, no. 3, pp. 50–60, May 2020.
+[4] L. Yin, J. Feng, H. Xun, Z. Sun, and X. Cheng, “A privacy-preserving federated learning for multiparty data sharing in social IoTs,” IEEE Trans. Netw. Sci. Eng., vol. 8, no. 3, pp. 2706–2718, Jul.–Sep. 2021.
+[5] Y. Liu, J. Nie, X. Li, S. H. Ahmed, W. Y. B. Lim, and C. Miao, “Federated learning in the sky: Aerial-ground air quality sensing framework with UAV swarms,” IEEE Internet Things J., vol. 8, no. 12, pp. 9827–9837, Jun. 2021.
+[6] K. Wei et al., “Federated learning with differential privacy: Algorithms and performance analysis,” IEEE Trans. Inf. Forensics Secur., vol. 15, pp. 3454–3469, 2020.
+[7] Y. Zhao et al., “Local differential privacy-based federated learning for Internet of Things,” IEEE Internet Things J., vol. 8, no. 11, pp. 8836–8853, Jun. 2021.
+[8] B. Zhao, K. Fan, K. Yang, Z. Wang, H. Li, and Y. Yang, “Anonymous and privacy-preserving federated learning with industrial Big Data,” IEEE Trans. Ind. Inform., vol. 17, no. 9, pp. 6314–6323, Sep. 2021.
+[9] Y. Li, Y. Zhou, A. Jolfaei, D. Yu, G. Xu, and X. Zheng, “Privacy-preserving federated learning framework based on chained secure multiparty computing,” IEEE Internet Things J., vol. 8, no. 8, pp. 6178–6186, Apr. 2021.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+KALAPAAKING et al.: BLOCKCHAIN-BASED FEDERATED LEARNING WITH SECURE AGGREGATION
+
+1713
+
+[10] E. Bagdasaryan, A. Veit, Y. Hua, D. Estrin, and V. Shmatikov, “How to backdoor federated learning,” in Proc. Int. Conf. Artif. Intell. Statist., 2020, pp. 2938–2948.
+[11] O. Ohrimenko et al., “Oblivious multi-party machine learning on trusted processors,” in Proc. 25th {USENIX} Secur. Symp., 2016, pp. 619–636.
+[12] F. Tramer and D. Boneh, “Slalom: Fast, veriﬁable and private execution of neural networks in trusted hardware,” in Int. Conf. Learn. Representations, 2019.
+[13] C. Juvekar, V. Vaikuntanathan, and A. Chandrakasan, “{GAZELLE}: A low latency framework for secure neural network inference,” in Proc. 27th {USENIX} Secur. Symp., 2018, pp. 1651–1669.
+[14] N. Hynes, R. Cheng, and D. Song, “Efﬁcient deep learning on multi-source private data,” 2018, arXiv:1807.06689.
+[15] T. Hunt, C. Song, R. Shokri, V. Shmatikov, and E. Witchel, “Chiron: Privacy-preserving machine learning as a service,” 2018, arXiv:1803.05961.
+[16] A. Ali et al., “Security, Privacy, and reliability in digital healthcare systems using blockchain,” Electronics, vol. 10, no. 16, 2021, Art. no. 2034.
+[17] Y. Zhao et al., “Privacy-preserving blockchain-based federated learning for IoT devices,” IEEE Internet Things J., vol. 8, no. 3, pp. 1817–1829, Feb. 2021.
+[18] Y. Qu, S. R. Pokhrel, S. Garg, L. Gao, and Y. Xiang, “A blockchained federated learning framework for cognitive computing in Industry 4.0 networks,” IEEE Trans. Ind. Inform., vol. 17, no. 4, pp. 2964–2973, Apr. 2021.
+[19] Y. Lu, X. Huang, K. Zhang, S. Maharjan, and Y. Zhang, “Communicationefﬁcient federated learning and permissioned blockchain for digital twin edge networks,” IEEE Internet Things J., vol. 8, no. 4, pp. 2276–2288, Feb. 2021.
+[20] L. Feng, Y. Zhao, S. Guo, X. Qiu, W. Li, and P. Yu, “Blockchain-based asynchronous federated learning for Internet of Things,” IEEE Trans. Comput., vol. 71, no. 5, pp. 1092–1103, May 2022.
+[21] H. Kim, J. Park, M. Bennis, and S.-L. Kim, “Blockchained on-device federated learning,” IEEE Commun. Lett., vol. 24, no. 6, pp. 1279–1283, Jun. 2020.
+[22] R. Kumar et al., “Blockchain-federated-learning and deep learning models for COVID-19 detection using CT imaging,” IEEE Sensors J., vol. 21, no. 14, pp. 16301–16314, Jul. 2021.
+[23] O. Samuel et al., “IoMT: A COVID-19 healthcare system driven by federated learning and blockchain,” IEEE J. Biomed. Health Inform., to be published, doi: 10.1109/JBHI.2022.3143576.
+[24] S. H. Alsamhi et al., “Drones’ edge intelligence over smart environments in B5G: Blockchain and federated learning synergy,” IEEE Trans. Green Commun. Netw., vol. 6, no. 1, pp. 295–312, Mar. 2022.
+[25] S. Otoum, I. A. Ridhawi, and H. Mouftah, “A federated learning and blockchain-enabled sustainable energy-trade at the edge: A framework for industry 4.0,” IEEE Internet Things J., to be published, doi: 10.1109/JIOT.2022.3140430.
+[26] Y. Qu et al., “Decentralized privacy using blockchain-enabled federated learning in fog computing,” IEEE Internet Things J., vol. 7, no. 6, pp. 5171–5183, Jun. 2020.
+[27] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efﬁcient learning of deep networks from decentralized data,” in Proc. Artif. Intell. Statist., 2017, pp. 1273–1282.
+[28] A. Krizhevsky, I. Sutskever, and G. E. Hinton, “ImageNet classiﬁcation with deep convolutional neural networks,” Commun. ACM, vol. 60, no. 6, pp. 84–90, 2017.
+[29] Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner, “Gradient-based learning applied to document recognition,” Proc. IEEE, vol. 86, no. 11, pp. 2278–2324, Nov. 1998.
+[30] K. Simonyan and A. Zisserman, “Very deep convolutional networks for large-scale image recognition,” in Proc. 3rd Int. Conf. Learn. Representations, Y. Bengio and Y. LeCun, Eds., San Diego, CA, USA, 2015.
+[31] V. Costan and S. Devadas, “Intel SGX Explained,” IACR Cryptology ePrint Arch., vol. 2016, no. 86, pp. 1–118, 2016.
+[32] A. Paszke et al., “Pytorch: An imperative style, high-performance deep learning library,” Adv. Neural Inf. Process. Syst., vol. 32, pp. 8026–8037, 2019.
+[33] A. Ziller et al., “PySyft: A library for easy federated learning,” in Federated Learning Systems. Berlin, Germany: Springer, 2021, pp. 111–139.
+[34] C.-C. Tsai, D. E. Porter, and M. Vij, “Graphene-SGX: A practical library {OS } for unmodiﬁed applications on {SGX},” in Proc. {USENIX} Annu. Tech. Conf., 2017, pp. 645–658.
+[35] H. Xiao, K. Rasul, and R. Vollgraf, “Fashion-MNIST: A novel image dataset for benchmarking machine learning algorithms,” 2017, arXiv:1708.07747.
+
+[36] A. Krizhevsky and G. Hinton, “Convolutional deep belief networks on CIFAR-10,” Unpublished Manuscript, vol. 40, no. 7, pp. 1–9, 2010.
+[37] L. Deng, “The MNIST database of handwritten digit images for machine learning research [Best of the Web],” IEEE Signal Process. Mag., vol. 29, no. 6, pp. 141–142, Nov. 2012.
+[38] C. Szegedy, S. Ioffe, V. Vanhoucke, and A. A. Alemi, “Inception-v4, inception-resnet and the impact of residual connections on learning,” in Proc. 31st AAAI Conf. Artif. Intell., 2017, pp. 4278–4284.
+[39] M. Fredrikson, S. Jha, and T. Ristenpart, “Model inversion attacks that exploit conﬁdence information and basic countermeasures,” in Proc. 22nd ACM SIGSAC Conf. Comput. Commun. Secur., 2015, pp. 1322–1333.
+[40] B. Wang and N. Z. Gong, “Stealing hyperparameters in machine learning,” in Proc. IEEE Symp. Secur. Privacy, 2018, pp. 36–52.
+[41] M. S. Rahman, I. Khalil, and M. Atiquzzaman, “Blockchain-powered policy enforcement for ensuring ﬂight compliance in drone-based service systems,” IEEE Netw., vol. 35, no. 1, pp. 116–123, Jan./Feb. 2021.
+[42] S. H. Alsamhi, O. Ma, M. S. Ansari, and F. A. Almalki, “Survey on collaborative smart drones and Internet of Things for improving smartness of smart cities,” IEEE Access, vol. 7, pp. 128125–128152, 2019.
+[43] M. S. Rahman, I. Khalil, and M. Atiquzzaman, “Blockchain-enabled SLA compliance for crowdsourced edge-based network function virtualization,” IEEE Netw., vol. 35, no. 5, pp. 58–65, Sep./Oct. 2021.
+Aditya Pribadi Kalapaaking received the bachelor’s degree in computer science (Hons.) in 2020 from RMIT University, Melbourne, Australia, where he.is currently working toward the Ph.D. degree in computer science with the School of Computing Technologies.
+His research interests include machine learning, privacy-preserving techniques, cybersecurity, edge computing, distributed system, and blockchain.
+Ibrahim Khalil received the Ph.D. degree in computer science from the University of Berne, Berne, Switzerland, in 2003.
+He is currently a Professor with the School of Computing Technologies, RMIT University, Melbourne, VIC, Australia. He has several years of experience in Silicon Valley, California-based networking companies, as a Software Engineer working on secure network protocols and smart network provisioning. He was also with EPFL and the University of Berne and Osaka University, Osaka, Japan, before joining RMIT University. In the past, he also worked on distributed systems, e-health, wireless and body sensor networks, biomedical signal processing, network security. His research interests include privacy, blockchain, secure AI, and data analytics. Dr. Ibrahim is the Chief Investigators of a few prestigious ARC discovery and linkage grants on blockchain and privacy awarded in Australia between 2017 and 2021. He was the recipient of international European grants, industry grants, and QNRF grant from Qatar.
+Mohammad Saidur Rahman received the B.Sc. degree in computer engineering and the M.Sc. degree in computer science from the American International University-Bangladesh (AIUB) of Dhaka, Dhaka, Bangladesh, in 2007 and 2009, respectively, and the Ph.D. degree in computer science from the School of Science, RMIT University, Melbourne, VIC, Australia, in 2020.
+He is currently a Research Associate with the School of Computing Technologies, RMIT University. He was a Faculty Member with AIUB before starting his Ph.D. His current research interests include blockchain, data privacy, lossless data hiding, Internet of Things (IoT), and service computing.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+
+1714
+
+IEEE TRANSACTIONS ON INDUSTRIAL INFORMATICS, VOL. 19, NO. 2, FEBRUARY 2023
+
+Mohammed Atiquzzaman (Senior Member) received the M.S. and Ph.D. degrees in electrical engineering and electronics from the University of Manchester, Manchester, U.K., in 1984 and 1987, respectively.
+He currently holds the Edith Kinney Gaylord Presidential Professorship with the School of Computer Science, University of Oklahoma, Norman, OK, USA. His research interests include communications switching, transport protocols, wireless and mobile networks, satellite networks, and optical communications. Dr. Atiquzzaman is the Editor-in-Chief of the Journal of Networks and Computer Applications, Founding Editor-in-Chief of Vehicular Communications, and has served/serving on the editorial boards of various IEEE journals and cochaired numerous IEEE international conferences including IEEE Globecom.
+
+Mahathir Almashor received the Ph.D. degree in computer science from RMIT University, Melbourne, VIC, Australia, in 2013.
+He is a Senior Research Scientist with CSIRO’s Data61 and Cyber Security Cooperative Research Centre, Black Mountain, ACT, Australia, with a background in software engineering research and data science. After his Ph.D., his talents have afforded him opportunities at industry leaders such as Seeing Machines and IBM Research. Prior work includes trafﬁc simulators, machine-vision, distributed systems, and antiphishing techniques. Recent focus has been on the capture, analysis and visualization of billions of records within distributed Python and DB frameworks. He is currently with the Smart Shield antiphishing project, which is jointly supported by Data61, Cyber Security Cooperative Research Centre, and the West Australian Government.
+
+Xun Yi received the Ph.D. degree in engineering from Xidian University, Xi’an, China, in 1995.
+He is currently a Full Professor of Cybersecurity with the School of Computing Technologies and with the School of Science, RMIT University, Melbourne, VIC, Australia. He has authored or coauthored more than 200 research papers in international journals and conference proceedings. His research interests include applied cryptography, computer and network security, mobile and wireless communication security, and data privacy protection. Prof. Yi has served as program committee members for more than 30 international conferences. Recently, he has led some Australia Research Council Discovery Projects in Data Privacy Protection. From 2014 to 2018, he was an Associate Editor for IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 06,2024 at 13:40:02 UTC from IEEE Xplore. Restrictions apply.
+

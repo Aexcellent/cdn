@@ -9,7 +9,7 @@
 	"priority": 100,
 	"inRepository": true,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2021-07-13 21:05:00"
+	"lastUpdated": "2024-12-11 18:55:00"
 }
 
 /*
@@ -37,7 +37,7 @@
 
 
 function detectWeb(doc, url) {
-	if (url.includes('/book/show/') && doc.querySelector('meta[property="books:isbn"]')) {
+	if (url.includes('/book/show/') && getISBN(doc)) {
 		return "book";
 	}
 	else if (getSearchResults(doc, true)) {
@@ -73,7 +73,7 @@ function doWeb(doc, url) {
 }
 
 function scrape(doc, _url) {
-	let ISBN = ZU.cleanISBN(attr(doc, 'meta[property="books:isbn"]', 'content'));
+	let ISBN = getISBN(doc);
 	
 	// adapted from Amazon translator
 	let search = Zotero.loadTranslator('search');
@@ -91,6 +91,13 @@ function scrape(doc, _url) {
 	Z.debug(`Searching by ISBN: ${ISBN}`);
 	search.setSearch({ ISBN });
 	search.getTranslators();
+}
+
+function getISBN(doc) {
+	let json = text(doc, 'script[type="application/ld+json"]');
+	if (!json) return null;
+	json = JSON.parse(json);
+	return json.isbn;
 }
 
 /** BEGIN TEST CASES **/

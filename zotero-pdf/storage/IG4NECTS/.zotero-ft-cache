@@ -1,0 +1,554 @@
+Transportation Research Part E 137 (2020) 101926 Contents lists available at ScienceDirect
+Transportation Research Part E
+journal homepage: www.elsevier.com/locate/tre
+
+Reinforcement learning framework for freight demand forecasting
+
+to support operational planning decisions
+
+T
+
+Lama Al Hajj Hassan, Hani S. Mahmassani⁎, Ying Chen
+
+Transportation Center, Northwestern University, Chambers Hall, 600 Foster Street, Evanston, IL 60208, United States
+
+ARTICLE INFO
+Keywords: Freight demand forecasting Time series Reinforcement learning Rolling horizon
+
+ABSTRACT
+Freight forecasting is essential for managing, planning operating and optimizing the use of resources. Multiple market factors contribute to the highly variable nature of freight flows, which calls for adaptive and responsive forecasting models. This paper presents a demand forecasting methodology that supports freight operation planning over short to long term horizons. The method combines time series models and machine learning algorithms in a Reinforcement Learning framework applied over a rolling horizon. The objective is to develop an efficient method that reduces the prediction error by taking full advantage of the traditional time series models and machine learning models. In a case study applied to container shipment data for a US intermodal company, the approach succeeded in reducing the forecast error margin. It also allowed predictions to closely follow recent trends and fluctuations in the market while minimizing the need for user intervention. The results indicate that the proposed approach is an effective method to predict freight demand. In addition to clustering and Reinforcement Learning, a method for converting monthly forecasts to long-term weekly forecasts was developed and tested. The results suggest that these monthly-to-weekly long-term forecasts outperform the direct long term forecasts generated through typical time series approaches.
+
+1. Introduction
+Taking 2015 as the base year, total U.S. freight shipments are expected to increase 41 percent by 2045 (Assoc. of Am. Railroads, 2017). In the midst of this growing demand, intermodal operations, which combine truck drayage with rail long haul service, offer a viable option to serve various markets. These operations help reduce trucks on highways at a competitive price. Intermodal traffic is expected to grow as the trucking industry continues to face driver shortages and regulatory changes that raise costs and limit driver hours and miles. The projected cost increases in trucking coupled with growth in e-commerce will further push retailers to seek savings along the supply chain (Stephens, 2017).
+To accommodate the projected growth, intermodal carriers need to understand and properly react to regulations, market forces, and evolving customer requirements in a competitive market. The response should be reliable through the coordination between freight and equipment flow (Dewitt and Clinger, 2000). Customers and retailers are expecting more shipping options and higher delivery speeds and reliability, lower prices, flexible destinations, and distribution terminals closer to urban agglomerations (Choe et al., 2017).
+These challenges underscore the role of data in planning and managing the supply chain process. Regardless of the mode in
+⁎ Corresponding author. E-mail addresses: lamaalhajjhassan2021@u.northwestern.edu (L. Al Hajj Hassan), masmah@northwestern.edu (H.S. Mahmassani),
+y-chen@northwestern.edu (Y. Chen).
+https://doi.org/10.1016/j.tre.2020.101926 Received 21 November 2019; Received in revised form 3 February 2020; Accepted 21 March 2020 1366-5545/ © 2020 Elsevier Ltd. All rights reserved.
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+question, operators need forecasting models that not only analyze and project based on historical trends and market information, but also adapt to recent changes in customer purchase patterns, policy and so on. Extracting analytical insights from the network data, developing demand projections on a real-time basis, and acting on them will affect carriers’ market position (Choe et al., 2017). This dynamic insight-response mechanism promises improved fleet utilization and business growth.
+Freight demand has been modeled using regression and time series techniques, behavioral models (Regan & Garrido, 2001), commodity-based input-output models, inventory theory, truck route optimization and simulation approaches (Mahmassani et al., 2007). One critical limitation in existing freight demand models is the inability to adapt quickly to new conditions (Chow et al., 2010). In addition, some models require extensive demand and economic datasets making implementation time and resource consuming (Cambridge Systematics, 2010). This paper presents a demand forecasting methodology to support operational planning over short to long term horizons. The approach combines time series models (“forecasters”) in a Reinforcement Learning (RL) framework implemented over a rolling horizon. In the proposed methodology, predictions for each market are generated after clustering the market lanes (different origin-destination pairs) on the basis of observed container demand patterns. The contribution of this paper lies in developing a structured responsive approach that starts by identifying market clusters in a large dataset, and then establishing a suitable subset (committee) of forecasters for each cluster. Constructing a committee of forecasters instead of relying on a single predictor helps improve the prediction accuracy since no one model is always the best performer (Newbold and Granger, 1974; Granger and Newbold, 1976; Granger and Jeon, 2004; Yang, 2004; Bichpuriya et al., 2016). The approach uses RL logic to overcome the responsiveness limitation of time series models by learning from the recent performance of the committee members. Reinforcement Learning is a computational approach to learning in which the agent learns and adapts through continuous experimentation. An agent’s goal is to maximize a suitably defined reward function, so the agent explores several options and consequently discovers which action yields the highest return, and as a result learns what to do (Sutton and Barto, 1998).
+In the following section, a review of the relevant literature is presented, followed by a presentation of the methodology in Section 3. The model is then tested, and the results are discussed in Section 4. Finally, Section 5 concludes the paper and suggests future extensions of this work.
+2. Literature review
+2.1. Freight demand modelling
+Several tools have been developed for freight demand modeling to support public and private sector decision making processes (Chow et al., 2010; Tavasszy and De Jong, 2013). Freight demand has been modeled using regression and time series techniques (Fite et al., 2002; Farrington and Harris, 2011), behavioral models (Regan and Garrido, 2001; Ben-Akiva et al., 2008), spatial econometrics techniques (Garrido and Mahmassani, 1998, 2000), commodity-based input-output models (Black, 1999; Holguín-Veras and Patil, 2008; Cascetta et al., 2013), inventory and supply chain theories (Winston, 1983), truck route optimization and simulation approaches (Zhang et al., 2008; Cambridge Systematics, 2010; Nuzzolo et al., 2013).
+Behavioral models simulate shippers’ decision processes and carrier choices. These can be implemented if survey data are collected from shippers and carriers; however the approach can be time-consuming and not readily available as shipper-carrier interaction data are typically proprietary (Cambridge Systematics, 2010). Input-output models are used to determine the amount of freight by commodity consumed and produced in a region as a result of economic mechanisms. Truck trips are then estimated based on the calculated freight flows. To develop such models, one would require historical and predicted freight flow data and economic indicators. Inventory models simulate the decision-making process between customers and suppliers while seeking to minimize the total transportation cost (shipping, inventory and ordering). Simulation and network models focus on freight mode choice and routing decisions (Mahmassani et al., 2007; Cambridge Systematics, 2010). Time series models are commonly used by public sector agencies and have fewer resource requirements compared to other approaches. However, time series models require a long history of observations and assume previous conditions remain stationary into the future. Therefore, on their own such models do not adapt to new situations and information quickly.
+One of the critical issues facing existing tools include lack of and late responsiveness to consumer demand variations and to sudden economic conditions (Cambridge Systematics, 2010). This misalignment between the freight market and the model adjustments could result in missed opportunities and inefficient operations. As a result, this paper uses time-series and machine learning models within a reinforcement learning approach to leverage available data and fast responsiveness to new conditions. Freight demand modeling literature using time series analysis have relied on single models to generate point forecasts (Farrington and Harris, 2011) or multiple models to generate bounds (Liu et al., 2006). The contribution of this paper lies in developing and testing using actual carrier data a structured responsive approach that starts by identifying clusters in the data and their suitable committee of forecasters. The approach then uses the RL logic to overcome the responsiveness limitation of time series models and learn from the recent performance of the committee members (model components).
+2.2. Reinforcement learning
+Inspired by behavioral psychology, Reinforcement Learning has been adopted and adapted by multiple disciplines such as game theory, control theory, and operations research, as a mechanism for integrating information from various sources and/or outcomes from repeated trials. In reinforcement learning, given a set of possible actions, the agent discovers the most rewarding decision by trying an action and reaping the reward immediately or after a set of subsequent actions i.e., delayed reward. Because of the structure
+
+2
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+of this problem, the agent is required to make a tradeoff between exploration of new options that may have higher rewards and exploitation of past actions that led to rewards (Weigang et al., 2008).
+In the field of game theory, Erev and Roth (1998) studied the descriptive (best fit) and predictive performance of reinforcement learning models in games with a unique equilibrium. They showed that static equilibrium predictions were outperformed by those from reinforcement learning models. They tested three games with similar equilibrium conditions and noted that the speed at which each experimental subject converged to the equilibrium prediction varied depending on their starting point. They further tested the long-term ramifications of initial conditions on the learning process and argued that although it is possible to improve the initial estimates their effects on the model were limited.
+In earlier work, Roth and Erev (1995) introduced two psychological features in their reinforcement learning framework: experimentation and recency effects. By allowing experimentation in the model, a subject’s choice set was not limited to past successful ones, thereby preventing subjects from being rapidly locked into one sub-optimal choice. Recency effects recognize that recent events might have a more significant impact on decisions compared to past experience. These two features allow the reinforcement learning model to be more responsive to changes in the environment, especially under partial and general conditions of information availability.
+Feltovich (2000) designed a multi-stage game and compared Nash equilibrium predictions to those of reinforcement learning and belief based models. In reinforcement learning models, a player bases his/her choices only on payoffs of past actions whereas in belief based models choices depend on the expected payoff of an action given held beliefs of the likely actions of the other players. Using a set of pre-defined criteria, the author concluded that predictions generated from both learning models substantially outperform those of Nash equilibrium. In fact, in the tested games and after multiple repetitions, the predictions of both models started and remained far from equilibrium. The experimental results were inconclusive as to which learning model (Reinforcement or Belief-Based) outperformed the other, though both models resulted in similar behavioral patterns regardless of their different specifications, suggesting that there might not be a single perfect model that would capture behavior under all circumstances.
+While there are numerous examples in the literature for the use of machine learning techniques for planning and management of airport operations, forecasting models for freight operations have been more inclined toward the use of time series and multiple regression models (Bodily and Freeland, 1988; Guerrero and Elizondo, 1997; Fite et al., 2002; Patil and Sahu, 2016). An overview of the use of reinforcement learning for forecasting demand for transportation services and the models used in forecasting freight flow are presented in Table 1.
+Table 1 shows that reinforcement learning succeeded in guiding processes and improving decisions in the aviation sector. Review of freight-related literature revealed that there had been attempts to incorporate several machine learning techniques in the forecasting process although time series models are still adopted. This paper seeks to combine the already established time series models with reinforcement learning to advance freight forecasting models and their application to support operational planning decision processes.
+3. Methodology
+This section presents the overall approach to forecasting freight movement. Assume that we have K oracles or forecasters who provide a forecast for each time period in a given market—in this case, the number of containers to be moved in a given week in that market. No forecast is perfect, and sometimes a forecast will hit the mark or get very close, whereas at other times it may miss the mark by varying degrees. Not knowing the past performance of the oracles, the operator (using the forecasts as a basis for planning decisions) may take a simple average of the forecasts as the “consensus” forecast. However, recognizing that some forecasters outperform others in certain instances or for different periods of time, the operator will place different weights on the respective forecasts in forming the “final” forecast. Reinforcement Learning (RL) provides a mechanism for (1) dynamically learning about the respective performance of the different forecasters based on the quality of their past forecasts, placing greater emphasis on more recent instances, and (2) weighing the respective forecasts accordingly at each instance.
+In this context, the forecasters, or agents, consist of different statistical or Machine Learning models developed using the same training (estimation) data set, and implemented in a rolling horizon framework to provide forecasts at different time scales. These are run in parallel, and compared against actual realizations once those have materialized, providing an automated basis for scoring the forecasters’ respective performance for use in the RL weight updating mechanism. The challenge consists in specifying the reward function and formulating the updating mechanism. The mathematical details are provided in this section as part of the model formulation.
+Before developing and applying the forecasting models, container demand originating in a given market is clustered into destination lane groups with similar spatio-temporal patterns, as described in Section 3.1. The overall approach is summarized in Fig. 1. The formulation of the continuous, self-correcting RL model is presented in Section 3.2, followed in Section 3.3 by a description of the time scales over which the forecasting models are applied. Recognizing the presence of seasonality and special events (e.g. holidays), Section 3.4 presents the approach followed to incorporate these effects in the models. Finally Section 3.5 describes the metrics used to evaluate the performance of the model in the case study application.
+3.1. Market lane clustering
+After correcting for missing data and data errors, the primary markets are identified along with their trends in time and space. The primary markets are defined as the origin terminals where all the containers are loaded. The primary market is the one for which
+
+3
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Table 1 Selected freight forecasting methods and reinforcement learning applications.
+
+Reference
+
+Method
+
+Application
+
+Findings
+
+(GOSAVII et al., 2002)
+Weigang et al., 2008
+Tumer and Agogino (Tumer and Agogino, 2009)
+Garrido and Mahmassani (Garrido and Mahmassani, 2000)
+Moscoso-López et al. (Moscoso-López et al., 2016)
+
+Formulated the problem as a semi-Markov decision problem aiming to maximize the average reward. Objective values defined for each state-action pair were updated within a neural network scheme Simulate future airspace demand to identify capacity requirements in each sector for different periods of time. Decision support process is designed as a Markov Decision Chain (MDC), the state information from MDC is transferred to a reinforcement learning model in which an action is selected, executed, and its corresponding outcomes are used to update the learning process. Multi-agent model that responded quickly to weather and airport conditions to limit the local delays. These agents learn continuously through reinforcement learning and provide air traffic controllers with recommendations and decisions.
+Multinomial probit (MNP) model for freight demand analysis and flow distribution prediction that captures general spatial and temporal correlation patterns. Given order patterns and information regarding socioeconomic activity, the model forecasts freight flow over space and time for operational and tactical level planning Compared the performance of Artificial Neural Networks (ANN) and Support Vector Machines (SVMs) models in predicting freight volume
+
+Revenue management problem for a single flight leg
+Air traffic flow management decisions
+Air traffic management systems (ATM)
+Motor carrier company dataset of all shipments picked up in the state of Texas between June 1994 and July 1995.
+Fresh vegetable transportation through RO-RO operations in the Port of Algeciras Bay
+
+The proposed method outperforms the Expected Marginal Seat Revenue (EMSR), a heuristic that is widely used in the industry.
+Using traffic flow information for Brazil, the model-suggested course of action was close to reality and even led to improvement in certain instances.
+A simulation based on US airspace showed that the proposed model could improve ATM while retaining current flow management procedures, without significant policy shifts. Comparison of simulation results to outputs of a Monte Carlo estimation procedure revealed that the adaptive agents outperformed the reference case. While predicted probabilities differed from those in the forecasting sample, the modified probit model succeeded in ranking and identifying sites with a higher probability of generating shipments at a given time.
+The SVMs models performed slightly better than ANN in forecasting the volume of fresh vegetables moved on each day
+
+predictions are generated. Primary vs secondary notation is used only to differentiate between the origin market and the destination markets respectively. It is important to examine the trends since the intensity and volatility of the fluctuations in each market hint to the type of the time series models that would best capture the different characteristics of demand such as seasonality and periodicity.
+For each market, the corresponding demand dataset is clustered so as to identify groups of destination lanes. Each group consists of lanes with similar patterns and for which separate cluster-customized models are developed. Cluster analysis seeks to find groups in a dataset that increase homogeneity in a group while increasing heterogeneity between groups (Kaufman and Rousseeuw, 2009). There are various algorithms for clustering; here we employ k-means clustering approach. K-means clustering is an unsupervised approach that starts by locating centroids in the dataset and then assigning elements in the data to that centroid to create groups. The assignment seeks to minimize the sum of the squared distance between the elements and the centroid in a cluster (Schoier and Gregorio, 2017). Orlin et al. (2017) used clustering to reduce errors in sales forecasting for a retail company. Compared to the nonclustered approach, clustering the different items sold by the retail company lowered the average errors by at least 10% (Orlin et al., 2017). Hence, in this study, a market is broken down into various clusters, as described in the case study application in Section 4. For each cluster, a set of forecasting models are selected to comprise the components that are later used in the RL approach to generate the final forecast. Therefore, the predicted demand for a cluster is the weighted average of the predictions of the individual component models and the weights are updated continuously using RL.
+
+3.2. Continuous and self-correcting model formulation
+In developing the forecasting model, the longitudinal dataset is divided into two time periods. The first is used for training, and the later one is used for testing. The estimation set is used for calibrating the statistical time series models and training the machine learning algorithms; forecasts are then produced using these models for the testing portion, along with forecasting new time intervals, where each time interval is one week in this application.
+The demand forecasting process is designed to operate on a rolling horizon basis, whereby a forecasting horizon is updated (rolled) at the end of every week as new information becomes available. Adopting this rolling horizon approach, depicted in Fig. 2,
+4
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 1. Stages in the presented methodology.
+allows updating the forecasts based on the most recent information. It is accomplished by adding to the estimation dataset the number of moves that occurred in the latest week, dropping the earliest week, and then forecasting. As a result, forecasting becomes a quasi-continuous process that is not only performed at the end of the forecasting horizon.
+Deploying a continuous model may be directly correlated with the need to increase monitoring efforts and incurring operational inefficiencies. However, the suggested framework incorporates reinforcement learning to maximize efficiency through better deployment and informed execution. Reinforcement learning (RL) would allow the model to adapt to recent trends while eliminating the need for direct auditing. The RL notion is introduced in a manner that guides forecasts generated in this proposed approach.
+Since no time series model is capable of fully capturing the demand trend characteristics and one model may not be suitable for
+5
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 2. Rolling horizon implementation.
+
+forecasting at all times, this proposed approach uses multiple time series models as RL agents. The time series or machine learning models (agents) are chosen based on the initial trend analysis performed at the level of clusters. The forecast of the individual component (agent) is then weighed through the reinforcement learning mechanism to obtain the final forecast. Suppose n time series models, Y1t … Ynt, are used for forecasting, where t is the t-th time step, p1…pn (0 ≤ pj ≤ 1, j = 1…n) denote the prediction accuracy of component n, which is the fraction of time over the testing period in which component n gives a correct prediction.
+The “correctness” or “accuracy” of a component j’s prediction at a time t could be a [0,1] variable, equal to 1 if j’s prediction is correct (within a pre-defined acceptable error range) for time t; 0 otherwise. It could also depend on the relative accuracy of the prediction, as implemented in the model presented here:
+
+Xj,t =
+
+1 ||J||
+
+1
+
+1
+
+j |Yj,t 1 Yobs,t | j j |Yj,t 1 Yobs,t |
+
+(1)
+
+Recognizing that each predictor is likely to be accurate with some probability, the “consensus” prediction will be a weighted sum of the values Y1t … Ynt, i.e.:
+
+Yt = w1t Y1t + w2t Y2t + +wnt Ynt
+
+(2)
+
+where wjt is the weight associated with predictor j for the t-th interval. fractions and the importance of performance in previous time steps. The
+
+The weights account for the respective weights are normalized and sum to 1 (
+
+prediction accuracy
+
+n j=1
+
+wjt
+
+=
+
+1,
+
+t
+
+T)
+
+in case ties are allowed, i.e., two components could have the same accuracy at the same time.
+
+The main feature of RL is the manner in which the weights are adjusted from one time step to next time step based on the latest
+
+information derived from actual observed values. The basic idea is that wjt will be set for the next time step (t) based on the outcome
+
+of the current time step (t − 1). One might also prefer positive deviations (Forecast – Actual > 0) to negative deviations (Forecast –
+
+Actual < 0). Note that it is usually better to over-predict than under-predict, as it is possible to redeploy or give discounts to
+
+customers in the former case, while customers and goodwill are lost in the latter case. The preference for over-prediction is reflected
+
+by including a penalty coefficient j in the weights applied to a forecast as follows:
+
+wjt =
+
+wj,t 1 + (1
+
+)
+
+1
+
+||J|| 1
+
+1
+
+j |Yj,t 1 Yobs,t |
+
+j j |Yj,t 1 Yobs,t |
+
+j=1 n
+
+(3)
+
+where
+
+j: Deviation penalty for component model j Yjt: Forecast for period t from model j Yobs,t: Observation at period t wjt: Weight given for forecast from model j at period t
+: Weight given to past data J : Number of fitting (component) models used
+
+3.3. Forecasting over different time scales
+
+As previously mentioned the proposed forecasting scheme is used to support operational planning over the short term and the longer term. The operations are planned on a weekly time scale therefore both short-term and long-term forecasts represent the number of moves per week. Accordingly, the short-term model is designed to predict the number of moves for one week and two weeks in advance whereas the long-term model forecasts the number of moves in each week for the weeks in one month and two
+
+6
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+months in advance. For the short-term forecast, a suitable number of time series models are chosen for each cluster based on the trend characteristics
+found during the pre-processing stage. However, time series models have low accuracy when it comes to forecasting over long horizons (Nguyen and Chan, 2004), so an alternative to long-term weekly forecasts is devised. Consequently, instead of directly forecasting weeks far in advance, we forecast the number of moves on a monthly basis, i.e., the number of moves that will occur in the next two months separately. Afterwards, the number of moves in each week is calculated as a weighted average of: (a) No Information/ Equal Allocation (NIA) Model, and (b) Monthly to Weekly Mapping (MWM) Model with the weights ( ) update using an RL mechanism similar to the one previously described. The final long-term weekly forecast is calculated as follows:
+
+wFinal,t = wNI,t NI,t + wMWM,t MWM,t
+
+(4)
+
+where
+
+wFinal,t: Final long-term weekly forecast for week t – regardless of the month it falls in wNI,t: Resultant forecast for week t from the “No Information Model” wMWM,t : Resultant forecast for week t from the “Monthly to Weekly Mapping model” m,t: The RL weight for model m and for week t
+
+In the NIA model, the monthly forecasts (Mi) are equally allocated over the days of the month. Then the weekly patterns are obtained by adding up the days of the weeks that belong to that month. On the other hand, the MWM model requires inputting a matrix of week-month weights (αji) defined as the proportion of days in week j that fall in month i, the monthly forecasts (Mi) and the long-term weekly forecasts using time series models (wj). Although time series models are not optimal for long-term forecasting, they are incorporated in this overall model to take advantage of their ability to pick up trends and patterns in the data albeit not with the best accuracy. Afterwards, the monthly forecasts are mapped into the weeks – in each month – using weights (αji) as follows:
+
+fji =
+
+j,i wj
+
+52 k=1 k,i
+
+wk
+
+(5)
+
+12
+
+wj = fji Mi
+
+i=1
+
+(6)
+
+where
+
+fji: The fraction of the number of moves in month i that fall in week j ji: The proportion of days in week j that fall in month i
+wj: The weekly forecast for j from the component models Mi: The forecasted number of moves for month i wj: The adjusted forecast for week j based on the monthly forecasts and the weekly pattern
+
+By definition, ji is the proportion of days in week j that fall in month “i”; for example, the week from December 30, 2019 to
+
+January 6, 2020 has 2 days out of 7 in December. Therefore, if week j does not belong to month i, then j,i = 0. It is an important
+
+property that ensures
+
+52 j=1
+
+f
+
+ji
+
+=
+
+1
+
+i, in other words, the number of moves during one month is not over/underestimated. This, in
+
+turn, ensures that the sum of the weekly forecasts matches the sum of the monthly forecasts in one year as shown below:
+
+12
+
+wj = fji Mi
+
+i=1
+
+(7)
+
+52
+
+52 12
+
+wj =
+
+f ji Mi
+
+j=1
+
+j=1 i=1
+
+(8)
+
+52
+
+12
+
+wj = Mi
+
+j=1
+
+i=1
+
+52
+f ji
+j=1
+
+where
+52
+fji = 1 i
+j=1
+
+52
+
+12
+
+wj = Mi (1)
+
+j=1
+
+i=1
+
+(9) (10) (11)
+
+7
+
+L. Al Hajj Hassan, et al.
+
+52
+
+12
+
+wj = Mi
+
+j=1
+
+i=1
+
+Transportation Research Part E 137 (2020) 101926
+(12)
+
+3.4. Accounting for calendar effects
+
+Holiday shopping season is critical for suppliers and retailers who rely on supply chain companies to deliver their products to the right place at the right time. Therefore, it is necessary to account for holidays as covariates in the time series models whenever possible. Nevertheless, this introduces additional challenges known as the calendar effect.
+Holidays such as Easter and Thanksgiving occur each year but their exact timing (such as date for Thanksgiving, day of the week for Christmas) shifts and their effect on the time series may affect more than one period (one week or one month). Therefore, the observations in the time series (in this case the number of container moves) depend on the absolute length of the period between moving holidays. It is important because the standard time series models, such as ARIMA do not capture these lags and effects. These models do capture seasonality, but by definition, the seasonal component occurs at the same time each year, and since these periods and holidays are shifting by date or day of the week, their effect is not picked up by the models.
+Cleveland and Grupe (1981) developed an approach to correct for the calendar effects. The approach used in their paper was developed for monthly forecasts however in this framework forecasts are generated on a weekly basis, so the approach is modified accordingly. Then the calendar effects of different holidays are added as external covariates (regression variables) to the models. The regression variables (effects) of the calendar events are defined as:
+
+(Number of 'w' days that f all in month of t) E(w, t) =
+
+di,t
+
+w
+
+Di
+
+(13)
+
+where
+
+w: The number of days before the holiday that are affected by it t: The current day di,t: Number of days in week i that belongs to the month of day t and are affected by the holiday Di: Total number of days in week i
+The holidays included in this study are New Year’s, Easter, Memorial Day, Fourth of July, Labor Day, Thanksgiving and Christmas. Their assumed w values are listed as follows:
+New Year’s – from Dec. 25th until Jan 2nd
+• Easter – 10 days • Memorial Day – 7 days • 4th of July – 7 days • Labor Day – 7 days • Thanks giving – 10 days •• Christmas – w is variable, and it is taken as the duration starting from the day after Thanksgiving up to and including Dec 24th.
+3.5. Evaluation metrics
+
+Several measures are used for assessing the prediction accuracy of the proposed forecasting method. Both statistical measures such as Mean Absolute Percentage Error (MAPE) and Mean Absolute Deviation (MAD) are utilized. Additionally, the results are interpreted graphically using a graph of error frequency distribution as well as individual weekly and cumulative forecasts. The statistical measures are presented below:
+
+1n MAPE =
+
+yi
+
+yi
+
+n i=1
+
+yi
+
+(14)
+
+MAD =
+
+1 n
+
+n i=1
+
+yi
+
+yi
+
+(15)
+
+where
+
+yi actual number of moves during period i yi forecasted number of moves for period i
+
+While MAPE measures the extent of the error in percentage units, the MAD measures the error in units of the object forecasted. Error frequency distribution graphs allow examination of the performance of the model. Ultimately, a bell-shaped distribution is preferred such that it is centered on 0% MAPE with most of the errors falling in between ± 15%. Moreover, the individual weekly
+
+8
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 3. Clustering market X at the lane level.
+graph helps examine how closely the forecasts follow the actual observation patterns as well as their proximities to the real values. As for the cumulative graphs, these are used for the long-term weekly pattern model to ensure that the forecasts are catching up with the actual number of moves and therefore to check and verify the soundness of the proposed approach.
+4. Case study
+The proposed approach is tested on a dataset provided by an intermodal company operating in the USA. The dataset includes information for each move by origin and destination. Moreover, for each movement, the dataset has information regarding the commodity type and order placement, pickup and delivery times. The data used in the model is the weekly number of moves from 2013 to 2017. The information presented below is for a market referred to here as X (for data confidentiality purposes).
+After pre-processing the dataset, the moves originating from market X are clustered by lane then each lane group is further clustered by commodity type. The clustering at the lane level results in three groups with the members of each cluster- destinations presented in green, blue and black respectively and the centroids are chosen by the k-means algorithm in red, shown in Fig. 3. Figs. 3 and 4 only show the first 52 weeks in the training set – for clear presentation. However, clustering was done using the whole training set. The plot shows that the grouping is mainly driven by the frequency of moves between market X and the different destinations. Accordingly, three clusters are referred to as the “More Frequent” in green, “Frequent” in blue, and “Less Frequent” in black with cluster size of one, four and six lanes respectively. Through Fig. 3, it is clear that the “More Frequent” group is distinct whereas the other two groups have some overlapping elements.
+
+Fig. 4. Clustering market X at the commodity level. 9
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 5. Weekly moves by cluster.
+Commodities, categorized based on a two-digit code, are clustered based on the number of weekly orders, as shown in Fig. 4. Starting with the original dataset, the number of weekly moves for 2-digit commodity ID is clustered. This results in two distinct groups presented in blue and green with cluster size two and 23 commodities respectively. Fig. 4 shows that there is no overlap between two clusters and that the primary distinction is again the number of weekly moves.
+Fig. 5 demonstrates the two main steps in the clustering process. The blue numbers on the arrows indicate the average number of weekly moves by cluster.
+As a result, the model is customized for each lane-commodity cluster, in other words, each lane cluster is divided into two commodity sub-sets, and the model is designed based on the specifications of each. The number of moves from January 2013 to June 2017, is extracted from the dataset and then aggregated to weekly moves for the short-term model and monthly moves for the longterm model. Afterwards, the number of container moves is divided into two sets: the “Training Dataset” is used for estimation from January 2013 to June 2015, and the “Testing Dataset” is predicted and introduced in the model gradually using the rolling horizon approach.
+4.1. Short-term model
+This model is used for forecasting one week (T + 1) and two weeks (T + 2) in advance. A “hybrid” model is used for forecasting such that the T + 1 is forecasted by combining data from lane clusters two and three into one cluster and forecasting for it. The “hybrid” approach was compared to forecasting the separate clusters and the combination, in this case, resulted in a higher prediction accuracy. Therefore, we decided to combine the two clusters for this case only. On the other hand, T + 2 forecasts are generated using three lane clusters previously discussed. The hybrid approach was introduced after the non-hybrid approach failed to produce acceptable results.
+The time series components used in forecasting T + 1 are: autoregressive integrated moving average with explanatory variables (ARIMAX) with the holiday covariates, Seasonal and Trend decomposition using Loess (STL), and Simple Moving Average (SMA). The components used in T + 2 forecasting are ARIMAX, TBATs, and SMA. In the ARIMAX models, the dependent variable is regressed on its own lagged values and lagged forecasting errors as well as covariates. The model may also apply an initial step of differencing to prevent non-stationarity. STL identifies the seasonal, trend and irregular components using locally weighted smoothing (local regression). SMA forecasts are calculated as the average of some previous observations (Hyndman and Athanasopoulos, 2014). Moreover, TBATs is a generalization of exponential smoothing. It allows for automatic Box-Cox transformation and errors are modeled as an ARMA process (De Livera et al., 2011).
+The training period is taken as 2.5 years and is kept so during the entire process of adding and dropping weeks. The initial forecasts are generated using a three-year period; however using 2.5 years improves the accuracy of results, which may be related to Erev and Roth’s (1998) concept of recency discussed in Section 2. Finally, the forecasts are generated at the lane-commodity cluster
+
+Fig. 6. Aggregate Short Term Forecasts for Market X – Forecasts starting 2017. 10
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 7. MAD in forecasting for T + 1 and T + 2 for market X.
+level with positive deviation penalty equal to the negative deviation penalty, shown in Fig. 6. The evaluation metrics, MAD and MAPE, in Figs. 7 and 8 are presented by one-week ahead forecasts (T + 1) and two-weeks ahead forecasts (T + 2) indicated on the xaxis. The figures also present the metrics as an average of all testing time intervals (All) and testing time intervals in 2017 only (2017). The approach proposed result in T + 1 forecasts with a margin of error of 20 weekly moves on average (Fig. 7), and of 5.32% for the overall forecasting period and 5.69% for 2017 forecasts only (Fig. 8). The errors for T + 2 (2 weeks ahead) forecasts increase to 50 weekly moves on average and around 12–16% MAPE (Figs. 7 and 8). The MAD for one and two weeks ahead are reasonable given that the demand to the market fluctuates around 450 moves per week, Fig. 6.
+Analyzing the error distributions for T + 1 forecasts (Fig. 9) shows that the relative errors follow a favorable normal distribution centered on zero. T + 2 errors (Fig. 9) are more spread out, but the majority of the forecasting errors are concentrated around zero.
+Figs. 10 and 11 show the cluster level forecasts for one week ahead. The forecasted values closely follow the actual observations and trends in demand. It is further verified by the low errors presented in Figs. 12 and 13. On the other hand, forecasts for two weeks ahead catch up with the fluctuations at a slower pace (Figs. 14 and 15). This is reflected in the errors in Figs. 16 and 17.
+Two-week ahead forecasts for the remaining clusters are still performed separately as discussed before. Below, their forecasts are summed and presented as forecasts for “Lane Cluster 2” to maintain a consistent format with T + 1 forecasts.
+4.2. Long-term model
+As previously mentioned, the long-term model combines the forecasts of the No Information model and the Monthly to Weekly Mapping model.
+The monthly model forecasts the total number of moves that will occur in the month (T + 2) or (T + 3) where T is the current month. The T + 2 forecasts are generated using the hybrid approach in which lane clusters 1 and 2 are combined. For that cluster, STL and structural time series (StructTS) are used with rolling history of length 2.5 years. Forecasts are generated at the lane commodity level and penalizing the negative deviations. As for the third lane cluster, all the specifications apply except for the components, which consist of SMA, STL, complex exponential smoothing (CES), and StructTS. StructTS is a linear-state space model that decomposes the time series into components (trend, seasonality, etc.) and fits the model by maximum likelihood (Petris and Petrone, 2011). CES is a nonlinear method that introduces complex variables to simple exponential smoothing method (Svetunkov et al., 2016).
+Separate T + 3 forecasts are generated for each lane cluster. The components for lane cluster 1 include TBATs and CES. Lane cluster 2 forecasts are generated using STL and CES whereas lane cluster 3 forecasts are generated using SMA, STL, CES, and StructTS. The previous specifications still apply.
+
+Fig. 8. MAPE in forecasting for T + 1 and T + 2 for market X. 11
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 9. Error Distribution in short term forecasts (T + 1 in Red, T + 2 in Green) for aggregate market X. (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this article.)
+Fig. 10. T + 1 Forecasts for market X - Cluster 1.
+Fig. 11. T + 1 Forecasts market X - hybrid Cluster 2. 12
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 12. MAD in forecasting for T + 1 for Lane Cluster 1 and 2- market X. Fig. 13. MAPE in forecasting for T + 1 for Lane Cluster 1 and 2- market X.
+
+Fig. 14. T + 2 Forecasts market X - Lane Cluster 1.
+Based on the results presented above (Figs. 18–21), it is evident that the monthly forecasts are accurate enough to be incorporated into the long-term weekly model. The calculations presented next are still performed within a rolling horizon framework. First, the weekly patterns are obtained for the “No Information / Equal Allocation” component of the model. It is done by an equal allocation of the monthly forecasts over the days of the month. Then, for each week, the number of daily moves that belong to that week and month are added.
+Afterwards, the “Monthly to Weekly Mapping” component is calculated as a function of a week-month weights matrix (αji), forecasts (Mi), and the long-term weekly forecasts using time series models (wj). The component models used for the long-term
+13
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 15. T + 2 Forecasts for market X – hybrid Lane Cluster 2.
+
+Fig. 16. MAD in forecasting for T + 2 for Lane cluster 1 and 2- market X.
+Fig. 17. MAPE in forecasting for T + 2 for Lane cluster 1 and 2- market X. weekly forecasts are XGboost, SMA, and Theta forecasting models. XGboost is a machine learning algorithm. For a given dataset with “n” rows of data and “m” features a tree model uses K additive functions to predict the output. XGboost finds the optimal weights for each leaf on the tree by minimizing a loss function that sums up the difference between the actual and predicted values (Xgboost.readthedocs.io, 2016). The theta model introduces a parameter theta that represents the local curvature of the time series model. The second order derivatives of the observed time series are multiplied by the theta parameters. Forecasts are obtained through a weighted average of the modified time series for different values of theta (Hyndman and Billah, 2003).
+Fig. 22 presents the actual and long-term weekly forecasts generated through the proposed method. Both forecasts tend to stabilize the overall trend and present a more stable basis upon which medium range operational decisions can be made. The evaluation metrics (Figs. 23–25) reveal that the majority of forecasts generated using this method have an 85% prediction interval with most of the errors falling [−9%, 12%] for T + 2 weekly forecasts and a more spread out error distribution for T + 3 forecasts
+14
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 18. Monthly forecasts for market X - forecasts starting 2016.
+
+Fig. 19. Error distribution (T + 2 top, T + 3 bottom) monthly forecasts for market X.
+(Fig. 25). When testing the typical time series models for long term weekly forecasting, forecasting weeks 8 and 12 ahead, the MAPE ranged between 15% and 27% whereas Fig. 24 shows that the proposed approach results in a MAPE between 12.2% and 14.5%.
+The forecasting errors for month T + 2 and T + 3 are calculated by summing the number of forecasted moves in each week that fall in each month and comparing them to the actual number of moves. These are then compared to the errors in the monthly model (directly forecasting monthly moves). Fig. 26 shows that the proposed long-term weekly model outperforms the direct monthly model in 7 out of the 18 forecasted months. The proposed model also outperforms the monthly model in half the forecasting instances for T + 3 forecasts (Fig. 26).
+4.3. Comparing individual approach to combined approach
+As previously mentioned, the intermodal company plans its operations on a weekly horizon. It requires devising models that generate long-term weekly patterns. The suggested model provides these forecasts as a weighted average of values obtained from an equal allocation of monthly forecasts over weeks and short-term time series models with a long-term forecasting horizon. The weights are initialized and then updated through reinforcement learning. Fig. 27 helps assess the performance of the overall model and its components (No Information and Short Term). In several instances, the short-term model and No Information react differently to
+15
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 20. MAD in forecasting for T + 2 and T + 3- Market X.
+Fig. 21. MAPE in forecasting for T + 2 and T + 3- Market X.
+Fig. 22. Long-term weekly forecasts for market X - forecasts for 2017. recent trends where the latter is more stable the short-term model fluctuates strongly. The results show that the RL weighted approach helps average out the over-prediction and under-prediction of the individual components. In fact, Fig. 28(a) and (b) show that the weekly long-term pattern model can closely follow the trend in actual observations over the long run for forecasting months T + 2 and T + 3. 5. Conclusion
+Freight service providers have relied on well-established time series models to forecast shipments and plan their operations in advance. However, with the changing markets, policies and evolving customer preferences, these models appear to be losing effectiveness, or are at best a hit of miss proposition. Moreover, tightening error margins is becoming more critical especially in freight
+16
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 23. MAD forecasting month T + 2 and T + 3 using the long-term model.
+Fig. 24. MAPE forecasting month T + 2 and T + 3 using the long-term model.
+applications with the growing need for faster and more reliable networks. This highlights the need for models that can react and adjust quickly to fluctuations. This paper presents and tests a new approach to freight forecasting that builds on typical time series models and machine learning algorithms, and enhances their performance through reinforcement learning framework applied over a rolling horizon. The advantage of the proposed approach compared to other models lies in its quick adaptability to recent events in the freight market and reasonable data requirements. The proposed approach, however, requires start time for RL calibration and training.
+The proposed freight forecasting framework is applied for a target market; it groups all the market’s lanes and generates clusterbased forecasts. Multiple suitable time series models are chosen for each cluster, and their forecasts are weighted using reinforcement learning formulation. Reinforcement learning updates the weights assigned to the forecasts of each time series component based on its performance in the latest forecasts. To aid the learning mechanism, forecasts are generated on a rolling horizon basis in which the estimation dataset drops the earliest week and adds the most recent in each rolling time interval. In addition to clustering and reinforcement learning, we developed and tested a method for converting monthly forecasts to long-term weekly forecasts. The results suggest that these monthly to weekly long-term forecasts outperform the direct long-term forecasts generated through typical time series approaches.
+The overall framework is tested using market data for a US intermodal company. The margin of error is around 5% and 15% for short-term T + 1 and T + 2 forecasts respectively. The margin of error in the long-term weekly forecasts is around 14% in all forecasting periods in 2017 and for T + 2 and T + 3 forecasts. Furthermore, analyzing the forecasted trends, the results reveal that the predictions of the proposed framework can capture and adjust to recent fluctuation in the market. This indicates that RL coupled with rolling horizon approach has potential benefits in improving forecast quality.
+Improving freight forecasting accuracy can help carriers and logistics service providers improve route planning, equipment allocation, labor needs, competitive pricing, and investment decisions. It could also help public sector agencies mitigate congestion by
+17
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 25. Error distribution in forecasting long-term weekly forecasts for months (T + 2 in Red, T + 3 in Green) for market X. (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this article.)
+Fig. 26. Monthly vs. sum of corresponding weekly errors – T + 2 forecasts (Red), T + 3 forecasts (Green). (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this article.) generating adaptive predictions of truck traffic as well as to inform infrastructure decisions and regulatory policies (Nuzzolo et al., 2013). This study demonstrates a successful new methodology for forecasting freight demand, validated in a representative Market X with short-term and long-term models. Additional work would extend the approach to multiple market lanes an overall network. Another extension of this work would seek to automate the clustering and component model selection approach such that the committee of forecasters can be updated if and when needed with minimal intervention.
+18
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Fig. 27. Comparing different approaches in forecasting long term weekly pattern - results for T + 2 forecasts starting 2017.
+
+Fig. 28. Cumulative actual weekly values vs cumulative monthly and weekly forecasts: (a) T + 2 forecasts starting 2016; (b) T + 3 forecasts starting 2016.
+Acknowledgement
+This paper is based on a study conducted by the Northwestern University Transportation Center (NUTC) in collaboration with an Intermodal Transportation company based in the USA, which prefers to remain anonymous. The analysis is based on real-world data provided by the company. The authors have benefited from helpful comments provided by analysts and managers of that company, as well as from the participation of NUTC Associate Director Breton Johnson in facilitating the project. The authors remain responsible for all content of the paper.
+Appendix A. Supplementary material
+Supplementary data to this article can be found online at https://doi.org/10.1016/j.tre.2020.101926.
+References
+Assoc. of American Railroads, 2017. Rail Intermodal Keeps America Moving. Available at https://www.aar.org/wp-content/uploads/2018/07/AAR-Rail-Intermodal. pdf.
+Ben-Akiva, M., Bolduc, D., Park, J.Q., 2008. Discrete choice analysis of shippers' preferences. In: Recent Developments in Transport Modelling: Lessons for the Freight Sector. Emerald Group Publishing Limited, pp. 135–155.
+19
+
+L. Al Hajj Hassan, et al.
+
+Transportation Research Part E 137 (2020) 101926
+
+Black, William R. Commodity flow modeling. Report No: E-C011. National Research Council (US), 1999. Bichpuriya, Y.K., Soman, S.A., Subramanyam, A., 2016. Combining forecasts in short term load forecasting: Empirical analysis and identification of robust forecaster.
+Sādhanā 41 (10), 1123–1133. Bodily, S.E., Freeland, J.R., 1988. A simulation of techniques for forecasting shipments using firm orders-to-date. J. Oper. Res. Soc. 39 (9), 833–846. Cambridge Systematics, GeoStats, LLP., 2010. Freight-demand Modeling to Support Public-sector Decision Making (Vol. 8). National Cooperative Freight Research
+Program, Transportation Research Board, Washington, DC. Cascetta, E., Marzano, V., Papola, A., Vitillo, R., 2013. A multimodal elastic trade coefficients MRIO model for freight demand in Europe. In: Freight Transport
+Modelling. Emerald Group Publishing Limited, pp. 45–68. Choe, T., Rosenberger, S., Garza, M., Woolfolk, J., 2017. The future of freight: how new technology and new thinking can transform how goods are moved. Deloitte
+Insights. Chow, J.Y., Yang, C.H., Regan, A.C., 2010. State-of-the art of freight forecast modeling: lessons learned and the road ahead. Transportation 37 (6), 1011–1030. Cleveland, W.P., Grupe, M.R., 1981. Modeling time series when calendar effects are present. Division of Research and Statistics, Federal Reserve Board. De Livera, A.M., Hyndman, R.J., Snyder, R.D., 2011. Forecasting time series with complex seasonal patterns using exponential smoothing. J. Am. Stat. Assoc. 106
+(496), 1513–1527. Dewitt, W., Clinger, J., 2000. Intermodal freight transportation. Transportation in the New Millennium. Transportation Research Board, Washington, DC. Erev, I., Roth, A.E., 1998. Predicting how people play games: Reinforcement learning in experimental games with unique, mixed strategy equilibria. Am. Econ. Rev.
+848–881. Farrington, P.A., Harris, G.A., 2011. Methods for Forecasting Freight in Uncertainty: Time Series Analysis of Multiple Factors (Research report No. 930-768).
+University of Alabama. Feltovich, N., 2000. Reinforcement-based vs. belief-based learning models in experimental asymmetric-information games. Econometrica 68 (3), 605–641. Fite, J.T., Don Taylor, G., Usher, J.S., English, J.R., Roberts, J.N., 2002. Forecasting freight demand using economic indices. Int. J. Phys. Distribut. Logist. Manage. 32
+(4), 299–308. Garrido, R.A., Mahmassani, H.S., 1998. Forecasting short-term freight transportation demand: Poisson STARMA model. Transp. Res. Rec. 1645 (1), 8–16. Garrido, R.A., Mahmassani, H.S., 2000. Forecasting freight transportation demand with the space–time multinomial probit model. Transport. Res. Part B: Methodol. 34
+(5), 403–418. Granger, C.W., Newbold, P., 1976. Forecasting transformed series. J. Roy. Stat. Soc. B Methodol. 189–203. Granger, C.W., Jeon, Y., 2004. Thick modeling. Econ. Model. 21 (2), 323–343. GOSAVII, A., Bandla, N., Das, T.K., 2002. A reinforcement learning approach to a single leg airline revenue management problem with multiple fare classes and
+overbooking. IIE Trans. 34 (9), 729–742. Guerrero, V.M., Elizondo, J.A., 1997. Forecasting a cumulative variable using its partially accumulated data. Manage. Sci. 43 (6), 879–889. Holguín-Veras, J., Patil, G.R., 2008. A multicommodity integrated freight origin–destination synthesis model. Networks Spatial Econ. 8 (2–3), 309–326. Hyndman, R.J., Athanasopoulos, G., 2014. Forecasting: principles and practice. OTexts. Hyndman, R.J., Billah, B., 2003. Unmasking the Theta method. Int. J. Forecast. 19 (2), 287–290. Kaufman, L., Rousseeuw, P.J., 2009. Finding Groups in Data: An Introduction to Cluster Analysis. John Wiley & Sons, New York, NY. Liu, F., Kaiser, R.G., Zekkos, M., Allison, C., 2006. Growth forecasting of vehicle miles of travel at county and statewide levels. Transp. Res. Rec. 1957 (1), 56–65. Mahmassani, H.S., Zhang, K., Dong, J., Lu, C.C., Arcot, V.C., Miller-Hooks, E., 2007. Dynamic network simulation–assignment platform for multiproduct intermodal
+freight transportation analysis. Transp. Res. Rec. 2032 (1), 9–16. Moscoso-López, J., Turias, I.T., Come, M., Ruiz-Aguilar, J., Cerbán, M., 2016. Short-term forecasting of intermodal freight using ANNs and SVR: case of the port of
+Algeciras bay. Transp. Res. Proc. 18, 108–114. Newbold, P., Granger, C.W., 1974. Experience with forecasting univariate time series and the combination of forecasts. J. Roy. Statist. Soc. Ser. A General 131–165. Nguyen, H.H., Chan, C.W., 2004. Multiple neural networks for a long term time series forecast. Neural Comput. Appl. 13 (1), 90–98. Nuzzolo, A., Coppola, P., Comi, A., 2013. Freight transport modeling: review and future challenges. Int. J. Transport Econ./Rivista internazionale di economia dei
+trasporti 151–181. Orlin, J.B., Kumar, M., Patel, N., Woo, J., 2017. Data clustering for forecasting. Available at: http://ebusiness.mit.edu/sponsors/common/2002-June-Wksp-DataM/
+orlin.pdf. Patil, G.R., Sahu, P.K., 2016. Estimation of freight demand at Mumbai Port using regression and time series models. KSCE J. Civ. Eng. 20 (5), 2022–2032. Petris, G., Petrone, S., 2011. State space models. R. J. Statist. Software 41 (4), 1–25. Regan, A.C., Garrido, R., 2001. Freight demand and shipper behavior modeling: state of the art, directions for the future. The leading edge of travel behavior research.
+Pergamon, New York. Roth, A.E., Erev, I., 1995. Learning in extensive-form games: Experimental data and simple dynamic models in the intermediate term. Games Econ. Behavior 8 (1),
+164–212. Schoier, G., Gregorio, C., 2017. Clustering algorithms for spatial big data. In: International Conference on Computational Science and Its Applications. Springer, pp.
+571–583. Stephens, B., 2017. Forecast: Intermodal Growth Trend to Continue Next Year. Trains Magazine. Sutton, R.S., Barto, A.G., 1998. Reinforcement Learning: An Introduction. MIT press Cambridge. Svetunkov, I., Kourentzes, N., Fildes, R., 2016. Complex Exponential Smoothing. Lancaster University. Tavasszy, L., De Jong, G., 2013. Modelling Freight Transport. Elsevier. Tumer, K., Agogino, A., 2009. Improving air traffic management with a learning multiagent system. IEEE Intell. Syst. 24 (1), 18–21. Weigang, L., de Souza, B.B., Crespo, A.M.F., Alves, D.P., 2008. Decision support system in tactical air traffic flow management for air traffic flow controllers. J. Air
+Transport Manage. 14 (6), 329–336. Winston, C., 1983. The demand for freight transportation: models and applications. Transport. Res. Part A: General 17 (6), 419–427. Xgboost.readthedocs.io., 2016. Introduction to Boosted Trees — xgboost 0.90 documentation. [online] Available at: https://xgboost.readthedocs.io/en/latest/
+tutorials/model.html. Yang, Y., 2004. Combining forecasting procedures: some theoretical results. Econometric Theory 20 (1), 176–222. Zhang, K., Nair, R., Mahmassani, H.S., Miller-Hooks, E.D., Arcot, V.C., Kuo, A., Dong, J., Lu, C.C., 2008. Application and validation of dynamic freight simulatio-
+n–assignment model to large-scale intermodal rail network: Pan-European case. Transp. Res. Rec. 2066 (1), 9–20.
+
+20
+

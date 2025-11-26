@@ -1,0 +1,434 @@
+The future of freight
+How new technology and new thinking can transform how goods are moved
+
+The future of freight
+Deloitte’s Center for Integrated Research focuses on developing fresh perspectives on critical business issues that cut across industry and function, from the rapid change of emerging technologies to the consistent factor of human behavior. We uncover deep, rigorously justified insights and look at transformative topics in new ways, delivering new thinking in a variety of formats, such as research articles, short videos, or in-person workshops. The entire way we travel from point A to point B is changing. This transformation is creating a new ecosystem of personal mobility, with implications affecting more than just the automotive industry. Deloitte serves the entire ecosystem of companies working in and around mobility. COVER IMAGE BY: DIETER BRAUN
+
+Contents
+
+How new technology and new thinking can transform how goods are moved
+
+Introduction: The last mile | 2 An ecosystem in transit(ion) | 4 Changing customer expectations | 6 The new route | 10 Future states for the last mile | 11 Pathways to a new age of integration for the last mile | 13 Endnotes | 17
+
+1
+
+The future of freight
+Introduction
+The last mile
+Monique needs a new lens for a photo shoot tomorrow morning. Scrambling, she looks for one online and finds a good choice from a reputable retailer. But she doesn’t work regular hours, and her apartment is in a high-rise with no doorman. A “Sorry We Missed You!” slip is not an option. As Monique browses, the retailer’s software is automatically looking across its inventory in distribution centers, fulfillment centers, stores, and trucks while dynamically incorporating transit costs from parcel carriers, rate bureaus, and its private fleet. Through real-time scenario analysis, the retailer identifies that a lens is in a truck on its way to a store near Monique’s default shipping address, and it could be efficiently diverted. At the online checkout, Monique is presented with two shipping options: standard two-day shipping through a parcel carrier’s network or same-day shipping to a self-serve smart locker. Since her photo shoot is in the morning, Monique selects the expedited smart-locker option. As soon as Monique clicks “Buy,” instructions are cascaded throughout the network to seamlessly enable the delivery. As the truck containing Monique’s lens is being unloaded at the store, the receiving agent is notified to set aside the item for high-priority delivery. The agent packages the lens and adds a smart label to the box so that it can be tracked through the cloud. In parallel, the retailer’s algorithm dynamically matches its high-priority delivery needs with available capacity in the market through an online platform. An independent transportation company accepted Monique’s delivery through the platform—it has vans in the area making other deliveries. Later that day, a small, electric van arrives to pick up Monique’s lens and other high-priority deliveries from the store. As the items are being loaded into the van, custody is tracked through the cloud so the retailer—and Monique—have visibility into the location of the lens in real time. As the van rolls away from the store,
+2
+
+How new technology and new thinking can transform how goods are moved
+the most efficient route is dynamically calculated based on drop-offs and forecasted traffic conditions. When the van arrives at the assigned smart locker—owned by yet another company—the driver places Monique’s lens in a particular compartment using a unique code.
+After the locker receives Monique’s package, and a number of others, it moves to a location near Monique’s default shipping address, since there are a number of customers picking up packages in that area. Monique is notified on her smartphone that her lens is ready for pickup.
+On her way home that evening, she swings by the locker. The order code that gives her access to her compartment is on her phone; a few hours later, a different code on a different phone will open the same compartment for someone else’s transaction.
+
+Shipping and the future of mobility
+To get Monique’s specialty lens from a moving truck to her hands in under 24 hours, the lens didn’t ride on a large delivery truck through a static transportation network. It was delivered through a dynamic network that flexes based on capacity and demand. And most of the innovation in this scenario happened within a short radius of Monique’s home. The factory, distribution center, and freight that got her package across thousands of miles have all seen their share of new thinking. But for carriers battling the bottom-line effects of fuel and labor prices, it’s
+
+that fragmented time- and labor-intensive last mile that seems to carry a truckload of promise.
+This article explores emerging trends within the transportation ecosystem and provides a framework for thinking about how digitization and new asset models could challenge existing business models. Along the way, it offers critical guidance to help both industry incumbents and new entrants determine where to place bets in the future of mobility. For those whose livelihoods depend on moving goods, the landscape is challenging, but it may also be a fertile field for the kind of leading-edge thinking that can turn complexity into opportunity.
+
+3
+
+The future of freight
+An ecosystem in transit(ion)
+
+TODAY’S transportation ecosystem is covering more miles with fewer vehicles and reaping the benefits of persistently low fuel prices. But pressures are appearing on the horizon.
+Recent years have seen commercial truck sales decline, a trend that appears likely to continue. Deloitte’s research finds that “commercial vehicle manufacturers are expected to sell barely any more heavy and medium commercial vehicles in 2026 than they do today.”1 Yet analysts expect this static or shrinking fleet to move more goods: The freight tonnage moved by trucks is forecast to grow 27 percent between 2016 and 2027.2
+Additionally, analysts expect online sales to continue to grow as a share of overall retail sales, driving growth in the number of goods that would need to navigate the complexities of the last mile.3 This could put pressure on the last-mile providers to move an increasing volume of goods through the network. Additionally, an increase in online sales would generate an uptick in returns, meaning that the last-mile networks of tomorrow will need to be optimized for both delivery and pick-up, while handling a greater volume of goods.
+When looking at an individual delivery, fuel and wages make up most of the cost, and because those are highly influenced by prevailing market forces,4 carriers typically have minimal control over those costs (see figure 1).5 The recent dip in crude oil prices has reduced the cost of a key input for the industry. Indeed, carriers have usually been able to turn volatility into profit: When fuel prices drop, margins expand, and when fuel prices rise, those increases usually get passed on to customers as a surcharge.6 But that pass-through isn’t absolute, and low oil prices likely won’t last forever. Indeed, low oil prices can even reduce transportation volumes for carriers within or adjacent to the energy industry, so they are not necessarily a boon to all.
+
+Figure 1. Share of marginal cost per mile10
+
+39%
+
+Driver wages and beneﬁts
+
+25%
+
+Fuel costs
+
+14%
+
+Truck/trailer lease or purchase payments
+
+10%
+6% 5%
+
+Repair maintenance Truck insurance premiums Other
+
+Source: American Transportation Research Institute, 2016.
+Deloitte University Press | dupress.deloitte.com
+
+Fuel is hardly the only factor with the potential to squeeze the bottom line. Since the 1980s, the trucking industry has experienced a labor shortage, much of it attributed to low wages, an aging workforce, and long-haul driving’s effects on overall health.7 Absent significant changes to the industry’s business model and talent pool, it may be difficult to see how carriers will attract the 890,000 new drivers that the American Trucking Associations (ATA) estimates will be needed through 2025 to meet rising demand.8 While this shortage is primarily affecting the long-haul segment, similar factors may affect other segments in years to come.9
+
+4
+
+How new technology and new thinking can transform how goods are moved
+
+BREAKING DOWN THE DELIVERY JOURNEY
+A typical package’s journey can be broken down into three phases: the first mile, middle mile, and last mile. While the first mile of an item’s trip usually takes it from a production facility to a warehouse, and the middle mile then takes it from that warehouse to a distribution hub (usually including the long haul that accounts for most of the actual distance), the last mile is where large shipments of goods atomize into hundreds or thousands of individual deliveries, each with its own route, location, and timing. Until now, major carriers have used big infrastructure investments and economies of scale to dominate this environment. But we expect the ways in which goods move about to change. New technologies and market dynamics look poised to reshape every stage of a product’s journey—especially the last mile.
+
+Traffic report: Tech and social trends expected to shape the new reality
+Against this backdrop, the transportation ecosystem faces new pressures from multiple directions: Most customers want more options while digitization
+
+makes more possible, new delivery concepts are possible in urban areas where destinations and recipients are concentrated, asset sharing may change the calculus of “ownership,” and alternative vehicle types may alter the ways in which time and labor influence the bottom line. Ultimately, these trends will likely affect stakeholders across the ecosystem (see figure 2).
+
+Figure 2. Inﬂuence of trends on stakeholders across the ecosystem
+
+Customers
+Individuals/businesses buying goods through retailers and e-commerce
+• Increased delivery speed: Drive to decrease time between order placement and order receipt
+• Lower shipping price: Desire for insight into diﬀerent price points and “free” shipping options included in a subscription (e.g., Amazon Prime)
+• Flexible destinations: Push for ﬂexibility on location to pick up a package (home vs. smart locker)
+• Dynamic shipments: Ability to divert a package mid-shipment
+• Easy returns: Desire for hassle-free, low-cost returns
+• Simple tracking: Ability to seamlessly track individual orders throughout the journey
+Source: Deloitte analysis.
+
+Retailers
+Amazon, Target, and Macy’s
+• Shifted shipping mix: Rebalance the shipping portfolio (e.g., third parties vs. in-house)
+• Increased customer insight: Provide insight into customers through digital touchpoints
+• Enhanced visibility: Enhance visibility to shipments, both internally and externally sourced
+• Distributed distribution: Increase the need for distribution centers near urban centers to enhance delivery speed
+• Proliferation of shipping options: Create need to vary service level (e.g., expedite for key customers, deliver to locker)
+
+Carriers
+US Postal Service, FedEx, and XPO Logistics
+• Reduced cost: Reduce the cost structure of each individual delivery
+• Increased accuracy: Help to manage the network to achieve higher accuracy
+• Analytic insights: Enable predictive and prescriptive insights from network data
+• Increased utilization: Increase utilized capacity and throughput
+• Shifted talent base: Enhance returns on hiring and retaining skilled labor
+• Increased safety: Minimize accidents and lower insurance costs
+
+Deloitte University Press | dupress.deloitte.com
+
+5
+
+The future of freight
+Changing customer expectations
+
+CONSUMERS’ expectations for shipping are rising: For example, a 2016 Deloitte study found that most consider “fast shipping” to be within two days, while just a year earlier most said it was within three or four days. Even as customers’ expectations have increased, though, their willingness to pay for fast shipping has fallen, with 64 percent unwilling to pay anything extra for twoday shipping.11 And from the consumer’s point of view, all miles—first, middle, last—are equal. They just want it NOW.
+They also “want to know.” Transparency about the status of their goods and control over delivery location and timing are both under increasing demand.12 In one recent survey, nearly half of online shoppers reported abandoning a seller due to poor order tracking and transparency.13
+These new demands come in the midst of the continued shift toward e-commerce. Increased Internet access and better tools for online shopping have been driving a growing volume of shipments and the proliferation of possible delivery locations for companies engaged in delivering goods. During 2016, for example, the Deloitte Holiday Survey found, for the first time, that customers planned to spend just as much online as in stores.14 This was unsurprising given the overall growth in e-commerce: According to US government estimates, e-commerce sales rose nearly 15 percent from 2015 to 2016.15
+As the balance of sales has moved from brick-andmortar to online, the demands on the transportation network have shifted, making shipping more complex. Where a single truck once moved a large load from a distribution center to a single retail location, the same volume of goods may now travel the last mile on many trucks—each of which may be less
+
+than full—with less predictable routing to stores, smart lockers, and individual homes.
+Or not homes. While many of these trends are most pronounced with consumers, businesses are beginning to ask for similar value creation in B2B transactions. One survey found that in Canada, nearly half of all businesses that receive less-thanfull truckload freight service are now asking for specialized or expedited deliveries to meet their operational needs.16
+Digitization
+Barcode scanners have been in use for years. Freight companies are no strangers to the use of IT. And connectivity is at their core—it’s no coincidence that telegraph lines originally ran along stagecoach and rail routes, or that truckers relied on CB radios long before smartphones made instantaneous two-way communication blasé. But today, all these forces—sensors, computing power, and the ability to connect—are coming together with unprecedented power.
+As a result, the ability to extract value from data is a large and possibly growing opportunity and could be a source of competitive advantage for carriers. The size of the global commercial vehicle telematics market was approximately $2.4 billion in 2016. While 95 percent of this is currently from hardware, analysts expect that figure to fall dramatically amid falling hardware costs and rising software revenues.17 By 2026, the market is forecast to be $10.9 billion, with software representing nearly $8.7 billion.18
+Having committed to such a large role for data, carriers could find it more and more necessary to maintain the ability to collect and make sense of it.
+
+6
+
+How new technology and new thinking can transform how goods are moved
+
+If yesterday’s version of digitization measured route efficiency and increased preventative maintenance effectiveness, today’s version is beginning to monitor individual operators’ driving styles and the way they contribute to things such as tire wear.19
+Going forward, more than four out of five industry professionals see the greatest value from digitization in fleet management, especially in routing optimization.20 More than three-quarters also believe this technology applies to driver and safety features, giving trucking companies the ability to record, coach, and improve driving behavior.21 Carriers could even use this information to demand lower insurance premiums based on good driving behavior. It is no wonder that telematics sales are forecast to grow at 16 percent a year for the next decade—a stronger growth than forecast for the trucks themselves.22 (See sidebar “The dollars in the details.”)
+THE DOLLARS IN THE DETAILS
+Even with today’s technology, digitization offers quantifiable benefits for trucking:
+• One company was able to save $1.3 million in annual fuel costs across its 1,000-vehicle fleet by identifying available trucks and adapting the routes of all vehicles.23
+• Testing shows that telematics can reduce crash rates by 20 percent and highway speeding by 42 percent.24
+• Preventive maintenance can reduce breakdowns by 75 percent.25
+This could be just the beginning: Smart contracts enabled by blockchain technology are emerging and are expected to enable more efficient and secure collaboration among players. For example, some large transportation companies are working to digitize paper-based processes by using blockchain’s digital ledger, enabling secure information exchange between supply chain partners.26 In Singapore, FreshTurf is building an open platform based on blockchain technology that allows customers and carriers to trace a package all the way from shipment to smart locker.27
+
+Increasing digitization of the fleet through the application of sensors and integration of data from across the supply chain could enable carriers to create a virtual model of the network. This model can be used to compute and compare multiple scenarios in real time, enhancing decision making—much like Monique’s photo equipment retailer did to determine shipping options for her lens.28
+New urban supply concepts
+The trouble with pickup timing is that it’s a two-person dance. If each of the participants—the deliverer and the recipient—could operate on her own timetable, the resulting flexibility could drive efficiency elsewhere in the system. For this reason, retailers and logistics companies have pushed for models and technologies in the last mile to shorten time and distance to delivery.
+One step is to slow or even reverse the proliferation of delivery destinations. That’s the reasoning behind the smart locker—an accessible but secure location that provides retailers, logistics companies, businesses, and individuals with spaces to temporarily store goods for customers to pick up at a later time. With smart lockers, retailers can combine multiple drop-offs into a single delivery. The access codes recipients use to get their packages can also improve tracking. And some lockers are more than smart— they’re mobile, able to meet delivery workers at different points throughout the city, minimize the time between deliveries, and allow workers to complete more jobs in less time with less stress. That means increased efficiency for the overall network, but mobile lockers can also add complexity to a system that already has many moving pieces.
+Even comparatively low-tech solutions can pay big dividends when it comes to last-mile delivery. As delivery volumes increase and units per delivery fall, especially in dense urban areas, simply locating distribution centers closer to cities can cut costs and delivery times.29 (“Simply,” granted, can often entail the significant expense associated with establishing a new warehouse in an often-pricier location.30) Taking this approach a step further, distributed inventory models—effectively, fulfilling deliveries with goods already located at brick-and-mortar
+
+7
+
+The future of freight
+
+stores—can be effective when delivery volumes are limited and to-your-door speed is a priority.31 The apotheosis of these trends is a rolling inventory model, in which every unsold good, no matter its location, is a candidate for delivery.
+Asset sharing
+Just as carsharing and ridesharing have challenged traditional models of personal movement—including, for some, the very idea of owning a car—so too could greater sharing of commercial vehicles prompt a rethinking of how carriers operate.
+Sharing assets also can allow transportation companies to accomplish more and take better advantage of their own networks’ capacities. For example, by leveraging an adjacent network, a regional carrier could use others’ assets to deliver outside its typical area, increasing the utilization of its own assets by extending its reach. Regional parcel carriers already collaborate, but technology could help reduce coordination costs and broaden their range.32
+Interfacing with an adjacent network is one opportunity; integrating an existing network with a shared network is another. A transparent, real-time platform that offers shippers, drivers, and customers visibility into real-time capacity and demand would increase asset utilization and make pricing more representative of the market—just the type of platform that enabled Monique to get her lens on a moment’s notice.33 This kind of crowdsourcing may let couriers expand their capacity at peak times and avoid paying costly overtime wages by using retired workers or other third parties to take on incremental jobs. Some start-ups, such as Seattle-based Convoy, are already building on this idea, and as the technology matures it may become a larger part of the transportation portfolio.34 This could provide the transparency and responsiveness needed to help address stakeholders’ increasing demands.
+However, creating an integrated platform that links multiple carriers together remains a challenge. It might make an already-complex network management challenge even more intricate, even as existing systems are under stress from growing demands
+
+for speed and real-time transparency. Add in the complexity of insurance coverage limits, liability, and regulatory requirements for certain types of shipments (for example, temperature-controlled or hazardous chemicals) and the solution quickly becomes more complicated than a typical ridesharing application.35
+Despite the technological and regulatory challenges of integrating shared platforms into complex distribution networks, shippers would also need to contend with other trade-offs. Many use the delivery point as an opportunity to attain customer insights and even cross-sell and up-sell, so they would need to consider alternative ways to maintain customer proximity. Additionally, some shippers may be uncomfortable with their products sharing a truck with those of a competitor.36
+NEW NEED, NEW TECH: START-UPS BEGIN TO FILL THE VOID
+A number of start-up companies have emerged to create platforms that connect carriers with customers and independent contractors.
+First mile
+Freightos—an integrated quote management system of carriers and forwarders provides greater transparency in just minutes on prices for cross-border freight shipments.37
+Middle mile
+Convoy—a platform that connects local truck drivers to area shippers to fulfill less-thanfull-truckload and full-truckload requests, introducing greater competition and optionality, as well as minimizing backhaul. Where many truckers once delivered a shipment and drove back empty, they are now able to track demand and pick up new jobs on the return trip.38
+Last mile
+Dropoff—a courier system that uses independent contractors and their own vehicles to offer same-day delivery within a city: insured, bonded, and certified to emphasize quality.39
+
+8
+
+How new technology and new thinking can transform how goods are moved
+
+Alternative vehicles
+There is another parallel between personal transportation and freight hauling: With promises of greater fuel efficiency and improved safety, the progressive adoption of electric cars has found its way to the trucking industry.
+It’s no mystery why many find battery-powered and fuel-cell electric vehicles attractive—they promise higher energy efficiency, lower emissions, greater energy diversity, lower maintenance costs, and new vehicle designs. The technology still has maturing to do, but even as they stand, electric vehicles are expected to make up 35 percent of new light-duty vehicle sales by 2040.40 A year ago, Nikola Motors revealed a completely electric, hydrogen-fueled truck with an 800- to 1,200-mile range and 1,000 horsepower—twice the amount of a typical diesel truck.41
+Because their limited emissions are matched (for now) by limited range, electric trucks have made the most sense in crowded urban areas—the traditional stomping grounds of the critical last mile. In conquering this territory, they’re abetted by environmental regulations that shut diesel trucks out of some areas. Cities have also made it easier to set up charging stations where they’re needed, so a carrier could employ a large fleet of smaller trucks with short range, thereby drastically reducing the price of fuel per delivery. Tesla is working to develop heavyduty trucks for high-density urban transport that promise to reduce the cost of cargo and improve safety.42 Dense areas may also enable high-speed, inductive charging infrastructure so vehicles can charge at different points along their routes, obviating the need to return to a central location to plug in.43
+Drones represent another new possibility for the freight business. Delivery via drone seems to just be crossing the threshold from science fiction to operable reality. Rather than replacing trucks, drones may become an excellent complement to them within larger freight systems, since they can take on many short-distance deliveries in a cost-effective manner; some companies are even experimenting with launching drones from the trucks themselves.44
+
+While talk of this emerging technology is still heard most often in speculative settings, some companies are already experimenting with drone delivery; one Chinese company deploys drones to deliver 500 parcels a day to cities and rural areas.45 Meanwhile, in the United Kingdom, Amazon is partnering with the government to test drone parcel delivery.46 Ultimately, the technology will likely need to mature to be viable in densely populated cities such as New York, though rural areas with poor infrastructure could become a proving ground for the technology.
+Nonetheless, drones must surmount legal and financial hurdles as well as technological ones. To become a serious component of the delivery business, they must overcome both government regulation and high operational costs. For now, the technology really makes sense for carriers only when delivery time is critical, customers are willing to pay, and few other options exist.
+Those are only the most prominent innovations. In the high-volume, high-demand jungle of the last mile, almost anything may be worth trying. For example, some carriers in China are capping their equipment-heavy package journeys with last-mile travel by a more traditional means: bicycle teams.47
+To give these new delivery methods a head start, some companies have turned to pre-planning technology, order management software, and dynamic routing tools that can combine with alternative options to help carriers improve delivery efficiency.
+Some carriers in China are capping their equipment-heavy package journeys with last-mile travel by a more traditional means: bicycle teams.
+
+9
+
+The future of freight
+The new route
+
+HOW can carriers not only adjust to these changing circumstances but profit from them? There are two elements of the delivery journey they need to understand and re-master: ownership and visibility. The ways in which these two dimensions develop and converge to influence the state of the first, middle, and last miles could have a deep influence on the fate of the transportation ecosystem.
+Ownership of the delivery journey represents the concentration of asset ownership—in other words, the number of asset owners employed to complete the delivery journey. Today, ownership is relatively concentrated, but in the future, platforms will likely create opportunities for more diffuse ownership by increasing access to excess network capacity and
+
+diverse assets with low switching costs. Ultimately, this would enable asset-light models for some players while creating an environment in which niche transportation providers can proliferate.
+Visibility into the delivery journey is a measure of the types of data available, the frequency that it is available, and the way that it can be used to make decisions. The rise of IoT technology and blockchain promises to create a high-volume and high-velocity data environment, and sophisticated analytics will likely create opportunities for insight such as dynamic routing and anticipatory shipping.
+Combined, these two dimensions of the freight journey—ownership and visibility—suggest four potential “future states” of the movement of goods (see figure 3).
+
+Figure 3. The future states of the movement of goods
+
+Diﬀused
+
+Extent to which the ownership of the delivery journey is concentrated:
+• Sharing technologies are expected to create more diﬀuse ownership by increasing access to excess network capacity and diverse assets
+• Platforms would seamlessly connect ecosystem players to enable asset-light models and to create an environment in which niche providers can proliferate
+Source: Deloitte analysis.
+
+“Ownership” of delivery journey
+
+Concentrated
+
+3 Rise of sharing
+
+4 A new age
+of integration
+
+1 Incremental change
+
+2 A world of
+digital insight
+
+Intermittent & partial
+
+Real time & complete
+
+“Visibility” into delivery journey
+
+The extent of the type of data available, the frequency of availability, and how it is used to make decisions:
+• The rise of IoT technology and blockchain is expected to enable high volumes and velocity of data (e.g., location, vehicle wear, available capacity, traﬃc, real-time custody)
+• Increasingly sophisticated analytics would create opportunities for insight such as dynamic routing and anticipatory shipping
+
+Deloitte University Press | dupress.deloitte.com
+
+10
+
+How new technology and new thinking can transform how goods are moved
+Future states for the last mile
+
+THIS framework can apply to the first, middle, and last mile of the extended transportation industry. However, given the level of complexity and innovation currently taking place in the last mile, this section will focus there.
+State 1: Incremental change
+Customer expectations around shipping continue to rise, but inefficiencies within the ecosystem make meeting those expectations challenging; therefore, e-commerce and home delivery represent a significant but not preponderant share of total shipments.
+Ecosystem players use third-party assets to augment their fleets, but transactional frictions remain. Players sign contracts far in advance to ensure access to third-party assets or rely on human brokers to manually find extra capacity in the marketplace. Platforms continue to emerge, but the challenge of integrating them into the business persists. Ultimately, these frictions result in excess capacity remaining in the transportation network and limit the integration of niche offerings into the supply chain.
+Varied deployment of telematics and connected vehicle technologies inform owners and operators about the status of their own fleets, but the availability of data about the ecosystem as a whole is limited. Many processes remain paper-based, especially those involving an exchange between two players. Analytics are largely descriptive and rely on humans for interpretation and decision making. With limited data and analytical capability, inefficiencies in the transportation network abound.
+State 2: A world of digital insight
+Increasingly prevalent deployment of telematics and IoT technology generates a significant volume of
+
+data about the fleet. Processes are no longer paperbased but reside in the cloud, expanding the digital data set. The most forward-thinking carriers and retailers continue to build their digital capabilities as the volume of data and the computer power to process it both increase. These companies gain real-time insight into their own supply chains, which improves accuracy and permits more efficient use of capacity. Predictive analytics help them better stock inventory by type and location, which means the right products are ready at the right place and time. Analytics change the cost equation, allowing businesses to create price differentials that they can pass to customers as savings. However, the last mile remains strained because excess capacity is not shared, so local optimization, as opposed to ecosystem-wide optimization, remains the norm.
+State 3: Rise of sharing
+Sharing platforms become increasingly relevant and an integral part of the ecosystem, even more important than human brokers and typical contractual arrangements. These platforms reduce switching costs and drive a proliferation of thirdparty shipping options, making the last mile of delivery extremely fragmented. This complexity is offset by increased vehicle utilization, which reduces the cost per delivery. Platforms make integrating additional shipping options such as bikes, drones, and smart lockers easier for businesses, helping to meet ever-rising customer expectations. A few platforms emerge as the dominant players in the market and effectively coordinate the fragmented last mile. Larger, integrated players compete against the dominant platforms on price and service level. With data as the new currency, there is limited sharing between the dominant platforms and the larger, integrated players, leaving inefficiency in the ecosystem.
+
+11
+
+The future of freight
+
+State 4: A new age of integration
+The creation of digital markets for the movement of goods enables packages to be delivered at the right place at the right time by the right method, resulting in lower costs and greater convenience across the ecosystem. These markets are made more efficient by integrating and distributing data flows from multiple sources—from vehicles and distribution centers to individual packages, giving customers and shippers constant real-time access to the location and status of their goods and assets. Smart, mobile lockers dynamically move throughout a city, all linked
+
+by a digital platform that any in-network carrier can securely access. Carriers and retailers routinely and easily source third-party providers for the last mile, reducing both the cost and speed of delivery. If it isn’t nailed down, it’s a potential means of delivery. Bikers, walkers, drivers, drones, cabs—they’re all available to get a package from point A to point B safely, reliably, and on time.
+The carriers and retailers that can place themselves at the center of this digital ecosystem are the ones likely to thrive. While we expect consolidation among the players at the center of the ecosystem, a host of niche providers and informal, part-time couriers will likely proliferate, seizing last-mile market share.
+
+If it isn’t nailed down, it’s a potential means of delivery. Bikers, walkers, drivers, drones, cabs— they’re all available to get a package from point A to point B safely, reliably, and on time.
+
+12
+
+How new technology and new thinking can transform how goods are moved
+Pathways to a new age of integration for the last mile
+
+WE expect the overarching trends discussed at the beginning of this article to continue into the future, pushing the last mile from the current state into a new age of integration. The
+
+relative power of these trends could influence how the future state evolves from today into the future, but it seems clear that the landscape is shifting (see figure 4).
+
+Figure 4. Inﬂuence of trends on the pathway to a new age of integration
+
+Current state
+
+Trends
+
+A new age of integration
+
+Customers consider “fast shipping” two days or less, with some willing to pay a premium
+
+As competition intensiﬁes, retailers continue to build omnichannel capabilities to meet and exceed customer expectations
+
+Customers expect same-day delivery for many items and seamless returns to a store or through the mail—all for free or very little cost
+
+Customer expectations
+
+Digitization
+
+Telematics and infrastructure technologies inform owners and operators but do not substantially guide decisions
+
+Carriers and retailers gain tremendous insight into ﬂeet utilization, helping optimize overall eﬃciency
+
+Instant access to a range of data on individual vehicles and the entire ﬂeet, integrating carriers, retailers, third parties, and customers
+
+New supply chain concepts
+
+Many customers still are inconvenienced by the need to travel to a physical location to shop and pick up deliveries
+
+Carriers and retailers can better predict patterns in local demand, allowing them to stock inventory and make drop-oﬀs in convenient locations
+
+The notion of a post oﬃce evolves as smart lockers are stationed and move throughout a city, all linked by a digital platform
+
+Asset sharing
+
+Ridesharing platforms continue to emerge, but the challenge of connecting business platforms remains
+
+Retailers beneﬁt from an array of third parties providing additional capacity during peak demand, ﬂexibility to enter new markets, and pricing optionality to match customer expectations
+
+Carriers and retailers routinely and easily source third-party providers for the last mile, optimizing on cost and speed of delivery
+
+Alternative vehicles
+
+Fuel remains a top cost in freight transportation and an opportunity for savings
+
+Carriers utilize bikes, robots, short-range electric vehicles, and other last-mile options
+
+Anyone and anything that is mobile becomes a potential delivery courier to get a package from point A to point B safely, reliably, and on time
+
+Source: Deloitte analysis.
+
+Deloitte University Press | dupress.deloitte.com
+
+13
+
+The future of freight
+
+NO ONE AT THE WHEEL? AUTONOMOUS VEHICLES AND THE MOVEMENT OF GOODS
+Autonomous technology may someday make it practical for trucks to move packages with minimal human involvement, reducing operating costs and increasing safety on the roads.
+Already, some companies are making significant progress in creating a truck that can go from coast to coast with no driver and no stops. Traditionally, labor represents about three-quarters of the $4,500 it costs to get a full tractor-trailer load from Los Angeles to New York. Autonomous vehicles could not only remove that cost, but also eliminate the stops required by driver time-out laws. A human needs eight hours downtime and can’t drive more than 11 hours a day. By moving 24 hours a day, autonomous trucks could increase the capacity of the US transportation network by 100 percent for 25 percent of the cost.48
+But making these systems widespread is easier said than done. The training, costs, and capabilities it could take to implement autonomy would squeeze smaller operators who lack the scale to “go digital” and may be unable to attract or retain the talent that a more sophisticated operation requires. Low margins across the industry, limited capital reserves, talent challenges, and the realities of daily financial needs may put smaller players at risk of becoming commodity transportation methods.
+And as advanced as the technology appears to be, companies may find it’s the easy part. Having the capital to implement autonomy at scale may be the larger obstacle to widespread adoption. No matter how high-tech one truck’s system may be, autonomy won’t work unless OEMs, infrastructure planners, and other third parties make corresponding advances.
+And for years to come, liability and security rules, as well as labor unions, may require that even a fully autonomous vehicle still have a driver on board, in which case the promised labor savings won’t fully materialize. However, autonomous technology could enable regulation changes allowing drivers to work additional hours. Even one additional hour of work could increase productivity by nearly 10 percent, helping to put a dent in the forecasted driver shortage.49
+Because of these and other limitations, autonomy may make its earliest advances in the first and middle miles, where driving is less complex. For example, driverless trucks could move goods over highway routes to distribution centers. While technology would drive this potential, the limiting factors may be more traditional: the perception of safety, for one, and the availability of the necessary capital.
+A different possible future would see the last mile as the frontier for autonomous vehicles. Technologies and practices first developed for the taxi industry may help freight carriers negotiate the complexity of in-town delivery. Or autonomous delivery robots could assist drivers with heavy loads or postal carriers with arms full of mail.
+Ultimately, if autonomous shipping becomes sufficiently ubiquitous, the capacity it represents could become a system of “mobile inventory,” in which vehicles on the move amount to rolling warehouses that make up a truly dynamic supply chain.
+
+What it means, and where to start
+The farther you look down the road of speculation, the easier it is to indulge the imagination, and the fuzzier the details become. But there are compelling reasons to believe that the movement of goods,
+
+particularly over the last mile, will evolve through the future states we have described.
+We already see companies actively looking for assetlight transportation models. And at the same time, the growth of digitization and analytics shows no sign of slowing, as companies continue to invest in
+
+14
+
+How new technology and new thinking can transform how goods are moved
+
+the hardware, software, and capabilities required to build more transparency into their networks.
+Given the potential pace of change in the last mile, retailers should consider:
+Making stores multipurpose. With the rise in e-commerce, the store’s role could evolve to become a showroom to sample products before buying. Additionally, it could serve as a departure point for same-day shipments to customers, even enabling alternate forms of delivery such as bicycle or drone. Ultimately, companies may need to rethink how their store strategy supports a more compressed supply chain while offering a differentiated customer experience. This is especially important given pressures to monetize square footage, but companies will likely need to build the capabilities to manage the complexities that come with a nextgeneration retail space and a more complex delivery network.
+Making delivery a differentiator for your customers. Delivery is no longer adjacent to the value proposition. More and more, sellers are using differentiated delivery to win customers through speed, tracking, white-glove service, and even highend packaging.50 This can be especially important if transportation services are a critical part of your value proposition—for example, through omnichannel retail models.
+For carriers, these changes in the ecosystem suggest they should consider:
+Refreshing partnership strategies. Some customers may hesitate to make investments in new capabilities given the fast pace of change, so partnering with your most forward-thinking customers to build mutual capabilities could well serve both parties. For example, a carrier could work with a retailer to test drone delivery for select customers who value the fastest possible delivery and who fancy themselves early adopters of new technology.
+Building the fleet of the future. Many carriers are already investing in telematics to build a connected fleet, and those investments will likely continue; collecting the data is the first step toward insight. Those that are more forward-looking may also look to experiment with semi-autonomous or
+
+electric vehicles, or with sharing platforms, to stay on the leading edge. Exploring small-scale pilots in targeted areas—for example, where weather and traffic are predictable or charging infrastructure abundant—can be helpful.
+Using data as a differentiator. As telematics become commonplace and IoT applications proliferate, the volume of available data will likely grow exponentially. To maximize value, companies need to draw actionable insights from this data, in real time. Increasingly, collating the data, analyzing it, and making a decision a day or week later is becoming table stakes. Creating algorithms to make real-time decisions (for example, re-routing) could be the major differentiator. For carriers, that likely means building capabilities to rapidly analyze and act on the information being collected and—just as daunting—creating a culture of data-based decision making. But the potential rewards could be substantial: Carrier executives can use the insights to make the fleet more efficient or to grow the business by identifying customer needs.
+To meet this new world of demand, ecosystem players should understand the ways different new technologies and practices are evolving.
+Less room for error, but plenty of room for improvement
+Today, customers such as Monique often expect a level of service that their parents would have considered the stuff of science fiction. They are more likely to have living arrangements and daily routines that make traditional porch-drop delivery untenable. And they see delivery as an integral part of
+
+15
+
+The future of freight
+
+the seller’s responsibility. If you’re the carrier, that means the companies that ship with you are putting more than packages on your trucks. More than ever, you are delivering their reputations.
+To meet this new world of demand, ecosystem players should understand the ways different new technologies and practices are evolving. And just as importantly, they should master the timing. Knowing the stages of change that lie ahead for the market
+
+as a whole, and especially for the last mile, may be the key to knowing which investments to make at which time. Without an informed view, it’s too easy to overextend or fall behind.
+Will your customers receive same-day, driverless delivery of every good they buy starting next week? Probably not. But these trends point ahead in very clear lines. To flourish, companies should trust in one of their oldest skills: seeing the road ahead.
+
+16
+
+How new technology and new thinking can transform how goods are moved
+ENDNOTES
+1. Thomas Schiller, Michael Maier, and Martin Büchle, Global Truck Study 2016: The truck industry in transition, Deloitte, 2017, https://www2.deloitte.com/content/dam/Deloitte/us/Documents/manufacturing/us-manufacturing- global-truck-study-the-truck-industry-in-transition.pdf.
+2. American Trucking Associations, “Latest U.S. Freight Transportation Forecast shows continued growth for trucking,” October 12, 2016, www.trucking.org/article/Latest-U.S.-Freight-Transportation-Forecast-Shows-Continued-Growth-for-Trucking.
+3. eMarketer, “Worldwide retail ecommerce sales will reach $1.915 trillion this year,” August 22, 2016, https://shar. es/1RyXwK.
+4. American Transportation Research Institute, “An analysis of the operational costs of trucking: 2016 update,” September 2016, http://atri-online.org/wp-content/uploads/2016/10/ATRI-Operational-Costs-of-Trucking2016-09-2016.pdf.
+5. IBISWorld, Long-distance freight trucking in the US: Market research report, January 2017, www.ibisworld.com/ industry/default.aspx?indid=1150.
+6. Ibid. 7. Bob Costello and Rod Suarez, Truck driver shortage analysis 2015, American Trucking Associations, October 2015,
+www.trucking.org/ATA%20Docs/News%20and%20Information/Reports%20Trends%20and%20Statistics/10%20 6%2015%20ATAs%20Driver%20Shortage%20Report%202015.pdf. 8. Michelle Rafter, “Truck driver shortage: Is it self-inflicted?”, Trucks.com, June 14, 2016, www.trucks.com/2016/06/14/ truck-driver-shortage-self-inflicted/. 9. Costello and Suarez, Truck driver shortage analysis 2015. 10. American Transportation Research Institute, “An analysis of the operational costs of trucking: 2016 update.” 11. Deloitte, 2016 holiday survey: Ringing in the retail, 2016, https://www2.deloitte.com/content/dam/Deloitte/us/ Documents/consumer-business/us-consumer-business-2016-holiday-survey-results.pdf. 12. See, for example, Dung H. Nguyen, Sander de Leeuw, and Wout E.H. Dullaert, “Consumer behaviour and order fulfilment in online retailing: A systematic review,” International Journal of Management Reviews, November 15, 2016, http://onlinelibrary.wiley.com/doi/10.1111/ijmr.12129/full. 13. Supply Chain Quarterly, “Survey: Online shoppers demand visibility as well as speed in delivery,” October 4, 2016, www.supplychainquarterly.com/news/20161004-survey-online-shopper--demand-visibility-as-well-as-speed-indelivery/. 14. Deloitte, 2016 holiday survey. 15. US Census Bureau News, “Quarterly retail e-commerce sales, 1st quarter 2017,” May 16, 2017, www.census.gov/ retail/mrts/www/data/pdf/ec_current.pdf. 16. Purolator, “The changing dynamics of B2B commerce: Building your best LTL freight strategy,” 2016, www. purolator.com/assets/pdf/white-papers/ltl-freight-strategy.pdf. 17. Schiller, Maier, and Büchle, Global Truck Study 2016. 18. Ibid.
+17
+
+The future of freight
+19. Ibid. 20. Ibid. 21. Ibid. 22. Ibid. 23. Ibid. 24. Ibid. 25. Ibid; World Economic Forum with Accenture, “Digital transformation of industries: Demystifying digital and
+securing $100 trillion for society and industry for 2025,” http://reports.weforum.org/digital-transformation/wpcontent/blogs.dir/94/mp/files/pages/files/wef-digital-transformation-2016-exec-summary.pdf. 26. Marcus Hand, “Maersk Line and IBM in blockchain partnership to streamline container shipping,” March 6, 2017, www.seatrade-maritime.com/news/europe/maersk-partners-with-ibm-on-blockchain-solution-for-containershipping.html. 27. IBM, “IBM empowers Singapore startup with blockchain and Bluemix for island-wide federated lockers network,” October 24, 2016, https://www-03.ibm.com/press/us/en/pressrelease/50862.wss. 28. Adam Mussomeli, Doug Gish, and Stephen Laaper, The rise of the digital supply network, Deloitte University Press, December 1, 2016, https://dupress.deloitte.com/dup-us-en/focus/industry-4-0/digital-transformation-in-supplychain.html. 29. Erica E. Phillips, “The new shopping hubs for cities: Warehouse distribution centers,” Wall Street Journal, April 16, 2017, www.wsj.com/articles/the-new-shopping-hubs-for-cities-warehouse-distribution-centers-1492394640. 30. Perry A. Trunick, “Sight selection decisions: A matter of data,” Inbound Logistics, July 2011, www.inboundlogistics. com/cms/article/site-selection-decisions-a-matter-of-data/. 31. Merrill Douglas, “New retail strategies: It’s a store! It’s a site! It’s a warehouse!”, Inbound Logistics, August 2014, www.inboundlogistics.com/cms/article/new-retail-strategies-its-a-store-its-a-site-its-a-warehouse/. 32. Deloitte, The rise of the sharing economy: Impact on the transportation space, 2016, https://www2.deloitte.com/ us/en/pages/consumer-business/articles/the-rise-of-the-sharing-economy-impact-on-the-transportation-space. html. 33. Ibid. 34. Kevin Jones, “New apps aim to replace brokers, ‘reinvent’ trucking,” American Trucker, October 27, 2015, http:// trucker.com/blog/new-apps-aim-replace-brokers-reinvent-trucking. 35. Deloitte, The rise of the sharing economy. 36. Ibid. 37. Freightos, www.freightos.com, accessed May 19, 2017. 38. Convoy, https://convoy.com, accessed May 19, 2017. 39. Dropoff, www.dropoff.com, accessed May 19, 2017. 40. Bloomberg New Energy Finance, “Electric vehicles to be 35% of global new car sales by 2040,” February 25, 2016, https://about.bnef.com/blog/electric-vehicles-to-be-35-of-global-new-car-sales-by-2040/. 41. Tiffany Hsu, “Nikola Motor plan flips to hydrogen fuel cell truck,” Trucks.com, August 30, 2016, www.trucks.com/ 2016/08/30/nikola-hydrogen-fuel-cell-truck/.
+18
+
+How new technology and new thinking can transform how goods are moved 42. Elon Musk, “Master plan, part deux,” Tesla, July 20, 2016, www.tesla.com/blog/master-plan-part-deux. 43. Julia Pyper, “Wireless charging: Coming soon to an electric vehicle near you,” Greentech Media, October 27, 2016,
+www.greentechmedia.com/articles/read/wireless-charging-coming-to-an-electric-vehicle-near-you. 44. Jaclyn Trop, “Drone delivery is about to disrupt the trucking industry,” Trucks.com, June 21, 2016, www.trucks.
+com/2016/06/21/drone-delivery-reshape-trucking/. 45. CRI, “S.F. Express launches first drone delivery service in China,” March 24, 2015, http://english.cri.cn/
+12394/2015/03/24/1261s871432.htm. 46. Arjun Kharpal, “Amazon tests drone parcel deliveries in the UK,” CNBC, July 26, 2016, http://cnb.cx/2adCjRp. 47. Liza Lin and Wayne Ma, “Olympic athletes have nothing on China’s lunch-delivery guys,” Wall Street Journal, March
+27, 2017, www.wsj.com/articles/olympic-athletes-have-nothing-on-beijings-lunch-delivery-guys-1490630378. 48. Ryan Petersen, “The driverless truck is coming and it’s going to automate millions of jobs,” TechCrunch, April 25,
+2016, http://tcrn.ch/1UdpRSh. 49. According to the Federal Motor Carrier Safety Administration, drivers may work a maximum of 11 hours after
+having 10 hours off duty. Assuming that drivers work 11 hours per day on average, then a one-hour increase in this limit would increase productivity by nearly 10 percent. 50. Supply Chain Quarterly, “Survey: Online shoppers demand visibility as well as speed in delivery.”
+19
+
+The future of freight
+ABOUT THE AUTHORS
+TED CHOE
+Ted Choe is a principal in Deloitte Consulting’s Strategy and Operations practice and a leader in the transportation and fleet management sector. He has 20 years of consulting and industry experience in large-scale business and service delivery transformations, and M&A and divestitures within the transportation, business-to-business, and consumer services sectors. Choe’s work spans multifunctional SG&A transformation, organizational restructuring, strategic cost optimization, and domestic and global shared services.
+JON WOOLFOLK
+Jon Woolfolk is a manager in Deloitte Consulting LLP’s Operations Transformation service line, helping clients reconfigure their operating models to manage disruptive change and to understand how they can operate more efficiently and invest in new capabilities to enhance and grow the business. Woolfolk brings nearly a decade of experience from a range of industries, including consumer products, hospitality, and transportation.
+MAURICIO GARZA
+Mauricio Garza is a senior manager in Deloitte Consulting LLP’s Operations Transformation service line, specializing in margin improvement for transportation, distribution, and consumer product companies. He has more than 17 years of consulting and industry experience leading transformation programs including operating model strategies, service delivery restructuring, complexity reduction, cross-selling execution, and advanced data analytics. Garza has researched and co-authored articles related to profitable transformation, including on recent economic trends such as the rise of the sharing economy.
+SCOTT ROSENBERGER
+Scott Rosenberger is a technology strategy and architecture partner focused on travel and transportation companies. With nearly three decades of experience, he has consulted globally to Fortune 2,000 companies and has been involved in all phases of strategy, technology planning, development, and integration. As a certified ITIL and FEA architect, Rosenberger’s focus in client service is the application of business strategy, information, and technology, in particular designing and delivering complex business solutions.
+20
+
+How new technology and new thinking can transform how goods are moved
+
+ACKNOWLEDGEMENTS
+
+The authors would like to thank the many advisers who helped inform and shape this article: Scott Corwin, Bill Kammerer, Herman Guzman, Remzi Ural, Jen Tifft, and Derek Pankratz. Joon Lee, Sahil Sandhu, Jeffrey Yung, and especially Nick Burrin and John Wheelock conducted much of the fundamental research on which the paper is based. Matthew Budman of Deloitte University Press put polish on the prose.
+
+CONTACTS
+
+Ted Choe Principal Deloitte Consulting LLP +1 224 622 7255 techoe@deloitte.com
+Scott Rosenberger Principal Deloitte Consulting LLP +1 901 322 6880 srosenberger@deloitte.com
+Mauricio Garza Senior manager Deloitte Consulting LLP +1 347 327 3749 maugarza@deloitte.com
+Jon Woolfolk Manager Deloitte Consulting LLP +1 512 201 3321 jwoolfolk@deloitte.com
+
+Remzi Ural Senior manager Deloitte Consulting LLP +1 312 405 1746 rural@deloitte.com
+Scott Corwin Managing director Strategy & Business Transformation Deloitte Consulting LLP +1 212 653 4075 scottcorwin@deloitte.com
+Philipp Willigmann Senior manager Strategy Monitor Deloitte Deloitte Consulting LLP +1 347 549 2804 phwilligmann@deloitte.com
+
+21
+
+Follow @DU_Press
+Sign up for Deloitte University Press updates at www.dupress.deloitte.com.
+About Deloitte University Press Deloitte University Press publishes original articles, reports and periodicals that provide insights for businesses, the public sector and NGOs. Our goal is to draw upon research and experience from throughout our professional services organization, and that of coauthors in academia and business, to advance the conversation on a broad spectrum of topics of interest to executives and government leaders.
+Deloitte University Press is an imprint of Deloitte Development LLC.
+About this publication This publication contains general information only, and none of Deloitte Touche Tohmatsu Limited, its member firms, or its and their affiliates are, by means of this publication, rendering accounting, business, financial, investment, legal, tax, or other professional advice or services. This publication is not a substitute for such professional advice or services, nor should it be used as a basis for any decision or action that may affect your finances or your business. Before making any decision or taking any action that may affect your finances or your business, you should consult a qualified professional adviser.
+None of Deloitte Touche Tohmatsu Limited, its member firms, or its and their respective affiliates shall be responsible for any loss whatsoever sustained by any person who relies on this publication.
+About Deloitte Deloitte refers to one or more of Deloitte Touche Tohmatsu Limited, a UK private company limited by guarantee (“DTTL”), its network of member firms, and their related entities. DTTL and each of its member firms are legally separate and independent entities. DTTL (also referred to as “Deloitte Global”) does not provide services to clients. In the United States, Deloitte refers to one or more of the US member firms of DTTL, their related entities that operate using the “Deloitte” name in the United States and their respective affiliates. Certain services may not be available to attest clients under the rules and regulations of public accounting. Please see www.deloitte.com/about to learn more about our global network of member firms.
+Copyright © 2017 Deloitte Development LLC. All rights reserved. Member of Deloitte Touche Tohmatsu Limited
+

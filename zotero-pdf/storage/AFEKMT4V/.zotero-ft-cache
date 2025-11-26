@@ -1,0 +1,1491 @@
+The Asian Journal of Shipping and Logistics 33(2) (2017) 095-104
+Contents lists available at ScienceDirect
+The Asian Journal of Shipping and Logistics
+Journal homepage: www.elsevier.com/locate/ajsl
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+Nurul Haqimin MOHD SALLEHa , Ramin RIAHIb, Zaili YANGc, Jin WANGd
+a Senior Lecturer, Universiti Malaysia Terengganu, Malaysia, E-mail: haqimin@umt.edu.my (First and Corresponding Author) b Ship Superintendent, Columbia Ship Management (Deutschland), Germany, E-mail: raminr@yahoo.com c Professor, Liverpool John Moores University, E-mail:Z.Yang@ljmu.ac.uk d Professor, Liverpool John Moores University, E-mail. Wang@ljmu.ac.uk
+
+ARTICLE INFO
+Article history: Received 30 November 2016 Received in revised form 31 May 2017 Accepted 10 June 2017
+Keywords: Schedule Reliability Arrival Punctuality Liner Shipping Fuzzy Rule-Based Bayesian Reasoning
+
+ABSTRACT
+One of the biggest concerns in liner operations is punctuality of containerships. Managing the time factor has become a crucial issue in today’s liner shipping operations. A statistic in 2015 showed that the overall punctuality for containerships only reached an on-time performance of 73%. However, vessel punctuality is affected by many factors such as the port and vessel conditions and knock-on effects of delays. As a result, this paper develops a model for analyzing and predicting the arrival punctuality of a liner vessel at ports of call under uncertain environments by using a hybrid decision-making technique, the Fuzzy Rule-Based Bayesian Network (FRBBN). In order to ensure the practicability of the model, two container vessels have been tested by using the proposed model. The results have shown that the differences between prediction values and real arrival times are only 4.2% and 6.6%, which can be considered as reasonable. This model is capable of helping liner shipping operators (LSOs) to predict the arrival punctuality of their vessel at a particular port of call.
+Copyright © 2017 The Korean Association of Shipping and Logistics, Inc. Production and hosting by Elsevier B.V. T h i s i s a n o p e n a c c e s s a r t i c l e u n d e r t h e C C B Y - N C - N D l i c e n s e (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+1. Introduction
+The container liner shipping industry is a dynamic and complex one. It consists of a fleet of vessels with a common ownership or management strategy, providing a fixed service at regular intervals between ports of call and offers transport of containerized goods in the catchment area
+
+served by those ports of call (Stopford, 2009). At present, a large proportion (i.e. 80%) of world commodities by volume is transported by seaborne trade and more than 62% of this seaborne trade is carried by the CLSI (UNCTAD, 2012; Mohd Salleh et al., 2014). A recent study
+
+http://dx.doi.org/10.1016/j.ajsl.2017.06.007
+2092-5212/© 2017 The Korean Association of Shipping and Logistics, Inc. Production and hosting by Elsevier B.V. Peer review under responsibility of the Korean Association of Shipping and Logistics, Inc.
+
+96
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+addressing 157 countries over the period 1962-1990 provided the empirical evidence that the CLSI is the driver of 20th-century economic globalization (Bernhofen et al., 2013). Therefore, it is noteworthy to mention that the CLSI is remarkably acting as an artery in making contributions to the growth of the global economy.
+Recently, performance on service punctuality has become an area of topical interest following various initiatives by many liner shipping operators (LSOs). Leading LSOs (e.g. Maersk Line, MSC Shipping, Hamburg Süd Group and CMA CGM) have developed a policy for future sustainability that focuses on guaranteed punctual arrivals. With today’s marketing structures and strategies in the CLSI, LSOs must ensure that vessels can deliver containers within the scheduled time. However, managing the time factor is not an easy task for LSOs. The schedule reliability for overall container shipping achieves an on-time performance of 73% (Drewry Shipping Consultants, 2015). Vessel delays lead to significant handling interruption and underutilization of resources for both ports and LSOs, which finally results in high financial losses.
+Vessels may be delayed due to uncertainties comprised of port congestion, port inefficiency, poor vessel conditions, rough weather, incapability and unreliability of an agency that represents the LSO at each port of call. These uncertainties are some of the reasons that may impede LSOs from providing on-time services to their customers. As a result, the aim of this paper is to develop a model for analyzing and predicting a vessel’s arrival punctuality prior to actual arrival by using a hybrid decision-making technique, the Fuzzy Rule-Based Bayesian Network (FRBBN). It is expected that this model is capable of forecasting the arrival punctuality of liner vessels, and sending an early warning signal to LSOs so that they can adopt proactive strategies.
+2. Literature Review
+In container liner shipping, there are three planning level stages, which can be listed as strategic, tactical and operational (Christiansen et al., 2007, Van Riessen et al., 2015; Mohd Salleh et al., 2015). In this paper, the focus is on the operational planning level, which is based on a short-term period that can be extended from a few hours to a few months. One of the problems in this operational planning level is disruption. Generally, disruption can be listed in four levels: delay, deviation, stoppage and loss of platform service (Gurning, 2011). Based on Hsu and Huang’s (2014) study, shippers pay more attention to transportation reliability involving key indicators such as correctness, perfect delivery and vessel punctuality. Vessel delay will affect the punctually of cargo delivery resulting in additional days of shipping days. Consequently, every possible mechanism should be encouraged to mitigate this issue.
+In recent years, many scholars have paid more attention to the schedule reliability of road networks, railways and airlines, rather than container liner shipping operations. There is little discussion about the analysis of schedule reliability in liner shipping services in the literature. In the context of liner shipping operations, only a few studies on schedule reliability, such as Notteboom (2006), Vernimmen et al. (2007), Wu et al. (2009), Gaonkar et al. (2011), Chung and Chiang (2011), Fancello et al. (2011) and Ducruet and Notteboom (2012), are available in the literature. Notteboom (2006) discussed causes of schedule unreliability from the perspective of a shipping line. Later, Vernimmen et al. (2007) analyzed the impact of schedule unreliability on shippers and consignees. Vernimmen et al.’s study also provides the factors causing liner shipping unreliability that can be used in this study. Nevertheless, the studies by Notteboom
+
+(2006) and Vernimmen et al. (2007) do not provide a mathematical model for analyzing and predicting arrival and departure punctuality.
+Several attempts have been made to analyze schedule reliability by using a mathematical model, such as Chung and Chiang (2011), Fancello et al. (2011) and Gaonkar et al. (2011). Gaonkar et al. (2011) assessed the timeliness of operational reliability in a maritime transportation system by considering congestion at ports and sea. Nevertheless, these elements are not deeply investigated as their study generally evaluates the criteria without observing the sub-criteria of each element. As a result, the collected data might not be accurate due to the generality of the criteria. In addition, their study is focused on operational reliability rather than arrival prediction. On the other hand, Chung and Chiang (2011) developed a model for evaluating the schedule reliability in liner shipping. However, they only assigned a weight for each criterion without assessing the real condition of each element in their model. Fancello et al. (2011) predicted ship delays by proposing two algorithms: a dynamic learning predictive algorithm based on neural networks and an optimization algorithm for resource allocation. They have reduced the prediction error from 4 hours to around 2.7 hours (absolute value), obtaining an uncertainty range of 6 hours (5.20 hours). As a result, this prediction error will be used as a benchmark in this paper.
+Based on literatures, it is noteworthy to mention that no probability model has been developed for analyzing the arrival punctuality of liner vessels under uncertain environments; thus, making these attempts is essential for the current research.
+With the growing complexity in global transport networks, managing the time factor in liner shipping operations is not an easy task. LSOs are keen to achieve the timings as announced in their official schedule. Delays, however, not only reduce the reliability value of the liner operations but also incur logistic costs to the customer as a consequence of additional inventory costs, and in some cases additional production costs are also incurred (Notteboom, 2006). Generally, for analyzing and predicting vessel punctuality, two aspects should be considered: vessel’s arrival and departure at/from port of call (Mohd Salleh et al., 2015).
+Fig. 1 shows the starting point of arrival and departure time for a vessel to/from ports of call. Drewry Shipping Consultants (2012) stated that the vessel is considered as having an “on-time arrival” if the divergence between Actual Time Arrival (ATA) and Estimated Time Arrival (ETA) is within one day or less. They also stated that the vessel is considered as having an “on-time departure” if the divergence between Actual Time Departure (ATD) and Estimated Time Departure (ETD) is within one day or less. The deviation of estimated time of arrival/departure compared to the actual time of arrival/departure can be formulated as follows:
+
+' Arrival = ATA – ETA
+
+(1)
+
+' Departure = ATD – ETD
+
+(2)
+
+' Arrival = ATA – ETA
+
+(1)
+
+' Departure = ATD - ETD
+
+(2)
+
+Fig. 1. Arrival and departure time at ports of call Source: Authors
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+97
+
+Based on Drewry Shipping Consultants (2012), if a vessel can arrive/depart at/from a port of call within the same day as its estimated time of arrival/departure, then the punctuality of the vessel’s arrival and departure is assessed as on-time (i.e. as long as a vessel arrives/departs within 24 hours, it is considered to be on time). As an example, if VesselA and VesselB respectively arrive at the named port of call 1 hour and 10 hours after ETA, both vessels are still assessed as on-time. To overcome the aforementioned drawback in this paper, a precise model for analyzing the arrival punctuality under a FRBBN model will be formulated.
+
+Step 3: Developing a generic model using the BN model. Step 4: Determining conditional probabilities by using the FRB method. Step 5: Determining unconditional probabilities by using membership functions and belief degrees. Step 6: Validating the model and prediction values by using sensitivity analysis and prediction error. A detailed explanation about these steps can be found in Mohd Salleh et al. (2016). However, these steps will be demonstrated in the test case (i.e. Section 4).
+
+2.1 Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+This sub-section discusses the background of FRBBN as a hybrid method (i.e. will be employed in the research methodology) combining a Fuzzy Rule-Based (FRB) approach and a Bayesian Network (BN) for analyzing and predicting the arrival punctuality of a liner vessel at ports of call under uncertain environments. A detailed explanation about the FRB and BN can be found in Mohd Salleh et al. (2016). A basic FRBBN formula can be formed using Eq. 3 as follows (Yang et al., 2009):
+
+IF A1, A2 and … AN, THEN B
+
+(3)
+
+where ‫ܣ‬௜ሺ݅ ൌ ͳǡ ʹǡ ǥ ǡ ܰሻis the ith piece of evidence and ‫ ܤ‬is a hypothesis suggested by the evidence. Each‫ܣ‬௜ and the hypothesis ሺ‫ܤ‬ሻ of a rule are propositional statements. Later, the FRB is able to be incorporated with a belief rule-base and can be defined as follows (Yang et al., 2006; Yang et al., 2009; Zhou et al., 2011):
+
+ܴ௞ǣ‫ܺܨܫ‬ଵ௞ǡ ܺଶ௞ܽ݊݀ ǥ ܺெ௞ ǡ
+
+ܶ‫ܰܧܪ‬ሼሺߚଵ௞ǡ ܻଵሻǡ ሺߚଶ௞ǡ ܻଶሻǡ ǥ ሺߚே௞ǡ ܻேሻሽ
+
+(4)
+
+where ܺ௝௞ ሺ݆ ‫ א‬ሼͳǡ ʹǡ ǥ ǡ ‫ܯ‬ሽǢ ݇ ‫ א‬ሼͳǡ ʹǡ ǥ ǡ ‫ܮ‬ሽሻ is the referential value of the jth antecedent attribute in the kth rule, M is the number of antecedent attributes used in the kth rule and ‫ ܮ‬is the number of rules in the rule-base. ߚ௜௞ ሺ݅ ‫ א‬ሼͳǡʹǡ ǥ ǡ ܰሽǢ ݇ ൌ ሼͳǡ ʹǡ ǥ ǡ ‫ܮ‬ሽ, with L as the number of the rules in the rule-base) is a belief degree to ܻ௜ ( ݅ ‫ͳ א‬ǡ ʹǡ ǥ ǡ ܰ ), called the consequent if, in the kth packet rule, the input satisfies the packet antecedentsܺ௞ ൌ ሼܺଵ௞ǡ ܺଶ௞ǡ ǥ ǡ ܺெ௞ ሽ.
+In order to determine the conditional probability table (CPT) by using an
+FRBBN, Eq. 4 can be further expressed as shown in Eq. 5 (Zhou et al., 2011):
+
+ܲሺܻ௜ȁܺଵ௞ǡ ܺଶ௞ǡ ǥ ǡ ܺெ௞ ሻ ൌ ߚ௜௞ ݅ ൌ ͳǡ ʹǡ ǥ ǡ ܰǤ
+
+(5)
+
+The FRBBN approach can be applied for combining rules and generating a final conclusion which can be calculated by using Bayes’ chain rules.
+
+Fig. 2. The procedure for analyzing and predicting the arrival punctuality
+4. Test Case
+In order to demonstrate the applicability of the proposed model, the arrival punctuality of ܸ݁‫݈݁ݏݏ‬஺ at ܲ‫ݐݎ݋‬஺ (test case 1) will be analysed in this study. The final result of test case 2 is shown in sub-section 4.5 for validation purposes. For test case 1, the backgrounds of ܸ݁‫݈݁ݏݏ‬஺ and ܲ‫ݐݎ݋‬஺ are listed in Tables 1 and 2 respectively.
+
+3. Methodology
+In order to develop the model for analyzing and predicting the arrival punctuality of a vessel by using the FRBBN method, as shown in Fig. 2, six steps are followed:
+Step 1: Identifying critical influential factors by using literature and consultation with experts.
+Step 2: Defining states for each node by using literature and consultation with experts.
+
+Table 1 Details of ࢂࢋ࢙࢙ࢋ࢒࡭
+Details Vessel Type Gross Tonnage Deadweight Length x Breadth Year Built Draught Distance
+
+ࢂࢋ࢙࢙ࢋ࢒࡭ Container Ship 17068 21206 tonne 186 m x 25 m 2009 9.5 m 554 nm
+
+98
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+Transit Time from Previous Port Planned Speed
+
+36 hours (Sailing Time) 24 hours (Buffer Time) 16 knot
+
+By reviewing the literature and consulting with the domain experts, the states of each node in the arrival model are described in Table 4.
+
+Table 2 Details of ࡼ࢕࢚࢘࡭
+Details Berth Capacity
+Yard Capacity Annual Handling Capacity Quay Crane Capacity Berth Occupancy Ratio Yard Utilization Average Truck Turnaround Time
+
+ࡼ࢕࢚࢘࡭ 12 Berths forming 4.3km of linear wharf 200,000 TEUs 8,400,000 44 Quay-side cranes 57.45% 54.79% 24.20 minutes
+
+4.1. Nodes and States in the Arrival Punctuality Model (Steps 1 and 2)
+
+In this paper, the process of identifying the critical factor for analyzing arrival punctuality involves the listing of influential factors and then analyzing them by using cause and effect analysis. With the focus on arrival punctuality of a liner vessel, every significant influential factor is carefully reviewed. Through the extensive literature review, firstly, the 32 influential factors (i.e. nodes in the model) are identified. Secondly, these factors are further revised and reduced by the domain experts (i.e. due to the complexity of the model and because some eliminated factors are not significantly determining the punctuality of a liner vessel). Finally, as shown in Table 3, the revised influential factors are selected (Mohd Salleh et al., 2016).
+
+Table 3 Summary of identified influential factors
+
+Arrival Model
+
+Main Criteria
+
+Sub-criteria Sub-sub-criteria
+
+Port Conditions
+
+Port Channel Conditions
+Terminal Conditions
+
+Access Channel – Punctuality of Pilotage Operation for Arrival Process, Tidal Window and Weather Condition at Port Berthing Area Condition Port Yard Condition
+
+Miscellaneous Factors
+
+Vessel Conditions
+
+Miscellaneous Factors
+Maritime Passage
+
+Port Administration Process Inland Corridors Country Reliability En-Route Traffic Condition Possibility of Canal Miss
+
+Vessel Operational Performance
+
+En-Route Weather Condition Speed Machinery Breakdown Ship Staff’s Reliability
+
+Unforeseen Events
+
+Dangerous Events Other Unexpected Delays
+
+Departure Punctuality from Previous Port Agency Reliability and Capability
+
+Fig. 3. The BN model for arrival punctuality (without data)
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+99
+
+Table 4 List of nodes and states in the arrival model
+
+Arrival Model
+
+Nodes
+
+States
+
+Arrival Punctuality
+
+On-time, Delay, Serious Delay
+
+Port Condition
+
+Smooth, Crowded, Densely Congested
+
+Vessel Condition
+
+Good, Average, Poor
+
+Agency
+
+Highly Reliable, Medium Reliable, Lowly
+
+Reliable
+
+Departure Punctuality from
+
+On-time or Resolved, Delay, Serious Delay
+
+Previous Port
+
+Port Channel Conditions
+
+Smooth, Crowded, Densely Congested
+
+Terminal Conditions
+
+Smooth, Crowded, Densely Congested
+
+Miscellaneous Factors
+
+Smooth, Average, Poor
+
+Maritime Passage Condition
+
+Excellent, Moderate, Poor
+
+Vessel Operational Performance High, Medium, Low
+
+Unforeseen Events
+
+Not Occurred, Occurred
+
+Access Channel Condition
+
+Smooth, Average, Poor
+
+Berthing Area Condition
+
+Smooth, Crowded, Densely Congested
+
+Port Yard Condition
+
+Smooth, Crowded, Densely Congested
+
+Port Administration Process
+
+Highly Efficient, Medium Efficient, Lowly
+
+Efficient
+
+Inland Corridors
+
+Free Flow, Crowded, Densely Congested
+
+Country Reliability
+
+High, Medium, Low
+
+En-Route Traffic Condition
+
+Less Traffic, Normal Traffic, Dense Traffic
+
+Missing a Convoy at a Canal
+
+No problem or Not related, Missed convoy
+
+En-Route Weather Condition Excellent, Moderate, Rough
+
+Speed
+
+Planned Speed, Slow, Disrupted
+
+Ship Staff’s Reliability
+
+Highly Reliable, Medium Reliable, Lowly
+
+Reliable
+
+Machinery Breakdown
+
+Not Occurred, Minor Breakdown, Major
+
+Breakdown
+
+Dangerous Events
+
+Not Occurred, Occurred
+
+Other Unexpected Delays
+
+Not Occurred, Occurred
+
+Weather Condition at Port
+
+Excellent, Moderate, Rough
+
+Punctuality of Pilotage Operation On-time, Delay, Serious Delay
+
+for Arrival Process
+
+Tidal Window
+
+Not Restrictive, Restrictive
+
+4.2. The Arrival Punctuality Modelling for VesselA at PortA (Step 3)
+Based on the identified factors and their states as shown in Steps 1 and 2, the BN model is developed and shown in Figure 3. As shown in Figure 3, the leaf node “arrival punctuality (AP)” has four parent nodes: “departure punctuality from previous port (DPfPP)”, “port conditions (PC)”, “vessel conditions (VC)” and “agency (AGENCY)”. The parent nodes that influence the node “PC” consist of “port channel conditions (PCC)”, “terminal conditions (TC)” and “miscellaneous factors (MISC)”. The node “PCC” is influenced by “access channel conditions (ACC)” and “TC”. The parent nodes that influence the node “ACC” consist of “punctuality of pilotage operation for arrival process (PPfAP)”, “tidal window (TW)” and “weather condition at port (WCaP)”. The node “TC” has two parent nodes, namely “berth area condition (BAC)” and “port yard condition (PYC)”; whereas the node “MISC” has three parent nodes, namely “port administration process (PAP)”, “inland corridors (IC)” and “country reliability (CR)”. The node “vessel conditions” has three parent nodes: “maritime passage condition (MPC)”, “vessel operational performance (VOP)” and “unforeseen events (UE)”. The node “MPC” has three parent nodes: “en-route traffic condition (ERTC)”, “possibility of canal miss (PoCM)” and “en-route weather condition (ERWC)” and, at the same time, the node “MPC” influences the node “speed (SPEED)”. “SPEED”, “machinery breakdown (MB)” and “ship staff’s reliability (SSR)” are the three parent nodes of the node “VOP”. Finally, “dangerous events (DE)” and “other unexpected delays (OUD)” are the two parent nodes that influence the node “UE”.
+4.3. Determination of Conditional Probabilities (Step 4)
+The CPT is a set of distributions to represent the dependency of a child node on its parent node(s). In this paper, a CPT for all child nodes in the arrival punctuality model is determined by using an FRB approach. To conduct conditional probability distributions using the FRB approach, four experts, “En”, with 15 and more years of experience in this operation are selected. Based on Equations 3-5, a CPT for all child nodes (i.e. “ACC”, “PCC”, “TC”, “MISC”, “MPC”, “VOP”, “UE”, “PC”, “VC”, “SPEED” and “AP”) will be calculated. For example, based on Table 5, to establish a rule for the child node “AP” under the combination of the conditions of its parent nodes (i.e. “DPfPP”, “PC”, “VC” and “AGENCY”), a preference number ranging from 1 to 5 can be selected. These preference numbers (i.e. have been selected by four experts) are then aggregated by using the geometric mean and shown in Table 6. The aggregated preference numbers for each rule, as listed in Table 6, are then transformed into a CPT using membership functions. As a result, the CPT for the child node “Arrival Punctuality” is shown in Table 7.
+
+Table 5 Preference numbers for the child node arrival punctuality
+
+Arrival Punctuality States Preference Number
+
+On-time (Exactly arrive on or before ETA)
+5
+
+Slight Delay (Up to 12 hours after ETA)
+4
+
+Delay (Up to 24 hours after ETA)
+3
+
+Serious Delay (Up to 36 hours after ETA)
+2
+
+Very Serious Delay (48 hours and more after ETA)
+1
+
+100
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+Table 6 Consequents for the child node arrival punctuality
+
+Rules
+
+IF
+Departure Punctuality from
+Previous Port
+
+Vessel Conditions
+
+1
+
+On-time
+
+Good
+
+2
+
+On-time
+
+Good
+
+3
+
+On-time
+
+Good
+
+4
+
+On-time
+
+Good
+
+5
+
+On-time
+
+Good
+
+6
+
+On-time
+
+Good
+
+7
+
+On-time
+
+Good
+
+8
+
+On-time
+
+Good
+
+9
+
+On-time
+
+Good
+
+10
+
+On-time
+
+Average
+
+11
+
+On-time
+
+Average
+
+…
+
+…
+
+…
+
+60
+
+Serious Delay
+
+Good
+
+61
+
+Serious Delay
+
+Good
+
+62
+
+Serious Delay
+
+Good
+
+63
+
+Serious Delay
+
+Good
+
+64
+
+Serious Delay
+
+Average
+
+…
+
+…
+
+…
+
+78
+
+Serious Delay
+
+Poor
+
+79
+
+Serious Delay
+
+Poor
+
+80
+
+Serious Delay
+
+Poor
+
+81
+
+Serious Delay
+
+Poor
+
+Port Conditions
+Smooth Smooth Smooth Crowded Crowded Crowded Densely Congested Densely Congested Densely Congested Smooth Smooth
+… Crowded Densely Congested Densely Congested Densely Congested Smooth
+… Crowded Densely Congested Densely Congested Densely Congested
+
+Agency
+Highly Reliable Medium Reliable Lowly Reliable Highly Reliable Medium Reliable Lowly Reliable Highly Reliable Medium Reliable Lowly Reliable Highly Reliable Medium Reliable
+… Lowly Reliable Highly Reliable Medium Reliable Lowly Reliable Highly Reliable
+… Lowly Reliable Highly Reliable Medium Reliable Lowly Reliable
+
+THEN Arrival Punctuality
+
+(E1) (E2) (E3) (E4)
+
+5
+
+5
+
+5
+
+5
+
+5
+
+5
+
+5
+
+5
+
+4
+
+5
+
+4
+
+5
+
+4
+
+5
+
+4
+
+5
+
+4
+
+5
+
+4
+
+4
+
+5
+
+5
+
+1
+
+3
+
+1
+
+5
+
+2
+
+3
+
+1
+
+4
+
+2
+
+3
+
+1
+
+4
+
+1
+
+2
+
+4
+
+5
+
+4
+
+3
+
+4
+
+5
+
+3
+
+2
+
+…
+
+…
+
+…
+
+…
+
+1
+
+4
+
+1
+
+1
+
+1
+
+3
+
+2
+
+1
+
+1
+
+3
+
+2
+
+1
+
+1
+
+3
+
+1
+
+1
+
+1
+
+3
+
+2
+
+1
+
+…
+
+…
+
+…
+
+…
+
+1
+
+2
+
+1
+
+1
+
+1
+
+2
+
+1
+
+1
+
+1
+
+2
+
+1
+
+1
+
+1
+
+1
+
+1
+
+1
+
+Aggregation
+5.0000 5.0000 4.4721 4.4721 4.2295 2.9428 2.3403 2.2134 1.6818 3.9360 3.3098
+… 1.4142 1.5651 1.5651 1.3161 1.5651
+… 1.1892 1.1892 1.1892 1.0000
+
+Table 7 CPTs for the child node arrival punctuality
+IF
+
+Rules
+
+Departure Punctuality from Previous Port
+
+Vessel Condition s
+
+Current Conditions
+
+Port Agency
+
+1
+
+On-time
+
+Good
+
+Smooth
+
+Highly Reliable
+
+2
+
+On-time
+
+Good
+
+Smooth
+
+Medium Reliable
+
+3
+
+On-time
+
+Good
+
+Smooth
+
+Lowly Reliable
+
+4
+
+On-time
+
+Good
+
+Crowded
+
+Highly Reliable
+
+5
+
+On-time
+
+Good
+
+Crowded
+
+Medium Reliable
+
+6
+
+On-time
+
+Good
+
+Crowded
+
+Lowly Reliable
+
+7
+
+On-time
+
+Good
+
+Densely Congested Highly Reliable
+
+8
+
+On-time
+
+Good
+
+Densely Congested Medium Reliable
+
+9
+
+On-time
+
+Good
+
+Densely Congested Lowly Reliable
+
+10
+
+On-time
+
+Average Smooth
+
+Highly Reliable
+
+11
+
+On-time
+
+Average Smooth
+
+Medium Reliable
+
+…
+
+…
+
+…
+
+…
+
+…
+
+60
+
+Serious Delay
+
+Good
+
+Crowded
+
+Lowly Reliable
+
+61
+
+Serious Delay
+
+Good
+
+Densely Congested Highly Reliable
+
+62
+
+Serious Delay
+
+Good
+
+Densely Congested Medium Reliable
+
+63
+
+Serious Delay
+
+Good
+
+Densely Congested Lowly Reliable
+
+64
+
+Serious Delay
+
+Average
+
+Smooth
+
+Highly Reliable
+
+…
+
+…
+
+…
+
+…
+
+…
+
+78
+
+Serious Delay
+
+Poor
+
+Crowded
+
+Lowly Reliable
+
+79
+
+Serious Delay
+
+Poor
+
+Densely Congested Highly Reliable
+
+80
+
+Serious Delay
+
+Poor
+
+Densely Congested Medium Reliable
+
+81
+
+Serious Delay
+
+Poor
+
+Densely Congested Lowly Reliable
+
+THEN
+Arrival Punctuality
+Aggregated Preferences Number (Average Output)
+5.0000 5.0000 4.4721 4.4721 4.2295 2.9428 2.3403 2.2134 1.6818 3.9360 3.3098 … 1.4142 1.5651 1.5651 1.3161 1.5651 … 1.1892 1.1892 1.1892
+1.0000
+
+CPT
+On-time
+1 1 0.7360 0.7360 0.6148 0 0 0 0 0.4680 0.1549 … 0 0 0 0 0 … 0 0 0 0
+
+Delay
+0 0 0.2640 0.2640 0.3852 0.9714 0.6701 0.6067 0.3408 0.5320 0.8451 … 0.2071 0.2825 0.2825 0.2825 0.2825 … 0.0946 0.0946 0.0946 0
+
+Serious Delay
+0 0 0 0 0 0.0286 0.3299 0.3933 0.6592 0 0 … 0.7929 0.7175 0.7175 0.7175 0.7175 … 0.9054 0.9054 0.9054 1
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+101
+
+The same process is applied to all the child nodes in the arrival punctuality model (i.e. “ACC”, “PCC”, “TC”, “MISC”, “MPC”, “VC”, “UE”, “PC”, “VOP” and “SPEED”). The number of pieces of data that need to be transformed and inserted into the arrival punctuality model is 259 per expert.
+4.4. Determination of Unconditional Probabilities (Step 5)
+In order to assess the unconditional probabilities of the root nodes in the arrival punctuality model, the required data about the vessel and port conditions can be obtained from several reliable sources (i.e. record, historical data, expert judgments and statistics). In this paper, the datasets for test case 1 are shown in Table 8.
+
+Table 8 Datasets for arrival punctuality (test case 1)
+
+Root Nodes
+
+Measurement
+
+Data
+
+DPfPP οDeparture = ATD -3 hours and 12 minutes (Before ETD)
+
+– ETD
+
+WCaP Beaufort Number 3
+
+PPfAP Initiated Time
+
+Before ETA
+
+TW
+
+Hours Delay
+
+No Delay
+
+BAC Berth Occupancy 57.45%
+
+Ratio (%)
+
+BAC Yard Utilization (%) 54.79%
+
+PAP Immigration
+
+Before ETA
+
+Clearance
+
+IC
+
+Truck Turnaround 24.20 minutes
+
+Time
+
+ERTC En-Route Traffic
+
+States
+
+Less
+
+Normal Dense
+
+Condition
+
+Evaluator
+
+Traffic Traffic Traffic
+
+(Qualitative)
+
+Evaluator 1 100%
+
+0%
+
+0%
+
+Evaluator 2 100%
+
+0%
+
+0%
+
+Evaluator 3 90%
+
+10%
+
+0%
+
+PoCM Occurrence
+
+Not Involved
+
+ERWC Beaufort Number 3
+
+MB
+
+Occurrence and Not Breakdown
+
+Delayed Time
+
+SSR Reliability (Qualitative)
+
+States
+High Medium Low Evaluator
+
+Evaluator 1 90%
+
+10%
+
+0%
+
+Evaluator 2 80%
+
+20%
+
+0%
+
+Evaluator 3 70%
+
+30%
+
+0%
+
+DE
+
+Occurrence
+
+Not Occur
+
+OUD Occurrence
+
+Not Occur
+
+CR
+
+Country
+
+High
+
+0.3429
+
+Reliability
+
+Medium
+
+0.5788
+
+Low
+
+0.0783
+
+AGEN Agency Reliability High
+
+0.7700
+
+CY
+
+Medium
+
+0.2092
+
+Low
+
+0.0208
+
+For assessing the unconditional probabilities, membership functions need to be constructed. As an example, based on Riahi et al. (2012), enroute weather conditions can be measured by using Beaufort numbers ranging from 0-13, as shown in Figure 4. If the Beaufort number is between 0 and 4, the weather condition can be considered as excellent and between 5 and 6 it can be considered as moderate. If the Beaufort number is between 7 and 13, this signifies rough weather.
+
+EXCELLENT
+
+1
+
+0.95
+
+0.9
+
+0.85
+
+0.8
+
+0.75
+
+0.7
+
+0.65
+
+0.6
+
+0.55
+
+0.5
+
+0.45
+
+0.4
+
+0.35
+
+0.3
+
+0.25
+
+0.2
+
+0.15
+
+0.1
+
+0.05
+
+0
+
+1
+
+4
+
+MODERATE
+
+ROUGH
+
+5
+
+6
+
+7
+
+10
+
+Beaufort Number
+
+Fig. 4. Membership functions for the node “ERWC” Based on Figure 4, the set for the “en-route weather condition” can be evaluated as:
+
+ERWC = {(Excellent, 1), (Moderate, 0), (Rough, 0)}
+
+The same process is applied to all the root nodes in the arrival punctuality model. The sets for all root nodes are obtained and shown in Table 9.
+
+Table 9 The sets (belief degrees) for all root nodes
+
+Root Nodes DPfPP WCaP PPfAP TW BAC BAC PAP IC ERTC
+PoCM ERWC MB
+SSR
+DE
+
+Sets {(On-time, 1), (Delay, 0), (Serious Delay, 0)} {(Excellent, 1), (Moderate, 0), (Rough, 0)} {(On-time, 1), (Delay, 0), (Serious Delay, 0)} {(Not Restrictive, 1), (Restrictive, 0)} {(Smooth, 1), (Crowded, 0), (Densely Congested, 0)} {(Smooth, 1), (Crowded, 0), (Densely Congested, 0)} {(Highly Efficient, 1), (Medium Efficient, 0), (Lowly Efficient, 0)} {(Smooth, 1), (Crowded, 0), (Densely Congested, 0)} {(Less Traffic, 0.9784), (Normal Traffic, 0.0216), (Dense Traffic, 0)} {(No Problem or Not Related, 1), (Miss Convoy, 0)} {(Excellent, 1), (Moderate, 0), (Rough, 0)} {(No Breakdown, 1), (Minor Breakdown, 0), (Major Breakdown, 0)} {(Highly Reliable, 0.8413), (Medium Reliable, 0.1587), (Lowly Reliable, 0)} {(Not Occurred, 1), (Occurred, 0)}
+
+OUD CR
+AGENCY
+
+{(Not Occurred, 1), (Occurred, 0)} {(Highly Reliable, 0.3429), (Medium Reliable, 0.5788), (Lowly Reliable, 0.0783)} {(Highly Reliable, 0.7700), (Medium Reliable, 0.2092), (Lowly Reliable, 0.0208)}
+
+The Netica software tool is employed to calculate the marginal probabilities for arrival punctuality. After all the CPTs for child nodes and unconditional probabilities of root nodes are determined and inserted into
+
+102
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+the software, the marginal probabilities of the child node(s) can be calculated. Based on Figure 5, the marginal probability of ܸ݁‫݈݁ݏݏ‬஺ arriving at ܲ‫ݐݎ݋‬஺ on-time is 92.1%.
+4.5. Model and Result Validations (Step 6)
+
+In order to ensure that the arrival punctuality model is functional, this model must at least meet the following two axioms (i.e. sensitivity analysis):
+
+Axiom 1: A slight increase or decrease in the degree of membership associated with any states of an input node will certainly result in a relative increase or decrease in the degree of membership of the highestpreference state of the model output.
+Axiom 2: If the degree of membership associated with the highestpreference state of an input node is decreased by ݈ and݉ (simultaneously the degree of membership associated with its lowest-preference state is increased by ݈ and ݉ (1 >݉ >݈)), and the values of the model output are evaluated as ܷ௟ and ܷ௠ respectively, then ܷ௟ should be greater thanܷ௠.
+
+DPfPP
+
+On time Or Resolved 100
+
+Delay
+
+0
+
+Serious Delay
+
+0
+
+AP
+
+On time
+
+92.1
+
+Delay
+
+6.80
+
+Serious Delay 1.12
+
+PPfAP
+
+On time
+
+100
+
+Delay
+
+0
+
+Serious Delay 0
+
+PCC
+
+Smooth
+
+92.6
+
+Crowded
+
+7.45
+
+Densely Congested 0
+
+ERTC
+Less Traffic 97.8 Normal Traffic 2.16 Dense Traffic 0
+
+PoCM
+
+No Problem or Not Related 100
+
+Missed Convoy
+
+0
+
+WCaP
+
+Excellent 100
+
+Moderate 0
+
+Rough
+
+0
+
+TW
+
+Not Restrictive 100
+
+Restrictive
+
+0
+
+BAC
+
+Smooth
+
+100
+
+Crowded
+
+0
+
+Densely Congested 0
+
+ACC
+
+Smooth 100
+
+Average 0
+
+Poor
+
+0
+
+PC
+
+Smooth Condition 91.9
+
+Crowded
+
+5.14
+
+Densely Congested 2.93
+
+VC
+Good 95.1 Average 4.89 Poor .055
+
+TC
+
+Smooth
+
+92.6
+
+Crowded
+
+7.45
+
+Densely Congested 0
+
+AGENCY
+Highly Reliable 77.0 Medium Reliable 20.9 Lowly Reliable 2.08
+
+IC
+
+Free Flow
+
+100
+
+Crowded
+
+0
+
+Densely Crowded 0
+
+PYC
+
+Smooth
+
+100
+
+Crowded
+
+0
+
+Densely Congested 0
+
+MISC
+
+Smooth 88.0
+
+Average 12.0
+
+Poor
+
+0
+
+OUD
+
+Not Occurred 100
+
+Occurred
+
+0
+
+MPC
+
+Excellent 99.4
+
+Moderate 0.57
+
+Poor
+
+0
+
+VOP
+
+High 91.2
+
+Medium 8.77
+
+Low
+
+0
+
+UE
+
+Not Occurred 100
+
+Occurred
+
+0
+
+PAP
+
+Highly Efficient 100
+
+Medium Efficient 0
+
+Lowly Efficient
+
+0
+
+CR
+High 34.3 Medium 57.9 Low 7.83
+
+DE
+
+Not Occurred 100
+
+Occurred
+
+0
+
+ERWC
+
+Excellent 100
+
+Moderate 0
+
+Rough
+
+0
+
+SPEED
+
+Planned Speed 99.4
+
+Slowed
+
+0.57
+
+Disrupted
+
+0
+
+MB
+
+Not Occurred
+
+100
+
+Minor Breakdown 0
+
+Major Breakdown 0
+
+SSR
+
+Highly Reliable 84.1
+
+Medium Reliable 15.9
+
+Lowly Reliable
+
+0
+
+Fig. 5. The probability set for the arrival punctuality in test case 1
+
+0.9300 0.8800 0.8300 0.7800 0.7300 0.6800 0.6300
+
+Without Alteration Alteration l
+
+Alteration k Alteration m
+
+Fig. 6. Representation of axioms 1 and 2 (test case 1)
+As shown in Figure 6, the membership degree for the highestpreference state of an input node is decreased by 0.1, 0.2 and 0.3 respectively and simultaneously the degree of membership for the lowestpreference state is increased by 0.1, 0.2 and 0.3 respectively. Since the assessed “on-time” values after alterations k, l and m are smaller than the actual one (i.e. 0.921 “on-time”), the results are aligned with axioms 1 and 2.
+In addition, for further validation of the arrival punctuality model, a prediction error (' Predicted Arrival Time - ' Real Arrival Time) is used. If the difference between outcome of the model and real arrival time is ൑10% or ±2.4 hours, then it will be considered to be reasonable. Based on Fancello et al. (2011), the validation error in their prediction model is
+
+around 2.7 hours (i.e. absolute value) and 5.6 hours if uncertainty is considered. Within this study, the use of 10% error or ±2.4 hours as a prediction error for the model is lower than the previous study. Based on Figure 5 (i.e. test case 1), the outcome of the model (i.e. the marginal probability of ܸ݁‫݈݁ݏݏ‬஺ departing from ܲ‫ݐݎ݋‬஺ on-time) was evaluated as 92.1%. Based on the real record obtained from the ship manager of ܸ݁‫݈݁ݏݏ‬஺ , the ο Arrival of ܸ݁‫݈݁ݏݏ‬஺ at ܲ‫ݐݎ݋‬஺ is +54 minutes and can be considered as 96.3% on-time (i.e. (24 hours – 0.9 hours) / (24 hours – 0 hours) ൈ 100%). The error of the model is calculated as 4.2% or 1 hour (i.e. 96.3% - 92.1%). As a result, the outcome of test case 1 is considered as reasonable (i.e. less than 2.4 hours) and it can be concluded that the developed result in this paper is reasonable. The prediction errors for test cases 1 and 2 are presented in Table 10.
+
+Table 10 Prediction errors for test cases 1 and 2
+
+Test
+Test case 1 Test case 2
+
+Model Result 92.1% 33%
+
+Real Arrival Time 96.3% 39.6%
+
+Percentage Difference
+4.2% 6.6%
+
+Hour Difference
+1.008 1.584
+
+5. Results and Discussion
+Within this paper, a model for analyzing the arrival punctuality of a vessel by using an FRBBN model is developed. In this model, the arrival punctuality depends upon many criteria, which are port conditions, vessel conditions, process management efficiency by agency and departure punctuality from the previous port of call. It is noteworthy to mention that this developed model is highly sensitive. Any alteration of criteria values will also alter the arrival punctuality’s value. In test case 1, based on the given datasets in Table 8, the arrival punctuality value of ܸ݁‫݈݁ݏݏ‬஺ at ܲ‫ݐݎ݋‬஺ is evaluated as 92.1%. This arrival punctuality value is not fixed and will change if a criterion’s value is altered. To justify these statements, the deviation of arrival punctuality of ܸ݁‫݈݁ݏݏ‬஺ at ܲ‫ݐݎ݋‬஺ due to alteration of each criterion as shown in Table 11 is evaluated.
+
+Table 11 Arrival punctuality’s value at different environments
+Description of Event (Change of Event) Departure from previous port is 100% serious delay Weather condition at port is 100% rough Punctuality of pilotage operation is 100% serious delay Tidal window is 100% restrictive Berthing area condition is 100% densely congested Port yard condition is 100% densely congested Port administration process is 100% low efficiency Inland corridor is 100% densely congested En-route traffic condition is 100% dense traffic Missing a convoy at a canal occurs En-route weather condition is 100% rough Machinery breakdown is 100% major Ship’s staff are 100% low reliability Dangerous event occurs Other unexpected delays occur Country reliability is 100% low reliability Agency is 100% low reliability
+
+On-time 0%
+48.2% 46.4% 47.6% 18.3% 33.6% 29.4% 59.8% 53.8% 50.9% 31.3% 20.2% 43.8%
+0% 0% 77.1% 64.3%
+
+Rank 1 10 8 9 2 6 4 13 12 11 5 3 7 1 1 15 14
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+103
+
+As shown in Table 11, the model output is more sensitive to the departure punctuality from the previous port, dangerous events and other unexpected delays. The condition of the berthing area is ranked 2nd and vessel machinery breakdown is ranked 3rd. Consequently, the ship manager should pay more attention to these criteria for further planning, monitoring and prevention measures.
+Based on Table 11, the importance of departure punctuality of ܸ݁‫݈݁ݏݏ‬஺ from the previous port of call has been proven. If the departure punctuality from the previous port is assessed as 100% serious delay, the probability of ܸ݁‫݈݁ݏݏ‬஺ arriving at ܲ‫ݐݎ݋‬஺ on-time is 0%. As a result, ship managers should ensure that the vessel always departs on-time from the previous port of call in order to ensure on-time arrival at the next port of call. This objective can be achieved by having an efficient process management (i.e. agency) and excellent coordination between a vessel and a port.
+Dangerous and other unexpected events such as pirate attacks, armed robbery, looting and ship hijacking, war, detention by port state control, ship captain or crew deaths and embargoes adversely disrupt the operation of a vessel. Based on Table 11, there is no chance of ܸ݁‫݈݁ݏݏ‬஺ arriving at ܲ‫ݐݎ݋‬஺ on-time if unforeseen events occur during the voyage.
+6. Conclusion
+Within this paper, the new mathematical model for analyzing and predicting the arrival punctuality of a vessel at a port of call under dynamic environments by using a hybrid technique (i.e. the FRBBN method) has been developed. For the analysis of arrival punctuality, firstly, the critical factors for analyzing and predicting the arrival punctuality have been identified. Secondly, the states of each node were defined by using literature and consultation with experts. Thirdly, a model for analyzing and predicting the arrival punctuality was constructed using the BN model. Fourthly, the strength of direct dependence of each child node on its associated parents was quantified by assigning each child node a CPT using an FRB approach. Fifthly, unconditional probabilities were determined by assigning assessment grades to all the root nodes in the arrival punctuality model. Finally, the developed model and results were validated by using sensitivity analysis and prediction error. Based on the proposed model, LSOs will be able to forecast their vessels’ arrival punctuality and, further, tactical strategies can be implemented if a vessel is expected to be delayed.
+Based on sensitivity analysis, one of three most significant factors in the developed model for analyzing the arrival punctuality is found to be the departure punctuality of a vessel from the previous port of call. For future research, an FRBBN model will again be developed for analyzing and predicting the critical factors in determining the departure punctuality of a liner vessel from a particular port of call. Consequently, this model is capable of helping academic researchers and industrial practitioners to comprehend the influence of uncertain environments on service punctuality.
+Acknowledgement
+Appreciation is given to the Ministry of Education Malaysia and Universiti Malaysia Terengganu for their financial support.
+
+References
+BERNHOFEN, D.M., EL-SAHLI, Z., and KNELLER, R. (2013), “Estimating the Effects of the Container Revolution on World Trade”, CESifo Working Paper Series 4136, CESifo, Center for Economic Studies and Ifo Institute, Munich, 2013.
+CHRISTIANSEN, M., FAGERHOLT, K., NYGREEN, B. and RONEN, D. (2007), “Chapter 4 Maritime Transportation”, Handbooks in Operation Research and Management Science, Vol. 14, pp. 189-284.
+CHUNG, C.C. and CHIANG, C.H. (2011), “The Critical Factors: An Evaluation of Schedule Reliability in Liner Shipping”, International Journal of Operations Research, Vol. 8, No. 4, pp. 3-9.
+DREWRY SHIPPING CONSULTANTS (2012), Container Performance Insight [Online] http://www.drewry.co.uk/ (accessed 10 August 2012).
+DREWRY SHIPPING CONSULTANTS (2015), Container Performance Insight [Online] http://www.drewry.co.uk/ (accessed 15 January 2016).
+DUCRUET, C. and NOTTEBOOM, T. (2012), “Chapter 6: Developing Liner Service Networks in Container Shipping”, in: Maritime Logistics: A Complete Guide to Effective Shipping and Port Management, edited by Song, D.W. and Panayides, P. Kogan Page, pp.77-100.
+FANCELLO, G., PANI, C., PISANO, M., SERRA, P., ZUDDAS, P. and FADDA, P. (2011), “Prediction of Arrival Times and Human Resources Allocation for Container Terminal”, Maritime Economic & Logistics, Vol. 13, No 2, pp. 142-173.
+GAONKAR, R.S.P, XIE, M., NG, K.M. and HABIBULLAH, M.S. (2011), “Subjective Operational Reliability Assessment of Maritime Transportation System”, Expert Systems with Applications, Vol. 38, No. 11, pp.13835–13846.
+GURNING, R.O.S. (2011), “Maritime Disruptions in AustralianIndonesian Wheat Supply Chain: An Analysis of Risk Assessment and Mitigation Strategies”, PhD Thesis, University of Tasmania.
+HSU, W-K.K. AND HUANG, S-H.S. (2014), “Evaluating the Service Requirements of Taiwanese International Port Distribution Centres Using IPA Model Based on Fuzzy AHP”, Int. J. Shipping and Transport Logistics, Vol. 6, No. 6, pp.632–651.
+MOHD SALLEH, N.H., RIAHI, R., YANG, Z. and WANG, J. (2014), “A Fuzzy Bayesian Belief Network Approach for Assessing the Operational Reliability of A Liner Shipping Operator”, Proceedings of the Second Intl. Conf. on Advances in Economics, Management and Social Study, Kuala Lumpur, Malaysia, pp.11-15.
+MOHD SALLEH, N.H., RIAHI, R., YANG, Z. and WANG, J. (2015), “Supply Chain Risk Management in the Container Liner Shipping Industry from a Strategic Point Of View”. European Journal of Business and Management, Vol. 7, pp.155-163.
+
+104
+
+Predicting a Containership’s Arrival Punctuality in Liner Operations by Using a Fuzzy Rule-Based Bayesian Network (FRBBN)
+
+MOHD SALLEH, N.H., OTHMAN, M.R, RIAHI, R., YANG, Z., and WANG, J. (2016), “Adopting a Fuzzy-Ruled Bayesian Network (FRBBN) for Analysing and Predicting a Vessel’s Arrival Punctuality in Liner Operations”, Proc. of the Conference on International Association of Maritime Economists (IAME), Hamburg, Germany.
+NOTTEBOOM, T. (2006), “The Time Factor in Liner Shipping Services”, Maritime Economics and Logistics, Vol. 8, No. 1, pp.19-39.
+RIAHI, R., BONSALL, S., JENKINGSON, I. and WANG, J. (2012), “A Seafarer’s Reliability Assessment Incorporating Subjective Judgement”, Proceedings of the Institution of Mechanical Engineers, Part M: Journal of Engineering for the Maritime Environment, Vol. 226, No. 4, pp.1-22.
+STOPFORD, M. (2009), “Maritime Economics”, 3rd ed, London and New York: Routledge.
+UNCTAD (2012), “Review of Maritime Transport 2012”. Geneva, Switzerland: United Nations Publication.
+VAN RIESSEN, B., NEGENBORN, R.R., DEKKER, R. and LODEWIJKS, G. (2015), “Service Network Design for an Intermodal Container Network with Flexible Transit Times and the Possibility of Using Subcontracted Transport”, Int. J. Shipping and Transport Logistics, Vol. 7, No. 4, pp.457–478.
+
+VERNIMMEN, B., DULLAERT, W. and ENGELAN, S. (2007), “Schedule Unreliability in Liner Shipping: Origins and Consequences for the Hinterland Supply”, Maritime Economics and Logistics, Vol. 9, No. 3, pp.193-213.
+WU, P., DENG, G. and TIAN, W. (2009), “Research on Time Reliability of Container Liner Shipping Network”, 2009 International Conference on Measuring Technology and Mechatronics Automation, Hunan, China, pp.847-850.
+YANG, C.C., MARLOW, P.B. and LU, C.S. (2009), “Knowledge Management Enablers in Liner Shipping”, Transportation Research Part E: Logistics and Transportation Review, Vol. 45, NO. 6, pp.893-903.
+YANG, J.B., LIU, J., WANG, J., SII, H.S. and WANG, H.W. (2006), “Belief Rule-Base Inference Methodology using the Evidential Reasoning Approach – RIMER”, IEEE Transactions on Systems, Man and Cybernetics – Part A: Systems and Humans, Vol. 36, No. 2, pp.266-285.
+ZHOU, Z.J., HU, C.H., XU, D.L., YANG, J.B. and ZHOU, D.H. (2011), “Bayesian Reasoning Approach Based Recursive Algorithm for Online Updating Belief Rule Base Expert System of Pipeline Leak Detection”, Expert Systems with Applications, Vol. 38, No. 4, pp.3937-3943
+

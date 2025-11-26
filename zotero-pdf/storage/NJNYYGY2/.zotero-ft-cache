@@ -1,0 +1,2051 @@
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Authenticated Garbling and Efficient Maliciously Secure Two-Party Computation
+
+Xiao Wang
+University of Maryland wangxiao@cs.umd.edu
+
+Samuel Ranellucci
+University of Maryland George Mason University
+samuel@umd.edu
+
+Jonathan Katz
+University of Maryland jkatz@cs.umd.edu
+
+ABSTRACT
+We propose a simple and efficient framework for obtaining efficient constant-round protocols for maliciously secure two-party computation. Our framework uses a function-independent preprocessing phase to generate authenticated information for the two parties; this information is then used to construct a single “authenticated” garbled circuit which is transmitted and evaluated. We also show how to efficiently instantiate the preprocessing phase with a new, highly optimized version of the TinyOT protocol by Nielsen et al.
+Our protocol outperforms existing work in both the singleexecution and amortized settings, with or without preprocessing:
+• In the single-execution setting, our protocol evaluates an AES circuit with malicious security in 37 ms with an online time of 1 ms. Previous work with the best overall time requires 62 ms (with 14 ms online time); previous work with the best online time (also 1 ms) requires 124 ms overall.
+• If we amortize over 1024 executions, each AES computation requires just 6.7 ms with roughly the same online time as above. The best previous work in the amortized setting has roughly the same total time but does not support functionindependent preprocessing.
+Our work shows that the performance penalty for maliciously secure two-party computation (as compared to semi-honest security) is much smaller than previously believed.
+CCS CONCEPTS
+• Theory of computation → Cryptographic protocols;
+KEYWORDS
+Two-party Computation; Secure Computation; Garbled Circuit
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org. CCS ’17, October 30-November 3, 2017, Dallas, TX, USA © 2017 Copyright held by the owner/author(s). Publication rights licensed to Association for Computing Machinery. ACM ISBN 978-1-4503-4946-8/17/10. . . $15.00 https://doi.org/10.1145/3133956.3134053
+
+1 INTRODUCTION
+
+Protocols for secure two-party computation (2PC) allow two par-
+
+ties to compute an agreed-upon function of their inputs with-
+
+out revealing anything additional to each other. Although orig-
+
+inally viewed as impractical, protocols for generic 2PC in the semi-
+
+honest setting based on Yao’s garbled-circuit protocol [49] have
+
+seen tremendous efficiency improvements over the past several
+
+years [2, 5, 17, 25, 27, 36, 42, 50].
+
+While these results are impressive, semi-honest security—which
+
+assumes that both parties follow the protocol honestly yet may
+
+try to learn additional information from the execution—is clearly
+
+not sufficient for all applications. This has motivated researchers to construct protocols achieving the stronger notion of malicious
+
+security. One popular approach for designing constant-round ma-
+
+liciously secure protocols is to apply the “cut-and-choose” tech-
+
+nique [1, 6, 18, 28–31, 44, 45, 47] to Yao’s garbled-circuit protocol. For statistical security 2−ρ , the best approaches using this paradigm
+require ρ garbled circuits (which is optimal); the most efficient in-
+
+stantiation of this approach, by Wang et al. [47], securely evaluates
+
+an AES circuit in 62 ms.
+
+The cut-and-choose approach incurs significant overhead when
+large circuits are evaluated precisely because ρ garbled circuits need to be transmitted (typically, ρ ≥ 40). In order to mitigate this, recent works have explored secure computation in an amortized
+
+setting where the same function is evaluated multiple times (on
+
+different inputs) [19, 33, 34, 43]. When amortizing over τ executions,
+
+only
+
+O
+
+(
+
+ρ log
+
+τ
+
+)
+
+garbled
+
+circuits
+
+are
+
+needed
+
+per
+
+execution.
+
+Rindal
+
+and Rosulek [43] report an amortized time of 6.4 ms to evaluate
+
+an AES circuit, where amortization is over 1024 executions. More recently, Nielsen and Orlandi [41] proposed a protocol with constant amortized overhead, but only when τ is at least the number of
+
+gates in the circuit. Also, their protocol allows for amortization
+only over parallel executions, whereas the works cited above allow amortization even over sequential executions, where inputs to the
+
+different executions need not be known all at once.
+
+Other techniques for constant-round, maliciously secure two-
+
+party computation, with asymptotically better performance than
+
+cut-and-choose in the single-execution setting, have also been ex-
+
+plored. The LEGO protocol [40] and subsequent optimizations [13,
+
+14, 26, 38] are based on a gate-level cut-and-choose subroutine that
+
+can be carried out during a preprocessing phase before the circuit to
+
+be evaluated is known. This class of protocols has good asymptotic
+
+performance and small online time; however, the best reported
+
+LEGO implementation [38] still has a higher end-to-end running
+
+time than the best protocol based on the cut-and-choose approach
+
+applied at the garbled-circuit level.
+
+21
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Function-ind. phase Function-dep. phase
+Online
+Total
+
+AES Evaluation (2.1 ms in the semi-honest setting)
+
+Single-Execution Setting
+
+[38]
+
+[47] This paper
+
+Amortized Setting (1024 executions)
+
+[34] [43]
+
+[38] This paper
+
+89.6 ms 13.2 ms 1.46 ms
+
+28 ms 14 ms
+
+10.9 ms 4.78 ms 0.93 ms
+
+-
+
+- 13.84 ms
+
+74 ms 5.1 ms 0.74 ms
+
+7 ms 1.3 ms 1.13 ms
+
+4.9 ms 0.53 ms 1.23 ms
+
+104.26 ms 42 ms 16.61 ms
+
+81 ms 6.4 ms 15.71 ms 6.66 ms
+
+SHA-256 Evaluation (9.6 ms in the semi-honest setting)
+
+Single-Execution Setting
+
+[38]
+
+[47] This paper
+
+Amortized Setting (1024 executions)
+
+[34] [43]
+
+[38] This paper
+
+Function-ind. phase Function-dep. phase
+Online
+
+478.5 ms 164.4 ms 350 ms 11.2 ms 84 ms
+
+96 ms 51.7 ms 9.3 ms
+
+-
+
+- 183.5 ms
+
+206 ms 48 ms 11.7 ms
+
+33 ms 8.4 ms 9.6 ms
+
+64.8 ms 8.7 ms 11.3 ms
+
+Total
+
+654.1 ms 434 ms 157 ms
+
+239 ms 56.4 ms 204.8 ms 84.8 ms
+
+Table 1: Constant-round 2PC protocols with malicious security. All timings are based on statistical security 2−40 and are benchmarked using Amazon EC2 c4.8xlarge instances over a LAN, averaged over 10 executions. Single-execution times do not include the base-OTs, which require the same time (∼20 ms) for all protocols. Timings for the semi-honest protocol are based on the same garbling code used in
+
+our protocol, and also do not include the base-OTs. See Section 8 for more details.
+
+The Beaver-Micali-Rogaway compiler [4] provides yet another way to construct constant-round protocols with malicious security [7, 9]. This compiler uses an “outer” secure-computation protocol to generate a garbled circuit that is then evaluated. Lindell et al. [32, 35] suggested applying this idea using SPDZ [12] (based on somewhat homomorphic encryption) as the outer protocol, but did not provide an implementation of the resulting scheme.
+There are also protocols whose round complexity is linear in the depth of the circuit being evaluated. The TinyOT protocol [39] extends the classical GMW protocol [15] by adding informationtheoretic MACs to shares held by the parties; The IPS protocol [21] has excellent asymptotic complexity, but its concrete complexity is unclear since it has never been implemented (and appears quite difficult to implement). We remark that the end-to-end times of these protocols suffer significantly due to the large round complexity: even over a LAN, each communication round requires at least 0.5 ms; for evaluating an AES circuit (with a depth of about 50), this means that the time for any linear-round protocol will be at least 25 ms. The situation will be even worse over a WAN.
+In Tables 1 and 2, we summarize the efficiency of various constantround 2PC protocols with malicious security. Table 1 gives the performance of state-of-the-art implementations under fixed hardware and network conditions, while Table 2 reports the asymptotic complexity of various approaches. Following [38], we consider executions that take place in three phases:
+• Function-independent preprocessing. In this phase, the parties need not know their inputs or the function to be computed (beyond an upper bound on the number of gates).
+• Function-dependent preprocessing. In this phase, the parties know what function they will compute, but do not need to know their inputs.
+
+Often, the first two phases are combined and referred to simply as the offline or preprocessing phase. • Online phase. In this phase, the parties evaluate the agreedupon function on their respective inputs.
+1.1 Our Contributions
+We propose a new approach for constructing constant-round, maliciously secure 2PC protocols with extremely high efficiency. At a high level (further details are in Section 3), and following ideas of Nielsen et al. [39], our protocol uses a function-independent preprocessing phase to realize an ideal functionality that we call FPre. This preprocessing phase is used to set up correlated randomness between the two parties that they can use during the online phase for information-theoretic authentication of different values. In contrast to prior work, however, the parties in our protocol use this information in the online phase to generate a single “authenticated” garbled circuit. As in the semi-honest case, this garbled circuit can then be transmitted and evaluated in just one additional round.
+Regardless of how we realize FPre, our protocol is extremely efficient in the function-dependent preprocessing phase and the online phase. Specifically, compared to Yao’s semi-honest garbledcircuit protocol, the cost of the function-dependent preprocessing phase of our protocol is only about 2× higher (assuming 128-bit computational security and 40-bit statistical security), and the cost of the online phase is essentially unchanged.
+We show how to instantiate FPre efficiently by developing a highly optimized version of the TinyOT protocol (adapting [39]), described in Section 5. Instantiating our framework in this way, we obtain a protocol with the same asymptotic communication complexity as recent protocols based on LEGO, but with two advantages. First, our protocol has much better concrete efficiency (see Table 1
+
+22
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Protocol
+Cut-and-choose [1, 29, 47] Amortized [19, 33] LEGO [13, 40] SPDZ-BMR [24, 32]∗
+
+Function-ind. (Comm./Comp.)
+
+—
+
+—
+
+O
+
+|C|ρ log τ +log |C|
+
+O ( | C |κ)
+
+Function-dep. (Comm./Comp.)
+
+O (|C|ρ)
+
+O
+
+|C|ρ log τ
+
+O ( | C |)
+
+O ( | C |)
+
+Online (Comm.)
+
+O ( |I |ρ)
+
+O
+
+|I|ρ log τ
+
+O(|I| + |O|)
+
+O(|I| + |O|)
+
+Online (Comp.) / Storage
+
+O ( | C |ρ )
+
+O
+
+|C|ρ log τ
+
+O
+
+|C|ρ log τ +log |C|
+
+O ( | C |)
+
+This paper (with Section 5)
+
+O
+
+|C|ρ log τ +log |C|
+
+This paper (with [21])
+
+O ( | C |)
+
+O ( | C |)
+
+|I| + |O|
+
+O ( | C |)
+
+Table 2: Asymptotic complexity of constant-round 2PC protocols with malicious security. |C|, |I|, and |O| are the circuit size, input size, and output size respectively; low-order terms independent of these parameters are ignored. The statistical security parameter is ρ, the computational security parameter is κ, and τ is the number of protocol executions in the amortized setting. Communication (Comm.) is
+
+measured as the number of symmetric-key ciphertexts, and computation (Comp.) is measured as the number of symmetric-key operations.
+
+“Storage” is the number of symmetric-key ciphertexts generated by the offline stage. ∗Although the complexity of function-independent preprocessing can be reduced to O (|C|) using somewhat homomorphic encryption [12], doing so requires a number of public-key operations proportional to |C|.
+
+Functionality FPre • Upon receiving ∆A from PA and init from PB, and assuming no values ∆A, ∆B are currently stored, choose uniform ∆B ∈ {0, 1} ρ and store
+∆A, ∆B. Send ∆B to PB. • Upon receiving (random, r, M[r ], K[s]) from PA and random from PB, sample uniform s ∈ {0, 1} and set K[r ] := M[r ] ⊕ r ∆B and M[s] :=
+K[s] ⊕ s ∆A. Send (s, M[s], K[r ]) to PB. • Upon receiving (AND, (r1, M[r1], K[s1]), (r2, M[r2], K[s2]), r3, M[r3], K[s3]) from PA and (AND, (s1, M[s1], K[r1]), (s2, M[s2], K[r2])) from PB,
+verify that M[ri ] = K[ri ] ⊕ ri ∆B and that M[si ] = K[si ] ⊕ si ∆A for i ∈ {1, 2} and send cheat to PB if not. Otherwise, set s3 := r3 ⊕ ((r1 ⊕ s1) ∧ (r2 ⊕ s2)), set K[r3] := M[r3] ⊕ r3∆B, and set M[s3] := K[s3] ⊕ s3∆A. Send (s3, M[s3], K[r3]) to PB.
+Figure 1: The preprocessing functionality, assuming PA is corrupted. (If PB is corrupted, the functionality is defined symmetrically. If neither party is corrupted, the functionality is adapted in the obvious way.)
+
+and Section 8). For example, it requires only 16.6 ms total to evaluate AES, a 6× improvement compared to a recent implementation of a LEGO-style approach [38]. Furthermore, the storage needed by our protocol is asymptotically smaller (see Table 2), something that is especially important when very large circuits are evaluated.
+Instantiating our framework with the realization of FPre described in Section 5 yields a protocol with the best concrete efficiency, and is the main focus of this paper. However, we note that our framework can also be instantiated in other ways:
+• When FPre is instantiated using the IPS compiler [21] and the bit-OT protocol by Ishai et al. [20], we obtain a maliciously secure constant-round 2PC protocol with total communication complexity O (|C|κ). Up to constant factors, this matches the complexity of semi-honest 2PC based on garbled circuits. The only previous work that achieves similar communication complexity [22] requires a constant number of public-key operations per gate of the circuit, and would have concrete performance much worse than our protocol.
+• We can also realize FPre using an offline, (semi-)trusted server. In that case we obtain a constant-round protocol for server-aided 2PC with complexity O (|C|κ). Previous work in the same model [37] achieves the same complexity but with number of rounds proportional to the circuit depth.
+
+The results described in this paper—both the idea of constructing
+an “authenticated” garbled circuit as well as the efficient TinyOT
+protocol we developed—have already found application in subsequent work [16, 48] on constant-round multiparty computation with malicious security.
+2 NOTATION AND PRELIMINARIES
+We use κ to denote the computational security parameter (i.e., security should hold against attackers running in time ≈ 2κ ), and ρ for the statistical security parameter (i.e., an adversary should succeed in cheating with probability at most 2−ρ ). We use = to denote equality and := to denote assignment. We denote the parties running the 2PC protocol by PA and PB.
+A circuit is represented as a list of gates having the format (α, β, γ ,T ), where α and β denote the indices of the input wires of the gate, γ is the index of the output wire of the gate, and T ∈ {⊕, ∧} is the type of the gate. We use I1 to denote the set of indices of PA’s input wires, I2 to denote the set of indices of PB’s input wires, W to denote the set of indices of the output wires of all AND gates, and O to denote the set of indices of the output wires of the circuit.
+2.1 Information-theoretic MACs
+We use the information-theoretic message authentication codes (IT-MACs) of [39], which we briefly recall. PA holds a uniform
+
+23
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+global key ∆A ∈ {0, 1}κ . A bit b known by PB is authenticated by having PA hold a uniform key K[b] and having PB hold the corresponding tag M[b] := K[b] ⊕ b∆A. Symmetrically, PB holds an independent global key ∆B; a bit b known by PA is authenticated by having PB hold a uniform key K[b] and having PA hold the tag M[b] := K[b] ⊕ b∆B. We use [b]A to denote an authenticated bit known to PA (i.e., [b]A means PA holds (b, M[b]) and PB holds K[b]), and define [b]B symmetrically.
+Observe that this MAC is XOR-homomorphic: given [b]A and [c]A, the parties can (locally) compute [b ⊕ c]A by having PA compute M[b ⊕c] := M[b]⊕M[c] and PB compute K[b ⊕c] := K[b]⊕K[c].
+It is possible to extend the above idea to authenticate secret
+values by using XOR-based secret sharing and authenticating each
+party’s share. That is, we can authenticate a bit λ, known to neither party, by letting r, s be uniform subject to λ = r ⊕ s, and then having PA hold (r , M[r ], K[s]) and PB hold (s, M[s], K[r ]). It can be observed that this scheme is also XOR-homomorphic.
+As described in the previous section, we use a preprocessing
+phase that realizes a stateful functionality FPre defined in Figure 1. This functionality is used to set up correlated values between the
+parties along with their corresponding IT-MACs. The functionality
+chooses uniform global keys for each party, with the malicious
+party being allowed to choose its global key. Then, when the parties
+request a random authenticated bit, the functionality generates an authenticated secret sharing of the random bit λ = r ⊕ s. (The adversary may choose the “random values” it receives, but this does
+not reveal anything about r ⊕s or the other party’s global key to the
+adversary.) Finally, the parties may also submit authenticated shares
+of two bits; the functionality then computes a (fresh) authenticated
+share of the AND of those bits. In the next section we describe
+our protocol assuming some way of realizing FPre; we defer until Section 5 a discussion of how FPre can be realized.
+
+3 PROTOCOL INTUITION
+We give a high-level overview of our protocol in the FPre-hybrid model. Our protocol has the parties compute a garbled circuit in
+a distributed fashion, where the garbled circuit is “authenticated”
+in the sense that the circuit generator (PA in our case) cannot change the logic of the circuit. We describe the intuition behind
+our construction in several steps.
+We begin by reviewing standard garbled circuits. Each wire α of a circuit is associated with a random “mask” λα ∈ {0, 1} known to PA. If the actual value of that wire (i.e., the value when the circuit is evaluated on the parties’ inputs) is x, then the masked value observed by the circuit evaluator (namely, PB) on that wire will be xˆ = x ⊕ λα . Using the free-XOR technique [27], each wire α is also associated with two labels Lα,0 and Lα,1 := Lα,0 ⊕ ∆ known to PA. If the masked bit on that wire is xˆ, then PB learns Lα,xˆ .
+Let H be a hash function modeled as a random oracle. The garbled table for, e.g., an AND gate (α, β, γ , ∧) with wires α, β, γ having values x, y, z, respectively, is given by:
+
+xˆ yˆ
+
+truth table
+
+garbled table
+
+0 0 zˆ00 = (λα ∧ λβ ) ⊕ λγ H (Lα,0, Lβ,0, γ , 00) ⊕ (zˆ00, Lγ ,zˆ00 ) 0 1 zˆ01 = (λα ∧ λβ ) ⊕ λγ H (Lα,0, Lβ,1, γ , 01) ⊕ (zˆ01, Lγ ,zˆ01 ) 1 0 zˆ10 = (λα ∧ λβ ) ⊕ λγ H (Lα,1, Lβ,0, γ , 10) ⊕ (zˆ10, Lγ ,zˆ10 ) 1 1 zˆ11 = (λα ∧ λβ ) ⊕ λγ H (Lα,1, Lβ,1, γ , 11) ⊕ (zˆ11, Lγ ,zˆ11 )
+
+PB, holding (xˆ, Lα,xˆ ) and (yˆ, Lβ,yˆ ), evaluates this garbled gate by picking the (xˆ, yˆ)-th row and decrypting using the garbled labels it holds, thus obtaining (zˆ, Lγ,zˆ ).
+The standard garbled circuit just described ensures security
+against a malicious PB, since (intuitively) PB learns no information about the true values on any of the wires. Unfortunately, it provides
+no security against a malicious PA who can potentially cheat by corrupting rows in the various garbled tables. One particular attack
+PA can carry out is a selective-failure attack. Say, for example, that a malicious PA corrupts only the (0, 0)-th row of the garbled table for the gate above, and assume PB aborts if it detects an error during evaluation. If PB aborts, then PA learns that the masked values on the input wires of the gate above were xˆ = yˆ = 0, from which it learns that the true values on those wires were λα and λβ .
+The selective-failure attack just mentioned can be prevented
+if the masks are hidden from PA. (In that case, even if PB aborts and PA learns the masked wire values, PA learns nothing about the true wire values.) Since knowledge of the garbled table would
+leak information about the masks to PA, the garbled table must be hidden from PA as well. That is, we now want to set up a situation in which PA and PB hold secret shares of the garbled table, as follows:
+
+xˆ yˆ
+
+PA’s share of garbled table
+
+PB’s share of garbled table
+
+0 0 H (Lα,0, Lβ,0, γ , 00) ⊕ (r00, LγA,00 ) (s00 = zˆ00 ⊕ r00, LγB,00 ) 0 1 H (Lα,0, Lβ,1, γ , 01) ⊕ (r01, LγA,01 ) (s01 = zˆ01 ⊕ r01, LγB,01 ) 1 0 H (Lα,1, Lβ,0, γ , 10) ⊕ (r10, LγA,10 ) (s10 = zˆ10 ⊕ r10, LγB,10 ) 1 1 H (Lα,1, Lβ,1, γ , 11) ⊕ (r11, LγA,11 ) (s11 = zˆ11 ⊕ r11, LγB,11 )
+
+(Here,
+
+e.g.,
+
+LγA,
+
+,
+00
+
+LγB, 00
+
+represent
+
+abstract
+
+XOR-shares
+
+of
+
+Lγ ,zˆ00 ,
+
+i.e.,
+
+Lγ ,zˆ00
+
+=
+
+LγA, 00
+
+⊕
+
+LγB,
+
+.)
+00
+
+Once
+
+PA
+
+sends
+
+its
+
+shares
+
+of
+
+all
+
+the
+
+garbled
+
+gates, PB can XOR those shares with its own and then evaluate the
+
+garbled circuit as before.
+
+Informally, the above ensures privacy against a malicious PA since (intuitively) the results of any changes PA makes to the garbled circuit are independent of PB’s inputs. However, PA can still affect correctness by, e.g., flipping the masked value in a row. This can be
+
+addressed by adding an information-theoretic MAC on PA’s share
+
+of the masked bit. The shares of the garbled table now take the
+
+following form:
+
+xˆ yˆ
+
+PA’s share of garbled table
+
+PB’s share of garbled table
+
+0 0 H (Lα,0, Lβ,0, γ , 00) ⊕ (r00, M[r00], LγA,00 ) (s00 = zˆ00 ⊕ r00, K[r00], LγB,00 ) 0 1 H (Lα,0, Lβ,1, γ , 01) ⊕ (r01, M[r01], LγA,01 ) (s01 = zˆ01 ⊕ r01, K[r01], LγB,01 ) 1 0 H (Lα,1, Lβ,0, γ , 10) ⊕ (r10, M[r10], LγA,10 ) (s10 = zˆ10 ⊕ r10, K[r10], LγB,10 ) 1 1 H (Lα,1, Lβ,1, γ , 11) ⊕ (r11, M[r11], LγA,11 ) (s11 = zˆ11 ⊕ r11, K[r11], LγB,11 )
+
+Once PA sends its shares of the garbled circuit to PB, the garbled circuit can be evaluated as before. Now, however, PB will verify the MAC on PA’s share of each masked bit that it learns. This limits PA to only being able to cause PB to abort; as before, though, any such abort will occur independently of PB’s actual input.
+Note that PA’s shares of the wire labels need not be authenticated,
+since a corrupted wire label can only cause input-independent abort;
+if PB does not abort, the MACs on the masked bits ensure that PB learns the correct masked wire value, i.e., zˆ.
+
+24
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+x ⊕ λα y ⊕ λβ
+
+PA’s share of garbled table
+
+PB’s share of garbled table
+
+0
+
+0
+
+H (Lα,0, Lβ,0, γ , 00) ⊕ (r00, M[r00], Lγ ,0 ⊕ r00∆A ⊕ K[s00]) (s00 = zˆ00 ⊕ r00, K[r00], M[s00])
+
+0
+
+1
+
+H (Lα,0, Lβ,1, γ , 01) ⊕ (r01, M[r01], Lγ ,0 ⊕ r01∆A ⊕ K[s01]) (s01 = zˆ01 ⊕ r01, K[r01], M[s01])
+
+1
+
+0
+
+H (Lα,1, Lβ,0, γ , 10) ⊕ (r10, M[r10], Lγ ,0 ⊕ r10∆A ⊕ K[s10]) (s10 = zˆ10 ⊕ r10, K[r10], M[s10])
+
+1
+
+1
+
+H (Lα,1, Lβ,1, γ , 11) ⊕ (r11, M[r11], Lγ ,0 ⊕ r11∆A ⊕ K[s11]) (s11 = zˆ11 ⊕ r11, K[r11], M[s11])
+
+Table 3: Our final construction of an authenticated garbled table for an AND gate.
+
+Efficient realization. Although the above idea is powerful, it still remains to design an efficient protocol that allows the parties to
+distributively compute shares of a garbled table of the above form
+even when one of the parties is malicious. One important observation is that if we set ∆ = ∆A then we can
+secret share, e.g., Lγ,zˆ00 as
+
+Lγ ,zˆ00 = Lγ ,0 ⊕ zˆ00∆A = Lγ,0 ⊕ (r00 ⊕ s00)∆A = Lγ ,0 ⊕ r00∆A ⊕ s00∆A
+
+= Lγ,0 ⊕ r00∆A ⊕ K[s00] ⊕ (K[s00] ⊕ s00∆A) .
+
+LγA , 00
+
+LγB , 00
+
+In our construction thus far, PA knows Lγ,0 and r00 (in addition to knowing ∆A). Our key insight is that if s00 is an authenticated bit known to PB, then PA can locally compute the share LγA,00 := Lγ,0 ⊕ r00∆A ⊕ K[s00] from the information it has, and then the other share LγB,00 = K[s00] ⊕ s00∆A is equal to the value M[s00] that PB holds! So if we rewrite the garbled table as in Table 3, shares of the table become easy to compute in a distributed fashion.
+Another final optimization is based on the observation that the
+masked output values take the following form:
+
+zˆ00 = (λα ∧ λβ ) ⊕ λγ zˆ01 = (λα ∧ λβ ) ⊕ λγ = zˆ00 ⊕ λα zˆ10 = (λα ∧ λβ ) ⊕ λγ = zˆ00 ⊕ λβ zˆ11 = (λα ∧ λβ ) ⊕ λγ = zˆ01 ⊕ λβ ⊕ 1.
+Thus, the parties can locally compute authenticated shares {rij , sij } of the {zˆi, j } from authenticated shares of λα , λβ , λγ , and λα ∧ λβ .
+Finally, our actual protocol pushes as much of the garbled-circuit
+generation as possible into the preprocessing phase.
+
+4 OUR MAIN FRAMEWORK
+In Figure 2, we give the complete description of our main protocol in the FPre-hybrid model. For clarity we set ρ = κ, but in Section 7 we describe how arbitrary values of ρ can be supported. Note that the calls to FPre can be performed in parallel, so the protocol runs in constant rounds. Moreover, we show later that FPre can be instantiated efficiently in constant rounds.
+Although our protocol, as described, calls FPre in the functiondependent preprocessing phase, it is easy to push this to the function-
+independent phase using standard techniques similar to those used
+with multiplication triples [3].
+
+4.1 Proof of Security
+We prove security of our protocol in the FPre-hybrid model.
+
+Theorem 4.1. If H is modeled as a random oracle, the protocol in Figure 2 securely computes f against malicious adversaries with statistical security 2−ρ in the FPre-hybrid model.
+Proof. We consider separately a malicious PA and PB.
+Malicious PA. Let A be an adversary corrupting PA. We construct a simulator S that runs A as a subroutine and plays the role of PA in the ideal world involving an ideal functionality F evaluating f . S is defined as follows.
+1–4 S, acting as an honest PB, interacts with A. The simulator also plays the role of FPre, recording all values received from and sent to A, as well as all values that would have been
+sent to PB. 5 S interacts with A while acting as an honest PB using input
+y equal to the 0-string. 6 For each wire w ∈ I1, S receives xˆw and computes xw :=
+xˆw ⊕ rw ⊕ sw , where rw , sw are the values used by FPre in the previous steps. S sends x = {xw }w ∈I1 to F . 7–8 S, acting as an honest PB, interacts with A. If PB would abort, S sends abort to F ; otherwise, it sends continue to F . Finally, it outputs whatever A outputs.
+We show that the joint distribution of the outputs of A and the
+honest PB in the real world is indistinguishable from the joint distribution of the outputs of S and PB in the ideal world. We prove this by considering a sequence of experiments, the first of
+which corresponds to the execution of our protocol and the last of
+which corresponds to execution in the ideal world, and showing
+that successive experiments are computationally indistinguishable.
+Hybrid1. This is the hybrid-world protocol, where we imagine S playing the role of an honest PB using PB’s actual input y, while also playing the role of FPre.
+Hybrid2. Same as Hybrid1, except that in step 6, for each wire w ∈ I1 the simulator S receives xˆw and computes xw := xˆw ⊕ rw ⊕ sw , where rw , sw are the values used by FPre; it then sends x = {xw }w ∈I1 to F . In steps 7–8, if an honest PB would abort, S sends abort to F ; otherwise, it sends continue to F (and so PB outputs f (x, y)). The distributions on the view of A in Hybrid1 and Hybrid2 are identical. Lemma 4.2 shows that PB generates the same output in both experiments except with probability at most 2−ρ .
+Hybrid3. Same as Hybrid2, except that S sets y equal to the 0-
+string throughout the protocol.
+The distributions on the view of A in Hybrid3 and Hybrid2 are again identical (since the {sw }w ∈I2 are uniform). Moreover, if S does not abort (when running the protocol as PB), the distribution on the output of PB is the same in Hybrid3 and Hybrid2. So it only remains to show that PB aborts with the same probability in both experiments.
+
+25
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Protocol Π2pc
+
+Inputs: In the function-dependent phase, the parties agree on a circuit for a function f : {0, 1}|I1| × {0, 1}|I2| → {0, 1}|O|. In the input-processing phase, PA holds x ∈ {0, 1}|I1| and PB holds y ∈ {0, 1}|I2|.
+
+Function-independent preprocessing:
+
+(1) PA and PB send init to FPre, which sends ∆A to PA and ∆B to PB. (2) For each wire w ∈ I1 ∪ I2 ∪ W, parties PA and PB send random to FPre. In return, FPre sends (rw , M[rw ], K[sw ]) to PA and (sw , M[sw ], K[rw ])
+to PB. Define λw = sw ⊕ rw . PA also picks a uniform κ-bit string Lw,0 and sets Lw,1 := Lw,0 ⊕ ∆A.
+
+Function-dependent preprocessing:
+
+(3) For each gate G = (α, β, γ , ⊕), PA computes (rγ , M[rγ ], K[sγ ]) := (rα ⊕ rβ , M[rα ] ⊕ M[rβ ], K[sα ] ⊕ K[sβ ]), and sets Lγ ,0 := Lα,0 ⊕ Lβ,0 and Lγ ,1 := Lγ ,0 ⊕ ∆A. Similarly, PB computes (sγ , M[sγ ], K[rγ ]) := (sα ⊕ sβ , M[rβ ] ⊕ M[rβ ], K[rα ] ⊕ K[rβ ]). Define λγ = λα ⊕ λβ .
+(4) For each gate G = (α, β, γ , ∧):
+
+(a) PA (resp., PB) sends (and, (rα , M[rα ], K[sα ]), (rβ , M[rβ ], K[sβ ])) (resp., (and, (sα , M[sα ], K[rα ]), (sβ , M[sβ ], K[rβ ]))) to FPre. In return, FPre sends (rσ , M[rσ ], K[sσ ]) to PA and (sσ , M[sσ ], K[rσ ]) to PB, where sσ ⊕ rσ = λα ∧ λβ .
+
+(b) PA computes the following locally:
+
+(rγ ,0, M[rγ ,0], K[sγ ,0]) := (rσ ⊕ rγ ,
+
+M[rσ ] ⊕ M[rγ ],
+
+K[sσ ] ⊕ K[sγ ]
+
+)
+
+(rγ ,1, M[rγ ,1], K[sγ ,1]) := (rσ ⊕ rγ ⊕ rα , (rγ ,2, M[rγ ,2], K[sγ ,2]) := (rσ ⊕ rγ ⊕ rβ , (rγ ,3, M[rγ ,3], K[sγ ,3]) := (rσ ⊕ rγ ⊕ rα ⊕ rβ ,
+
+M[rσ ] ⊕ M[rγ ] ⊕ M[rα ], M[rσ ] ⊕ M[rγ ] ⊕ M[rβ ], M[rσ ] ⊕ M[rγ ] ⊕ M[rα ] ⊕ M[rβ ],
+
+K[sσ ] ⊕ K[sγ ] ⊕ K[sα ]
+
+)
+
+K[sσ ] ⊕ K[sγ ] ⊕ K[sβ ]
+
+)
+
+K[sσ ] ⊕ K[sγ ] ⊕ K[sα ] ⊕ K[sβ ] ⊕ ∆A )
+
+(c) PB computes the following locally:
+
+(sγ ,0, M[sγ ,0], K[rγ ,0]) := (sσ ⊕ sγ ,
+
+M[sσ ] ⊕ M[sγ ],
+
+K[rσ ] ⊕ K[rγ ]
+
+)
+
+(sγ ,1, M[sγ ,1], K[rγ ,1]) := (sσ ⊕ sγ ⊕ sα ,
+
+M[sσ ] ⊕ M[sγ ] ⊕ M[sα ],
+
+K[rσ ] ⊕ K[rγ ] ⊕ K[rα ]
+
+)
+
+(sγ ,2, M[sγ ,2], K[rγ ,2]) := (sσ ⊕ sγ ⊕ sβ ,
+
+M[sσ ] ⊕ M[sγ ] ⊕ M[sβ ],
+
+K[rσ ] ⊕ K[rγ ] ⊕ K[rβ ]
+
+)
+
+(sγ ,3, M[sγ ,3], K[rγ ,3]) := (sσ ⊕ sγ ⊕ sα ⊕ sβ ⊕ 1, M[sσ ] ⊕ M[sγ ] ⊕ M[sα ] ⊕ M[sβ ], K[rσ ] ⊕ K[rγ ] ⊕ K[rα ] ⊕ K[rβ ] )
+
+(d) PA computes Lα,1 := Lα,0 ⊕ ∆A and Lβ,1 := Lβ,0 ⊕ ∆A, and then sends the following to PB:
+
+Gγ ,0 := H (Lα,0, Lβ,0, γ , 0) ⊕ (rγ ,0, Gγ ,1 := H (Lα,0, Lβ,1, γ , 1) ⊕ (rγ ,1, Gγ ,2 := H (Lα,1, Lβ,0, γ , 2) ⊕ (rγ ,2, Gγ ,3 := H (Lα,1, Lβ,1, γ , 3) ⊕ (rγ ,3,
+
+M[rγ ,0], M[rγ ,1], M[rγ ,2], M[rγ ,3],
+
+Lγ ,0 ⊕ K[sγ ,0] ⊕ rγ ,0∆A) Lγ ,0 ⊕ K[sγ ,1] ⊕ rγ ,1∆A) Lγ ,0 ⊕ K[sγ ,2] ⊕ rγ ,2∆A) Lγ ,0 ⊕ K[sγ ,3] ⊕ rγ ,3∆A)
+
+Input processing:
+
+(5) For each w ∈ I2, PA sends (rw, M[rw ]) to PB, who checks that (rw, K[rw ], M[rw ]) is valid. If so, PB computes λw := rw ⊕ sw and sends yw ⊕ λw to PA. Finally, PA sends Lw,yw ⊕λw to PB.
+(6) For each w ∈ I1, PB sends (sw, M[sw ]) to PA, who checks that (sw, K[sw ], M[sw ]) is valid. PA computes λw := rw ⊕ sw and sends xw ⊕ λw and Lw,xw ⊕λw to PB.
+Circuit evaluation:
+
+(7) PB evaluates the circuit in topological order. For each gate G = (α, β, γ , T ), PB initially holds (zα ⊕ λα , Lα,zα ⊕λα ) and (zβ ⊕ λβ , Lβ,zβ ⊕λβ ), where zα , zβ are the underlying values of the wires. (a) If T = ⊕, PB computes zγ ⊕ λγ := (zα ⊕ λα ) ⊕ (zβ ⊕ λβ ) and Lγ ,zγ ⊕λγ := Lα,zα ⊕λα ⊕ Lβ,zβ ⊕λβ .
+(b) If T = ∧, PB computes i := 2(zα ⊕ λα ) + (zβ ⊕ λβ ) followed by (rγ ,i, M[rγ ,i ], Lγ ,0 ⊕ K[sγ ,i ] ⊕ rγ ,i ∆A) := Gγ ,i ⊕ H (Lα,zα ⊕λα , Lβ,zβ ⊕λβ , γ , i ). Then PB checks that (rγ ,i, K[rγ ,i ], M[rγ ,i ]) is valid and, if so, computes zγ ⊕ λγ := (sγ ,i ⊕ rγ ,i ) and Lγ ,zγ ⊕λγ := (Lγ ,0 ⊕ K[sγ ,i ] ⊕ rγ ,i ∆A ) ⊕ M[sγ ,i ].
+Output determination:
+(8) For each w ∈ O, PA sends (rw, M[rw ]) to PB, who checks that (rw, K[rw ], M[rw ]) is valid. If so, PB outputs zw := (zw ⊕ λw ) ⊕ rw ⊕ sw .
+
+Figure 2: Our protocol in the FPre-hybrid model. Here ρ = κ for clarity, but this is not necessary (cf. Section 7).
+
+The only place where PB’s abort can depend on y is in steps 7(b) and 8. However, these aborts depend on which
+row of a garbled gate is selected to decrypt. This selection, in turn, depends on λα ⊕ zα and λβ ⊕ zβ , which are uniformly distributed in both experiments.
+Note that Hybrid3 corresponds to the ideal-world execution described earlier. This completes the proof for a malicious PA.
+Malicious PB. Let A be an adversary corrupting PB. We construct a simulator S that runs A as a subroutine and plays the role of PB in the ideal world involving an ideal functionality F evaluating f . S is defined as follows.
+
+1–4 S, acting as an honest PA, interacts with A and also plays
+the role of FPre. 5 For each wire w ∈ I2, S receives yˆw and computes yw :=
+yˆw ⊕rw ⊕sw , where rw , sw are the values used by FPre in the previous steps. S sends y = {yw }w ∈I2 to F , which responds with z = f (x, y).
+6–7 S interacts with A while acting as an honest PA using input
+x equal to the 0-string. 8 For each w ∈ O, if zw′ = zw , then S sends (rw , M[rw ]); other-
+wise, S sends (rw , M[rw ] ⊕ ∆B), where ∆B is the value used
+
+26
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+by FPre in the previous steps. Finally, S outputs whatever A outputs.
+We now show that the distribution on the view of A in the real
+world is indistinguishable from the distribution on the view of A
+in the ideal world. (Note PA has no output.)
+Hybrid1. This is the hybrid-world protocol, where we imagine S playing the role of an honest PA using PA’s actual input x, while also playing the role of FPre.
+Hybrid2. Same as Hybrid1, except that in step 5, S receives yˆw and computes yw := yˆw ⊕ rw ⊕ sw , where rw , sw are the values used by FPre. Then S performs the same computation that PB would in step 7, to obtain a value zˆw for each w ∈ O. Finally, for each w ∈ O, S computes rw′ := zˆw ⊕ sw ⊕ zw and sends (rw′ , K[rw′ ] ⊕ rw′ ∆B) to A, where K[rw′ ], ∆B are the values used by FPre. Noting that zˆw = zw ⊕ λw , we see that the distributions on the view of A in Hybrid2 and Hybrid1 are identical.
+Hybrid3. Same as Hybrid2, except that in step 6, S uses x equal
+to the 0-string.
+It follows from the security of garbling with H modeled as a random oracle that the distributions on the views of A in
+Hybrid2 and Hybrid1 are computationally indistinguishable.
+Note that Hybrid3 is identical to the ideal-world execution. □
+
+Lemma 4.2. Let PB have input y. Consider an A corrupting PA and let xw := xˆw ⊕ sw ⊕ rw , where xˆw is the value A sends to PB in step 6 and sw , rw are the values used by FPre. Except with probability at most 2−ρ , either PB aborts or PB outputs z∗ = f (x, y).
+
+Proof. For a wire w, let zˆw be the masked value computed by PB on that wire during the protocol, and let zw∗ be the value on that wire when f (x, y) is computed with x defined as in the lemma.
+For w ∈ I1 ∪ I2 ∪ W, define λw = rw ⊕ sw , where rw , sw are the values used by FPre; for each XOR gate (α, β, γ , ⊕), inductively define λw = λα ⊕ λβ .
+We prove by induction that, except with probability at most 2−ρ ,
+if PB does not abort then zw∗ = zˆw ⊕ λw for all w. Base step: It is obvious that zw∗ = zˆw ⊕ λw for all w ∈ I1 ∪ I2, unless A is able to forge an IT-MAC.
+
+Induction step: Consider a gate (α, β, γ ,T ), where the stated invariant holds for wires α, β. We show that zγ∗ = zˆγ ⊕ λw .
+• T = ⊕: Here we have zˆγ = zˆα ⊕ zˆβ and zγ∗ = zα∗ ⊕ z∗β . Since λγ = λα ⊕ λβ , the invariant trivially holds for γ .
+• T = ∧: Here zγ∗ = zα∗ ∧ z∗β . Assuming PB does not abort, the only way PB can compute zˆγ zγ∗ ⊕ λγ is if A forges an
+
+IT-MAC.
+
+In particular, except with probability at most 2−ρ , we have zˆw =
+
+zw∗ ⊕ λw for all w ∈ O. It follows that if PB does not abort, it outputs
+
+z∗ unless A forges an IT-MAC.
+
+□
+
+5 EFFICIENTLY REALIZING FPRE
+Here we show how to realize FPre efficiently using an optimized version of the TinyOT protocol.
+Our protocol relies on a stateful ideal functionality Fabit (cf. Figure 3) for generating authenticated bits using uniform values of ∆A, ∆B ∈ {0, 1}κ that are preserved across executions [38, 39].
+
+Functionality Fabit Honest case:
+(1) Upon receiving init from both parties the first time, choose uniform ∆A, ∆B ∈ {0, 1} ρ and send ∆A to PA and ∆B to PB.
+(2) Upon receiving (random, A) from both parties, choose uniform x ∈ {0, 1} and M[x ], K[x ] ∈ {0, 1} ρ with M[x ] = K[x ] ⊕ x ∆B . Then send (x, M[x ]) to PA and K[x ] to PB.
+(3) Upon receiving (random, B) from both parties, generate an authenticated bit for PB in a manner symmetric to the above.
+Corrupted parties: A corrupted party gets to specify the randomness used on its behalf by the functionality.
+Figure 3: The authenticated-bit functionality.
+Technically, the functionality also allows the adversary to make
+“global-key queries” that correspond to a guess about the honest party’s value of ∆. Both these features are preserved in all our ideal functionalities (including FPre), but we suppress explicit mention of them in our descriptions. (Note that the global-key queries have
+little effect on security, since the probability that the attacker can correctly guess the honest party’s value of ∆ using polynomially many queries is negligible. One can also verify that they can be
+easily incorporated into our security proofs.) Recall that FPre can be used to generate authenticated values
+[x1]A, [y1]A, [z1]A, [x2]B, [y2]B, and [z2]B such that z1 ⊕ z2 = (x1 ⊕ x2) ∧ (y1 ⊕y2); we refer to these collectively as an AND triple. In the original TinyOT protocol, the four terms that result from expanding (x1 ⊕ x2) ∧ (y1 ⊕ y2) for an AND triple (namely, x1y1, x1y2, x2y1, and x2y2) are computed individually and then combined. In our new approach, we instead compute AND triples directly.
+At a high level, we use three steps to compute an AND triple.
+(1) The parties jointly compute [x1]A, [y1]A, [z1]A, [x2]B, [y2]B, [z2]B, such that if both parties are honest, these are a correct AND triple. If a party cheats, that party can modify z2 but cannot learn the other party’s bits.
+(2) The parties perform a checking protocol that ensures the
+correctness of every AND triple, while letting the malicious party guess the value of x1 (resp., x2). Each such guess is correct with probability 1/2, but an incorrect guess is detected and will cause the other party to abort.
+As a consequence, we can argue that (conditioned on no abort) the malicious party obtains information on at most ρ AND triples except with probability at most 2−ρ .
+(3) So far we have described a way for the parties to generate
+many “leaky” AND triples such that the attacker may have disallowed information on at most ρ of them. We then show how to distill these into a smaller number of “private” AND
+triples, about which the attacker is guaranteed to have no
+disallowed information.
+Overall, when using bucket size B (see Section 5.2) our new TinyOT protocol requires only (5κ + 3ρ)B bits of communication per AND triple, while the original TinyOT protocol requires (14κ + 8ρ)B bits of communication even taking optimizations into account. For κ = 128 and ρ = 40, this is an improvement of 2.78×.
+
+27
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+5.1 Half-Authenticated AND Triples
+
+We first show a protocol that realizes a functionality in which only
+the x’s in an AND triple are authenticated. This will serve as a
+building block in the following sections. This functionality, called
+FHaAND, is described in Figure 4. It outputs authenticated bits [x1]A and [x2]B to the two parties. It also takes y1 from PA and y2 from PB, and outputs shares of x1y2 ⊕ x2y1. (Note that the parties can then locally compute x1y1 and x2y2, respectively, and thus generate shares of (x1 ⊕ x2) ∧ (y1 ⊕ y2).) In Figure 5 we show a protocol that realizes FHaAND in the Fabit-hybrid model.
+
+Lemma 5.1. If H is modeled as a random oracle, the protocol in Figure 5 securely implements FHaAND in the Fabit-hybrid model.
+
+Proof. We first show correctness. Note that s2 = s1 ⊕ x2y1, so s1 ⊕ s2 = x2y1. Similarly, t1 ⊕ t2 = x1y2. Thus, v1 and v2 are shares of x1y2 ⊕ x2y1. Moreover, when both parties are honest v1 and v2
+
+are individually uniform.
+
+We next prove security. We consider the case of a malicious PA;
+the case of a malicious PB is symmetric (and is, in fact, easier since PB sends (H0, H1) before PA). The simulator S works as follows:
+
+(1) S plays the role of Fabit, and stores all shares of [x1]A and
+
+[x2]B, as well as global keys ∆A, ∆B.
+
+(2)
+
+S
+
+chooses uniform H0, H1
+
+and
+
+sends
+
+them
+
+to
+
+A.
+
+Let t ′
+1
+
+:=
+
+Hx1 ⊕ H (M[x1]).
+
+(3) S receives (H ′, H ′) from A, and computes s ′ := H ′ ⊕
+
+01
+
+0
+
+0
+
+H
+
+(K[x2]),
+
+s′
+1
+
+:=
+
+H′
+1
+
+⊕ H (K[x2] ⊕ ∆A), and y1
+
+:=
+
+s′
+0
+
+⊕ s′.
+1
+
+It sets v1 := s0′ ⊕ t1′, and sends y1, v1 to FHaAND on behalf
+
+of PA. It then outputs whatever A does.
+
+It is not hard to see that, if H is modeled as a random oracle, the
+
+distribution on the view of A in the ideal-world execution described
+
+above is computationally indistinguishable from the view of A
+
+in the real-world execution of the protocol. Let x2, y2 denote the
+
+authenticated bit PB received and PB’s input, respectively. In a real-
+
+world
+
+execution
+
+of
+
+the
+
+protocol
+
+with
+
+transcript
+
+(H0,
+
+H1
+
+,
+
+H ′,
+0
+
+H′
+1
+
+),
+
+the value output by PB would be
+
+s2 ⊕ t1 = sx′ 2 ⊕ (t1′ ⊕ x1y2) = (1 ⊕ x2)s0′ ⊕ x2s1′ ⊕ t1′ ⊕ x1y2 = s0′ ⊕ x2 (s0′ ⊕ s1′ ) ⊕ t1′ ⊕ x1y2,
+
+which matches the value
+
+v1 ⊕ (x1y2 ⊕ x2y1) = (s0′ ⊕ t1′) ⊕ x1y2 ⊕ x2 (s0′ ⊕ s1′ )
+
+that PB outputs in the ideal-world execution.
+
+□
+
+5.2 Leaky AND Triples
+The leaky-AND functionality FLaAND is described in Figure 6. This functionality generates authenticated values [x1]A, [y1]A, [z1]A, [x2]B, [y2]B, and [z2]B such that z1 ⊕ z2 = (x1 ⊕ x2) ∧ (y1 ⊕ y2), but allows a malicious PA (resp., PB) to guess x2 (resp., x1). This guess is correct with probability 1/2, but an incorrect guess is revealed to
+the other party (who can then abort).
+To realize this functionality, we begin by having the parties gen-
+erate authenticated bits [y1]A, [z1]A, [y2]B, and then use FHaAND to generate [x1]A, [x2]B and shares of x1y2 ⊕ x2y1. The parties can then locally compute shares of (x1 ⊕ x2) ∧ (y1 ⊕ y2). Note that
+
+Functionality FHaAND Honest case:
+(1) Generate uniform [x1]A and [x2]B and send the respective shares to the two parties.
+(2) Upon receiving y1 from PA and y2 from PB, choose uniform v1 and send v1 to PA and v2 := v1 ⊕ (x1y2 ⊕ x2y1) to PB.
+Corrupted parties: A corrupted party gets to specify the randomness used on its behalf by the functionality.
+Figure 4: Functionality FHaAND for computing a halfauthenticated AND triple.
+
+Protocol ΠHaAND
+
+PA and PB have input y1 and y2, respectively.
+
+Protocol:
+
+(1) PA and PB call Fabit to obtain [x1]A and [x2]B, i.e., PA receives
+
+(x1, M[x1], K[x2]) and PB receives (x2, M[x2], K[x1]).
+
+(2) PB chooses uniform t1 ∈ {0, 1} and computes H0 :=
+
+H (K[x1]) ⊕ t1, H1 := H (K[x1] ⊕ ∆B) ⊕ t1 ⊕ y2. PB sends
+
+(H0, H1) to PA, who computes t2 := Hx1 ⊕ H (M[x1]).
+
+(3)
+
+PA
+
+chooses uniform s1
+
+∈
+
+{0, 1} and then computes H ′
+0
+
+:=
+
+H (K[x2]) ⊕ s1, H1′ := H (K[x2] ⊕ ∆A) ⊕ s1 ⊕ y1. PA sends
+
+(H ′,
+0
+
+H′)
+1
+
+to PB,
+
+who computes s2
+
+:=
+
+Hx′ 2
+
+⊕
+
+H (M[x2]).
+
+(4) PA outputs v1 := s1 ⊕ t2, and PB outputs v2 := s2 ⊕ t1.
+
+Figure 5: Protocol ΠHaAND realizing FHaAND.
+
+PA (resp., PB) can easily misbehave by, for example, sending an incorrect value of y1 (resp., y2) to FHaAND. We address this in the
+next step. Looking ahead, however, we note that the way we ad-
+
+dress this issue introduces a selective-failure attack that can leak information to the attacker: if the attacker flips a y-value but the
+
+checking step described next does not abort, then it must be the case that x1 ⊕ x2 = 0.
+
+Checking correctness. Now both parties check correctness of the AND triples generated in the previous step. If x2 ⊕ x1 = 0, then we want to check that z2 = z1; if x2 ⊕ x1 = 1, then we want to to check that y1 ⊕ z1 = y2 ⊕ z2. However, an obvious problem is that neither party knows the value of x1 ⊕ x2; therefore there is no way
+to know which relationship should be checked. We thus need to
+construct a checking procedure such that the computation of PA is oblivious to x2, while the computation of PB is oblivious to x1.
+We describe the intuition from the point of view of an honest PB holding x2 = 0. Abstractly, the first step is for PB to compute values T0 and U0 and to send U0 to PA; PA will then compute V0 such that if x1 = 0 then V0 = T0, but if x1 = 1 then V0 ⊕ U0 = T0. We set things up such that if the AND triple is incorrect, then PA cannot compute V0 correctly. Similar constructs (namely V1, U1, and T1) are computed if x2 = 1. Now, depending on the value of x1 and x2,
+parties need to perform an equality comparison between different
+
+values, as summarized below.
+
+x2 = 0 x2 = 1
+
+x1 = 0 V0 = T0 V1 = T1
+
+x1 = 1 V0 ⊕ U0 = T0 V1 ⊕ U1 = T1
+
+28
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Functionality FLaAND Honest case:
+(1) Generate uniform [x1]A, [y1]A, [z1]A, [x2]B, [y2]B, [z2]B such that z1 ⊕ z2 = (x1 ⊕ x2) ∧ (y1 ⊕ y2), and send the respective shares to the two parties.
+(2) PA can choose to send a bit b. If b = x2, the functionality sends correct to PA. If b x2, the functionality sends fail to both parties and abort. Corrupted parties: A corrupted party gets to specify the randomness used on its behalf by the functionality.
+Figure 6: Functionality FLaAND for computing a leaky AND triple.
+
+Protocol ΠLaAND
+
+Protocol:
+
+(1) PA and PB obtain random authenticated bits [y1]A, [z1]A, [y2]B, [r ]B. PA and PB also calls FHaAND, receiving [x1]A and [x2]B.
+
+(2) PA picks a random bit v1 and sends (y1, v1) to FHaAND; PB sends y2 to FHaAND, which sends v2 to PB.
+
+(3) PA computes u = v1 ⊕ x1y1 ⊕ z1 and sends to PB. PB computes z2 := u ⊕ x2y2 ⊕ v2 and sends d := r ⊕ z2 to PA. Two parties compute
+
+[z2]B = [r ]B ⊕ d .
+
+(4) PB checks correctness as follows:
+
+(a) PB computes:
+
+T0 := H (K[x1], K[z1] ⊕ z2∆B)
+
+U0 := T0 ⊕ H (K[x1] ⊕ ∆B, K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B)
+
+T1 := H (K[x1], K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B)
+
+U1 := T1 ⊕ H (K[x1] ⊕ ∆B, K[z1] ⊕ z2∆B)
+
+(b) PB sends Ux2 to PA.
+
+(c) PA chooses a uniform κ-bit string R and computes:
+
+V0 := H (M[x1], M[z1])
+
+V1 := H (M[x1], M[z1] ⊕ M[y1])
+
+W0,0 := H (K[x2]) ⊕ V0 ⊕ R
+
+W0,1 := H (K[x2] ⊕ ∆A) ⊕ V1 ⊕ R
+
+W1,0 := H (K[x2]) ⊕ V1 ⊕ U0 ⊕ R
+
+W1,1 := H (K[x2] ⊕ ∆A) ⊕ V0 ⊕ U1 ⊕ R
+
+(d) PA sends Wx1,0, Wx1,1 to PB and sends R to FEQ . (e) PB computes R′ := Wx1,x2 ⊕ H (M[x2]) ⊕ Tx2 and sends R′ to FEQ .
+
+(5) PA checks correctness as follows:
+
+(a) PA computes:
+
+T0 := H (K[x2], K[z2] ⊕ z1∆A)
+
+U0 := T0 ⊕ H (K[x2] ⊕ ∆A, K[y2] ⊕ K[z2] ⊕ (y1 ⊕ z1)∆A)
+
+T1 := H (K[x2], K[y2] ⊕ K[z2] ⊕ (y1 ⊕ z1)∆A)
+
+U1 := T1 ⊕ H (K[x2] ⊕ ∆A, K[z2] ⊕ z1∆A)
+
+(b) PA sends Ux1 to PB.
+
+(c) PB chooses a uniform κ-bit string R and computes:
+
+V0 := H (M[x2], M[z2])
+
+V1 := H (M[x2], M[z2] ⊕ M[y2])
+
+W0,0 := H (K[x1]) ⊕ V0 ⊕ R
+
+W0,1 := H (K[x1] ⊕ ∆B) ⊕ V1 ⊕ R
+
+W1,0 := H (K[x1]) ⊕ V1 ⊕ U0 ⊕ R
+
+W1,1 := H (K[x1] ⊕ ∆B) ⊕ V0 ⊕ U1 ⊕ R
+
+(d) PB sends Wx2,0, Wx2,1 to PA and sends R to FEQ , (e) PA computes R′ := Wx2,x1 ⊕ H (M[x1]) ⊕ Tx1 and sends R′ to FEQ .
+
+Figure 7: Protocol ΠLaAND realizing FLaAND.
+
+Unfortunately, a direct comparison is not possible since PA does not know the value of x2 and therefore does not know which com-
+parison to perform. Our idea is to transform PA’s computation such that it is oblivious to x2. In detail: if x1 = 0, then PA computes V0 as if x2 = 0 and computes V1 as if x2 = 1. Then PA “encrypts” V0 and V1 such that PB can only decrypt Vx2 . PB can then locally check whether Vx2 = Tx2 . In the case when x1 = 1, PA computes and encrypts V0 ⊕ U0 and V1 ⊕ U1 in a similar manner.
+A problem is that although a malicious PA cannot cheat, a malicious PB will not be caught on an incorrect AND triple because PB compares the results locally and PA does not learn the result of the
+
+comparison! To solve this, we let PA instead send the encrypted values V0 ⊕ R and V1 ⊕ R, for a uniform R, such that PB can obtain Vx2 ⊕ R, and learn R from it. Now PA and PB can check the equality on R using the FEQ functionality that allows both parties get the outcome. (If a party aborts, that is also detected as cheating.) Finally,
+the same check is performed in the opposite direction to convince
+both parties of the correctness of the triples.
+A complete description of the protocol is shown in Figure 7; the
+proof of security is in Appendix A.
+
+29
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Functionality FaAND Honest case: Generate uniform [x1]A, [y1]A, [z1]A, and [x2]B, [y2]B, [z2]B, such that (x1 ⊕ x2) ∧ (y1 ⊕ y2) = z1 ⊕ z2. Corrupted parties: A corrupted party gets to specify the randomness used on its behalf by the functionality.
+Figure 8: Functionality FaAND for generating AND triples
+
+Protocol ΠaAND
+
+Protocol:
+
+(1)
+
+PA
+
+and PB
+
+call
+
+FLaAND
+
+a total of ℓ′
+
+=
+
+ℓB
+
+times to obtain
+
+{[x i
+1
+
+]A,
+
+[y i
+1
+
+]A,
+
+[z i
+1
+
+]A,
+
+[x i
+2
+
+]B,
+
+[y i
+2
+
+]B,
+
+[z i
+2
+
+]B
+
+}iℓ=′ 1.
+
+(2) PA and PB use coin tossing to randomly partition the results into ℓ buckets, each containing B AND triples.
+
+(3) For each bucket, the parties combine B leaky ANDs into one non-leaky AND. To combine two leaky ANDs
+
+([x ′
+1
+
+]A,
+
+[y′
+1
+
+]A,
+
+[z′
+1
+
+]A,
+
+[x ′
+2
+
+]B,
+
+[y2′ ]B,
+
+[z′
+2
+
+]B
+
+)
+
+and
+
+([x1′′]A,
+
+[y1′′]A,
+
+[z1′′]A,
+
+[x2′′]B,
+
+[y2′′]B,
+
+[z2′′]B )
+
+do:
+
+(a) The parties reveal d′ := y1′ ⊕ y1′′, d′′ = y2′ ⊕ y2′′ along with their MACs, and compute d := d′ ⊕ d′′ if the MACs verify.
+
+(b)
+
+Set
+
+[x1]A
+
+:=
+
+[x1′ ]A
+
+⊕
+
+[x1′′]A, [x2]B
+
+:=
+
+[x ′
+2
+
+]B
+
+⊕
+
+[x2′′]B, [y1]A
+
+:=
+
+[y′
+1
+
+]A
+
+,
+
+[y2]B
+
+:=
+
+[y2′ ]B,
+
+[z1]A
+
+:=
+
+[z′
+1
+
+]A
+
+⊕ [z1′′]A
+
+⊕ d [x1′′]A, [z2]B
+
+:=
+
+[z′
+2
+
+]B
+
+⊕
+
+[z2′′]B ⊕ d [x2′′]B.
+
+The parties iterate over all B leaky AND triples one-by-one, taking the resulting triple and combining it with the next one.
+
+Figure 9: Protocol ΠaAND realizing FaAND.
+
+5.3 Combining Leaky AND Triples
+
+The above check is vulnerable to a selective-failure attack, from which a malicious party can learn the value of x1 or x2 with one-half probability of not being caught. In order to get rid of the leakage, bucketing is performed analogously to (but different from) what is done by Nielsen et al. [39]. Given two potentially leaky AND triples
+
+[x1′]A, [y1′ ]A, [z1′ ]A, [x2′]B, [y2′ ]B, [z2′ ]B
+
+and
+
+[x1′′]A, [y1′′]A, [z1′′]A, [x2′′]B, [y2′′]B, [z2′′]B ,
+
+we set [x1]A := [x1′]A ⊕ [x1′′]A, [x2]B := [x2′]B ⊕ [x2′′]B. Note that the
+
+result is non-leaky as long as one of the original triples is non-leaky.
+
+We can also d := y′ ⊕ y′
+
+set ⊕y
+
+′[′y⊕1]yA′′:,=si[nyc1′e]Ay,’s[yb2it]sB
+
+:= are
+
+[y2′]B and reveal the bit all private. Observe that
+
+121 2
+
+(x1 ⊕ x2)(y1 ⊕ y2) = (x1′ ⊕ x2′ ⊕ x1′′ ⊕ x2′′)(y1′ ⊕ y2′ )
+
+= (x1′ ⊕ x2′ )(y1′ ⊕ y2′ ) ⊕ (x1′′ ⊕ x2′′)(y1′ ⊕ y2′ )
+
+= (x1′ ⊕ x2′ )(y1′ ⊕ y2′ ) ⊕ (x1′′ ⊕ x2′′)(y1′′ ⊕ y2′′)
+
+⊕ (x1′′ ⊕ x2′′)(y1′ ⊕ y2′ ⊕ y1′′ ⊕ y2′′)
+
+= (z1′ ⊕ z2′ ) ⊕ (z1′′ ⊕ z2′′) ⊕ d (x1′′ ⊕ x2′′)
+
+=
+
+(z1′
+
+⊕
+
+z1′′
+
+⊕
+
+dx
+
+′′)
+1
+
+⊕
+
+(z2′
+
+⊕
+
+z2′′
+
+⊕
+
+dx2′′).
+
+Therefore, we
+
+[z2]B
+
+:=
+
+[z ′
+2
+
+]B
+
+can just set [z1]A ⊕ [z2′′]B ⊕ d[x2′′]B.
+
+:= [z1′ ]A ⊕ [z1′′]A (This corresponds
+
+⊕ to
+
+d[x1′′]A and the protocol
+
+in Figure 9.)
+
+6 OTHER WAYS TO INSTANTIATE FPRE
+We briefly note other ways FPre can be instantiated.
+IPS-based instantiation. We can obtain better asymptotic performance by instantiating FPre using the protocol of Ishai, Prabhakaran, and Sahai [21]. In the function-dependent preprocessing phase, we need to generate an authenticated sharing of λw for each wire w, and an authenticated sharing of λσ = (λα ∧ λβ ) ⊕ λγ for
+
+each AND gate (α, β, γ , ∧). These can be computed by a constantdepth circuit of size O (|C |κ). For evaluating a circuit of depth d and size ℓ, the IPS protocol uses O (d ) rounds and a communication complexity of O (ℓ) + poly(κ, d, log ℓ) bits. In our setting, this translates to a communication complexity of O (|C |κ) + poly(κ, log |C |) bits or, for sufficiently large circuits, O (|C |κ) bits.
+Using a (semi-)trusted server. It is straightforward to instantiate FPre using a (semi-)trusted server. By applying the techniques of Mohassel et al. [37], the offline phase can also be done without
+having to know the identity of the party with whom the online
+phase will be executed; we refer to their paper for further details.
+7 EXTENSIONS AND OPTIMIZATIONS
+Handling κ ρ. In Figure 2 step 4d, all MACs that PA sends are κ bits long. For ρ-bit statistical security, the value M[r00] used in step 4(d) only needs to have length ρ. Similarly, the MACs in step 5, step 6 and step 8 can be shortened to ρ bits.
+Reducing the size of the garbled tables. Observe that the bits rγ,i need not be included in the garbled table, since M[rγ,i ] is sufficient for PB to determine (and verify) that value. Furthermore, the value Lγ,0 is uniform and so we can further reduce the size of garbled tables using ideas similar to garbled row reduction [42]. That is, instead of choosing a uniform Lγ,0, we instead let Lγ,0 be equal to the κ least-significant bits of H (Lα,0, Lβ,0, γ , 0). This reduces the size of a garbled table to 3κ + 4ρ bits.
+Pushing computation to earlier phases. For clarity, in our description of the protocol we send the values {rw , M[rw ]}w ∈I1 and {sw , M[sw ]}w ∈I2 in steps 5 and 6. However, these values can be sent in step 4 before the inputs are known, which reduces the online communication to |I|κ + |O|ρ.
+Further optimization of our TinyOT protocol. We aimed for simplicity in Figure 7, but we note here several optimizations:
+
+30
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Bucket size 3 4 5
+
+ρ = 40 ρ = 64 ρ = 80
+
+280K 3.1K 320 1.2B 780K 21K 300B 32M 330K
+
+Table 4: Fewest AND gates needed for bucketing, for different bucket sizes and statistical security parameters.
+
+Circuit
+
+I1
+
+I2
+
+O
+
+|C|
+
+AES SHA-128 SHA-256
+
+128 128 128 6800 256 256 160 37300 256 256 256 90825
+
+Hamming Dist. 1048K 1048K 22 2097K
+
+Integer Mult. 2048 2048 2048 4192K
+
+Sorting
+
+131072 131072 131072 10223K
+
+Table 5: Circuits used in our evaluation.
+
+(1) For clarity, in Figure 7 step4c, the value R was chosen uniformly. To reduce the communication, Wx1,0 can be set to 0, which defines R := H (K[x2]) ⊕V0. This saves two ciphertexts per leaky AND triple.
+(2) Since efficiency depends on the bucket size B = ρ/ log |C|, we calculated the smallest circuit size needed for each bucket size based on the exact formula, so that the bucket size can be minimized. Table 4 shows the fewest AND gates needed in order to use different bucket sizes (B), for different values of ρ.
+8 EVALUATION 8.1 Implementation and Evaluation Setup
+Our implementation uses the EMP-toolkit [46], and is publicly available as a part of it.
+In our evaluation, we set the computational security parameter to κ = 128 and the statistical security parameter to ρ = 40. In Figure 2 we describe garbling as relying on a random oracle, but in fact it can be done using any encryption scheme; in our implementation we use the JustGarble approach of Bellare et al. [5]. We use Multithreading, Streaming SIMD Extensions (SSE), and Advanced Vector Extensions (AVX) to improve performance whenever possible.
+Our implementation consists mainly of three parts:
+(1) Authenticated bits. Authenticated bits can be generated using OT extension [39]. In our implementation we adopt the OT-extension protocol of Keller et al. [23] along with the optimizations of Nielsen et al. [38]. The resulting protocol requires κ + ρ bits of communication per authenticated bit.
+(2) FPre functionality. To improve the efficiency, we spawn multiple threads that each generate a set of leaky AND triples. After these are all generated, bucketing and combining are done in a single thread.
+(3) Our protocol. The function-independent phase invokes the above two sub-routines to generate random AND triples with IT-MACs. In the function-dependent phase, these random AND triples are used to construct a single garbled circuit. In the single-execution setting, we use one thread to construct
+
+the garbled circuit; in the amortized setting we use multiple threads, each constructing a different garbled circuit. (This matches what was done in prior work.) The online phase is always done using a single thread.
+Evaluation setup. Our evaluation focuses on two settings: • LAN setting: Here we use two Amazon EC2 c4.8xlarge machines, both in the North Virginia region, with the link between them having 10 Gbps bandwidth and less than 1ms roundtrip time. • WAN setting: Here we use two Amazon EC2 c4.8xlarge machines, one in North Virginia and one in Ireland. Singlethread communication bandwidth is about 224 Mbps; the maximum total bandwidth is about 3 Gbps when using multiple threads.
+In Section 8.2, we first compare the performance of our protocol with previous protocols in similar settings, focusing on three circuits (AES, SHA-1, and SHA-256) commonly used in prior work. Our results show that these circuits are no longer large enough to serve as benchmark circuits for malicious 2PC. Therefore, in Section 8.3 we also explore the performance of our protocol on some larger circuits. (These circuits are available in [46].) Parameters for all the circuits we study are given in Table 5. In Sections 8.4 and 8.5, we study the scalability of our protocol and compare its concrete communication complexity with prior work.
+8.2 Comparison with Previous Work
+Single-execution setting. First we compare the performance of our protocol to state-of-the-art 2PC protocols in the single-execution setting. In particular, we compare with the protocol of Wang et al. [47], which is based on circuit-level cut-and-choose and is tailored for the single-execution setting, as well as the protocol of Nielsen et al. [38], which is based on gate-level cut-and-choose and is able to utilize function-independent preprocessing. For a fair comparison, all numbers are based on the same hardware configuration as we used. Our reported timings do not include the time for the base-OTs for the same reason as in [38]: the time for the base-OTs is constant across all protocols and is not the focus of our work. For completeness, though, we note that our base-OT implementation (based on the protocol by Chou and Orlandi [8]) takes about 20 ms in the LAN setting and 240 ms in the WAN setting.
+As shown in Table 6, our protocol performs better than previous protocols in terms of both overall time and online time. Compared with the protocol by Wang et al., we achieve a speedup of 2.7× overall and an improvement of about 10× for the online time. Compared with the protocol by Nielsen et al., the online time is roughly the same but our offline time is 4–7× better in the LAN setting, and 1.3-1.5× better in the WAN setting.
+Compared to the recent (unimplemented) work of Lindell et al. [32], our protocol is asymptotically more efficient in the functionindependent preprocessing phase. More importantly, the concrete efficiency of our protocol is much better for several reasons: (1) our work is compatible with free-XOR and we do not suffer from any blowup in the size of the circuit being evaluated; (2) Lindell et al. require five SPDZ-style multiplications per AND gate of the
+
+31
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+AES [47] AES [38] AES (here)
+SHA1 [47] SHA1 (here)
+SHA256 [47] SHA256 [38] SHA256 (here)
+
+LAN
+
+WAN
+
+Ind. Phase Dep. Phase Online Total
+
+Ind. Phase Dep. Phase Online Total
+
+89.6 ms 10.9 ms
+
+28 ms 13.2 ms 4.78 ms
+
+14 ms 42 ms 1.46 ms 104.3 ms 0.93 ms 16.6 ms
+
+1882 ms 821 ms
+
+425 ms 96.7 ms 461 ms
+
+416 ms 841 ms 83.2 ms 2061.9 ms 77.2 ms 1359.2 ms
+
+41.4 ms
+
+139 ms 41 ms 180 ms 21.3 ms 3.6 ms 66.3 ms
+
+-
+
+1414 ms 472 ms 1886 ms
+
+1288 ms 603 ms 78.4 ms 1969.4 ms
+
+-
+
+350 ms 84 ms 434 ms
+
+478.5 ms 164.4 ms 11.2 ms 654.1 ms
+
+-
+
+2997 ms
+
+2738 ms 350 ms
+
+96 ms 51.7 ms 9.3 ms 157 ms
+
+1516 ms 772 ms
+
+Table 6: Comparison in the single-execution setting
+
+514 ms 3511 ms 93.9 ms 3182 ms 88 ms 2376 ms
+
+LAN
+
+WAN
+
+τ
+
+Ind. Phase Dep. Phase Online Total
+
+Ind. Phase Dep. Phase Online Total
+
+32
+
+-
+
+45 ms 1.7ms 46.7 ms
+
+[43] 128
+
+-
+
+16 ms 1.5 ms 17.5 ms
+
+1024
+
+-
+
+5.1 ms 1.3 ms 6.4 ms
+
+-
+
+282 ms 190 ms 472 ms
+
+-
+
+71 ms 191 ms 262 ms
+
+-
+
+34 ms 189 ms 223 ms
+
+32 [38] 128
+1024
+
+54.5 ms 21.5 ms 14.7 ms
+
+0.85 ms 0.7 ms 0.74 ms
+
+1.23 ms 56.6 ms 1.2 ms 23.4 ms 1.13 ms 16.6 ms
+
+235.8 ms 95.8 ms 42.1 ms
+
+5.2 ms 3.9 ms 2.1 ms
+
+83.2 ms 324.2 ms 83.7 ms 183.4 ms 83.2 ms 127.4 ms
+
+32
+
+8.9 ms
+
+0.6 ms 0.97 ms 10.47 ms
+
+75.2 ms 8.7 ms 76 ms 160 ms
+
+Here 128
+
+5.4 ms 0.54 ms 0.99 ms 6.93 ms
+
+36.6 ms 8.4 ms 75 ms 120 ms
+
+1024
+
+4.9 ms 0.53 ms 1.23 ms 6.66 ms
+
+30.0 ms 7.5 ms 76 ms 113.5 ms
+
+Table 7: Comparison in the amortized setting. All experiments evaluate AES, with τ the number of executions being amortized over.
+
+Hamming Dist. Integer Mult.
+Sorting
+
+LAN
+
+WAN
+
+Ind. Phase Dep. Phase Online Total
+
+Ind. Phase Dep. Phase Online Total
+
+1867 ms 2860 ms 7096 ms
+
+1226 ms 74 ms 3167 ms 1921 ms 301 ms 5081 ms
+
+11531 ms 6592 ms 20218 ms 9843 ms
+
+5508 ms 1021 ms 13625 ms 45155 ms 25582 ms
+
+Table 8: Experimental results for larger circuits.
+
+133 ms 18256 ms 376 ms 30437 ms 1918 ms 72655 ms
+
+underlying circuit, while we need only one TinyOT-style AND computation per AND gate.
+We perform a back-of-the-envelope calculation to compare the relative efficiency of our protocol and that of Lindell et al. [32]. Over a 10 Gbps network, the recent work of Keller et al. [24] can generate 55,000 SPDZ multiplication triples per second using an ideal implementation that fully saturates the network. The protocol of Lindell et al. requires 5 SPDZ multiplications per AND gate, and so the best possible end-to-end speed of their protocol is 11,000 AND gates per second. On the other hand, our actual implementation computes 833,333 AND gates per second (as shown by the scalability evaluation in Section 8.4). Therefore, our protocol is at least 75× better than the best possible implementation of their protocol.
+Comparison with linear-round protocols. The AES circuit has depth 50 [34]. Therefore, even in the LAN setting with 0.5 ms roundtrip time, and ignoring all computation and communication,
+
+any linear-round protocol for securely computing AES would require at least 25 ms in total, which is 1.5× slower than our protocol.
+The protocol by Damgård et al. [10] has the best end-to-end running time among all linear-round protocols. Their protocol only supports amortization for parallel executions (where inputs to all executions are known at the outset). They report an amortized time for evaluating AES of 14.65 ms per execution, amortized over 680 executions. This is roughly on par with our single-execution performance without any preprocessing. When comparing their results to our amortized performance, we are more than 2× faster, and we are not limited to parallel execution.
+A more recent work by Damgård et al. [11] proposes a protocol with a very efficient online phase. In the LAN setting with similar hardware, it has an online time of 1.09 ms to evaluate AES, which is similar to our reported time (0.93 ms). They also report 0.47µs online time in the parallel execution setting, which is different from our amortized setting as discussed above. We cannot compare endto-end running times since they do not report the preprocessing
+
+32
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Running Time (second)
+
+30
+
+WAN, 1.56µs / bit
+
+25
+
+LAN, 0.35µs / bit
+
+20
+
+15
+
+10
+
+5
+
+0 ... 221
+
+222
+
+223
+
+Number of Bits in P1’s Input
+
+(a) Increasing PA’s input size (I1).
+
+3.5
+
+3.0
+
+WAN, 0.13µs / bit LAN, 0.03µs / bit
+
+2.5
+
+2.0
+
+1.5
+
+1.0
+
+0.5
+
+0.0 ... 221 222
+
+223
+
+Number of Bits in the Output
+
+(c) Increasing output size (O).
+
+30 25 20 15 10 5 224 0
+3.5 3.0 2.5 2.0 1.5 1.0 0.5 224 0.0
+
+Running Time (second)
+
+Running Time (second)
+
+30
+
+WAN, 1.57µs / bit
+
+25
+
+LAN, 0.35µs / bit
+
+20
+
+15
+
+10
+
+5
+
+0 ... 221 222
+
+223
+
+Number of Bits in P2’s Input
+
+(b) Increasing PB’s input size (I2).
+
+80
+
+70
+
+WAN, 4.48µs / gate
+
+LAN, 1.19µs / gate
+
+60
+
+50
+
+40
+
+30
+
+20
+
+10
+
+0 ... 221
+
+222
+
+223
+
+Number of AND Gates
+
+(d) Increasing circuit size ( | C |).
+
+30 25 20 15 10 5 224 0
+80 70 60 50 40 30 20 10 224 0
+
+Running Time (second)
+
+Figure 10: Scalability of our protocol. Initially |I1| = |I2| = |O| = 128 and |C| = 1024, and then one of those parameters is allowed to grow while the others remain fixed. The total running time is reported.
+
+time. However, we note that they use TinyOT for preprocessing, and our optimized TinyOT protocol is more efficient. (On the other hand, our new TinyOT protocol could be plugged into their work to improve the running time of the preprocessing phase in their work as well.)
+Amortized setting. It is somewhat difficult to compare protocols in the amortized setting, since relative performance depends on the setting (LAN or WAN), the number of executions being amortized over, and whether one chooses to focus on the total time or the online time. Nevertheless, as shown in Table 7, our protocol offers a consistent improvement as compared to the best prior work of Nielsen et al. [38] and Rindal and Rosulek [43].
+8.3 Larger Circuits
+The results of the previous section show that evaluating the AES circuit using our protocol takes less time than generating the baseOTs. Thus, our work implies that AES and other existing benchmark circuits are no longer large enough for a meaningful performance evaluation of malicious 2PC protocols. We propose three new example computations and evaluate our protocol on these examples:
+• Hamming distance: Here we consider computing the Hamming distance between two n-bit strings using an O (n)-size
+
+circuit. For our concrete experiments, we set n = 1048576;
+
+the output is a 22-bit integer.
+
+• Integer multiplication: Here we consider computing the
+least-significant n bits of the product of two n-bit integers using a nO (n2)-size circuit. For our concrete experiments, we use n = 2048. • Sorting: Here we consider sorting n integers, each ℓ bits
+
+long, that are XOR-shared between two parties, using a cir-
+
+cuit
+
+of
+
+size
+
+O
+
+(nℓ
+
+2
+log
+
+n).
+
+For
+
+our
+
+concrete
+
+experiments,
+
+we
+
+use n = 4096 and ℓ = 32.
+
+The parameters of the concrete circuits we use in our experiments are given in Table 5.
+In Table 8 we show the performance of our protocol on the above examples. We observe that the difference in the online time between the LAN and WAN settings is about 75 ms, which is roughly the roundtrip time of the WAN network we used. This is also consistent with the fact that our protocol requires only one round of online communication (one message from each party). To compare our results with state-of-the-art semi-honest protocols, note that garbling can be done at the rate of about 20 million AND gates per second. So, for example, sorting could be done with an online time of about 0.5 seconds in the semi-honest setting.
+
+33
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Protocol τ Ind. Phase Dep. Phase Online
+
+302
+
+-
+
+[43] 128
+
+-
+
+1024
+
+-
+
+3.8 MB 2.5 MB 1.6 MB
+
+25.8 KB 21.3 KB 17.0 KB
+
+1 14.9 MB
+32 8.7 MB [38]
+128 7.2 MB
+1024 6.4 MB
+
+0.22 MB 0.22 MB 0.22 MB 0.22 MB
+
+16.1 KB 16.1 KB 16.1 KB 16.1 KB
+
+1 2.86 MB This 32 2.64 MB Paper 128 2.0 MB
+1024 2.0 MB
+
+0.57 MB 0.57 MB 0.57 MB 0.57 MB
+
+4.86 KB 4.86 KB 4.86 KB 4.86 KB
+
+Table 9: Communication per execution for evaluating an AES circuit. Numbers presented are for the amount of data sent from garbler to evaluator; this reflects the speed in a duplex net-
+work. For a simplex network, the communication reported here and
+by Rindal and Rosulek [43] should be doubled for a fair comparison.
+
+8.4 Scalability
+To explore the concrete performance of our protocol for circuits with different input, output, and circuit sizes, we study the effect on the total running time as each of these parameters is varied. The results are reported in Figure 10. Trend lines are also included to show the marginal effect (i.e., the slope) of each parameter. Although the optimal bucket size in our protocol becomes smaller as the circuit size increases, we fix the bucket size to 3 in Figure 10(d).
+Our results show that the performance of our protocol scales linearly in the input, output, and circuit sizes, as expected. In the LAN setting, our protocol requires only 0.35 µs to process each input bit and 0.03 µs per output bit. Note that this is much better than circuit-level cut-and-choose protocols, mainly for two reasons: (1) Since we construct only one garbled circuit, only one set of garbled labels needs to be transferred; this is an improvement of ρ×. (2) We do not need to use an XOR-Tree or a ρ-probe matrix (which can incur a huge cost when the input is large [47]) to prevent selective-failure attacks.
+Our results also show that the marginal performance (for all the parameters considered) is about 3–4× slower in the WAN setting than in the LAN setting, which roughly matches the ratio of network bandwidth between the two settings.
+8.5 Communication Complexity
+In Table 9, we compare the communication complexity (measured in terms of the amount of data sent from the garbler to the evaluator) of our protocol to that of other work, focusing on the amortized evaluation of AES. The communication complexity of our protocol is 3−−5× less than in the protocol of Nielsen et al.. Furthermore, the communication complexity of our protocol in the single-execution setting is only half the communication complexity of their protocol even when amortized over 1024 executions. Note that for protocols based on cut-and-choose, the total communication required to send 40 garbled AES circuits is 8.7 MB, which is already higher than
+
+the total communication of our protocol in the single-execution
+setting.
+We also observe that the communication complexity of our pro-
+tocol in the function-dependent preprocessing phase is higher than
+that of the protocol of Nielsen et al.; this is due to the fact that we need to send 3κ + 4ρ bits per gate while they only need to send 2κ bits per gate. On the other hand, our online communication is extremely small: it is about 3× smaller than in the protocol of Nielsen et al. and 3.5–5.3× smaller than in the protocol of Rindal
+and Rosulek.
+ACKNOWLEDGMENTS
+This material is based on work supported by NSF awards #1111599,
+#1563722, and #1564088. The authors would like to thank Roberto
+Trifiletti, Yan Huang, and Ruiyu Zhu for their helpful comments.
+REFERENCES
+[1] Arash Afshar, Payman Mohassel, Benny Pinkas, and Ben Riva. 2014. NonInteractive Secure Computation Based on Cut-and-Choose. In Eurocrypt 2014 (LNCS), Vol. 8441. 387–404.
+[2] Gilad Asharov, Yehuda Lindell, Thomas Schneider, and Michael Zohner. 2013. More efficient oblivious transfer and extensions for faster secure computation. In ACM CCS 2013. 535–548.
+[3] Donald Beaver. 1992. Efficient Multiparty Protocols Using Circuit Randomization. In Crypto’91 (LNCS), Vol. 576. 420–432.
+[4] Donald Beaver, Silvio Micali, and Phillip Rogaway. 1990. The Round Complexity of Secure Protocols. In ACM STOC. 503–513.
+[5] Mihir Bellare, Viet Tung Hoang, Sriram Keelveedhi, and Phillip Rogaway. 2013. Efficient Garbling from a Fixed-Key Blockcipher. In IEEE Symposium on Security & Privacy. 478–492.
+[6] Luís T. A. N. Brandão. 2013. Secure Two-Party Computation with Reusable Bit-Commitments, via a Cut-and-Choose with Forge-and-Lose Technique. In ASIACRYPT 2013, Part II (LNCS), Vol. 8270. 441–463.
+[7] Seung Geol Choi, Jonathan Katz, Alex J. Malozemoff, and Vassilis Zikas. 2014. Efficient Three-Party Computation from Cut-and-Choose. In Crypto 2014, Part II (LNCS), Vol. 8617. 513–530.
+[8] Tung Chou and Claudio Orlandi. 2015. The Simplest Protocol for Oblivious Transfer. In LATINCRYPT 2015 (LNCS), Vol. 9230. 40–58.
+[9] Ivan Damgård and Yuval Ishai. 2005. Constant-Round Multiparty Computation Using a Black-Box Pseudorandom Generator. In Crypto 2005 (LNCS), Vol. 3621. 378–394.
+[10] Ivan Damgård, Rasmus Lauritsen, and Tomas Toft. 2014. An Empirical Study and Some Improvements of the MiniMac Protocol for Secure Computation. In Intl. Conf. on Security and Cryptography for Networks (LNCS), Vol. 8642. 398–415.
+[11] Ivan Damgård, Jesper Buus Nielsen, Michael Nielsen, and Samuel Ranellucci. 2017. The TinyTable protocol for 2-Party Secure Computation, or: Gate-scrambling Revisited. In Crypto 2017, Part I (LNCS), Vol. 10401. 167–187.
+[12] Ivan Damgård, Valerio Pastro, Nigel P. Smart, and Sarah Zakarias. 2012. Multiparty Computation from Somewhat Homomorphic Encryption. In Crypto 2012 (LNCS), Vol. 7417. 643–662.
+[13] Tore Kasper Frederiksen, Thomas Pelle Jakobsen, Jesper Buus Nielsen, Peter Sebastian Nordholt, and Claudio Orlandi. 2013. MiniLEGO: Efficient Secure Two-Party Computation from General Assumptions. In Eurocrypt 2013 (LNCS), Vol. 7881. 537–556.
+[14] Tore Kasper Frederiksen, Thomas P. Jakobsen, Jesper Buus Nielsen, and Roberto Trifiletti. 2015. TinyLEGO: An Interactive Garbling Scheme for Maliciously Secure Two-Party Computation. Cryptology ePrint Archive, Report 2015/309. (2015). http://eprint.iacr.org/2015/309.
+[15] Oded Goldreich, Silvio Micali, and Avi Wigderson. 1987. How to Play any Mental Game, or A Completeness Theorem for Protocols with Honest Majority. In 19th ACM STOC. 218–229.
+[16] Carmit Hazay, Peter Scholl, and Eduardo Soria-Vazquez. 2017. Low Cost Constant Round MPC Combining BMR and Oblivious Transfer. Cryptology ePrint Archive, Report 2017/214. (2017). To appear in Asiacrypt 2017.
+[17] Yan Huang, David Evans, Jonathan Katz, and Lior Malka. 2011. Faster Secure Two-Party Computation Using Garbled Circuits. In USENIX Security 2011.
+[18] Yan Huang, Jonathan Katz, and David Evans. 2013. Efficient Secure Two-Party Computation Using Symmetric Cut-and-Choose. In Crypto 2013, Part II (LNCS), Vol. 8043. 18–35.
+[19] Yan Huang, Jonathan Katz, Vladimir Kolesnikov, Ranjit Kumaresan, and Alex J. Malozemoff. 2014. Amortizing Garbled Circuits. In Crypto 2014, Part II (LNCS),
+
+34
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Vol. 8617. 458–475.
+[20] Yuval Ishai, Eyal Kushilevitz, Rafail Ostrovsky, and Amit Sahai. 2009. Extracting Correlations. In IEEE FOCS. 261–270.
+[21] Yuval Ishai, Manoj Prabhakaran, and Amit Sahai. 2008. Founding Cryptography on Oblivious Transfer - Efficiently. In Crypto 2008 (LNCS), Vol. 5157. 572–591.
+[22] Stanislaw Jarecki and Vitaly Shmatikov. 2007. Efficient Two-Party Secure Computation on Committed Inputs. In Eurocrypt 2007 (LNCS), Vol. 4515. 97–114.
+[23] Marcel Keller, Emmanuela Orsini, and Peter Scholl. 2015. Actively Secure OT Extension with Optimal Overhead. In Crypto 2015, Part I (LNCS), Vol. 9215. 724– 741.
+[24] Marcel Keller, Emmanuela Orsini, and Peter Scholl. 2016. MASCOT: Faster Malicious Arithmetic Secure Computation with Oblivious Transfer. In ACM CCS 2016. 830–842.
+[25] Vladimir Kolesnikov, Payman Mohassel, and Mike Rosulek. 2014. FleXOR: Flexible Garbling for XOR Gates That Beats Free-XOR. In Crypto 2014, Part II (LNCS), Vol. 8617. 440–457.
+[26] Vladimir Kolesnikov, Jesper Buus Nielsen, Mike Rosulek, Ni Trieu, and Roberto Trifiletti. 2017. DUPLO: Unifying Cut-and-Choose for Garbled Circuits. In ACM CCS 2017.
+[27] Vladimir Kolesnikov and Thomas Schneider. 2008. Improved Garbled Circuit: Free XOR Gates and Applications. In ICALP 2008, Part II (LNCS), Vol. 5126. 486–498.
+[28] Benjamin Kreuter, Abhi Shelat, and Chih-Hao Shen. 2012. Billion-Gate Secure Computation with Malicious Adversaries. In USENIX Security 2012.
+[29] Yehuda Lindell. 2013. Fast Cut-and-Choose Based Protocols for Malicious and Covert Adversaries. In Crypto 2013, Part II (LNCS), Vol. 8043. 1–17.
+[30] Yehuda Lindell and Benny Pinkas. 2007. An Efficient Protocol for Secure TwoParty Computation in the Presence of Malicious Adversaries. In Eurocrypt 2007 (LNCS), Vol. 4515. 52–78.
+[31] Yehuda Lindell and Benny Pinkas. 2011. Secure Two-Party Computation via Cut-and-Choose Oblivious Transfer. In TCC 2011 (LNCS), Vol. 6597. 329–346.
+[32] Yehuda Lindell, Benny Pinkas, Nigel P. Smart, and Avishay Yanai. 2015. Effi-
+cient Constant Round Multi-party Computation Combining BMR and SPDZ. In Crypto 2015, Part II (LNCS), Vol. 9216. 319–338. [33] Yehuda Lindell and Ben Riva. 2014. Cut-and-Choose Yao-Based Secure Computation in the Online/Offline and Batch Settings. In Crypto 2014, Part II (LNCS), Vol. 8617. 476–494.
+[34] Yehuda Lindell and Ben Riva. 2015. Blazing Fast 2PC in the Offline/Online Setting with Security for Malicious Adversaries. In ACM CCS 2015. 579–590.
+[35] Yehuda Lindell, Nigel P. Smart, and Eduardo Soria-Vazquez. 2016. More Efficient Constant-Round Multi-party Computation from BMR and SHE. In TCC 2016-B, Part I (LNCS), Vol. 9985. 554–581.
+[36] Dahlia Malkhi, Noam Nisan, Benny Pinkas, and Yaron Sella. 2004. Fairplay—A Secure Two-Party Computation System. In USENIX Security 2004.
+[37] Payman Mohassel, Ostap Orobets, and Ben Riva. 2016. Efficient Server-Aided 2PC for Mobile Phones. Proc. Privacy Enhancing Technologies 2 (2016), 82–99.
+[38] Jesper Nielsen, Thomas Schneider, and Roberto Trifiletti. 2017. Constant-Round
+Maliciously Secure 2PC with Function-Independent Preprocessing Using LEGO. In Network and Distributed System Security Symposium (NDSS). [39] Jesper Buus Nielsen, Peter Sebastian Nordholt, Claudio Orlandi, and Sai Sheshank
+Burra. 2012. A New Approach to Practical Active-Secure Two-Party Computation. In Crypto 2012 (LNCS), Vol. 7417. 681–700. [40] Jesper Buus Nielsen and Claudio Orlandi. 2009. LEGO for Two-Party Secure Computation. In TCC 2009 (LNCS), Vol. 5444. 368–386. [41] Jesper Buus Nielsen and Claudio Orlandi. 2016. Cross and Clean: Amortized Garbled Circuits with Constant Overhead. In TCC 2016-B, Part I (LNCS), Vol. 9985. 582–603.
+[42] Benny Pinkas, Thomas Schneider, Nigel P. Smart, and Stephen C. Williams. 2009. Secure Two-Party Computation Is Practical. In ASIACRYPT 2009 (LNCS), Vol. 5912. 250–267.
+[43] Peter Rindal and Mike Rosulek. 2016. Faster Malicious 2-Party Secure Computation with Online/Offline Dual Execution. In USENIX Security 2016.
+[44] Abhi Shelat and Chih-Hao Shen. 2011. Two-Output Secure Computation with Malicious Adversaries. In Eurocrypt 2011 (LNCS), Vol. 6632. 386–405.
+[45] Abhi Shelat and Chih-Hao Shen. 2013. Fast Two-Party Secure Computation with Minimal Assumptions. In ACM CCS 2013. 523–534.
+[46] Xiao Wang, Alex J. Malozemoff, and Jonathan Katz. 2016. EMP-Toolkit: Efficient
+Multiparty Computation Toolkit. https://github.com/emp-toolkit. (2016).
+[47] Xiao Wang, Alex J. Malozemoff, and Jonathan Katz. 2017. Faster Secure TwoParty Computation in the Single-Execution Setting. In Eurocrypt 2017, Part II (LNCS), Vol. 10211. 399–424.
+[48] Xiao Wang, Samuel Ranellucci, and Jonathan Katz. 2017. Global-Scale Secure Multiparty Computation. In ACM CCS 2017.
+[49] Andrew Chi-Chih Yao. 1986. How to Generate and Exchange Secrets. In IEEE FOCS. 162–167.
+[50] Samee Zahur, Mike Rosulek, and David Evans. 2015. Two Halves Make a Whole— Reducing Data Transfer in Garbled Circuits Using Half Gates. In Eurocrypt 2015, Part II (LNCS), Vol. 9057. 220–250.
+
+A PROOF FOR THE LEAKY-AND PROTOCOL
+In the following, we will discuss at a high-level how the proof works
+for the new TinyOT protocol. We will focus on the security of the ΠLaAND protocol, since the security of the ΠaAND protocol is fairly straightforward given the proof in the original paper [39].
+Correctness. We want to show that if both parties follow the protocol then in step 4.e Wx1,x2 ⊕ M[x2] ⊕ Tx2 = R. The checks in step 5 are symmetric to those in step 4. We proceed on a case-by-
+case basis.
+Case 1: x1 = 0, x2 = 0. Here we have M[x1] = K[x1] and M[x2] = K[x2]. Since x1 ⊕ x2 = 0, we know that z1 = z2, which further implies that
+M[z1] = K[z1] ⊕ z1∆B = K[z1] ⊕ z2∆B
+. The desired equation thus holds because:
+Wx1,x2 ⊕ H (M[x2]) ⊕ Tx2 = H (K[x2]) ⊕ V0 ⊕ R ⊕ H (M[x2]) ⊕ H (K[x1], K[z1] ⊕ z2∆B) = V0 ⊕ T0 ⊕ R = H (M[x1], M[z1]) ⊕ H (K[x1], K[z1] ⊕ z2∆B) ⊕ R = R.
+Case 2: x1 = 0, x2 = 1. Similar to the previous case, we know that M[x1] = K[x1] and that M[x2] = K[x2] ⊕ ∆B. Then x1 ⊕ x2 = 1 implies
+M[z1] ⊕ M[y1] = K[y1] ⊕ K[z1] ⊕ (y1 ⊕ z1)∆B = K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B.
+The desired equation thus holds because:
+Wx1,x2 ⊕ H (M[x2]) ⊕ Tx2 = Wx1,x2 ⊕ H (M[x2]) ⊕ T1 = H (K[x2] ⊕ ∆A) ⊕ V1 ⊕ R ⊕ H (M[x2]) ⊕ T1 = V1 ⊕ T1 ⊕ R = H (M[x1], M[z1] ⊕ M[y1]) ⊕ H (K[x1], K[z1] ⊕ z2∆B ⊕ K[y1] ⊕ y2∆B) ⊕ R = R.
+Case 3: x1 = 1, x2 = 0. Similar to the previous cases, we know that M[x1] = K[x1] ⊕ ∆B, M[x2] = K[x2], and M[z1] ⊕ M[y1] = K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B. Therefore:
+Wx1,x2 ⊕ H (M[x2]) ⊕ Tx2 = Wx1,x2 ⊕ H (M[x2]) ⊕ T0 = H (K[x2]) ⊕ V1 ⊕ U0 ⊕ R ⊕ H (M[x2]) ⊕ T0 = V1 ⊕ U0 ⊕ R ⊕ T0 = H (M[x1], M[z1] ⊕ M[y1]) ⊕ R ⊕ T0 ⊕ T0 ⊕ H (K[x1] ⊕ ∆B, K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B) = R.
+Case 4: x1 = 1, x2 = 1.
+
+35
+
+Session A1: Multi-Party Computation 1
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+Similar to the previous cases, we know that M[x1] = K[x1] ⊕ ∆B, M[x2] = K[x2] ⊕ ∆B, and M[z1] = K[z1] ⊕ z2∆B. Therefore:
+Wx1,x2 ⊕ H (M[x2]) ⊕ Tx2 = Wx1,x2 ⊕ H (M[x2]) ⊕ T1 = H (K[x2] ⊕ ∆A) ⊕ V0 ⊕ U1 ⊕ R ⊕ H (M[x2]) ⊕ T1 = V0 ⊕ U1 ⊕ R ⊕ T1 = H (M[x1], M[z1]) ⊕ R ⊕ T1 ⊕ T1 ⊕ H (K[x1] ⊕ ∆B, K[z1] ⊕ z2∆B) = R.
+We next prove security.
+Lemma A.1. If (x1 ⊕ x2) ∧ (y1 ⊕ y2) (z1 ⊕ z2) then the protocol will result in an abort except with negligible probability.
+We will proceed on a case-by-case basis. Without loss of generality, we assume PB is honest and PA is corrupted. Case 1: x1 = 0, x2 = 0.
+To pass the test, the adversary would have to produce a pair R and W0,0 such that:
+W0,0 = H (M[x2]) ⊕ Tx2 ⊕ R W0,0 = H (M[x2]) ⊕ R
+⊕ H (K[x1], K[z1] ⊕ z2∆B).
+Since z1 ⊕ z2 = 1, this means the adversary must compute K[z1] ⊕ z2∆B = M[z1] ⊕ ∆B. This requires guessing a κ-bit MAC and is thus computationally infeasible. Alternatively, the adversary could try to compute T0 from U0 = T0 ⊕ H (K[x1] ⊕ ∆B, K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B). Fortunately, since K[x1] ⊕ ∆B = M[x1] ⊕ ∆B, this is also infeasible.
+
+Case 2: x1 = 0, x2 = 1.
+
+To pass the test, the adversary would have to produce a pair R and W0,1 such that:
+
+W0,1 = H (M[x2]) ⊕ Tx2 ⊕ R W0,1 = H (M[x2]) ⊕ R
+
+⊕ H (K[x1], K[z1] ⊕ z2∆B ⊕ K[y1] ⊕ y2∆B).
+
+However, since z1 ⊕ z2 ⊕ y1 ⊕ y2 = 1, the last line requires the
+adversary to compute K[y1]⊕K[z1]⊕ (z2 ⊕y2)∆B = M[y1]⊕M[z1]⊕ ∆B. This requires guessing a κ-bit MAC and is thus computationally
+infeasible. Alternatively, the adversary could try to compute T1
+from U1 = T1 ⊕ H (K[x1] ⊕ ∆B, K[z1] ⊕ z2∆B). Fortunately, since K[x1] ⊕ ∆B = M[x1] ⊕ ∆B, this is also infeasible. Case 3: x1 = 1, x2 = 0.
+
+To pass the test, the adversary would have to produce R, W1,0
+
+such that:
+
+W1,0 = H (M[x2]) ⊕ Tx2 ⊕ R W1,0 = H (M[x2]) ⊕ R
+
+⊕ H (K[x1], K[z1] ⊕ z2∆B).
+
+Since x1 = 1, the last line requires the adversary to compute K[x1] = M[x1] ⊕ ∆B. This requires guessing a κ-bit MAC and is
+
+thus computationally infeasible. Alternatively, the adversary could
+try to compute T0 from U0 = T0 ⊕ H (K[x1] ⊕ ∆B, K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B). Fortunately, since y1 ⊕ y2 ⊕ z1 ⊕ z2 = 1 we have
+
+K[y1] ⊕ K[z1] ⊕ (y2 ⊕ z2)∆B = M[y1] ⊕ M[z1] ⊕ ∆B, and so this is also infeasible.
+
+Case 4: x1 = 1, x2 = 1.
+To pass the test, the adversary would have to produce R and W1,1 such that:
+W1,1 = H (M[x2]) ⊕ Tx2 ⊕ R W1,1 = H (M[x2]) ⊕ R
+⊕ H (K[x1], K[z1] ⊕ z2∆B ⊕ K[y1] ⊕ y2∆B).
+Since x1 = 1, the last line requires the adversary to compute K[x1] = M[x1] ⊕ ∆B. This requires guessing a κ-bit MAC and is thus computationally infeasible. Alternatively, the adversary could try to compute T1 from U1 = T1 ⊕ H (K[x1] ⊕ ∆B, K[z1] ⊕ z2∆B). Fortunately, since z1 ⊕ z2 = 1 we have K[z1] ⊕ z2∆B = M[z1] ⊕ ∆B, and so this is also infeasible.
+
+Lemma A.2. The protocol in Figure 7 securely realizes FLaAND in the (Fabit, FHaAND, FEQ )-hybrid model.
+
+Proof. We consider separately the case of a malicious PA and a malicious PB.
+
+Malicious PA. We construct a simulator S as follows:
+
+1 S receives (x1, M[x1]), (y1, M[y1]), (z1, M[z1]), K[x2], K[y2],
+
+K[r ], and ∆A that A sends to Fabit. Then S picks a uni-
+
+form bit s, sets K[z2] := K[r ] ⊕ s∆A, and sends (x1, M[x1]),
+
+(y1, M[y1]), (z1, M[z1]), K[x2], K[y2], K[z2], and ∆A to FLaAND.
+
+Functionality FLaAND then sends (x2, M[x2]), (y2, M[y2]),
+
+(z2, M[z2]), K[x1], K[y1], K[z1], and ∆B to PB.
+
+2–3 S plays the role of FHaAND obtaining the inputs from A,
+
+namely y1′ and the value A sent, namely u′. S uses y1 and
+
+u to denote the value that an honest PB would use. If y1′
+
+y1, u ′
+
+u, S sets д0
+
+=
+
+1
+
+⊕
+
+x1,
+
+if
+
+y′
+1
+
+y1, u′ = u, S sets
+
+д0 = x1.
+
+4 S sends a random U ∗ to A, and receives some W0,W1 and
+
+computes some R0, R1, such that, if x1 = 0, W0 := H (K[x2]) ⊕
+
+V0 ⊕ R0,W1 := H (K[x2] ⊕ ∆A) ⊕ V1 ⊕ R1; otherwise, W0 := H (K[x2]) ⊕ V1 ⊕ U ∗ ⊕ R0 and W1 := H (K[x2] ⊕ ∆A) ⊕ V0 ⊕ U ∗ ⊕ R1.
+
+S also obtains R that A sent to FEQ . If R does not equal to
+
+either R0 or R1, S aborts; otherwise S computes д1 such that
+
+R Rд1 for some д1 ∈ {0, 1}. 5 S receives U , picks random W ∗,W ∗ and sends them to A.
+01
+S obtains R′ that A sent to FEQ . • If both U , R′ are honestly computed, S proceeds as normal.
+
+• If U is not honestly computed and that R′ = Wx∗1 ⊕H (M[x1])⊕ Tx1 is honestly computed, S set д2 = 0
+• If either of the following is true: 1) x1 = 0 and R′ =
+
+Wx∗1 2) x
+
+⊕
+1
+
+H =
+
+(M[x1]) ⊕ 1 and R′
+
+U =
+
+⊕ H (K[x1] ⊕ ∆B, K[y1] ⊕ (y2 ⊕z2)∆B); Wx∗1 ⊕ H (M[x1]) ⊕ U ⊕ H (K[x1] ⊕
+
+∆B, K[z1] ⊕ z2∆B), S sets д2 = 1.
+
+• Otherwise S aborts.
+
+6 For each value д ∈ {д0, д1, д2}, if д ⊥, S sends д to FLaAND. If FLaAND abort after any guess, S aborts.
+
+Note that the first 3 steps are perfect simulations. However, a ma-
+
+licious PA can flip the value of y1 and/or u used. According to the unforgeability proof, the protocol will abort if the relationship
+
+36
+
+Session A1: Multi-Party Computation 1
+
+(x1 ⊕ x2) ∧ (y1 ⊕ y2) ⊕ (z1 ⊕ z2) = 0 does not hold. Therefore, if A flip y1, it is essentially guessing that x1 ⊕ x2 = 0; if A flip both y1 and u, it is guessing that x1 ⊕ x2 = 1. Such selective failure attack
+is extracted by S and answered accordingly. In step 4, U ∗ is sent in the simulation, while Ux2 is sent. This is a
+perfect simulation unless both of the input to random oracle in Ux2 get queried. This does not happen during the protocol, since ∆B in not known to A. In step 5, W ∗,W ∗ are sent in the simulation, while
+01
+Wx2,0,Wx2,0 are sent in the real protocol. This is also a perfect simulation unless PA gets ∆B: both R and one of H (K[x1]) and H (K[x1] ⊕ ∆B) are random.
+Another difference is that PB always aborts in the simulation if Gx2,y2 is not honestly computed. This is also the case in the real protocol unless A learns ∆B.
+Malicious PB. We construct a simulator S as follows:
+(1) S receives (x2, M[x2]), (y2, M[y2]), (r , M[r ]), K[x1], K[y1], K[z1], ∆B that A sends to Fabit. Then S picks a random bit s, sets
+
+(z2, M[z2]) := (r ⊕ s, M[z2] ⊕ s∆B),
+
+and sends (x2, M[x2]), (y2, M[y2]), (z2, M[z2]), K[x1], K[y1],
+
+K[z1]) to FLaAND. Functionality FLaAND then sends (x1, M[x1]),
+
+(y1, M[y1]), (z1, M[z1]), K[x2], K[y2], K[z2]) to PB.
+
+2-3 S plays the role of FHaAND and obtains y2′ A sent. S also
+
+obtains d ′
+
+PB would
+
+y′
+2
+
+y2, d ′
+
+sent by PB. Denoting
+
+use, if y′
+2
+
+y2, d ′
+
+= d, S sets д0 = x2.
+
+y′,d
+2
+d, S
+
+as values sets д0 =
+
+an honest 1 ⊕ x2, if
+
+4-6 Note that step 4 and step 5 of the protocol are the same with
+
+the exception that the roles of PA and PB are switched. We denote S ′ the simulator that was defined for the case where
+
+PA is corrupted. S will employ in step 4 the same strategy that was employed by S ′ in step 5. S will employ in step 5, the same strategy that was employed by S ′ in step 4.
+
+The first three steps are perfect simulation, with a malicious PB
+
+having a chance to perform a selective failure attack similar to
+
+when PA is malicious. If PB flip y2, it is guessing that x1 ⊕ x2 = 0; if PB flip y2 and d, PB is guessing x1 ⊕ x2 = 1. The proof for step
+4 and 5 are the same as the proof for malicious PA (with order of
+
+steps switched).
+
+□
+
+CCS’17, October 30-November 3, 2017, Dallas, TX, USA
+
+37
+

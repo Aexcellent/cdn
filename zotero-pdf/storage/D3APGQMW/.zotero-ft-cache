@@ -1,0 +1,503 @@
+SplitNN-driven Vertical Partitioning
+
+arXiv:2008.04137v1 [cs.LG] 7 Aug 2020
+
+Iker Ceballos Acuratio
+iker@acuratio.com
+
+Vivek Sharma MIT/ Harvard Medical School
+vvsharma@mit.edu
+
+Eduardo Mugica Acuratio
+eduardo@acuratio.com
+
+Abhishek Singh
+
+Alberto Roman
+
+Praneeth Vepakomma Ramesh Raskar
+
+MIT
+
+Acuratio
+
+MIT
+
+MIT
+
+abhi24@mit.edu alberto@acuratio.com vepakom@mit.edu raskar@mit.edu
+
+Abstract
+In this work, we introduce SplitNN-driven Vertical Partitioning, a conﬁguration of a distributed deep learning method called SplitNN to facilitate learning from vertically distributed features. SplitNN does not share raw data or model details with collaborating institutions. The proposed conﬁguration allows training among institutions holding diverse sources of data without the need of complex encryption algorithms or secure computation protocols. We evaluate several conﬁgurations to merge the outputs of the split models, and compare performance and resource efﬁciency. The method is ﬂexible and allows many different conﬁgurations to tackle the speciﬁc challenges posed by vertically split datasets.
+1 Introduction
+Leading banks and ﬁnancial services are currently using deep learning algorithms to optimize their processes on targeted tasks, such as approving loans, assessing risk and carrying out credit scores among others. The ﬁnancial sector generates huge amounts of data daily, and are always in need of better ways to assess risk and detect fraud, and also to utilize the data efﬁciently. Even if considerable progress has been made in a data-intensive industry, ﬁnancial services companies face challenges to efﬁciently adapt to the latest data processing techniques, and there is an increasing pressure to access third party data to improve their operational efﬁciency. On top of these challenges, there are issues like regulatory compliance costs; competition; legacy infrastructures; security concerns, that prevent ﬁnancial services companies from effectively use data. Unlocking data silos and uncovering novel sources of data will provide a competitive advantage, and companies in regulated sectors will have higher network effects than its competitors.
+Currently, each company works in isolation, where they keep their data private and use that to build their own proprietary models. On the other hand, banks utilize third parties data and resources pulled from several companies as services to build their customized models for their targeted tasks. However, with the recent rise of a new distributed deep learning: SplitNN (Gupta & Raskar, 2018) architecture, a new way to process all of these data collaboratively has emerged, without conceding ownership or loosening privacy requirements. Furthermore, using SplitNN (Gupta & Raskar, 2018; Vepakomma et al., 2018b; Sharma et al., 2019a) also enables the use of distributed sources of data, which results in improved and generalised robust models. Tapping into this data, which is often private and owned by several companies poses a totally new set of challenges that can be addressed by SplitNN.
+Motivated by the above observations, we are interested in the setting where multiple entities (clients) collaborate for a targeted task at hand, under the coordination of a central server or service provider. Each client’s raw data is stored locally and are not exchanged or transferred; instead, focused updates intended for immediate aggregation are used to achieve the learning objective. Usually the data is split horizontally, meaning that each company holds an unique set of features over a non-overlapping
+
+set of users. As mentioned earlier, in an industry with huge amounts of data on every client, such as the ﬁnancial services industry, companies often have enough data of a particular type. In that scenario SplitNN provides more value, since it allows to utilize data from several parties (Sharma et al., 2019a,b). The other variants to SplitNN for distributed private training can also be achieved with Federated Learning (McMahan et al., 2017; Kairouz et al., 2019), but unlike SplitNN it is necessary to share the complete model with all the clients. In essence, the goal of our work is to learn a shared model using vertical partitioned data coming from several sources while preserving data privacy.
+2 Related Work
+In this section, we share related works on several techniques for vertically partitioned machine learning. We categorize these works under the following categories.
+1. Vertically partitioned linear and logistic regression The work in (Gascón et al., 2016) proposes a multi-party computation (MPC) scheme based on garbled circuits for secure linear regression in the vertically partitioned setting. The works in (Yang et al., 2019a,b) provide schemes for secure vertically partitioned logistic regression based on homomorphic encryption.
+2. Vertically partitioned decision trees The works in (Gascón et al., 2016; Vaidya et al., 2008; Vaidya & Clifton, 2004; Kourtellis et al., 2016; Cheng et al., 2019) share approaches for vertically partitioned learning with decision trees, gradient boosted decision trees and Hoeffding trees.
+3. Vertically partitioned SVM The work in (Shen et al., 2019) shows a threshold Paillier and blockchain based secure approach for using support vector machines on vertically partitioned data. Similarly, the work in (Stolpe et al., 2013) shows a simpler approach of using core vector machines for anomaly detection using vertically partitioned data.
+4. Vertical federated learning Learning with vertically partitioned data in the context of federated learning, a popular distributed deep learning paradigm was studied in (Nock et al., 2018; Liu et al., 2019, 2020; Sameer et al., 2018; Vepakomma et al., 2018b; Sharma et al., 2019a,b). Conventional solutions in this setting make use of expensive cryptographic schemes such as Homomorphic Encryption and Multi-Party Computation and thus face critical performance challenges and communication overhead. SecureNN (Sameer et al., 2018) was proposed in 2018 achieved great success in reducing the communication by over 8 times and in eliminating the requirement to use conventional cost intensive oblivious transfer protocols.
+Other lines of work try to avoid these challenges (Liu et al., 2020) following the same design principles as (McMahan et al., 2017), and they propose Federated Stochastic Block Coordinate Descent (Fed-BCD). They show that applying classical Block Coordinate Descent to the FL setting can signiﬁcantly reduce the communication cost. In their setting they reduce the amount of communication by updating the model fewer times with richer local updates. This approach maximizes the information sent in each update, since having hundreds of clients means each communication round is very expensive. Further, performing local updates on the clients requires sharing the labels which is not always feasible. Motivated by these observations, (Vepakomma et al., 2018b) proposed an approach called split learning in which a smaller fraction of the model is present on each client-network and just the output of these models is shared with the server in every iteration. This results in smaller but more frequent updates and it helps reduce communication and computational overhead on the clients.
+3 Vertical SplitNN
+The overall goal of our work is to learn a shared model while preserving data privacy. To this end, we propose to train partial neural networks (NN) on each client and then aggregate all of their outputs before feeding them to the last stage of the combined model on the server-side, as seen in Figure 1. We are inspired from SplitNN (Vepakomma et al., 2018b). In particular, we extend SplitNN architecture to use all of the partial clients-networks on each iteration instead of using them sequentially. We
+2
+
+𝑉𝑒𝑟𝑡𝑡𝑖𝑐𝑎𝑙 𝑃𝑎𝑟𝑡𝑖𝑡𝑖𝑜𝑛𝑒𝑑 𝐷𝑎𝑡𝑎
+
+𝑆𝑝𝑙𝑖𝑡𝑁𝑁
+
+𝑋!
+
+𝐹!
+
+𝑋"
+
+𝐹"
+
+𝑋#
+
+𝐹#
+
+𝐼𝑛𝑡𝑒𝑟𝑚𝑒𝑑𝑖𝑎𝑡𝑒 𝐹𝑒𝑎𝑡𝑢𝑟𝑒 𝑀𝑎𝑝𝑠
+
+𝑑ℓ 𝑆! 𝑑𝑆!
+𝑑ℓ
+
+𝑉𝑒𝑟𝑡𝑖𝑐𝑎𝑙 𝑆𝑝𝑙𝑖𝑡 𝐿𝑒𝑎𝑟𝑛𝑖𝑛𝑔
+
+𝑆"𝑑𝑆" D = 𝑆! + 𝑆" + ⋯ + 𝑆#
+
+y = 𝐹$%&'%&(D)
+
+𝑑ℓ 𝑆# 𝑑𝑆#
+
+𝑑ℓ 𝑑ℓ 𝑑y ←
+𝑑𝐷 𝑑y 𝑑𝐷
+
+𝐿𝑜𝑠𝑠(ℓ)
+
+Figure 1: Vertical SplitNN architecture: Each client computes a ﬁxed portion of the computation graph and passes it to the server which computes the rest and performs back-propagation and returns back the jacobians to the client which can perform their respective back-propagation.
+
+employ ﬁve pooling mechanisms to aggregate the outputs of the partial networks via element-wise average, element-wise maximum, element-wise sum, element-wise multiplication and concatenation.
+Among all the aggregation mechanisms, concatenation is the simplest approach and is the closest to training a single network with all of the input features. However, this method requires having the intermediate outputs of all the networks on every iteration, so it is not robust to stragglers. Element-wise sum and average pooling are very close to each other, the main limitation of both of these aggregation methods is that all the networks need to have compatible shapes so that their outputs can be combined together. On the other hand, these methods allow the use of a secure aggregation protocol (Bonawitz et al., 2016), which can enhance the privacy and security of the algorithm. Element-wise max pooling also requires all the networks to have compatible output shapes, in this case we pick the activations with the maximum value for each neuron and discard the rest. All these setups require communication on every iteration since they are jointly optimized by back-propagating the error from the main network to the smaller ones. One can readily employ other encoding methods like Compact Bilinear Pooling (Diba et al., 2017; Gao et al., 2016), Temporal Compact Bilinear Pooling (Sharma et al., 2020), NetVLAD (Arandjelovic´ et al., 2016) instead of the pooling mechanisms for a more robust representation learning.
+Implementation: Split Learning was deﬁned by (Gupta & Raskar, 2018). We utilize SplitNN (Gupta & Raskar, 2018) architecture as a baseline architecture for distributed private training.
+In our method each partial clients-network encodes its data into a different space and then transmits it to train a shared deep servers-network. A deep neural network can be deﬁned as a function F , describable as a sequence of layers {L0, L1, ...LN }. For a given input X, the output of this function is given by F (X) which is computed by sequential application of layers, given as:
+F (X) ← LN (LN−1...(L0(X)))
+Gradients can be backpropagated over each layer to generate gradients of previous layers and to update the current layer. We will use LTi (gradient) to denote the process of backpropagation over one layer and F T (gradient) to denote backpropagation over the entire neural network. Similar to forward propagation, backpropagation on the entire neural network is comprised of sequential backward passes, given as:
+F T (gradient) ← LT1 (LT2 ...(LTN (gradient)))
+The process of sequential computation and transmission followed by computation of remaining layers is functionally identical to application of all layers at once. Similarly because of the chain rule in differentiation, backpropagating F T (gradients) is functionally identical to sequential application of FaT (FbT (gradients)).
+When extending this for multiple concurrent clients as in the SplitNN-driven vertical partitioning case, the backpropagated error will be split and each client-network will be passed the corresponding gradients. Let’s take concatenation as an example. The full forward pass will be a concatenation of
+3
+
+the forward passes coming from each client-network {F1 ++ F2 ++ . . . Fk}, k ∈ {1, . . . , K} where K is the maximum number of clients. In the same way, the gradients on the concatenation layer will be {L1 ++ L2 ++ . . . Lk}. Thus, we only need to split this gradients before passing them to the upstream clients.
+We evaluate our proposed method on three popular ﬁnancial datasets, namely Bank Marketing (Moro et al., 2014a), Give me Some Credit Kaggle (2011a) and Financial PhraseBank (Malo et al., 2014). We focus on ﬁnancial datasets because of the special relevance of vertically partitioned data which is widespread in the industry. At the moment, ﬁnancial institutions share plain and anonymized data with third parties for critical applications, but this is not the best solution due to multiple reasons: little amount of privacy offered by the anonymization scheme, no control on the usage, inability to audit the usage and marginal returns on the value of data is depleted with each partnership. Using our proposed split learning scheme, the need to pool all of the data together is obviated, keeping the data sources private, which enables unprecedented collaboration between the sharing parties and the non-rivalry of data (Charles & Christopher, 2018) would potentially lead to increasing returns. Use cases in the industry range from multi-party borrowing detection, risk analysis, fraud detection to cross-selling and customer retention.
+
+4 Experiments
+
+We present our evaluation of the proposed method on several different datasets. All of the datasets here are used for the prediction task.
+Datasets and Implementation Details. We test our system experimentally on three ﬁnancial datasets. The datasets are summarized in Table 1.
+
+Table 1: Datasets. “#Samples” denotes the number of samples, “#Dim” denotes the dimensionality of the features and “#Classes” denotes the number of classes.
+
+bankmarketing givemecredit phrasebank
+
+#Samples
+
+45k
+
+#Dim.
+
+16
+
+#Classes
+
+2
+
+30k
+
+5k
+
+25
+
+300
+
+2
+
+3
+
+Bank Marketing (Moro et al., 2014b) is a dataset related with direct marketing campaigns of a Portuguese banking institution from UCI machine learning repository. We use all the 16 feature dimensions for prediction and distribute them vertically among the clients. The vertical split is done based on the source of the features, with the bank client data in one split and all the social and economic context attributes in the other.
+Give Me Some Credit (Kaggle, 2011b) is a dataset of ﬁnancial data built for the task of predicting the likelihood of someone experiencing a ﬁnancial distress in the close future. Once again there is no coherent vertical split for the data so we choose to split the features arbitrarily into two sets.
+Financial PhraseBank (Malo et al., 2013) consists of 4845 english sentences selected randomly from ﬁnancial news found on LexisNexis database. These sentences then were annotated by 16 people with background in ﬁnance and business. The annotators were asked to give labels according to how they think the information in the sentence might affect the mentioned company stock price. We use all the sentences in the dataset and apply GloVe (Pennington et al., 2014) based embedding with 300 dimensions for the word embedding. After applying GloVe we treat this embedding space as a feature space and split it arbitrarily in a four vertical splits.
+Evaluation Metric. We report accuracy as well as F1 score to account for the class imbalance.
+Multiple Clients. Due to the small number of features available, We use only two splits for both Bank Marketing and Give me Credit datasets. We use Financial PhraseBank to analyze the effect of splitting the dataset across a higher number of clients. From practical standpoint, it is worth mentioning that unlike in horizontally distributed datasets, in vertical SplitNN the number of clients are likely to remain small since relevant data about a single user is not usually distributed into too many sources.
+4
+
+4.1 Comparison with a centralized model
+In Table 2, we compare the results of training a centralized model (M ) with training several split models (M 1, M 2, M 3...), merging their outputs and using those as input for M . We choose max pooling as a merging technique for this comparison since it overall provides the best performance for the studied datasets.
+As noted in the results, the Financial Phrasebank dataset is the only one where vertical partitioning and element-wise max pooling results in a drop in performance. This could be due to two reasons - the data we applied vertical partitioning over was obtained after the embedding, splitting the 300 GloVe features into 4 sets, the other reasoning could be due to the underlying semantic nature of a sentence making it a difﬁcult task for vertical partitioned learning from a practical standpoint. For all the other cases, the performance roughly remains same with some marginal improvements when using split learning.
+
+Table 2: Comparison of the performance of a single model with access to the full dataset vs a split model with four vertical partitions. We only report results for element-wise max pooling since it’s the best performing merging technique.
+
+Dataset
+
+Single Model Max Pooling Acc F1 Acc F1
+
+Bank Marketing
+
+0.83 0.47 0.84 0.47
+
+Give Me Credit
+
+0.80 0.34 0.81 0.35
+
+Financial PhraseBank 0.78 0.78 0.76 0.76
+
+4.2 Comparison of merging strategies
+In Table 3, we compare several strategies to merge the outputs of the models trained with the vertically partitioned features. We consider two pooling mechanisms as well as simple combinations such as concatenation, element-wise multiplication and element-wise sum of the outputs.
+The simplest strategy is the concatenation, however this requires all outputs from each participating client to be present during the forward pass, which could be infeasible in a real scenario since some of the clients may drop randomly or there might be synchronization issues. Therefore any of the other strategies are preferable because of their aggregation mechanism.
+Furthermore, both element-wise average pooling and simple element-wise addition over the inputs can allow us to use a secure aggregation protocol while combining the outputs of the smaller models. Thus, providing an extra layer of security on top of the obfuscation provided by the models themselves and NoPeek (Vepakomma et al., 2018a).
+We notice that the performance doesn’t suffer huge drops with any of the methods. However, in practice one could choose the average pooling since, it allows to use a secure aggregation protocol as well as compression techniques that can help with stronger privacy and communication overhead respectively.
+Figure 2 shows the loss and metrics during training for Financial PhraseBank. The centralized training (single model) takes fewer batches to converge,
+
+4.3 Clients dropping randomly
+In Table 4, we present the results of dropping some of the clients randomly both during training and testing. The drop during the training means that the model is trained with the outputs of all models but on each iteration one or more of those outputs is missing. On the other hand, dropping during testing means that the model was trained with the outputs of all the models but for the prediction on the test set the output of some of the models from the client side is missing.
+5
+
+Loss Accuracy
+F1
+
+2.00
+
+for dTirfafeinreinngt Lmoesrsgeinvgolsuttriaotnegies
+Centralized
+
+1.75
+
+Concatenate
+
+Max Pooling
+
+1.50
+
+Average Pooling
+
+1.25
+
+Sum Element-wise Product
+
+1.00
+
+0.75
+
+0.50
+
+0.25
+
+0.000 250 N50u0m Ba7tc5h0es 1000 1250
+
+1.0 foTrradiinffienrgenAtcmcuerragciyngevsotrluattieognies
+
+0.9
+
+0.8
+
+0.7
+
+0.6
+
+0.5
+
+Centralized Concatenate
+
+0.4
+
+Max Pooling Average Pooling
+
+0.3
+
+Sum Element-wise Product
+
+0.20 250 N50u0m Ba7tc5h0es 1000 1250
+
+1.0 for diTfrfearineinntgmFe1regvinoglusttiorantegies
+
+0.9
+
+0.8
+
+0.7
+
+0.6
+
+0.5
+
+Centralized Concatenate
+
+0.4
+
+Max Pooling Average Pooling
+
+0.3
+
+Sum Element-wise Product
+
+0.20 250 N50u0m Ba7tc5h0es 1000 1250
+
+Figure 2: Comparison of several merging strategies for SplitNN-driven vertical partitioning with PhraseBank.
+
+Table 3: Comparison of merging/pooling strategies.
+
+Merging
+
+Financial PhraseBank Bank Marketing Give me Credit
+
+Acc
+
+F1
+
+Acc F1 Acc F1
+
+Element-wise Max Pooling 0.76
+
+0.76
+
+0.84 0.47 0.81 0.35
+
+Element-wise Average Pooling 0.77
+
+0.77
+
+0.83 0.46 0.82 0.36
+
+Concatenation
+
+0.76
+
+0.76
+
+0.82 0.46 0.83 0.37
+
+Element-wise Multiplication 0.72
+
+0.72
+
+0.82 0.46 0.80 0.34
+
+Element-wise Sum
+
+0.77
+
+0.76
+
+0.83 0.46 0.77 0.32
+
+As shown in the Table 3, in both the cases the performance suffers a signiﬁcant impact as a consequence of the clients dropping. This is expected, since we are missing the predictive power of several features. When we increase the number of clients that drop at each point the performance hit is even bigger, which is consistent with our hypothesis.
+Furthermore, in Figure 3 we can see that dropping more than two clients, in a four client setting, even affects the convergence of the model and the loss starts to rise by the end of the training, indicating that optimization is drifting from local/global minima. This performance drop however does not arise if a client drops just on a few iterations but is present for most of the training. This is an interesting starting point for future work since it would be interesting to analyze how to minimize the impact of stragglers with vertical SplitNN.
+
+4.4 Measurement of communication and computational costs
+Tests over different datasets were carried out in order to estimate the amount the communications performed in a vertical SplitNN training process. We use the roles deﬁned in (Ceballos et al., 2020) to identify the type of data available for each of the participants. Role 1 only has access to features, role 3 has access to both features and labels and role 0 is just a computation client with no data. Each test was carried out by three clients. One of them with role 1, another one with role 3 and the last one with role 0. Results are shown in Table 5.
+The communication cost computed for this table is based on the division of task according to different roles. Once the training starts for each batch, workers with roles 1 and 3 send the output of their nextto-last layer to role 0 worker, which performs its forward pass and send the output of its next-to-last layer to worker with role 3 to compute the loss.
+Similarly once the loss is computed, role 3 worker will send back to role 0 worker the error at the output of the shared layer so that it can continue back propagating it. Finally this role 0 worker will
+6
+
+Table 4: Comparison of merging strategies when clients drop randomly. We report accuracy for the Financial PhraseBank.
+
+Merging
+
+Training
+
+Testing
+
+Drop 1 Drop 2 Drop 3 Drop 1 Drop 2 Drop 3
+
+Element-wise Max Pooling
+
+0.74 0.72 0.69 0.76 0.70 0.63
+
+Element-wise Average Pooling 0.75 0.72 0.69 0.74 0.71 0.65
+
+Element-wise Multiplication 0.75 0.75 0.71 0.71 0.60 0.58
+
+Element-wise Sum
+
+0.74 0.73 0.70 0.74 0.70 0.64
+
+2.00
+
+whenTrsaoimninegwloorskseersvoalruetidornopped
+Centralized
+
+1.75
+
+Average
+
+1.50
+
+Average, Drop 1 Average, Drop 2
+
+1.25
+
+Average, Drop 3
+
+1.00
+
+0.75
+
+0.50
+
+0.25
+
+0.000 250 N50u0m Ba7tc5h0es 1000 1250
+
+1.0 whTeraninsoinmgeacwcourrkaecrys eavreoldurtoiopnped
+
+0.9
+
+0.8
+
+0.7
+
+0.6
+
+0.5
+
+Centralized
+
+0.4
+
+Average Average, Drop 1
+
+0.3
+
+Average, Drop 2 Average, Drop 3
+
+0.20 250 N50u0m Ba7tc5h0es 1000 1250
+
+1.0 whenTsroamineinwgoFr1keervsoalurteiodnropped
+
+0.9
+
+0.8
+
+0.7
+
+0.6
+
+0.5
+
+Centralized
+
+0.4
+
+Average Average, Drop 1
+
+0.3
+
+Average, Drop 2 Average, Drop 3
+
+0.20 250 N50u0m Ba7tc5h0es 1000 1250
+
+Figure 3: Loss and metrics for PhraseBank dataset while workers drop during training.
+
+Loss Accuracy
+F1
+
+send back to its corresponding worker with role 1 or 3 the error at the output of each corresponding shared layer.
+The communication size in a vertical SplitNN architecture is dependent on the size of the output at the endpoints layer. The computational cost however is dependent on the architecture and the size of the input feature vector at each layer. For widely used architectures, everything remains same here in comparison with traditional deep learning except the size of the feature vector of the ﬁrst layer on the central server.
+Bearing this in mind, in conjunction with performance trade-offs between different merging strategies, it is extremely important to know the details and the limitations of the speciﬁc use case, in order to be able to propose the best training strategy. The neural network architecture splitting scheme between the workers, or the adjustment of the hyper-parameters can greatly change the speed and therefore the efﬁciency of the training process.
+Thus, we ﬁnd that in the training processes where the bottleneck is on the communication side, most of the training process should be done in workers with roles 1 and 3 so that the outputs of their networks are already as small as possible. On the other hand when the bottleneck is the computational cost, workers with roles 1 and 3 should have the minimum amount of layers to assure the data is kept private, and the core of the model should be in a role 0 worker with higher computational capacity. As shown in Table 6, other techniques as adjusting the batch size could be highly convenient in some cases to speed up the training processes.
+An interesting line of research for the future, would be to study the effect on the convergence of compression techniques such as STC (Sattler et al., 2019) or Random Rotation Matrix (Konecˇný et al., 2017) as well as privacy preserving techniques such as Secure Aggregation Protocol (Bonawitz et al., 2016) or minimizing Distance Correlation (Vepakomma et al., 2019), as well as their effect on the computational cost.
+7
+
+Table 5: Communication costs in initialization, forward pass and backward pass for each studied dataset.
+
+Dataset Role
+
+Financial PhraseBank Bank Marketing
+
+13
+
+0
+
+1
+
+3
+
+0
+
+Give me Credit
+
+1
+
+3
+
+0
+
+Total sent per epoch (MB) 488 490 977 2,560 3,840 7,680 4,800 7,200 14,400
+
+Total received per epoch (KB) 488 490 977 2,560 5,120 6,400 4,800 9,600 12,000
+
+Table 6: Measurements of the computational costs
+
+Dataset
+
+Financial PhraseBank Bank Marketing Give me Credit
+
+Number of parameters of the NN FLOP/sample us/batch (batch size=32) MFLOPS (batch size=32) us/batch (batch size=128) MFLOPS (batch size=128)
+
+3,907,059 33,667 26,037 41.377 97,871 44.031
+
+745 4,041 911 141.945 1,114 464.316
+
+457 741 793 29.902 1,107 85.680
+
+5 Conclusion
+In this paper, we proposed split learning for vertically partitioned data and further addressed the speciﬁc challenges arising in this scenario. We have shown that the proposed methods to merge the outputs of the split networks result in a shared model that performs on par with the centralized model. Max-pooling is the best overall, however we believe the small drop in performance shown with average-pooling is acceptable considering that it allows the use of a secure aggregation protocol. We believe our approach to train models with vertically partitioned data provides a way which is better suited to its speciﬁc challenges, which are different from those arising with horizontally partitioned data.
+References
+Arandjelovic´, R., Gronat, P., Torii, A., Pajdla, T., & Sivic, J. 2016. NetVLAD: CNN architecture for weakly supervised place recognition. In: CVPR.
+Bonawitz, Keith, Ivanov, Vladimir, Kreuter, Ben, Marcedone, Antonio, McMahan, H. Brendan, Patel, Sarvar, Ramage, Daniel, Segal, Aaron, & Seth, Karn. 2016. Practical Secure Aggregation for Federated Learning on User-Held Data. arXiv preprint arXiv:1611.04482.
+Ceballos, Iker, Mugica, Eduardo, Roman, Alberto, Singh, Abhishek, Vepakomma, Praneeth, & Raskar, Ramesh. 2020. Towards split learning at scale: System Design. In: Workshop on MLOps Systems.
+Charles, I., Jones, & Christopher, Tonetti. 2018. Nonrivalry and the economics of data. 2018 Meeting Papers.
+Cheng, Kewei, Fan, Tao, Jin, Yilun, Liu, Yang, Chen, Tianjian, & Yang, Qiang. 2019. Secureboost: A lossless federated learning framework. arXiv preprint arXiv:1901.08755.
+Diba, Ali, Sharma, Vivek, & Van Gool, Luc. 2017. Deep temporal linear encoding networks. In: CVPR.
+Gao, Yang, Beijbom, Oscar, Zhang, Ning, & Darrell, Trevor. 2016. Compact bilinear pooling. In: CVPR.
+Gascón, Adrià, Schoppmann, Phillipp, Balle, Borja, Raykova, Mariana, Doerner, Jack, Zahur, Samee, & Evans, David. 2016. Secure Linear Regression on Vertically Partitioned Datasets. IACR Cryptol. ePrint Arch., 2016, 892.
+8
+
+Gupta, Otrkist, & Raskar, Ramesh. 2018. Distributed learning of deep neural network over multiple agents. arXiv preprint arXiv:1810.06060.
+Kaggle. 2011a. Give Me Some Credit. data retrieved from Kaggle, https://www.kaggle.com/c/ GiveMeSomeCredit/data.
+Kaggle. 2011b. Give me some credit dataset.
+Kairouz, Peter, McMahan, H Brendan, Avent, Brendan, Bellet, Aurélien, Bennis, Mehdi, Bhagoji, Arjun Nitin, Bonawitz, Keith, Charles, Zachary, Cormode, Graham, Cummings, Rachel, et al. 2019. Advances and open problems in federated learning. arXiv preprint arXiv:1912.04977.
+Konecˇný, Jakub, McMahan, H. Brendan, Yu, Felix X., Suresh, Ananda Theertha, Bacon, Dave, & Richtárick, Peter. 2017. Federated Learning: Strategies for Improving Communication Efﬁciency. arXiv preprint arXiv:1610.05492.
+Kourtellis, Nicolas, Morales, Gianmarco De Francisci, Bifet, Albert, & Murdopo, Arinto. 2016. Vht: Vertical hoeffding tree. Pages 915–922 of: 2016 ieee international conference on big data (big data). IEEE.
+Liu, Yang, Kang, Yan, Zhang, Xinwei, Li, Liping, Cheng, Yong, Chen, Tianjian, Hong, Mingyi, & Yang, Qiang. 2019. A communication efﬁcient vertical federated learning framework. arXiv preprint arXiv:1912.11187.
+Liu, Yang, Kang, Yan, Zhang, Xinwei, Li, Liping, Cheng, Yong, Chen, Tianjian, Hong, Mingyi, & Yang, Qiang. 2020. A Communication Efﬁcient Collaborative Learning Framework for Distributed Features. arXiv preprint arXiv:1912.11187.
+Malo, Pekka, Sinha, Ankur, Takala, Pyry, Korhonen, Pekka J., & Wallenius, Jyrki. 2013. Good Debt or Bad Debt: Detecting Semantic Orientations in Economic Texts. CoRR, abs/1307.5336.
+Malo, Pekka, Sinha, Ankur, Takala, Pyry, Korhonen, Pekka, & Wallenius, Jyrki. 2014. Good Debt or Bad Debt: Detecting Semantic Orientations in Economic Texts. Journal of the American Society for Information Science and Technology, 04.
+McMahan, H. Brendan, Moore, Eider, Ramage, Daniel, Hampson, Seth, & y Arcas, Blaise Agüera. 2017. Communication-Efﬁcient Learning of Deep Networks from Decentralized Data. arXiv preprint arXiv:1602.05629.
+Moro, Sérgio, Cortez, Paulo, & Rita, Paulo. 2014a. A Data-Driven Approach to Predict the Success of Bank Telemarketing. Decision Support Systems, 62(06).
+Moro, Sérgio, Cortez, Paulo, & Rita, Paulo. 2014b. A Data-Driven Approach to Predict the Success of Bank Telemarketing. Decision Support Systems, 62(06).
+Nock, Richard, Hardy, Stephen, Henecka, Wilko, Ivey-Law, Hamish, Patrini, Giorgio, Smith, Guillaume, & Thorne, Brian. 2018. Entity resolution and federated learning get a federated resolution. arXiv preprint arXiv:1803.04035.
+Pennington, Jeffrey, Socher, Richard, & Manning, Christopher D. 2014. GloVe: Global Vectors for Word Representation. Pages 1532–1543 of: Empirical Methods in Natural Language Processing (EMNLP).
+Sameer, Wagh, Divya, Gupta, & Nishanth, Chandran. 2018. SecureNN: Efﬁcient and Private Neural Network Training. IACR Cryptol. ePrint Arch., 2018, 442.
+Sattler, Felix, Wiedemann, Simon, Müller, Klaus-Robert, & Samek, Wojciech. 2019. Robust and Communication-Efﬁcient FederatedLearning from Non-IID Data. arXiv preprint arXiv:1903.02891.
+Sharma, Vivek, Vepakomma, Praneeth, Swedish, Tristan, Chang, Ken, Kalpathy-Cramer, Jayashree, & Raskar, Ramesh. 2019a. ExpertMatcher: Automating ML Model Selection for Users in Resource Constrained Countries. In: NeurIPS Workshop on Robust AI in Financial Services: Data, Fairness, Explainability, Trustworthiness, and Privacy.
+9
+
+Sharma, Vivek, Vepakomma, Praneeth, Swedish, Tristan, Chang, Ken, Kalpathy-Cramer, Jayashree, & Raskar, Ramesh. 2019b. ExpertMatcher: Automating ML Model Selection for Users in Resource Constrained Countries. In: NeurIPS Workshop on Machine learning for the Developing World.
+Sharma, Vivek, Tapaswi, Makarand, & Stiefelhagen, Rainer. 2020. Deep Multimodal Feature Encoding for Video Ordering. In: ICCV workshop on Large Scale Holistic Video Understanding.
+Shen, Meng, Zhang, Jie, Zhu, Liehuang, Xu, Ke, & Tang, Xiangyun. 2019. Secure SVM training over vertically-partitioned datasets using consortium blockchain for vehicular social networks. IEEE Transactions on Vehicular Technology.
+Stolpe, Marco, Bhaduri, Kanishka, Das, Kamalika, & Morik, Katharina. 2013. Anomaly detection in vertically partitioned data by distributed core vector machines. Pages 321–336 of: Joint European Conference on Machine Learning and Knowledge Discovery in Databases. Springer.
+Vaidya, Jaideep, & Clifton, Chris. 2004. Privacy preserving naive bayes classiﬁer for vertically partitioned data. Pages 522–526 of: Proceedings of the 2004 SIAM international conference on data mining. SIAM.
+Vaidya, Jaideep, Clifton, Chris, Kantarcioglu, Murat, & Patterson, A Scott. 2008. Privacy-preserving decision trees over vertically partitioned data. ACM Transactions on Knowledge Discovery from Data (TKDD), 2(3), 1–27.
+Vepakomma, Praneeth, Swedish, Tristan, Raskar, Ramesh, Gupta, Otkrist, & Dubey, Abhimanyu. 2018a. No Peek: A Survey of private distributed deep learning. arXiv preprint arXiv:1812.03288.
+Vepakomma, Praneeth, Gupta, Otkrist, Swedish, Tristan, & Raskar, Ramesh. 2018b. Split learning for health: Distributed deep learning without sharing raw patient data. arXiv preprint arXiv:1812.00564.
+Vepakomma, Praneeth, Gupta, Otkrist, Dubey, Abhimanyu, & Raskar, Ramesh. 2019. Reducing leakage in distributed deep learning for sensitive health data. arXiv preprint arXiv:1812.00564.
+Yang, Kai, Fan, Tao, Chen, Tianjian, Shi, Yuanming, & Yang, Qiang. 2019a. A quasi-newton method based vertical federated learning framework for logistic regression. arXiv preprint arXiv:1912.00513.
+Yang, Shengwen, Ren, Bing, Zhou, Xuhui, & Liu, Liping. 2019b. Parallel distributed logistic regression for vertical federated learning without third-party coordinator. arXiv preprint arXiv:1911.09824.
+10
+

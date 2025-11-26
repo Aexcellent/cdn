@@ -1,0 +1,578 @@
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+Briefings in Bioinformatics, 23(1), 2022, 1–13
+https://doi.org/10.1093/bib/bbab461 Review
+Positive-unlabeled learning in bioinformatics
+and computational biology: a brief review
+Fuyi Li, Shuangyu Dong, André Leier, Meiya Han, Xudong Guo, Jing Xu, Xiaoyu Wang, Shirui Pan, Cangzhi Jia, Yang Zhang, Geoffrey I. Webb, Lachlan J.M. Coin, Chen Li and Jiangning Song
+Corresponding authors: Jiangning Song, Department of Biochemistry and Molecular Biology, Monash University, Melbourne, Victoria 3800, Australia. Tel: +61-3-9902-9304; Fax: +61-3-9902-9500; E-mail: Jiangning.Song@monash.edu; Chen Li, Department of Biochemistry and Molecular Biology, Monash University, Melbourne, Victoria 3800, Australia; Tel: +61-3-9905-5414; E-mail: Chen.Li@monash.edu
+Fuyi Li received his PhD degree in Bioinformatics from Monash University, Australia. He is currently a Research Fellow in the Peter Doherty Institute for Infection and Immunity, The University of Melbourne, Australia. His research interests are bioinformatics, computational biology, machine learning and data mining. Shuangyu Dong received her MEng degree in Electrical Engineering from the University of Melbourne, Australia. She is currently a PhD candidate in the Department of Electrical and Electronic Engineering, The University of Melbourne, Australia. Her research interests are communication systems, information theory and machine learning. André Leier is currently an assistant professor in the Department of Genetics, UAB School of Medicine, USA. He is also an associate scientist in UAB’s O’Neal Comprehensive Cancer Center and the Gregory Fleming James Cystic Fibrosis Research Center. His research interests are computational biomedicine, bioengineering, bioinformatics and machine learning. Meiya Han received her MSc degree in Data Science from Monash University, Australia. She is currently a research assistant in the Department of Biochemistry and Molecular Biology, Monash University, Australia. Her research interests are bioinformatics, computational biology, machine learning and data mining. Xudong Guo received his MEng degree from Ningxia University, China. His research interests are bioinformatics and data mining. Jing Xu received her MSc degree in Computer Science and Technology from Nankai University, China. She is currently a PhD candidate in the Department of Biochemistry and Molecular Biology and Biomedicine Discovery Institute, Monash University, Australia. Her research interests include bioinformatics, computational biology, machine learning and deep learning. Xiaoyu Wang received her MSc degree in Information Technology from The University of Melbourne, Australia. She is currently a research assistant in the Department of Biochemistry and Molecular Biology and Biomedicine Discovery Institute, Monash University, Australia. Her research interests are bioinformatics, computational biology, machine learning and data mining. Shirui Pan received his PhD in Computer Science from the University of Technology Sydney (UTS), Ultimo, NSW, Australia. He is currently a senior lecturer with the Faculty of Information Technology, Monash University, Australia. Prior to this, he was a lecturer in the School of Software, University of Technology Sydney. His research interests include data mining and machine learning. Cangzhi Jia is an associate professor in the College of Science, Dalian Maritime University. She obtained her PhD degree in the School of Mathematical Sciences from the Dalian University of Technology in 2007. Her major research interests include mathematical modeling in bioinformatics and machine learning. Yang Zhang received his PhD degree in Computer Software and Theory in 2005 from Northwestern Polytechnical University, China. He is a professor at College of Information Engineering, Northwest A&F University. His research interests include machine learning and data mining. Geoffrey I. Webb received his PhD degree in Computer Science in 1987 from La Trobe University. He is research director of the Monash Data Futures Institute and professor in the Faculty of Information Technology at Monash University. His research interests include machine learning, data mining, computational biology and user modeling. Lachlan J.M. Coin is a professor and group leader in the Department of Microbiology and Immunology at the University of Melbourne. He is also a member of the Department of Clinical Pathology, University of Melbourne. His research interests are bioinformatics, machine learning, transcriptomics and genomics. Chen Li is a research fellow in the Biomedicine Discovery Institute and Department of Biochemistry of Molecular Biology, Monash University. He is currently a CJ Martin Early Career Research Fellow, supported by the Australian National Health and Medicine Research Council (NHMRC). His research interests include systems proteomics, immunopeptidomics, personalized medicine, experimental bioinformatics and data mining. Jiangning Song is an associate professor and group leader in the Monash Biomedicine Discovery Institute, Monash University, Melbourne, Australia. He is also affiliated with the Monash Centre for Data Science, Faculty of Information Technology, Monash University. His research interests include bioinformatics, computational biology, machine learning, data mining and pattern recognition. Submitted: 30 August 2021; Received (in revised form): 27 September 2021 © The Author(s) 2021. Published by Oxford University Press. All rights reserved. For Permissions, please email: journals.permissions@oup.com
+1
+
+2 Li et al.
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+Abstract
+Conventional supervised binary classification algorithms have been widely applied to address significant research questions using biological and biomedical data. This classification scheme requires two fully labeled classes of data (e.g. positive and negative samples) to train a classification model. However, in many bioinformatics applications, labeling data is laborious, and the negative samples might be potentially mislabeled due to the limited sensitivity of the experimental equipment. The positive unlabeled (PU) learning scheme was therefore proposed to enable the classifier to learn directly from limited positive samples and a large number of unlabeled samples (i.e. a mixture of positive or negative samples). To date, several PU learning algorithms have been developed to address various biological questions, such as sequence identification, functional site characterization and interaction prediction. In this paper, we revisit a collection of 29 state-of-the-art PU learning bioinformatic applications to address various biological questions. Various important aspects are extensively discussed, including PU learning methodology, biological application, classifier design and evaluation strategy. We also comment on the existing issues of PU learning and offer our perspectives for the future development of PU learning applications. We anticipate that our work serves as an instrumental guideline for a better understanding of the PU learning framework in bioinformatics and further developing next-generation PU learning frameworks for critical biological applications.
+Key words: positive unlabeled learning; semi-supervised learning; machine learning; bioinformatics; pattern recognition
+
+Introduction
+With the advances of high-throughput sequencing techniques and large-scale biomedical experiments, an unprecedented volume of biological data has accumulated, allowing for datadriven computational analysis. Compared to wet laboratorybased research, which is often laborious and time-consuming, computational methods can predict and analyze potential patterns from the massive volume of biological data and shortlist candidates for follow-up experimental validation. To date, computational prediction and analysis have been successfully applied to address a broad spectrum of fundamental biological questions, such as homology sequence detection [1, 2], genome signals and regions identification [3–6], protein–protein interaction (PPI) and complex prediction [7–10], gene function prediction [11–14], protein/RNA/DNA functional site prediction [15–32] and biomedical image classification [33–36]. Among the computational analysis tasks, classification is of particular importance, which aims to classify the test samples into different classes (e.g. positive and negative samples in binary classification). For example, in protein phosphorylation site prediction, both phosphorylated peptides (i.e. positive samples) and non-phosphorylated peptides (i.e. negative samples) need to be provided for training the classification models [37, 38]. The performance of the classifier is therefore highly dependent on the quality of the training samples, the correctness of sample labeling and the ratio of the positive and negative samples. In the research areas of bioinformatics and computational biology, a variety of supervised-learning algorithms have been applied to construct classification models [39], such as support vector machines (SVM) [40], random forest (RF) [41], naïve Bayesian (NB) classifier [42] and logistic regression (LR) [43].
+However, in numerous biological applications, negative samples are either limited or uncertain because it is much more straightforward to confirm a property than to ascertain that it does not hold. A potential binding site is confirmed if it binds a target, but failure to bind only means that the conditions for binding were not satisfied under a given experimental condition. Further, technological advances often lead to improved
+
+identification of specific properties, indicating that biological samples previously not known to have a property can now be confidently classified. For example, in our recent study [44], we demonstrated the changes in protein glycosylation site labeling throughout four time points across 10 years. Another example is PPI prediction [45, 46], where experimentally validated PPIs and non-interacting protein pairs are used as positive and negative training samples, respectively. Nevertheless, selecting the non-interacting protein pairs is challenging for two reasons: (i) novel PPIs are constantly being discovered in the course of time, indicating that some non-interacting protein pairs (i.e. negative samples) might be mislabeled; and (ii) there is a large number of protein pairs for which no interactions have been identified, significantly outnumbering the positive samples. Similar situations can also be found in gene function prediction [47– 50], biological sequence classification [51], small non-coding RNA detection [52] and drug–drug interaction identification [53]. To address these issues, the positive unlabeled (PU) learning scheme has recently emerged as a useful approach [54], which is a special category belonging to the semi-supervised learning scheme. Semi-supervised learning scheme generally refers to building prediction models with partially labeled training data (e.g. the labeled data can be either positives or both positives and negatives) [55]. In contrast, PU learning specifically refers to the semi-supervised scheme that builds classification models directly from a small number of labeled positive samples and a huge volume of unlabeled samples (i.e. a mixture of both positive and negative samples) [54]. Due to the presence of unlabeled data, conventional binary classifiers that require both positive and negative samples, such as SVM and RF, are no longer directly applicable. One-class learning [56] is another alternative approach that trains a model based only on positive samples. However, this scheme cannot benefit from large amounts of information that might be present in unlabeled samples. Two major research directions have been proposed to enable PU learning, as summarized in previous studies [57, 58], including (i) converting the PU learning problems to conventional classification tasks by identifying reliable negatives from
+
+Positive unlabeled learning in bioinformatics 3
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+the unlabeled dataset, and (ii) adapting conventional classification frameworks to directly learn from positive and unlabeled samples.
+To the best of our knowledge, only one review [45] has been published to date that summarized PU learning applications in protein-interaction networks. It compared eight PU learning algorithms only for derivations of PPI networks. However, PU learning has been widely applied in many different bioinformatic fields. It is thus highly desirable to comprehensively survey the PU learning scheme applied to a wide spectrum of bioinformatics tasks and discuss and explore the applicability of the PU learning scheme in addressing biological questions. In this study, we systematically reviewed and discussed the design and implementation of 29 PU learning-based bioinformatic applications covering a wide range of biological and biomedical topics, including sequence classification, interaction prediction, gene/protein function and functional site prediction. In addition, we discussed performance evaluation existing issues and future perspectives of PU learning algorithm development to offer valuable insights into the applicability of PU learning scheme in addressing important biological and biomedical questions.
+PU learning scheme
+PU learning scheme aims to build classifiers with competitive prediction performance using limited positive samples and high volumes of unlabeled data. To date, various PU learning algorithms have been developed and applied to address a variety of biological classification tasks (Table 1). We categorized these algorithms into two major strategies – ‘selecting reliable negatives’ and ‘adapting the base classifier,’ as in Kilic et al. [45]. A schematic overview of these two strategies is illustrated in Figure 1. A key difference between the two strategies is reflected by how they deal with unlabeled samples in the training data. The ‘selecting reliable negatives’ strategy seeks to identify a subset of unlabeled samples, which are then treated as negative samples. The positive samples together with these putative negative samples are subsequently used as training data for a conventional learning algorithm. The ‘adapting the base classifier’ strategy adapts the base classifiers (e.g. SVM) to estimate and correct for the expected ratio of negative samples in the unlabeled dataset. The ‘selecting reliable negatives’ strategy includes two sub-strategies, namely ‘negative expansion’ and ‘label propagation.’ Both ‘negative expansion’ and ‘label propagation’ strategies can reduce the number of mislabeled negative samples by calculating the likelihood of each unlabeled sample. ‘Negative expansion’ performs this calculation iteratively (e.g. bagging) through the classifier training procedure; while ‘label propagation’ calculates the likelihoods iteratively until convergence is reached based on a pre-generated similarity matrix. Please note that both Figure 1 and Table 1 provide a generic classification of reviewed PU learning tools in this article. As it is challenging to classify some PU tools that can fit into multiple categories, for the simplicity, we classified them based on their main PU learning characteristics according to their algorithmic descriptions. The following abbreviations are used throughout this review: P, U and N stand for positive data, unlabeled data and negative data, respectively; while RNs and LNs denote reliable negatives and likely negatives, FNs stand for false negatives and RPs denote reliable positives.
+
+Selecting reliable negatives
+The flowchart of PU approaches within the ‘selecting reliable negatives’ strategy is demonstrated in Figure 1A and B. As can be seen, two main approaches for selecting reliable negative samples have been proposed, including ‘negative expansion’ and ‘label propagation.’
+Negative expansion
+As illustrated in Figure 1A, ‘negative expansion’ approaches iterate through a process of first labeling selected unlabeled samples as putative negatives, building a model to classify between positives and putative negatives, and then applying the model to relabel selected unlabeled samples as putative negatives. The selected putative negatives at each iteration represent the samples for which the current model is most confident.
+‘Bagging-based’ approaches [49, 59, 62] directly regard all the unlabeled samples as negatives and use bootstrap aggregation to group unlabeled samples into smaller subsamples S1, . . . Sk. Then for each Si, a conventional supervised learning algorithm is used to form a model using P with Si as the negative examples. At each iteration i, a score is given to each sample x in U \ Si, and U \ Si means the subset of U that does not contain the samples in Si (i.e. each sample is not selected for training). If the average score of the sample x in U after all k iterations reaches a threshold θ as shown in Equation 1, the sample will be predicted as positive:
+
+Vx =
+
+k i=1
+
+Vix
+
+≥θ
+
+k
+
+(1)
+
+where Vx is the average score of the sample x, Vix denotes the score of the sample x at the ith iteration, while θ is a pre-set threshold. The ‘simple bagging’ approach has been applied to SIRENE [73], PULSE [70] and PRIPU [75]. Given the potential false positives predicted, likely positive-iterative classification (LP-IC) [51] manages to boost the prediction accuracy by monitoring the distance between the centroid of the initial P set and the centroid of the predicted positives. The iterative prediction process stops until the distance reaches a threshold.
+To reduce the number of FNs in N, the NOIT [59] approach divides U into three large groups. Samples in each group are predicted by the classifier trained with P and the unlabeled samples randomly selected from the other two groups. Only the top-performing negative candidates will be added into the training set for the next iteration. The ‘simple bagging’ approaches provide the most straightforward strategy for potentially mislabeled negatives in U, which has proven to be able to better predict positives from unlabeled dataset U, compared to the conventional supervised binary classifiers, which simply treat U as N, as demonstrated in [51]. However, the prediction accuracy of the bagging-based methods might be lower compared to other types of approaches (i.e. ‘label propagation,’ and ‘adapting the base classifier’), since the positive samples in U are still likely to be mislabeled as N and therefore mislead the classifiers.
+The ‘converging reliable negatives’ approach chooses an initial selection of candidate reliable positives RP1 = P and reliable negatives RN1 ⊂ U, and then iteratively refines successive RPis and RNis until they converge to a fixed solution. Different methods have been applied to select RN1 in the first step of negative expansion, i.e. iteration 1. PSoL [52] adopts the rule of maximum distance and minimum redundancy, according to which the selected ‘reliable negatives’ should be far from the samples in P and not too close to each other. Differently, EPuL
+
+4 Li et al.
+
+Table 1. A comprehensive list of surveyed bioinformatic tools based on the PU learning schemea
+
+Category
+
+Tool
+
+Year PU strategy
+
+Application
+
+Base classifier
+
+Performance evaluation
+
+Performance evaluation metrics
+
+Software/Code availabilityb
+
+Selecting reliable negatives
+
+Negative Expansion
+
+PSoL [52] LP-IC [51]
+
+2006 2008
+
+AGPS [47]
+
+2008
+
+SPE_RNE [48]
+
+2010
+
+Bhardwaj et al. [50] 2010
+
+NOIT [59]
+
+2010
+
+ProDiGe [49]
+
+2011
+
+Patel and Wang [60] 2015
+
+PUL-PUP [61]
+
+2016
+
+LDAP [62]
+
+2017
+
+EPuL [63]
+
+2017
+
+DeepDCR [64]
+
+2020
+
+iPiDi-PUL [66]
+
+2021
+
+EmptyNN [67]
+
+2021
+
+Label
+
+PUDI [68]
+
+Propagation
+
+EPU [69]
+
+PULSE [70]
+
+PUPre [71]
+
+PUDT [72]
+
+2012
+2014 2015 2015 2016
+
+None
+
+ncRNA identification
+
+Centroid distance evaluation Spy positives, Select RN Positive enlargement Spy positives
+Bagging
+
+Biological sequence classification Gene function prediction
+Gene function prediction
+Peripheral protein identification TF-target interaction
+
+Bagging
+Spy positives, Bagging None
+
+Disease gene identification Gene regulatory network
+Pupylation site prediction
+
+Bagging Select RN
+
+lncRNA-disease association Pupylation site prediction
+
+Select RN None None
+None
+
+Disease-associated circular RNAs prediction ncRNA-disease association Single-cell RNA sequencing quality control Disease gene identification
+
+Ensemble classifiers
+None
+Spy positives, Select RN Ensemble label propagation
+
+Disease gene identification Stably folded isoform discovery Conformational B-cell epitopes prediction Drug-target interaction prediction
+
+SVM SVM
+
+5-fold CV and independent test Independent test
+
+AUC F-measure
+
+SVM
+
+10-fold CV
+
+SVM
+
+Random test
+
+C4.5 decision tree
+SVM with Platt scaling Weighted-SVM
+
+5-fold CV and independent test 10-fold CV and independent test LOO CV
+
+SVM, RF
+
+Random test
+
+Precision, Recall, F-measure, AUC Precision, Recall, F-measure Recall, ACC
+AUC, AUPR
+Precision, Recall, CDF ACC
+
+SVM Weighted-SVM
+
+10-fold CV LOO CV
+
+Recall, ACC, TNR, MCC, AUC AUC
+
+SVM Deep forests [65] RF Neural network
+
+10-fold CV and independent test 5-fold CV and independent test 5-fold CV and independent test 10-fold CV and independent test
+
+Recall, TNR, ACC, MCC, AUC Recall, Precision, AUC AUC
+AUC, Recall, Specificity
+
+Multi-level weighted SVM
+KNN, NB, SVM
+RF
+
+10-fold CV, 3-fold CV and benchmark 3-fold CV, LOO CV
+5-fold CV
+
+F-measure
+Precision, Recall, F-measure AUC
+
+Weighted-SVM
+
+10-fold CV
+
+F-measure
+
+Weighted-SVM
+
+5-fold CV
+
+AUC
+
+No No No No No No Webserver No No Webserver Webserver Source code Webserver Source code
+Software
+No Software No No
+
+Continued
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+Table 1. Continued Category
+
+Tool
+
+Year
+
+PU strategy
+
+Application
+
+Base classifier
+
+Performance evaluation
+
+Performance evaluation metrics
+
+Software/Code availabilityb
+
+Adapting the base classifier
+
+PosOnly [57]
+SIRENE [73] HOCCLUS2 [74] PRIPU [75]
+PUEL [76]
+
+2010
+2013 2014 2015
+2016
+
+None
+None Bagging None
+Bagging
+
+MutPred2 [77]
+PAnDE [78]
+GlycoMine_PU [44] Topaz [79]
+PU-HIV [80]
+
+2017 2017 2019 2019 2021
+
+Bagging, Prior probability Bagging
+Bagging, Prior probability None
+None
+
+Gene regulatory networks
+TF-CRE interaction Gene regulatory networks Protein-RNA interaction
+
+SVM with Platt scaling SVM SVM Biased-SVM
+
+Kinase substrate prediction
+
+SVM
+
+Pathogenic amino acid variants prioritization Glycosylation sites prediction Glycosylation sites prediction Particle detection
+
+Feed-forward neural networks AnDE
+AnDE
+CNN
+
+HIV-1 protease cleavage site prediction
+
+Biased-SVM
+
+10-fold CV and independent tests 3-fold CV Independent tests 5-fold CV
+LOO CV
+10-fold CV
+
+F-measure, AUC
+Precision, Recall AUC Precision, Recall, ACC, EPR Recall, TNR, F-measure, MCC, GM AUC
+
+10-fold CV and independent tests 10-fold CV and independent tests 10-fold CV and independent tests 10-fold CV and independent tests
+
+F-measure
+ACC, F-measure, AUC Precision
+Precision, Recall, F-measure
+
+No
+No No Source code
+Software and source code
+Software and webserver No
+Webserver
+Software and source code Source code
+
+Positive unlabeled learning in bioinformatics 5
+
+aAbbreviations: ACC – accuracy; AnDE – averaged n-dimensional estimators; AUC – area under the ROC curve; AUPR – area under the precision-recall curve; LOO – leave one out; CDF – cumulative distribution function [49]; CNN – convolutional neural network; CRE – cis-regulatory elements; CV – cross-validation; EPR – explicit positive recall [75]; GM – geometric mean; KNN – K nearest neighbors; lncRNA – long non-coding RNA; LR – logistic regression; MCC – Matthews correlation coefficient; NB – naive Bayesian; ncRNA – non-coding RNA; RF – random forest; RN – reliable negatives; ROC – receiver operating characteristic; SVM – support vector machine; TF – transcription factor; TNR – true negative rate. bThe URL addresses for the listed tools are as follows: ProDiGe: http://cbio.ensmp.fr/prodige/; LDAP: http://bioinformatics.csu.edu.cn/ldap/; EPuL: http://59.73.198.144:8080/EPuL/; DeepDCR: https://github.com/xzenglab/ DeepDCR/; iPiDi-PUL: http://bliulab.net/iPiDi-PUL/server/; EmptyNN: https://github.com/lkmklsmn/empty_nn/; PUDI: http://www1.i2r.a-star.edu.sg/&#x007E;xlli/PUDI/PUDI.html/; PULSE: http://www.kimlab.org/software/pulse/; PRIPU: http://admis.fudan.edu.cn/projects/pripu.htm/; PUEL: https://github.com/PengyiYang/KSP-PUEL/; MutPred: http://mutpred.mutdb.org/; GlycoMine_PU: https://glycomine.erc.monash.edu/Lab/GlycoMine_PU/; Topaz: http:// topaz.csail.mit.edu/; PU-HIV: https://github.com/allenv5/PU-HIV/.
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+6 Li et al.
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+Figure 1. A schematic illustration of different types of PU learning algorithms used in the compared bioinformatic tools, including ‘selecting reliable negatives’: (A) negative expansion, (B) label propagation and (C) ‘adapting the base classifier.’ Panel (D) illustrates the four bioinformatics application domains of PU learning algorithms covered in this review, including DNA/RNA/protein sequence classification, functional site prediction, protein/gene function prediction and interaction prediction. RNs: reliable negatives; LN: dataset of likely negatives; P: dataset of positives and U: dataset of unlabeled samples.
+
+[63] chooses the unlabeled samples as RNs that have 1.05 times longer distances to the samples in P than the average. AGPS [47] uses one-class SVMs [81] to draw an initial decision boundary that distinguishes between the samples in P and most samples in U, and the rest of the samples in U are labeled as RNs. The RN set is subsequently augmented with more negative samples iteratively identified from U by the reconstructed SVM with Ps
+
+and RNs, until only a small number of samples are left in U based on the given threshold. Among these iterative trials, the Ps and RNs resulting in the top-performing models are regarded as the final training set. This strategy has been successfully applied in PSoL [52], PUL-PUP [61] and ProDiGe [49]. To balance the dramatic size difference between P and U, LDAP [62] bags U randomly into several subsets and then performs negative expansion, while
+
+Positive unlabeled learning in bioinformatics 7
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+EPuL [63] bags U into five subsets and perform negative expansion separately. Alternatively, SPE_RNE [48] enlarges the positive training set by selecting reliable synthetic positives using the following equation:
+
+RP = α ∗ P + (1 − α) ∗ P ,
+
+(2)
+
+where RP is a synthetic positive sample, α ∈ (0, 1) is a random number, P denotes a labeled positive sample and P represents another labeled positive sample near P based on the distance measure.
+To evaluate the performance of the trained classifiers, some labeled positives are mixed into U acting as ‘spies.’ AGPS [47] and the method by Patel and Wang [60] chose the SVM with the best prediction performance as the final classifier to identify the ‘spies’; while Bhardwaj et al. [50] adjusted the threshold of selecting negatives at each iteration to minimize the number of positive spies being identified as negatives. It has been shown in [49] that compared with the one-class classifier that uses only positive examples to train a model, the PU learning algorithm with negative expansion is able to identify hidden positives from U more consistently and accurately. Compared with the baggingbased approaches, distance-based approaches might achieve a higher prediction accuracy as they select more reliable negatives to reduce the number of FNs in N.
+
+Label propagation
+Label propagation, also known as random walk with restart [68, 72], is a strategy which classifies U into different groups based on the likelihood and then trains a base classifier to perform the prediction (Figure 1B). It first identifies RNs from U based on the distance to the samples in P (distance longer than the average), similar to the ‘negative expansion’ strategy in EPuL [63]. Then a similarity matrix W is built based on the distances between the samples, where Wij represents the distance between the samples i and j. With RNs, Ps and Wij, Label propagation is performed by the following equation iteratively until Gr converges (with β = 0.8):
+
+Gr = (1 − β) WijGr−1 + βG0,
+
+(3)
+
+where Gr is a likelihood matrix indicating the probability of each sample being positive, G0 denotes the initial likelihood matrix
+P
+with the probability value as 1, − , and 0 for each sample in P,
+RN
+RN and the rest, respectively. The iterative procedure terminates when Gr − Gr−1 is smaller than 10−6. This strategy, governed
+by the similarity matrix, gradually propagates the probability information of RNs and samples in P to the remaining samples in U. After propagation, all the samples are divided into five groups, including Ps, RNs, LNs, LPs (i.e. likely positives) and WNs (i.e. weak negatives) based on the likelihood values. A weighted multi-level SVM is then trained using these classified samples. This label propagation approach has been directly adopted in PUDI [68]. Different from PUDI, PUPre [71] uses a weighted SVM to select RNs. The ‘spy’ positives are also used in this step by PUPre to adjust the weights for optimizing the recall rate and F-measure of the SVM. In addition to the weighted multi-level SVM, EPU [69] ensembles the other two base classifiers, KNN [82] and NB [42], to perform the final positive prediction after label information propagation. The ensemble strategy has been widely applied, which aims to weight and integrate the prediction outcomes
+
+from different base classifiers to maximize the prediction accuracy. For example, PUDT [72] ensembles three different strategies to perform ‘label propagation,’ including the random walk with restart, K nearest neighbor clustering and heat kernel diffusion [83]. The final classification result is then determined via a majority voting strategy by combining the predictions from different classifiers. Compared to ‘negative expansion’ approaches, ‘label propagation’ offers a more sophisticated strategy that better leverages the sample information. Nevertheless, ‘label propagation’ has somewhat demanding requirements in terms of computational resources, especially when the number of the samples is large.
+
+Adapting the base classifier
+
+Figure 1C shows the generic workflow of adapting the base classifier for PU learning scenarios. While ‘negative expansion’ and ‘label propagation’ aim to identify reliable positive and negative samples from U, ‘adapting the base classifier’ algorithms are Bayesian-based approaches that focus on estimating the ratio of positive and negative samples in U. This estimate can then be applied using the Bayes rule for classification. Based on the ‘selected completely at random’ assumption, proposed by Elkan et al. in [84], the ratio of positive and negative samples in U is estimated by dividing the score by a constant correction factor, generally using a separate validation set (apart from training and test datasets). The final positive likelihood score Px(y = 1) (the proportion of samples that are positives) is then estimated as follows:
+
+Px
+
+y=1
+
+= Px
+
+Px (s = 1) s = 1/y = 1
+
+,
+
+(4)
+
+where Px(s = 1) is the likelihood of the sample x being labeled as positive in the training data. Px(s = 1/y = 1) stands for the posterior probability of the sample x, i.e. positive being labeled as positive in the training data. Px(y = 1) is treated as a constant factor for all the samples, assuming that positive samples are randomly labeled under a uniform distribution and can be obtained through a validation set [57].
+Using this strategy, PUEL [76] randomly bags U into several groups, repeats the base classifier for each group in an ensemble manner, and averages different outcomes from the groups to obtain the final prediction result, adjusted using the Bayes rule and Equation 4. Similarly, HOCCLUS2 [74], MutPred2 [77], PAnDE [78] and GlycoMine_PU [44] subsample U when obtaining Px(s = 1) to overcome the data imbalance (i.e. non-glycosylation sites significantly outnumbering glycosylation sites). SVM is used as the base classifier in PUEL [76], HOCCLUS2 [74] and MutPred2 [77], while AnDE [85] is used as the base classifier in PAnDE [78] and GlycoMine_PU [44].
+As noted above, this baseline method assumes that positive samples are labeled randomly. However, it might not be true in real-world bioinformatics applications. To further improve the prediction accuracy, an algorithm called AlphaMax [86, 87] was adopted in MutPred2 [77] and GlycoMine_PU [44] to estimate the prior probability of each sample being labeled as positive. The performance results showed that the prediction accuracy could be significantly improved.
+
+Applying PU scheme to address specific biological questions
+Table 1 summarizes a total of 29 bioinformatic applications developed under the PU learning scheme, which can be further
+
+8 Li et al.
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+categorized into four classes shown in Figure 1D, including sequence classification, interaction prediction, gene/protein function and functional site prediction. These applications and their performance are discussed in detail in the following subsections.
+DNA/RNA/protein sequence classification
+‘Selecting reliable negatives’ algorithms have been widely applied to identifying disease-associated genes, classification of biological sequences and identification of ncRNAs (noncoding RNAs). Among these applications, PU algorithms are prevalent in the identification of disease-associated genes [49, 62, 68, 69], which aims to unravel the causative relationships between genes and diseases, contributing to providing a better understanding of gene variation-driven pathogenicity and proposing possible solutions to a variety of healthcare problems [68]. Current experimental efforts can generally identify a long list of potential candidate genes, but only a few are genuinely disease-causative [49]. This means that the proposed approach should be able to uncover the positive samples (i.e. diseasecausative genes) from a vast number of unknown genes [68]. PU learning algorithms are therefore applied to this scenario based on the assumption that the genes with similar phenotypes are likely to have similar biological functions [69]. In addition to the PU algorithms, different types of biological data have been used for predicting disease-associated genes in [69], including human protein interaction (PPI), gene expression, gene ontology (GO) and phenotype-gene association. The causative genes of various common diseases have been explored under the PU learning scheme, including cancers, cardiovascular, endocrine, metabolic, neurological, psychiatric and ophthalmological disorders [49, 69]. Compared with the one-class learning algorithms, PU learning algorithms have demonstrated better performance for identifying disease-causative genes [49]. Similarly, PU algorithms have also been used to identify the associations between lncRNAs (long non-coding RNAs) and diseases [62]. PU learning scheme has also been successfully applied to biological sequence classification via the proposed LP-IC framework [51]. Two scenarios of biological sequence classification using LPIC were investigated and discussed, including HLA-A2 binding and human-mouse alternative splicing. It was demonstrated in [51] that PU algorithms outperformed conventional supervised learning algorithms in identifying hidden positive samples, thereby leading to a higher precision rate. Another promising application is to detect ncRNAs. Experimental identification of ncRNAs using routine genetic and biochemical approaches is challenging because the majority of ncRNAs are short and non-susceptible to frameshift and nonsense mutations [52, 88]. This challenge highlights the necessity of using PU learning algorithms to computationally identify potential ncRNAs based on identified ncRNAs and a considerable number of unknown sequences. In this regard, Wang et al. [52] proposed a PU learning method, PSoL, to detect ncRNAs from the Escherichia coli (E. coli) genome. The empirical studies demonstrated that PSoL achieved superior prediction performance compared to the benchmarked approaches.
+Interaction prediction
+Both ‘selecting reliable negative’ and ‘adapting base the classifier’ algorithms have been applied to identify TF (transcription factor)–CRE (cis-regulatory element), TF-target and protein-RNA interactions, as well as gene regulatory networks. The TF–CRE interactions have been investigated in [73], which are part of
+
+gene regulatory networks and crucially important for understanding the regulation mechanisms of cells. However, identifying TF–CRE interactions using experimental methods is difficult even for well-studied organisms [73]. It was shown in [73] that PU learning methods performed better than those algorithms that used only positive samples, including the one-class approach. Uncovering the target genes of transcription factors is another important topic in mining and understanding gene regulatory networks. Eight different transcription factors with the largest numbers of known target genes from E. coli and Saccharomyces cerevisiae (S. cerevisiae) were investigated in [60] using a PU learning approach belonging to the ‘negative expansion’ group. Additionally, using experimental datasets from E. coli, Cerulo et al. [59] predicted the target genes of BCL6 in normal germinal center human B cells using the PU learning algorithm by heuristically selecting reliable negative samples to train the machine-learning model. Protein–RNA interactions are important in regulating many cellular processes. Using PU biased-SVM, Cheng et al. accurately predicted protein–RNA and protein–non-coding RNA interactions, achieving a satisfactory EPR (explicit positive recall) value [75]. Gene regulatory networks were analyzed and predicted in [57, 74] using the PU algorithms with probability estimation (i.e. the ‘adapting the base classifier’ group). Despite the availability of positive data (i.e. experimentally validated gene pair interactions) in public databases, the negative samples (i.e. non-interacting gene pairs) are not readily available due to the lack of experimental validation. PU learning, therefore, provides potential solutions to learn and analyze gene regulatory networks using both experimentally validated gene pair interactions and a large number of unlabeled gene pairs (i.e. for which the interaction information is not known).
+Protein/gene function and functional site prediction
+PU algorithms based on ‘negative expansion’ and ‘label propagation’ have been widely applied to predict protein/gene functions and functional sites of proteins. In [50], Bhardwaj et al. applied PU algorithms to predict peripheral (membrane-binding) proteins, which play an important role in biological processes such as cell signaling and are associated with serious diseases including cancers and acquired immunodeficiency syndrome. Additionally, a two-step PU algorithm from the ‘label propagation’ group has been successfully applied to predict conformational B-cell epitopes in [71] using a weighted SVM for selecting reliable negative samples. Several studies for predicting S. cerevisiae (i.e. yeast) gene functions from its genome sequence data have also deployed PU algorithms [47, 48]. Most databases such as GO only provide GO annotations for proteins/genes (i.e. positive samples), while the negative annotation (i.e. indicating there is no link between the gene and the GO term) are usually not available, necessitating and promoting the implementation and deployment of PU algorithms.
+Both ‘selecting reliable negative’ and ‘adapting base the classifier’ algorithms have also been employed to predict functional sites of proteins. PU algorithms from the probability estimate correction group are the most widely used. A number of studies have been carried out to use PU algorithms for predicting different types of protein functional and post-translational modification sites (PTMs), such as glycosylation sites [44, 78], kinase substrates [76], pupylation sites [61] and protease cleavage sites [80]. Other PU applications for functional sites involve pathogenic amino acid variants prioritization [77] and gene site prediction for the identification of functional isoforms (i.e. alternative splicing) [70].
+
+Positive unlabeled learning in bioinformatics 9
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+Performance evaluation metrics and strategies
+Shared with conventional supervised classifiers, six commonly used performance metrics are adopted to evaluate the performance of PU classifiers, including F1, area under the receiver operating characteristic curve (AUC), recall, precision, accuracy (ACC) and Matthew’s correlation coefficient (MCC). Some of the performance metrics are defined as follows:
+
+⎧ ⎪⎪⎪⎪⎪⎨
+
+Precision =
+
+TP TP+FP
+
+Recall
+
+=
+
+TP TP+FN
+
+⎪⎪⎪⎪⎪⎩
+
+F1 =
+
+2×Precision×Recall Precision+Recall
+
+ACC
+
+=
+
+TP+TN TP+FN+TN+FP
+
+MCC =
+
+√
+
+TP×TN−FN×FP
+
+(TP+FN)×(TN+FP)×(TP+FP)×(TN+FN)
+
+(5)
+
+where TP, FP, TN and FN represent true positives, false positives, true negatives and false negatives, respectively. In addition, cumulative distribution function (CDF), areas under the precision-recall curve (AUPR) and geometric mean (GM) are also used in bioinformatics studies to assess the performance of PU algorithms. TNR and GM are respectively defined as follows:
+
+TNR =
+
+TN TN+FP
+
+GM =
+
+TP TP+FN
+
+×
+
+TP TP+FP
+
+.
+
+(6)
+
+Among these measures, AUPR is often used to evaluate imbalanced binary classifiers [89]. CDF considers the percentage of the positives that can be identified among all the hidden positives in U [49]. In addition to above performance metrics, EPR is a newly introduced metric that measures the proportion of the known positives that are identified accurately (refer to [75] for more details). Compared with traditional performance metrics, EPR is particularly applicable for assessing the performance of PU learning problems where negative samples are completely unavailable.
+As shown in Table 1, five validation strategies have been used to evaluate the prediction performance of PU algorithms, including k-fold cross-validation (CV), independent test, leaveone-out (LOO) CV and random test. Among these strategies, k-fold CV is the most adopted test strategy. In k-fold CV, the samples are divided into k subgroups. At each validation step, one subgroup is used as the validation set, while the others are combined as the training set. The k subgroups take turns to be the validation set until the training and testing processes have been repeated k times. The value of k is typically set as 3, 5 or 10, and 10 is the most common choice. As used in [49, 62, 69, 76], LOOCV can be regarded as an extreme situation of k-fold crossvalidation, where k is the total number of the training samples. Each time, only one sample is used for testing while the rest of the data is used to train the model. On larger training sets, the performance evaluation of LOOCV is usually more stable than that of k-fold CV.
+
+Discussions and future perspectives
+Imbalanced data and classifier overfitting are common problems in PU learning since many classifiers are sensitive to size differences between U and P. To address this, the unlabeled data usually are sub-sampled into smaller sizes to train the classifiers. For example, in [52], the size of the unlabeled training set is limited to three times the size of the positive training set to reduce the effect of classifier imbalance. Some algorithms further reduced the size of unlabeled training data to be the
+
+same as that of the positive set. However, it has been commented in [48] that overfitting will occur when the unlabeled training set is overly small. It is therefore essential to balance the sizes of P and U for generating reliable models. In addition, crossvalidation should be frequently applied to avoid performance overestimation effectively.
+As shown in Table 1, only a small number of base classifiers have been widely applied to date, predominantly SVM and RF. More PU learning methods, ensemble strategies and deeplearning approaches are expected to be integrated to explore the possibility of improving the performance and robustness of the PU learning algorithms. Apart from the widely used base classifiers such as SVM, RF and KNN, there are other excellent PU learning algorithms that can be taken into consideration, such as POSC4.5 [90], PURF [91], positive hidden naive Bayes (PHNB) and positive full Bayesian network classifier (PFBC) [92], which are based on the basic decision tree, RF and the naïve Bayes classifier, respectively. Note that these approaches are the extended versions of the decision tree, RF and naïve Bayes classifiers, which can directly learn from positive and unlabeled samples. Besides the base classifiers, ensemble methods have been widely applied to improve prediction performance [93]. In addition to the traditional ensemble methods for base classifiers, such as Adaboost [94, 95] and Stacking [96], integrating prediction outcomes of different PU learning algorithms has also demonstrated considerable promise in improving the prediction performance. For example, Yang et al. [69] integrated different biological data sources and prediction outputs of various PU learning schemes to significantly improve the prediction performance of disease-associated gene identification.
+In recent years, deep-learning techniques have demonstrated superior prediction performance in a wide range of biomedical applications, including protein function prediction [97–99], DNA/RNA modification identification [25, 100], biomedical image classification and analysis [33, 101], and multi-omics data analysis [102–107]. Compared to the conventional machine learning algorithms such as SVM, deep neural networks are able to improve prediction accuracy by discovering the inherent relationships among various features [89]. To address the PU learning scenario, several adapted deep-learning algorithms have been published, such as NNPU [108], PUCNN [79] and GenPU [109]. Notably, deep learning has not yet been widely applied in PU learning scenarios using biological and biomedical data. In Table 1, three approaches, including PUCNN, MutPred2 and EmptyNN, used deep-learning algorithms for mining biological data. Bepler et al. [79] successfully applied PU neural network (PUCNN) to particle picking in cryo-electron micrographs; feedforward neural networks were adopted in MutPred2 [77] for the molecular and phenotypic impact of amino acid mutations; while EmptyNN [67] was developed based on a positiveunlabeled learning neural network to remove cell-free droplets and recover lost cells in scRNA-seq data. Apart from generic deep neural networks, graph neural networks have also been further advanced for PU learning. Wu et al. [110] proposed a novel long-short distance aggregation network (LSDAN) for the PU graph learning framework and demonstrated that the proposed LSDAN achieved an outstanding F1 score. Note that LSDAN has great potential to be applied to interaction identification, for example, using PPI and gene regulation data. The performance of this framework to address PU tasks using biological data will then need to be carefully assessed. Another application of deep-learning algorithms is feature extraction.
+
+10 Li et al.
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+Compared to the traditional features such as DNA/protein sequence-derived features [111–114] and structural features [21, 23], deep-learning algorithms can automatically learn suitable feature representations for the input data, such as DNA/RNA/protein sequences, without the need of the manual design for biological or physicochemical properties or use of hand-crafted features [115–120]. In addition, the feature representations learned by deep learning algorithms can provide better characterization of the input dataset and improve the predictive performance.
+Conclusion
+In many applications, a lack of well labeled negative examples has been shown to hinder the development of traditional bioinformatics tools. This is of particular importance in biological and biomedical applications, where it may be much easier to identify positive cases than negative cases confidently, or data can be mislabeled as negatives due to the low sensitivity of experimental equipment. Compared to conventional supervised learning, PU learning provides a scheme where limited numbers of well-labeled positive samples and large numbers of unlabeled samples can be used together to train a classifier, avoiding the potential impact on prediction performance caused by lack of or unreliably labeled negative samples. To date, a variety of PU learning algorithms have been developed. This study comprehensively summarizes the current research progress of PU learning using biological and biomedical data. We have surveyed 29 state-of-the-art PU learning-based bioinformatic applications in underlying PU learning methodology, algorithm implementation, performance evaluation strategy and biological application. Our survey further discussed current issues and possible future directions for PU learning in bioinformatics. We anticipate that our review and analysis can provide helpful insights into the applications of PU learning algorithms and will therefore underpin the development of novel PU learning frameworks to address critical biomedical questions.
+Key Points • Positive unlabeled (PU) learning overcomes the issue of limited positive samples and potentially mislabeled negative samples in biological and biomedical data and have been therefore widely applied to various bioinformatics applications. • We conducted a comprehensive review of 29 stateof-the-art PU bioinformatic applications regarding their PU learning approaches, performance evaluation strategies and application domains. • Based on our investigation and analysis, we further commented on the current issues of PU learning in bioinformatics and provided several novel perspectives to underpin the future development of PU frameworks for addressing biological and biomedical questions.
+Acknowledgements
+This work was supported by grants from the National Health and Medical Research Council of Australia (NHMRC) (APP1127948, APP1144652); Australian Research Council (ARC) (LP110200333, DP120104460); National Institute of Allergy and Infectious Diseases of the National Institutes of Health (R01 AI111965); a Major Inter-Disciplinary Research
+
+(IDR) project awarded by Monash University. FL’s work is supported by the core funding of the Doherty Institute at the University of Melbourne. CL is currently a CJ Martin Early Career Research Fellow supported by the NHMRC (1143366). LC’s work is supported by NHMRC career development fellowship (APP1103384), as well as an NHMRC-EU project grant (GNT1195743).
+References
+1. Jin X, Liao Q, Liu B. S2L-PSIBLAST: a supervised two-layer search framework based on PSI-BLAST for protein remote homology detection. Bioinformatics 2021. 10.1093/bioinformatics/btab472.
+2. Chen J, Guo M, Li S, et al. ProtDec-LTR2.0: an improved method for protein remote homology detection by combining pseudo protein and supervised learning to rank. Bioinformatics 2017;33:3473–6.
+3. Kalkatawi M, Magana-Mora A, Jankovic B, et al. DeepGSR: an optimized deep-learning structure for the recognition of genomic signals and regions. Bioinformatics 2019;35:1125–32.
+4. Umarov R, Kuwahara H, Li Y, et al. Promoter analysis and prediction in the human genome using sequence-based deep learning models. Bioinformatics 2019;35:2730–7.
+5. Rapakoulia T, Gao X, Huang Y, et al. Genome-scale regression analysis reveals a linear relationship for promoters and enhancers after combinatorial drug treatment. Bioinformatics 2017;33:3696–700.
+6. Lin H, Deng EZ, Ding H, et al. iPro54-PseKNC: a sequencebased predictor for identifying sigma-54 promoters in prokaryote with pseudo k-tuple nucleotide composition. Nucleic Acids Res 2014;42:12961–72.
+7. Zhang QC, Petrey D, Deng L, et al. Structure-based prediction of protein-protein interactions on a genome-wide scale. Nature 2012;490:556–60.
+8. Luck K, Kim DK, Lambourne L, et al. A reference map of the human binary protein interactome. Nature 2020;580: 402–8.
+9. Chen H, Li F, Wang L, et al. Systematic evaluation of machine learning methods for identifying humanpathogen protein-protein interactions. Brief Bioinform 2021;22(3):bbaa068. https://doi.org/10.1093/bib/bbaa068.
+10. Fossati A, Li C, Uliana F, et al. PCprophet: a framework for protein complex prediction and differential analysis using proteomic data. Nat Methods 2021;18:520–7.
+11. Barutcuoglu Z, Schapire RE, Troyanskaya OG. Hierarchical multi-label prediction of gene function. Bioinformatics 2006;22:830–6.
+12. Cho H, Berger B, Peng J. Compact integration of multinetwork topology for functional analysis of genes. Cell Syst 2016;3:540–548 e545.
+13. Zhao Y, Wang J, Chen J, et al. A literature review of gene function prediction by modeling gene ontology. Front Genet 2020;11:400.
+14. Hong J, Luo Y, Zhang Y, et al. Protein functional annotation of simultaneously improved stability, accuracy and false discovery rate achieved by a sequence-based deep learning. Brief Bioinform 2020;21:1437–47.
+15. Li F, Fan C, Marquez-Lago TT, et al. PRISMOID: a comprehensive 3D structure database for post-translational modifications and mutations with functional impact. Brief Bioinform 2020;21:1069–79.
+
+Positive unlabeled learning in bioinformatics 11
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+16. Li F, Wang Y, Li C, et al. Twenty years of bioinformatics research for protease-specific substrate and cleavage site prediction: a comprehensive revisit and benchmarking of existing methods. Brief Bioinform 2019;20:2150–66.
+17. Pazos F, Sternberg MJ. Automated prediction of protein function and detection of functional sites from structure. Proc Natl Acad Sci U S A 2004;101:14754–9.
+18. Wang X, Li C, Li F, et al. SIMLIN: a bioinformatics tool for prediction of S-sulphenylation in the human proteome based on multi-stage ensemble-learning models. BMC Bioinform 2019;20:602.
+19. Lee D, Redfern O, Orengo C. Predicting protein function from sequence and structure. Nat Rev Mol Cell Biol 2007;8:995–1005.
+20. Li F, Li C, Wang M, et al. GlycoMine: a machine learningbased approach for predicting N-, C- and O-linked glycosylation in the human proteome. Bioinformatics 2015; 31:1411–9.
+21. Li F, Li C, Revote J, et al. GlycoMine(struct): a new bioinformatics tool for highly accurate mapping of the human N-linked and O-linked glycoproteomes by incorporating structural features. Sci Rep 2016;6:34595.
+22. Song J, Li F, Leier A, et al. PROSPERous: high-throughput prediction of substrate cleavage sites for 90 proteases with improved accuracy. Bioinformatics 2018;34:684–7.
+23. Li F, Leier A, Liu Q, et al. Procleave: predicting proteasespecific substrate cleavage sites by combining sequence and structural information. Genom Proteom Bioinform 2020; 18:52–64.
+24. Li F, Guo X, Jin P, et al. Porpoise: a new approach for accurate prediction of RNA pseudouridine sites. Brief Bioinform 2021. 10.1093/bib/bbab245.
+25. Liu Q, Chen J, Wang Y, et al. DeepTorrent: a deep learningbased approach for predicting DNA N4-methylcytosine sites. Brief Bioinform 2021;22(3):bbaa124. https://doi.o rg/10.1093/bib/bbaa124.
+26. Mei S, Li F, Xiang D, et al. Anthem: a user customised tool for fast and accurate prediction of binding between peptides and HLA class I molecules. Brief Bioinform 2021. 10.1093/bib/bbaa415.
+27. Lv H, Dao FY, Zulfiqar H, et al. DeepIPs: comprehensive assessment and computational identification of phosphorylation sites of SARS-CoV-2 infection using a deep learning-based approach. Brief Bioinform 2021. 10.1093/bib/bbab244.
+28. Dao FY, Lv H, Su W, et al. iDHS-deep: an integrated tool for predicting DNase I hypersensitive sites by deep neural network. Brief Bioinform 2021. 10.1093/bib/bbab047.
+29. Song Z, Huang D, Song B, et al. Attention-based multi-label neural networks for integrated prediction and interpretation of twelve widely occurring RNA modifications. Nat Commun 2021;12:4011.
+30. Dai C, Feng P, Cui L, et al. Iterative feature representation algorithm to improve the predictive performance of N7methylguanosine sites. Brief Bioinform 2021;22(4):bbaa278. https://doi.org/10.1093/bib/bbaa278.
+31. Tang Q, Kang J, Yuan J, et al. DNA4mC-LIP: a linear integration method to identify N4-methylcytosine site in multiple species. Bioinformatics 2020;36:3327–35.
+32. Liu K, Chen W. iMRM: a platform for simultaneously identifying multiple kinds of RNA modifications. Bioinformatics 2020;36:3336–42.
+33. Campanella G, Hanna MG, Geneslaw L, et al. Clinicalgrade computational pathology using weakly supervised
+
+deep learning on whole slide images. Nat Med 2019;25: 1301–9. 34. Manifold B, Men S, Hu R, et al. A versatile deep learning architecture for classification and label-free prediction of hyperspectral images. Nat Mach Intell 2021;3:306–15. 35. Wang G, Liu X, Shen J, et al. A deep-learning pipeline for the diagnosis and discrimination of viral, non-viral and COVID19 pneumonia from chest X-ray images. Nat Biomed Eng 2021;5:509–21. 36. Wang Y, Coudray N, Zhao Y, et al. HEAL: an automated deep learning framework for cancer histopathology image analysis. Bioinformatics 2021. 10.1093/bioinformatics/btab380. 37. Chen Z, Zhao P, Li F, et al. PROSPECT: a web server for predicting protein histidine phosphorylation sites. J Bioinform Comput Biol 2020;18:2050018. 38. Li F, Li C, Marquez-Lago TT, et al. Quokka: a comprehensive tool for rapid and accurate prediction of kinase familyspecific phosphorylation sites in the human proteome. Bioinformatics 2018;34:4223–31. 39. Larrañaga P, Calvo B, Santana R, et al. Machine learning in bioinformatics. Brief Bioinform 2006;7:86–112. 40. Byvatov E, Schneider G. Support vector machine applications in bioinformatics. Appl Bioinform 2003;2:67–77. 41. Boulesteix A-L, Janitza S, Kruppa J, et al. Overview of random forest methodology and practical guidance with emphasis on computational biology and bioinformatics. Wiley Interdiscipl Rev: Data Mining Knowl Discov 2012;2:493–507. 42. Wang Q, Garrity GM, Tiedje JM, et al. Naïve Bayesian classifier for rapid assignment of rRNA sequences into the new bacterial taxonomy. Appl Environ Microbiol 2007;73: 5261. 43. Sobel E, Lange K, Wu TT, et al. Genome-wide association analysis by lasso penalized logistic regression. Bioinformatics 2009;25:714–21. 44. Li F, Zhang Y, Purcell AW, et al. Positive-unlabelled learning of glycosylation sites in the human proteome. BMC Bioinform 2019;20:112. 45. Kilic C, Tan M. Positive Unlabeled Learning for Deriving Protein Interaction Networks. Netherlands: Springer, 2012, 87. 46. Liu H, Torii M, Xu G, et al. Learning from Positive and Unlabeled Documents for Retrieval of Bacterial Protein-Protein Interaction Literature. Germany: Springer-Verlag, 2010, 62. 47. Xing-Ming Z, Yong W, Luonan C, et al. Gene function prediction using labeled and unlabeled data. BMC Bioinform 2008;9:1–14. 48. Chen Y, Li Z, Wang X, et al. Predicting gene function using few positive examples and unlabeled ones. BMC Genomics 2010;11(Suppl 2):S11–1. 49. Mordelet F, Vert JP. ProDiGe: prioritization of disease genes with multitask machine learning from positive and unlabeled examples. BMC Bioinform 2011;12:389. 50. Bhardwaj N, Gerstein M, Lu H. Genome-wide sequencebased prediction of peripheral proteins using a novel semi-supervised learning technique. BMC Bioinform 2010; 11(Suppl 1):S6–6. 51. Xiao Y, Segal MR. Biological sequence classification utilizing positive and unlabeled data. Bioinformatics 2008;24: 1198–205. 52. Wang C, Ding C, Meraz RF, et al. PSoL: A Positive Sample Only Learning Algorithm for Finding Non-coding RNA Genes. Great Britain: Oxford University Press, 2006, 2590. 53. Hameed PN, Verspoor K, Kusljic S, et al. Positive-unlabeled learning for inferring drug interactions based on heterogeneous attributes. BMC Bioinform 2017;18:140.
+
+12 Li et al.
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+54. Bekker J, Davis J. Learning from positive and unlabeled data: a survey. Mach Learn 2020;109:719–60.
+55. van Engelen JE, Hoos HH. A survey on semi-supervised learning. Mach Learn 2020;109:373–440.
+56. Khan SS, Madden MG. One-class classification: taxonomy of study and review of techniques. Knowl Eng Rev 2014; 29:345–74.
+57. Cerulo L, Elkan C, Ceccarelli M. Learning gene regulatory networks from only positive and unlabeled data. BMC Bioinform 2010;11:228.
+58. Li C, Zhang Y, Li X. OcVFDT: one-class very fast decision tree for one-class classification of data streams. Proceedings of the Third International Workshop on Knowledge Discovery from Sensor Data. Paris, France: Association for Computing Machinery, 2009, 79–86.
+59. Cerulo L, Paduano V, Zoppoli P, et al. A negative selection heuristic to predict new transcriptional targets. BMC Bioinform 2010;14(Suppl 1):S3–3.
+60. Patel N, Wang JTL. Semi-Supervised Prediction of Gene Regulatory Networks Using Machine Learning Algorithms. J Biosci 2015;40:731–40.
+61. Jiang M, Cao J-Z. Positive-unlabeled learning for pupylation sites prediction. Biomed Res Int 2016;2016:1–5.
+62. Lan W, Li M, Zhao K, et al. LDAP: a web server for lncRNA-disease association prediction. Bioinformatics 2017;33:458–60.
+63. Nan X, Bao L, Zhao X, et al. EPuL: an enhanced positiveunlabeled learning algorithm for the prediction of pupylation sites. Molecules 2017;22(9):1463. https://doi.org/10.3390/ molecules22091463.
+64. Zeng X, Zhong Y, Lin W, et al. Predicting diseaseassociated circular RNAs using deep forests combined with positive-unlabeled learning methods. Brief Bioinform 2020;21:1425–36.
+65. Zhou Z-H, Feng J. Deep forest. Natl Sci Rev 2019;6:74–86. 66. Wei H, Xu Y, Liu B. iPiDi-PUL: identifying Piwi-interacting
+RNA-disease associations based on positive unlabeled learning. Brief Bioinform 2021;22(3):bbaa058. https://doi.o rg/10.1093/bib/bbaa058. 67. Yan F, Zhao Z, Simon LM. EmptyNN: a neural network based on positive and unlabeled learning to remove cell-free droplets and recover lost cells in scRNA-seq data. Patterns 2021. https://doi.org/10.1016/j.patter.2021.100311:100311. 68. Yang P, Li XL, Mei JP, et al. Positive-unlabeled learning for disease gene identification. Bioinformatics 2012;28:2640–7. 69. Yang P, Li X, Chua H-N, et al. Ensemble positive unlabeled learning for disease gene identification. PLoS One 2014;9:1–11. 70. Yanqi H, Recep C, Joan T, et al. Semi-supervised learning predicts approximately one third of the alternative splicing isoforms as functional proteins. Cell Rep 2015;12(2):183–9. 10.1016/j.celrep.2015.06.031:183. 71. Ren J, Liu Q, Ellis J, et al. Positive-unlabeled learning for the prediction of conformational B-cell epitopes. BMC Bioinform 2015;16(Suppl 18):S12. 72. Lan W, Wang J, Li M, et al. Predicting drug–target interaction using positive-unlabeled learning. Neurocomputing 2016;206:50–7. 73. Mamitsuka HE, DeLisi CE, Kanehisa ME, et al. Supervised Inference of Gene Regulatory Networks from Positive and Unlabeled Examples. Totowa, NJ: Humana Press, 2012, 47. 74. Pio G, Malerba D, D’Elia D, et al. Integrating MicroRNA target predictions for the discovery of gene regulatory networks:
+
+a semi-supervised ensemble learning approach. BMC Bioinform 2014;15:S4. doi: 10.1186/1471-2105-15-S1-S4. 75. Cheng Z, Zhou S, Guan J. Computationally predicting protein-RNA interactions using only positive and unlabeled examples. J Bioinform Comput Biol 2015;13:1541005. 76. Yang P, Humphrey SJ, James DE, et al. Positive-Unlabeled Ensemble Learning for Kinase Substrate Prediction from Dynamic Phosphoproteomics Data. Great Britain: Oxford University Press, 2016, 252. 77. Pejaver V, Urresti J, Lugo-Martinez J, et al. Inferring the molecular and phenotypic impact of amino acid variants with MutPred2. Nat Commun 2020;11:5918. 78. Li F, Song J, Li C, et al. PAnDE : averaged n-dependence estimators for positive unlabeled learning, ICIC express letters. Part B, Applications. Int J Res Surveys 2017;8:1287–97. 79. Bepler T, Morin A, Rapp M, et al. Positive-unlabeled convolutional neural networks for particle picking in cryo-electron micrographs. Nat Methods 2019;16:1153–60. 80. Li Z, Hu L, Tang Z, et al. Predicting HIV-1 protease cleavage sites with positive-unlabeled learning. Front Genet 2021;12. https://doi.org/10.3389/fgene.2021.658078. 81. Scholkopf B, Platt JC, Shawe-Taylor J, et al. Estimating the support of a high-dimensional distribution. Neural Comput 2001;13:1443–71. 82. Zhang M, Zhou Z. In: Zhou Z (ed). A k-Nearest Neighbor Based Algorithm for Multi-label Classification. Piscataway, NJ, USA, USA: IEEE, 2005, 718. 83. Ma H, Yang H, Lyu MR et al. Mining social networks using heat diffusion processes for marketing candidates selection. Proceedings of the 17th ACM conference on Information and knowledge management. Napa Valley, California, USA: ACM, 2008, 233–42. 84. Elkan C, Noto K. Learning classifiers from only positive and unlabeled data. Proceedings of the 14th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. Las Vegas, Nevada, USA: ACM, 2008, 213–20. 85. Webb GI, Boughton JR, Zheng F, et al. Learning by Extrapolation from Marginal to Full-Multivariate Probability Distributions: Decreasingly Naive Bayesian Classification. Great Britain: Springer Science + Business Media, 2012, 233. 86. Jain S, White M, Trosset MW, et al. Nonparametric Semisupervised Learning of Class Proportions, 2016. arXiv: 1601.01944. 87. Jain S, White M, Radivojac P. Estimating the Class Prior and Posterior from Noisy Positives and Unlabeled Data, 2016. arXiv:1606.08561. 88. Hershberg R, Altuvia S, Margalit H. A survey of small RNA-encoding genes in Escherichia coli. Nucleic Acids Res 2003;31:1813–20. 89. Eraslan G, Avsec Zˇ , Gagneur J, et al. Deep learning: new computational modelling techniques for genomics. Nat Rev Genet 2019. 10.1038/s41576-019-0122-6. 90. Denis F, Gilleron R, Letouzey F. Learning from positive and unlabeled examples. Theor Comput Sci 2005;348: 70–83. 91. Li C, Hua X-L. Towards Positive Unlabeled Learning for Parallel Data Mining: A Random Forest Framework. In the conference proceedings of International Conference on Advanced Data Mining and Applications 2014 (ADMA 2014). Cham: Springer International Publishing, 2014, 573–87. 92. He J, Zhang Y, Li X, et al. Bayesian Classifiers for Positive Unlabeled Learning. Berlin, Heidelberg: Springer Berlin Heidelberg, 2011, 81–93.
+
+Positive unlabeled learning in bioinformatics 13
+
+Downloaded from https://academic.oup.com/bib/article/23/1/bbab461/6415313 by guest on 06 September 2024
+
+93. Dong X, Yu Z, Cao W, et al. A survey on ensemble learning. Front Comp Sci 2020;14:241–58.
+94. Freund Y, Schapire RE. A decision-theoretic generalization of on-line learning and an application to boosting. J Comput Syst Sci 1997;55:119–39.
+95. Hastie T, Rosset S, Zhu J, et al. Multi-class adaboost. Stat Interface 2009;2:349–60.
+96. Wolpert DH. Stacked generalization. Neural Netw 1992; 5:241–59.
+97. Gligorijevic´ V, Renfrew PD, Kosciolek T, et al. Structurebased protein function prediction using graph convolutional networks. Nat Commun 2021;12:3168.
+98. Kulmanov M, Hoehndorf R. DeepGOPlus: improved protein function prediction from sequence. Bioinformatics 2020; 36:422–9.
+99. Li F, Chen J, Leier A, et al. DeepCleave: a deep learning predictor for caspase and matrix metalloprotease substrates and cleavage sites. Bioinformatics 2020;36:1057–65.
+100. Chen Z, Zhao P, Li F, et al. Comprehensive review and assessment of computational methods for predicting RNA post-transcriptional modification sites from RNA sequences. Brief Bioinform 2020;21:1676–96.
+101. Zhu Q, Shao Y, Wang Z, et al. DeepS: a web server for image optical sectioning and super resolution microscopy based on a deep learning framework. Bioinformatics 2021. 10.1093/bioinformatics/btab144.
+102. Oh M, Park S, Kim S, et al. Machine learning-based analysis of multi-omics data on the cloud for investigating gene regulations. Brief Bioinform 2021;22:66–76.
+103. Sharifi-Noghabi H, Zolotareva O, Collins CC, et al. MOLI: multi-omics late integration with deep neural networks for drug response prediction. Bioinformatics 2019;35:i501–9.
+104. Meyer JG. Deep learning neural network tools for proteomics. Cell Reports Methods 2021;1:100003.
+105. Gessulat S, Schmidt T, Zolg DP, et al. Prosit: proteomewide prediction of peptide tandem mass spectra by deep learning. Nat Methods 2019;16:509–18.
+106. Wilhelm M, Zolg DP, Graber M, et al. Deep learning boosts sensitivity of mass spectrometry-based immunopeptidomics. Nat Commun 2021;12:3346.
+107. Schmauch B, Romagnoni A, Pronier E, et al. A deep learning model to predict RNA-Seq expression of tumours from whole slide images. Nat Commun 2020;11:3877.
+108. Kiryo R, Niu G, MCd P, et al. Positive-unlabeled learning with non-negative risk estimator. In: , arXiv preprint
+
+arXiv:1703.00593 2017. 07, November, 2017, preprint: not peer reviewed. 109. Hou M, Chaib-Draa B, Li C, et al. Generative adversarial positive-unlabelled learning. In: , arXiv preprint arXiv:1711.08054 2017. preprint: not peer reviewed. 110. Wu M, Pan S, Du L, et al. Long-short distance aggregation networks for positive unlabeled graph learning. Proceedings of the 28th ACM International Conference on Information and Knowledge Management. 2019, p. 2157–60. 111. Liu B. BioSeq-analysis: a platform for DNA, RNA and protein sequence analysis based on machine learning approaches. Brief Bioinform 2019;20:1280–94. 112. Chen Z, Zhao P, Li F, et al. iFeature: a python package and web server for features extraction and selection from protein and peptide sequences. Bioinformatics 2018; 34:2499–502. 113. Chen Z, Zhao P, Li F, et al. iLearn: an integrated platform and meta-learner for feature engineering, machine-learning analysis and modeling of DNA, RNA and protein sequence data. Brief Bioinform 2020;21:1047–57. 114. Chen Z, Zhao P, Li C, et al. iLearnPlus: a comprehensive and automated machine-learning platform for nucleic acid and protein sequence analysis, prediction and visualization. Nucleic Acids Res 2021;49:e60. 115. Cao C, Liu F, Tan H, et al. Deep learning and its applications in biomedicine, genomics. Proteom Bioinform 2018;16: 17–32. 116. Shin H, Orton M, Collins DJ et al. Autoencoder in timeseries analysis for unsupervised tissues characterisation in a large unlabelled medical image dataset. 2011 10th International Conference on Machine Learning and Applications and Workshops, USA. 2011, p. 259–64. 117. Lee T, Yoon S. Boosted categorical restricted Boltzmann machine for computational prediction of splice junctions. In: Proceedings of the 32nd International Conference on International Conference on Machine Learning, Vol. 37. Lille, France: JMLR.org, 2015, 2483–92. 118. Jia C, Bi Y, Chen J, et al. PASSION: an ensemble neural network approach for identifying the binding sites of RBPs on circRNAs. Bioinformatics 2020;36:4276–82. 119. Zhu Y, Li F, Xiang D, et al. Computational identification of eukaryotic promoters based on cascaded deep capsule neural networks. Brief Bioinform 2020. 10.1093/bib/bbaa299. 120. Li H, Tian S, Li Y, et al. Modern deep learning in bioinformatics. J Mol Cell Biol 2020;12:823–7.
+

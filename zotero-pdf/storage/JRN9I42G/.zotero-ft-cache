@@ -1,0 +1,147 @@
+ 
+ACM Digital Library home 
+ACM home 
+ 
+    Browse 
+    About 
+        Sign in 
+        Register 
+ 
+    Journals 
+    Magazines 
+    Proceedings 
+    Books 
+    SIGs 
+    Conferences 
+    People 
+ 
+Search ACM Digital Library 
+Search Search 
+Advanced Search 
+10.1145/2541940.2541949 acmconferences Article/Chapter View Abstract Publication Pages asplos Conference Proceedings conference-collections 
+asplos 
+ 
+    Conference 
+    Proceedings 
+    Upcoming Events 
+    Authors 
+    Affiliations 
+    Award Winners 
+ 
+Home Conferences ASPLOS Proceedings ASPLOS '14 Using ARM trustzone to build a trusted language runtime for mobile applications 
+research-article 
+Using ARM trustzone to build a trusted language runtime for mobile applications 
+Share on 
+ 
+    Authors: 
+    Nuno Santos 
+    , 
+    Himanshu Raj 
+    , 
+    Stefan Saroiu 
+    , 
+    Alec Wolman 
+ 
+Authors Info & Claims 
+ASPLOS '14: Proceedings of the 19th international conference on Architectural support for programming languages and operating systems February 2014 Pages 67–80 https://doi.org/10.1145/2541940.2541949 
+Online: 24 February 2014 Publication History 
+ 
+    136 citation 
+    1,450 
+    Downloads  
+ 
+    Get Citation Alerts 
+    Save to Binder 
+    Export Citation 
+ 
+    Get Access  
+ 
+ASPLOS '14: Proceedings of the 19th international conference on Architectural support for programming languages and operating systems 
+Using ARM trustzone to build a trusted language runtime for mobile applications 
+Pages 67–80 
+Previous Chapter Next Chapter 
+ 
+        ABSTRACT 
+        References 
+        Index Terms 
+        Comments  
+ 
+ACM Digital Library 
+ABSTRACT 
+ 
+This paper presents the design, implementation, and evaluation of the Trusted Language Runtime (TLR), a system that protects the confidentiality and integrity of .NET mobile applications from OS security breaches. TLR enables separating an application's security-sensitive logic from the rest of the application, and isolates it from the OS and other apps. TLR provides runtime support for the secure component based on a .NET implementation for embedded devices. TLR reduces the TCB of an open source .NET implementation by a factor of $78$ with a tolerable performance cost. The main benefit of the TLR is to bring the developer benefits of managed code to trusted computing. With the TLR, developers can build their trusted components with the productivity benefits of modern high level languages, such as strong typing and garbage collection. 
+ 
+References 
+ 
+    Android. http://www.android.com. Google Scholar Google Scholar 
+    Dalvik VM Internals. https://sites.google.com/site/io/dalvik-vm-internals. Google Scholar Google Scholar 
+    Apple iOS 6. http://www.apple.com/ios. Google Scholar Google Scholar 
+ 
+Show All References 
+Index Terms 
+ 
+    Using ARM trustzone to build a trusted language runtime for mobile applications 
+ 
+        Security and privacy 
+ 
+            Systems security 
+ 
+                Operating systems security 
+ 
+Comments 
+Please enable JavaScript to view the comments powered by Disqus. 
+ 
+    38 References 
+ 
+View Table of Contents 
+back 
+Categories 
+ 
+    Journals 
+    Magazines 
+    Books 
+    Proceedings 
+    SIGs 
+    Conferences 
+    Collections 
+    People 
+ 
+About 
+ 
+    About ACM Digital Library 
+    Subscription Information 
+    Author Guidelines 
+    Using ACM Digital Library 
+    All Holdings within the ACM Digital Library 
+    ACM Computing Classification System 
+ 
+Join 
+ 
+    Join ACM 
+    Join SIGs 
+    Subscribe to Publications 
+    Institutions and Libraries 
+ 
+Connect 
+ 
+    Contact 
+    Facebook 
+    Twitter 
+    Linkedin 
+ 
+The ACM Digital Library is published by the Association for Computing Machinery. Copyright © 2022 ACM, Inc. 
+ 
+    Terms of Usage 
+    Privacy Policy 
+    Code of Ethics 
+ 
+ACM Digital Library home 
+ACM home 
+About Cookies On This Site 
+ 
+We use cookies to ensure that we give you the best experience on our website. 
+ 
+Learn more 
+ 
+Got it! 
+ 

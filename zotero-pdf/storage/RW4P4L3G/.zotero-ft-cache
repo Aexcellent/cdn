@@ -1,0 +1,730 @@
+64 BIG DATA RESEARCH 大数据
+联邦学习算法综述
+王健宗1，孔令炜1，黄章成1，陈霖捷1，刘懿1，何安珣1，肖京2 1. 平安科技（深圳）有限公司，广东 深圳 518063 2. 中国平安保险（集团）股份有限公司，广东 深圳 518031
+
+摘要 近年来，联 邦学习作为解决数据孤岛问题的技术被 广泛关注，已经 开始被 应用于金融、医疗健 康以 及智 慧 城 市 等 领 域 。从3 个层 面 系 统 阐 述 联 邦 学习 算法。首先 通 过 联 邦 学习的 定 义、架 构、分 类 以 及 与 传 统 分 布 式 学习的 对 比 来 阐 述 联 邦 学习的 概 念；然 后 基 于机 器 学习和 深 度 学习对目前 各 类 联 邦 学 习算法进行分类比较和深入分析；最后分别从通信成本、客户端选择、聚合方式优化的角度 对联 邦 学习优化算法进行分类，总 结了联 邦学习的研 究 现 状，并提出了联 邦学习面临的通信、系统异 构、 数 据 异 构三 大 难 题 和 解 决 方 案，以 及 对未 来 的 期 望。
+关键词 联 邦 学习；算法 优化；大 数 据；数 据 隐 私
+
+中 图 分 类 号：T P 311
+
+文 献 标 识 码：A
+
+doi: 10.11959/j.issn.2096-0271.2020055
+
+Research review of federated learning algorithms
+WANG Jianzong1, KONG Lingwei1, HUANG Zhangcheng1, CHEN Linjie1, LIU Yi1, HE Anxun1, XIAO Jing2 1. Ping An Technology (Shenzhen) Co., Ltd., Shenzhen 518063, China 2. Ping An Insurance (Group) Company of China, Ltd., Shenzhen 518031, China
+Abstract
+In recent years, federated learning has been proposed and received widespread attention to overcome data isolated island challenge. Federated learning related researches were adopted in areas such as financial field, healthcare domain and smart city related application. Federated learning concept was introduced into three different layers. The first layer introduced the definition, architecture, classification of federated learning and compared the federated learning with traditional distributed learning. The second layer presented comparison and analysis of federated learning algorithms from machine learning and deep learning aspects. The third layer separated federated learning optimization algorithms into three aspects to optimize federated learning algorithm through reducing communication cost, selecting proper clients and different aggregation method. Finally, the current research status and three main challenges on communication, heterogeneity of system and data to be solved were concluded, and the future prospects in federated learning domain were proposed.
+Key words
+federated learning, algorithm optimization, big data, data privacy
+2020055-1
+
+STUDY 研究 65
+
+1 引言
+随着数字化技术进入高速发展期，大数 据和人工智能等技术迎 来 爆发 式 发 展[1-2 ]， 这一方 面 为传 统 业 态 带 来了升 级 变 革 的 新 机 遇 [3-5]，另一方面 不 可 避 免 地 给 数 据和 网络安 全带来了全 新的挑战，而数 据孤岛 问题[6-7]是关 键 挑战之一。纵向来看，行业 顶尖 的巨 头 公司垄 断了大 量 的 数 据 信息， 小公司往往很 难得到这些数据，导致企业 间的层 级和差距 不断拉 大；横向来 看，同 一层 级 不 同 行 业 的 公司，由于系 统 和 业 务 的 闭 塞 性 与 阻 隔 性，很 难 实 现 数 据 信息 的 交 流 与 整 合，联 合 建 模 需 要 跨 越 重 重 壁垒。
+针 对上 述 人 工智 能 行业目前 面 临 的 痛 点，联邦学习给出了答案。联邦学习是由谷 歌研究院在2016年率先提出的概念 。 [8-10] 该 技 术可 在 数 据不 共 享的情况下完 成 联 合 建 模。具 体来讲，各 个 数 据拥有者（个人/ 企 业 / 机 构）的自有 数 据 不 会离开本 地，通 过 联 邦系统中 加密 机制下的参 数 交 换 方 式
+
+（即在不违反数 据隐私法 规的情况下）联 合建立一个全局的共享 模型，建好的模型 在各自的区域 只为本 地的目标服务[11]。尽 管联邦学习[12-14]和分布式 机器 学习[15-19]有 部 分相似的地方，但 是在 应用领 域、系统 设计、优化算法方面，联邦学习有自己的特 征。在数据量庞大、所需计算资源较高时， 分布 式 机 器 学习（如参 数 服务 器）有明显 的 优 势，它 将 独 立 同 分布（i nd e p e nd e nt ly identically distribution，IID）的数 据或 模型参 数存 储在各 个分布式节点上，中心 服 务 器 调 动 数 据 和 计 算资 源，联 合 训练 模 型。因客户端的地 理、时间等 分布差异， 联 邦 学习经常要 处 理 非 独 立同分布（nonI I D）的 数 据。本 文 结 合 联 邦 学 习的 现 状， 对 联 邦 学 习系 统 进 行分层，按 模 块 整 理 联 邦学习目前取得的相关成果。
+联邦学习算法结构如图1所示。 为了整合多个来源的数据，当前比较普遍 的做 法 是 通 过 数 据 预 处 理 E T L（ex t r ac ttransform-load）工具 将不同源的数据移 动到关 系数 据库中，将具 有庞大计算量的 任务部署到多台机器上，以提升计算效率， 减少任务耗能。
+
+图 1  联邦学习算法结构
+
+2020055-2
+
+66 BIG DATA RESEARCH 大数据
+
+2 联邦学习概述
+
+2.1 联邦学习的定义
+
+2 016 年，谷 歌 研 究 院 在 解 决 面 向 用
+
+户 个 体 的 键 盘 输 入 法 优 化 问 题 时，提 出
+
+了联邦学习这一全 新的人工智能解决
+
+方 案 。联 邦 学 习 面 向 的 场 景 是 分 散 式
+
+多用 户 {F1,, FN } ，每 个 用 户 客 户 端 拥 有 当 前 用 户 的 数 据 集 {D1,, DN } 。传 统 的 深 度 学 习将 这 些 数 据 收 集 在 一 起，得 到
+
+汇 总 数 据 集DDD===UUU111,,,,,,UUUNNN，训 练 得 到 模 型 MSUM 。联 邦 学 习 方 法 则 是 由 参 与 的用 户 共 同 训 练 一 个 模 型 M FED ，同 时 用 户 数 据 D i 保 留 在 本 地 ，不 对 外 传 输。如 果 存 在 一 个 非 负 实 数 δ ，使 得 M FED 的 模 型 精 度VFED 与 M SUM的 模 型 精度VSUM满足 如下 不等式：
+
+VFED − VSUM < δ  
+
+（1）
+
+则称该 联 邦 学习算 法 达 到δ -精度 损 失 [4]。
+
+联 邦 学 习允 许 训练 模 型存 在一定 程 度 的 性
+
+能偏差，但是为所有的参与方 提 供了数 据
+
+的安 全 性和隐私保 护。联邦学习常用的框
+
+架 有 两 种，一 种 是 客户端 -服 务 器 架 构 [ 8 ]，
+
+另一种是 对 等网络 架构[20]。在客户端-服
+
+务器架构中，联邦学习的训练方 式是让各
+
+个 数 据 持 有 方 根 据自己的 条 件 和 规 则在 本
+
+地训练模型，然后将脱敏参数汇 总到中央
+
+服 务 器 进 行 计 算，之 后再 下发回各 个 数 据
+
+持有 方更 新自己本地的模型，直至全局模
+
+型稳健为止。在对等网络 架构中进行联邦
+
+学习训练时，参 与方之间可以直接 通信，
+
+不需要 借助第三方，安 全 性得到了进一 步
+
+提 高，但 是 需 要 更 多 的 计 算 操 作 进 行 加 密
+
+和解 密[21-24]。目前的研究更多的是 基于第
+
+三 方服 务 器 的 框 架 。因此 本 文 着 重介 绍 客
+
+户端-服务器架构的联邦学习流程。
+
+2020055-3
+
+2.2 客户端-服务器架构的联邦学习流程
+在物理 层面上，联邦学习系统一 般由 数 据 持 有 方 和中心服 务 器 组 成。各 数 据 持 有 方的 本 地 数 据的 数 量 或特 征 数可能 并不 足以支持 一次成功的模型训练，因此需要 其他数 据持有 方的支持。而联邦学习中心 服 务 器 的工作 类 似于分布 式 机 器 学习的服 务器，其收集各数据持有方的梯度，并在服 务 器内进行 聚合操 作后 返回新 的 梯度 [ 2 5 ]。 在一次联邦学习的合作建模过程中，数据持 有方对本地数据的训练仅发生在本地，以保 护数据隐私，迭代产生的梯度在脱敏后被作 为交互信息，代替本地数据上传给第三方受 信任的服务器，等待服务 器 返回聚合后的 参 数，对 模型 进行更 新[8]。图2展 示了客户 端-服务器架构的联邦学习流程。
+步 骤 1：系 统 初 始 化 。首先由中心 服 务 器发 送 建 模任 务，寻求 参 与客户端。客户端 数 据 持 有 方 根 据自身 需 求，提 出联 合 建 模 设 想。在与 其 他合 作 数 据 持 有 方达 成 协议 后，联 合 建 模设 想被确立，各 数 据持有 方 进入联 合建模过程。由中心服务器向各 数 据持有方发布初始参数。
+步 骤 2：局 部计 算。联 合 建 模任 务 开启 并初始化系统参数 后，各数据持有方将被 要求 首先 在 本 地 根 据己方 数 据 进行局 部计 算，计 算完 成 后，将本 地 局 部计 算所 得 梯 度 脱敏 后 进行上传，以用于全局模型的一 次更新。
+步骤3：中心聚合。在收 到来自多个数 据持有 方的计算结果后，中心服务 器对这 些 计 算值 进 行 聚 合 操 作，在 聚 合 的 过 程中 需要同时考虑效率、安全、隐私等多方面的 问 题。比 如，有 时 因为系 统 的 异 构 性，中心 服务器可能不会等待所有数据持有方的上 传，而是 选择 一个合 适的数据持有方子集 作为收集目标，或者为了安 全地 对参 数 进
+
+STUDY 研究 67
+
+图 2  客户端 - 服务器架构的联邦学习流程
+
+行聚合，使用一定的加密技 术对参数 进行 加 密，这 些 方 法 将 会在 后 面的 章 节 中 详 细 讨论。
+步 骤 4：模 型 更 新。中心服 务 器 根 据 聚 合后的结果对全局模型 进行 一次更 新，并 将更 新后的 模 型 返 回给 参 与建 模 的 数 据 持有 方。数 据持有 方更 新本 地 模 型，并开 启下一 步局部计算，同时评 估更 新后的模 型性 能，当性 能 足够 好 时，训练 终止，联 合 建 模 结 束 。建 立 好 的 全 局 模 型将 会 被保留 在中心服务器端，以进行后 续的预测或分 类工作。
+上 述 过 程 是 一 个典 型 的基 于客户端服务器架构的联邦学习过程。但并不是 每 个联邦学习任务都一定要严格按照这样的 流 程 进行操作，有时可能会针对不同场景 对 流 程 做出改动，例如，适当地减 少 通信 频率来保证学习效率[26-31]，或 者在聚合后 增加一个 逻辑判断，判断接收 到的本地计 算 结果 的质 量 [ 3 2-3 5 ]，以 提 升 联 邦 学 习系 统 的鲁棒性[36]。
+
+2.3 联邦学习与传统分布式学习的区别
+基于客户端-服务 器 架构的联 邦 学习 和分布 式 机 器 学习[37 ]都 是 用来处 理分布 式 数 据的，但在应用领域、数 据属性 和系统 构成等方面，其 与分布式 机器 学习存在差 异，主要如下。
+（1）应用领域 大量的数据或者较大的模型往往对计算 资源有较高的要求。单一的计算节点已经不 能满足需求。分布式机器学习将训练数据或 模型参数分布在各个计算或存储节点，利用 中心服务器对节点进行调度，加速模型的训 练。而当数据具有隐私敏感属性时，分布式机 器学习的中心调度将会给用户数据带来极大 的隐私泄露风险[38]。联邦学习始终将数据存 储在本地，相比需要将数据上传到服务器的 方式，可以最大限度地保障数据隐私。 （2）数据属性 机 器 学习的 主要目的 是 寻 找 数 据 的 概
+2020055-4
+
+68 BIG DATA RESEARCH 大数据
+
+率分布，这在数 据集满足独立同分布的情 况下相对比较容易。分布式 机 器 学习与经 典 机 器 学习处 理的 数 据 往往 是 独 立同分布 的，联邦学习则有所不同。由于客户端的地 理位置、时间等分布的差异性，联邦学习系 统的原始数 据往往是非独立同分布的。同 时，横 向 联 邦 学 习和 纵 向 联 邦 学 习也 是 根 据客户端 数 据的不同属性 来 进行分 类 的。 客户端之 间的 数 据 特 征 和分 类 标 签 差异 较 大，在 进行 训练时 需要进行对齐工作。
+（3）系统构成 在物理 组 成上，联邦学习系统和分布 式 系 统 较 为 相 似，都由中心服 务 器 和 多 个 分布 式节点 构成。在分布 式 系统中，数 据 计 算 和 模 型更 新 统一由中心服 务 器 进行 调 度，节点和中心服务 器之间的 数 据时延 较 小，模 型 训 练 时 间 主 要由计 算 时 间 决 定 。 而在联邦系统中，各 个参 与 方地位平 等， 可 以自主 决 定 是 否参 与 模 型 训 练 。且由于 分布 式节点多为计 算能力差异 较 大、网络 环 境 不同以 及 所处状 态 不 可 控 的 客户端， 在系统设计上，需要考虑数 据传 递时延、 数 据 非 独 立同分布以 及隐 私安 全 等 众 多因 素，这 就要求系统对联邦学习算法 做出适 应 性 的改 变 [ 3 9 -41]。联 邦 聚 合 是 联 邦 学 习系 统中不同于分布式 机器 学习的优化算法， 为解 决 数 据非 独 立同分布 和 减 轻 数 据异 构 提 供了新的思 路。同时，由于联 邦 学习具 有 极好的隐私保护能力，在系统的各 个环 节 都 要 注 意 加 密算 法 的应 用。加 密 数 据 的 传 递、目标函数 损 失的计 算、梯度的计 算与 传递模型参数的传递等都对传统的算法提 出了新的要求。
+2.4 联邦学习分类
+联 邦 学 习的 孤 岛 数 据 有 不同的 分布 特 征。对于 每一个参 与 方来说，自己所拥有 的数据可以用一个 矩阵来表示。矩阵的每
+2020055-5
+
+一行 表 示 每 一 个用户或 者 一 个 独 立的 研 究 对象，每一列表 示用户或者研究 对象的一 种特 征。同时，每 一行数 据 都 会有一 个标 签。对于 每一个用户来说，人们希望 通 过 他的特 征 X，学习一个模 型 来 预测他的 标 签Y。在 现 实中，不同的 参 与 方 可能 是 不同 的公司或 者机 构，人们不希望自己的数 据 被别人知道，但是人们希望可以联 合 训练 一个更强大的模型来预测标签Y。
+根 据联邦学习的数 据 特点（即不同参 与 方之间的 数 据重 叠程 度），联邦学习可 被分为横向联邦学习[42]、纵向联邦学习[43]、 迁移联邦学习[44]。
+当两个参与方的用户重 叠部分很少， 但 是两个 数 据 集 的用户特 征 重 叠 部 分比 较 多时，这种场 景下的联邦学习叫作 横向联 邦学习。比如一个 银行系统在深圳和上海 的分 部为参 与 方，两边 业务 类 似，收 集的用 户数 据特征比较类似，但是两个分 部的用 户大部分是本地居民，用户重叠比较少，当 两个 分 部需要 做联 邦 模 型 对用户进行分 类 的时候，就属于横向联邦学习。
+当两 个 参 与 方 的用户 重 叠 部 分 很 多， 但 是两个 数 据 集 的用户特 征 重 叠 部 分比 较 少时，这种场 景下的联邦学习叫作纵向联 邦 学习。比 如同一 个 地 区的两个机 构，一 个机 构有用户的消费记录，另一个机 构有 用户的银行 记录，两个机 构有很多重 叠用 户，但 是记 录的 数 据 特 征 是 不同的，两个 机构想通 过加密聚合用户的不同特征来 联 合 训练一个更强大的联邦学习模型，这 种 类 型的 机 器 学习模 型 就 属于 纵向联 邦 学习。
+当两个参与方的用户重 叠部分很少， 两个 数 据 集 的用户特 征 重 叠 部 分 也比 较 少，且有的 数 据 还存 在 标 签缺 失时，这种 场 景下的 联 邦 学 习叫 作 迁 移 联 邦 学 习。比 如两个不同地区的 机 构，一个机 构拥有所 在地区的用户消费记录，另一个机 构拥有
+
+STUDY 研究 69
+
+所在地区的银行 记录，两个机构具 有不同 的用户，同时 数 据 特 征 也 各不 相同，在 这 种 情况下 联 合 训练的 机 器 学习模 型 就 是 迁 移 联邦学习。
+目前 大 部 分 的 研 究 是 基 于横向 联 邦 学 习和 纵 向 联 邦 学 习的，迁 移 联 邦 学 习领 域 的研 究暂时还 不多。因此，本 文 将重 点讨 论 横向 联 邦 学 习和 纵 向 联 邦 学 习的 算 法 类 型。横向联 邦 学习中 数 据 特 征 重 叠 维 度 较 多，根 据重合 维度 进行对齐，取 出参 与 方 数 据 中 特 征相同 而用户不完 全相同的 部 分 进行联 合 训练；纵向联邦学习用户重合较 多，根 据用户ID 进行匹配，取出参 与 方 数 据中用户相同 而 特 征 不完 全相同的 部 分 进 行联合训练。
+2.5 联邦学习算法的特点
+基于上 述 对联 邦 学习的介 绍，总 结出 以下几点联邦学习算法的特点。
+● 支持非 独立同分布数 据：这是联邦 学习算法的一个很 重要的特性。联邦学习 算 法 必 须在 非 独 立同分布 数 据中有良 好 的 表 现 。在联邦学习的实际使用中，数 据持有 方的数据质量和分布是不可控的，无法要求 数据持有方的数据满足独立同分布[45]，因此 联邦学习算法需要支持非独立同分布数据。
+● 通信高效：联邦学习算法 需要考虑 数 据 持 有 方 的系 统 异 构 性，并 在 不损 失 准 确 率 或 损 失很 小的 情况下提 高通 信 效 率， 降低通信损耗。
+● 快 速收 敛：在 联 合 建 模 过 程中，首 先需要 保证模型收敛，同时需要 提高收敛 速度。
+● 安 全 性和隐私性：数 据隐私安 全是 联邦学习的重要 特点，因此安 全 性和隐私 性 是 对联 邦 梯度 更 新 的必 要 要求 。安 全 性 和隐 私性可以 通 过 加 密等 方 式 在 聚合 过 程 中进行，也可以反映在单机优化的过程中。
+
+● 支 持 复 杂用户：复 杂用户指用户本 身数 量大，且用户数据存在不均衡性或偏 移。这 在 联 邦 学 习的 实 际 应 用中 是 非常 可 能的，联邦优化算法需要对这种情况具 有 很好的兼容效果。
+3 联邦学习算法分类
+联邦学习系统是面向多客户端的模型 训练 系 统，各 个客户端在参 与训练时，数 据 保留在 本地，不会被发 送 给其他客户端或 中心服务器。中心服务器通 过 对客户端发 送 的 本 地 模 型 更 新 进行 整 合，最 终 完 成 共 享 模型的训练。客户端在进行本地模型训 练时，由于 设备间计 算能 力的差异，各 个客 户端完 成计算的时间不同。同时由于本 地 数 据和全局数 据之间的分布差异，部分异 常 数 据 会对 共 享 模 型 造 成 破 坏，导 致 模 型 精度降低。联邦学习算法 针对以上问题， 在 机 器 学习算 法和深 度 学习的基 础 上做出 修改，满足非 独 立同分布 数 据、网络时延 以及隐私保护的需求。
+3.1 基于机器学习的联邦学习算法
+联 邦 机 器 学习算 法 指在 联 邦 学习框 架 下的 经典 机 器 学习算 法实 现。联 邦 机 器 学 习，尤其是横向联 邦 学习，在 整 体 模式 上与 分布 式 机 器 学习类 似[16]。但 是，相较于传 统的机 器 学习算法，由于联邦学习特有的 迭代模式和特点，即需要在数 据不出本地 的基础上双方交换训练参数以完成联合建 模，联邦学习框架下的机器 学习算法实现 更 加 复 杂。联 邦 机 器 学习算 法 的 实 现 往往 基于上 述联邦优化算法的框架，但因为机 器 学习算法之间的差异性，有时又需要 做 一 些 针 对 性 的 修 改，同时 也需 要 考虑 实 际 过程中的安 全 性等因素。下 面介 绍几 种目
+2020055-6
+
+70 BIG DATA RESEARCH 大数据
+
+前常见的联 邦 机 器 学习算法。
+
+3.1.1 联邦线性算法
+
+Yang K等人[30]提出了一种中心联邦学 习框 架 下的 纵 向 联 邦 逻辑 回归实 现 方 法，
+
+这 种 方 法 实 现了纵 向 联 邦 学 习中的 逻辑 回 归，其目标函数是：
+
+∑ min
+
+  
+
+1 N
+
+N (ω; xn; yn )  
+
+n
+
+
+
+（2）
+
+其 中，ω为 模 型 的 参 数，x n为 模 型 的 特 征，
+y n为 模 型 的 标 签， n ∈{11，,NN}}为 数 据 的 数
+量， (ω; xn; yn ) 为模 型 损 失 函 数。在 纵 向 联邦学习中，通常假设 数 据持有 方分为有
+
+标 签 数 据 持 有 方 和无 标 签 数 据 持 有 方。 这 种 算 法在 联 邦 优 化 算 法 的 框 架 下结 合 了同 态 加 密 的 思 想，训 练 过 程 通 过 同 态 加 密的 方 法 对双方的 数 据和 梯度 进行加 密。假 设 无 标 签 数 据 持 有 方α 的 数 据 为
+
+，其 中 表 示 第 τ 轮 状 态 下的 无 标 签 数 据持有 方的 模 型参 数。用[d α]表 示 对dα的同态加密，整 个 训练 过程可以描述 如下。
+
+无标签 数 据持有 方α首先向有标签 数
+
+据
+
+持有
+
+方β
+
+发
+
+送
+
+[d
+
+α]、[d
+
+2 a
+
+]
+
+及[∆da
+
+]，β
+
+计
+
+算
+
+梯
+
+度与损失，加密后回传。中心服务器收集来
+
+自α、β 的 加密 梯度 后，辅助α、β 进行模 型
+
+更 新。为减 少 通信次 数，降 低 通信 损 耗，这
+
+种方法引入了一个向量s来体现模型的变化，
+
+辅助更新，并且使用了周期性梯度更新。
+
+Yang S W等人[41]提出了一种去中心联
+
+邦学习框架下的纵向联邦逻辑回归实现方 法。他们认为在现实生活中，找到合作双方 共同信任的第三方 辅助方是很 难的，并且 这也 在无 形中 提高了数 据 泄 露 的风险 和系 统 的 整 体 复 杂 性，因此 他 们 认 为取 消 第 三 方的参与对整个过程有很大的积极意义。
+在 这 种 方 法 中，有 标 签 数 据 持 有 方 在训练过程中起 主导作用。从某种意义上
+
+讲，有标 签 数 据持有 方承担了被取消的中 心服 务 器 的责任。假 设有 标 签 数 据 持 有 方 α和无标签数据持有方β 协定合作建模， α首先向β发 送建模密钥，α、β分别初始化
+参数ω1、ω2，并计算ωixi，其中 i ∈{11，2,}2}。计
+算完毕后β 将计 算结果发 送 给α，α对双方 计算结果 取和，并利用逻辑回归方程求 取 最 终输出，在对相同标签 值计算损失结果 后，加密损 失 并返回。之 后双方分 别计 算 梯度（对于β来说是加密后的梯度）。β将加 密后的 梯度 添 加噪 声后交由α 解 密 返回，双 方分 别进行梯度 更 新。在 整 个 过 程中，双 方 彼 此 之 间 始 终对 数 据 进 行 保 密，传 输 通 道中也均为保密信息，这 就使得 数 据的隐 私性 不止针对合 作 方，也 拥有了一定的对 抗外部异常攻击的能力。
+3.1.2 联邦树模型 Liu Y等人[46]提出了一种基于中心纵向
+联 邦 学习框 架的随 机 森 林 实 现 方 法 ——联 邦森 林。在建 模 过程中，每棵树都 实 行联 合建模，其结 构被存 储在中心服务器及各 个数据持有方，但是每 个数据持有方仅持 有与己方特 征 匹配的分散节点信息，无法 获得来自其他数 据持有 方的有 效信息，以 保障数据的隐私性。最终整个随机森林 模 型的结 构被 打散存 储，中心服务器中保留 完 整的结 构信息，节点信息被分散在各 数 据 持有 方。在 使 用模 型 进行 预测时，首先 获 取 本 地 存 储的节点信息，然后 通 过中心节 点联合 调用树结构中其他客户端的节点信 息。这 种 方 法 减 少了 预 测时 每 棵 树 的 通 信 频率，对提高通信效率有一定的帮助。
+SecureBoost[47]是一种基于梯度 提 升决 策树（gradient boosting decision tre e，GBDT）的去中心 纵向联 邦 学习框 架，同样包含有标签 数据持有方和无标签 数 据持有方。梯度提升决策树算法中联邦
+
+2020055-7
+
+STUDY 研究 71
+
+学 习需 要 交 换 的 参 数与联 邦 线 性 算 法有很 大区别，涉及二阶导 数 项。根 据 一 般的 梯 度提升决策树算法，目标函数为：
+
+∑ ( ) min τ  
+
+N
+
+ 
+
+j
+
+n
+
+yn , yˆi(τ −1)
+
++
+
+F
+
+(
+
+xi
+
+)
+
+ 
+
+  
+
+ （3）
+
+其中，τ为回归树 的 第τ 次 迭 代， τ 为目标
+
+函数的最小化损失值，j(·,·)为每 个叶子节
+
+点上损失的计算函数，F( x)为预测残 差的
+
+一 阶、二 阶 导 数 之 和，即 泰 勒 二 次 展 开
+
+式 。为 防 止 过 拟 合，在 损 失 函 数 中 添 加
+
+正 则 项：
+
+ 
+
+（4）
+
+其中，γ 和 λ为超参 数，分 别控制树 和特 征的 数 量，ω为权 重值，T 为原始损失函数。
+在一 般分布 式 机 器 学习中，可以 通 过 向参与方发 送F(x)实现联 合建模。但是由 于使用F( x)可以反 推出数 据标 签，这 样的 方 法显然不适用于联邦学习框架，因此， SecureBoost采用一种在保护数据隐私的 同时，保证训练性 能的联 合 建 模 方 法。有 标 签 数 据 持 有 方α首先计 算 F ( x)，并 将 结果 加 密后发 送 给 无 标 签 数 据 持 有 方β。β 根 据 同态 加 密 求 和 方 法 进 行局 部 求 和，并 将 结果 回 传。收 到 计 算 结果 后，α 将 数 据 按 照特 征分桶，并进行 聚合操 作，将加密结 果发 送 给β。最 终由α将从 β中收 集的局部 最 优 解进行 聚合，产生 最 优 解，并下发回 β，完 成 联 合 建 模 的 过 程。需 要说明的 是， SecureBoost支持多方合作，即无标 签 数 据 持 有 方β 表 示所有无 标 签 数 据 持 有 方的 集 合，但 是有 标 签 数 据 持有 方仅 为一方。与 分布 式 XG B o o st 相比，S e c u re B o o st 在 保 障 模型准 确率的情况下，保 护了数 据的隐 私，成功地将 纵向GBDT应用到联邦学习 框架中。
+Li Q B等人[48]提出了一种实现多方GBDT 建 模 的 去 中心 横 向 联 邦 学 习框 架 —— 基 于相似 度的联邦学习（similarity-based
+
+federated learning，SimFL）。这种方法 总体分为两个 步 骤。首先，在 预 训练时， 各个数据持有方在本地对数据进行哈希 分 类，分 类 依 据为局 部 敏 感 哈 希（lo c a l ity sensitive hashing，LSH）；之后对各个本 地哈 希 表 进行 聚合，生 成全局哈 希 表，并 向所有数据持有方发布。因此各 个数据持 有方在训练阶段可以基于全局哈希表进 行 建 模，而 不 会直 接 接 触 到 其 他 数 据 持 有 方 的 数 据。L SH 还 可以 用于获得 不同 数 据 持 有 方 之 间 数 据 的 相 似性，数 据 的 相 似 度 越高，在哈希表中表现相同值的可能性 就 越大。
+当某 个 数 据 持 有 方表 现出与多 个 数 据 持有 方有高度的数 据相似性时，可以认为 这个数 据持有方的数 据是很 重要的，因此 Si m FL 使 用一 种 加 权梯度 上升（wei g hte d gradient boosting）的方法进行单棵树建 模，具 体思想表现为将相似程度与梯度权 值 关 联，相 似 程 度 越 大，梯度 权值 越高，聚 合时产生的表现力就越强。
+这种通 过哈 希 表 加密的 方 法单从隐 私 保 护 性 能 上 来 讲，无 法 超 越 差 分 隐 私等 方 法，但是在牺牲小部分隐私保 护强度的情 况下，该方法在通信效率方面得到了补偿， 是 一 种联 邦 学习框 架下树 类 算 法实 现 的 新 方向。
+
+3.1.3 联邦支持向量机 Hartmann V等人[49]提出了一种将支持
+向量机（support vector machine，SVM） 安 全 部署在联邦学习中的方法，主要通 过 特 征哈 希、更 新分 块 等 方 式 对 数 据 隐 私性 进行 保障。其目标函数 如下：
+
+= min (ω )
+
+
+1 N
+
+N
+∑L (ω ,
+i
+
+xi
+
+,
+
+yi
+
+)
+
++
+
+λR(ω
+
+)
+
+
+ （5）
+
+其 中，N 为 训 练 数 据 ，ω 为 模 型 参 数 ，
+
+L
+
+(
+
+ω,
+
+x
+
+,
+i
+
+y
+
+i
+
+)
+
+为
+
+在
+
+点
+
+(
+
+x
+
+,
+i
+
+y
+
+i
+
+)
+
+的
+
+损
+
+失
+
+，λ
+
+R
+
+(
+
+ω
+
+)
+
+为
+
+2020055-8
+
+72 BIG DATA RESEARCH 大数据
+
+损 失 函 数 的 正 则 项，超 参 数 λ 控 制 惩 罚 力度。在 支 持向量机中，其损 失 函数 为： L ( ω, x i, y i) = m a x {0,1- ω τ x i y i}。类 似 于 Si m FL，这 里也 对 特 征 值 进 行 降 维哈 希处 理，以隐 藏 实 际 的 特 征 值。除 此 之 外，由于 在 线性支持向量机中，中心服务器 有可能 根 据更 新梯度反 推出数 据标 签，为了保 护 数 据的隐私性，这 里 采用次梯度更 新的更 新方 式。在实际 表 现中，这种支 持向量机 在 联 邦 框 架下的应用具 有不 亚于单 机 支 持 向量机的性能。
+3.2 基于深度学习的联邦学习算法
+为了保障 数 据隐 私安 全，联 邦 学习客 户端在进行数 据通信时，往往会对传输的 信息进行 编码和加密，同时因为原始用户 数 据对中心服务器不 可见，所以在模型 搭 建时训练样本对中心服务器以及模型设计 人员不 可 观测。之前用于经典 深度学习的 相关 模 型在 联 邦 学 习系 统中不一定 是 最 优 设 计。为了避 免网络 模 型 的 冗 余，需 要 对 经典 深度学习模型 进行相应的修改，如神 经网络（neural network，NN）、卷积神 经网络（convolutional neural networks， CN N）、长 短 期 记忆网络（lo n g shor tterm memory，LSTM）等。同时，为了适 应联 邦 学习的 流 程，提高训练 效 果，学习 训练的一些环 节（如参 数 初始化、损失计 算以及梯度更新等）也需要相应的调整。
+3.2.1 联邦神经网络 McMa ha n H B 等人 [10]分 别用N N 和
+CNN在MNIST数 据集 上 进行了测试。对 于NN，模 型的具 体结 构为含有两个隐 藏 层的 神经网络，每 个隐 藏 层包含200 个神 经元，且隐 藏 层用ReLU激 活函数 进行激 活。然 后将MN IST 数 据 集分配 到两个 计
+
+算 节点，每 个 计 算 节点含有 样 本量 大小为
+
+600且无交集的子 数 据集。在进行联邦训
+
+练时，为了验 证模型参 数初始化和聚合比
+
+例带来的影响，实验分为具 有不同初始化
+
+方 式的两组：一组使用相同的随机 种子初
+
+始化分配在两个计算节点的模型参 数，另
+
+外一组使用不同的随机种子初始化模型参
+
+数。每组实验 对来自不同节点的模型参 数
+
+采用不同的权 重比例进行加权 整 合，获取
+
+最 终的联 邦 共 享 模 型，即：
+
+ωFL=θω+(1-θ)ω’ 
+
+（6）
+
+其
+
+中，ω
+
+F
+
+为
+L
+
+联
+
+邦
+
+模
+
+型
+
+参
+
+数，ω
+
+和
+
+ω’
+
+为
+
+分布
+
+在 不同 节点的 模 型参 数，θ用来调 整两个 模
+
+型参 数 之间的比例。实验发现，在 达 到相
+
+同的精度 时，相比于单一 数 据本 地训练，使
+
+用模 型平均 方 法 的 联 邦 学习模 型需要 的 训
+
+练回合更 少，训练 效率更 高。在都 使 用联
+
+邦学习时，使用相同的随机 初始化种子的
+
+联邦模型具 有较好的效果，同时在模型参
+
+数比例为1:1时，达 到最优 损 失。
+
+3.2.2 联邦卷积神经网络 Zhu X H等人[50]使用简单的CNN训练隐
+私 场 景中的中文字 体识别模 型 来测试 现 有 的联邦学习框架（TensorFlow federated （TFF）和PySyft）以及 数 据集和客户端 数 量对联邦模型的影响。虽然对于文本识 别问题常采用递归网络，但 过于 复 杂的网 络 结 构 往往 会 影 响 联 邦 学习的收 敛 效率， 于是 采用含有4个卷积 层和2个 全 连接层 的简单 CN N来训练 模 型。然 后 根 据 样 本 I D 将 数 据集随机分配 到不同的客户端，形成 不同子集来模拟分布式数据。在进行 训练 时，客户端先在本地数据集 上进行梯度计 算 和 参 数 更 新。在 每 个 训练 迭 代 结 束 后， 汇 总每 个客户端累积的参 数 更 新，用来更 新最终的联邦模型。
+作为对比，首先 采用非 联 邦 学习模式
+
+2020055-9
+
+STUDY 研究 73
+
+进行 训练，将所有 数 据放 在 Tens orFlow上 进行模型训练，获得的基 础对比模型的准 确率为42.65%。当客户端数 量固定，改变 每 个客户端拥有的数 据 子集大小时，模型 精度基本上随着数 据集的增大而上升。不 过 在 P ySyft 上，最 佳 精度 始 终无 法 达 到基 线（ba s el i ne）精度，且 网络 迭 代 次 数 多于 基 线 模 型 的 迭 代 次 数。但TF F 的 模 型收 敛 效 果 要 优 于P ySyft，且在客户端 样 本 数 量 达 到一定程度时，联邦模型表现出优于基 线 模 型的成 绩，迭代次 数也 显著 减 少。两 个框 架下 不同模 型的 效 果 差异可能 是由于 采 用了 不 同 的 优 化 算 法。针 对 联 邦 深 度 学 习模型的框架 还有很多限制，很多技 术问 题需 要进 一 步 解 决，如TFF上 对 GPU卷 积 和 池 化计 算的 支 持、P y Sy ft 上 对更 多 优 化 器的支持。
+影响卷积网络 效果的因素还有很多， 例如，客户端和服务器之间进行参 数传 递 时，为了减 轻 对 带宽的占用，往往 对 卷 积网 络模型的参数进行压缩。Sattler F等人[36] 利用视觉几何组网络11（visual geometry group 11，VGG11）[51]发现，具 有参 数 压 缩的联 邦 聚合 算 法 受 non-I I D 数 据 的影 响 比 较 大，而 在 I I D 数 据上 则表 现出几乎与非 压缩聚合算法相同的收敛 速度。用于联邦 学习系统的稀疏三元压缩（sparse ternary compression，STC）[52]证明，在联邦学习环 境中，该编码技术的通信协议优于联邦平均 算法FedAvg（federated averaging）。
+3.2.3 联邦LSTM 也有许多学者将LSTM运用到联邦语
+言 模 型中，用于 预测字符[53-54]。他们 将 数 据 集 人 工分 割为分 配 在 多 个客户端的 联 邦 学习数 据集，在合 适的超参 数设 置下，这 些 模型在non-IID数据集 上均达 到了常规情 况下的模型精度[8]。Sahu A K等人[39]在联
+
+邦数 据集中训练LSTM分类器，提出了解 决 统计异质 性 的 联 邦 学 习框 架 Fe d P rox， 用于 情感 分析 和字符预测。实 验 表明，相 比于Fed Avg，Fed Prox具 有更快的收 敛 速 度。Sattler F等人[36]也在卷积网络的基础 上研究了优化模型参数 压缩在non-IID数 据集 上的应用。在客户端与中心服务器通 信时，相较于无压缩基线的2 422 MB网络 参数 量，使用基于STC编码通信协议的联 邦 学习系 统 可以在 保证模 型收 敛 效 果 的同 时，将上行通信参数量压缩至10 MB左右， 将下行参数量压缩到100 MB左右。
+联邦学习算法目前的主要 研究方向和 瓶颈是如何提升联邦聚合的优化效率和性 能，以 达 成 模 型 的 快 速 收 敛 和 精 准 训 练。 因 此，目前 关 于 联 邦 深 度 学 习模 型 的 研 究 主 要 是 如 何 优 化 联 邦 聚 合，而针 对 联 邦 深 度学习模型的研究还相对较少。
+表 1从 算 法、框 架 和 特点 等角度，对比 了联 邦 机 器 学习和联 邦 深 度学习的算法。
+4 联邦学习算法的优化分类方法
+相对于分布 式学习，联 邦 学习有一些 独特的属性，具体如下：
+● 联邦学习的通信是比较慢速且不稳 定的；
+● 联邦学习的参 与 方设备异 构，不同 设备有不同的运算能力；
+● 联 邦 学习更关注隐私 和安 全，目前 大部 分 的 研 究假 设 参 与 方 和服 务 器方是可 信的，然而在 现 实生活中，其 可能 是 不 可 信的。
+在实现 联 邦 学习的过 程中，需要考虑 如 何 优 化 联 邦 学 习的 算 法，从 而 解 决 存 在 的现实问题。本 文将从 通信成 本、客户端 选 择、异 步 聚 合 的角度 介 绍 优 化 联 邦 学 习 的算法。在介 绍优化算法之前，先 介 绍最
+
+2020055-10
+
+74 BIG DATA RESEARCH 大数据
+
+表 1  联邦学习算法对比
+
+类型 基础
+
+算法
+
+框架
+
+特点
+
+联邦 机器 学习
+
+联邦线性算法 联邦树模型
+
+逻辑回归[40] 逻辑回归[41] 联 邦 森 林 [46]
+
+中心 去中心 中心
+
+同态 加 密，观 察 模 型变化，周期性 梯度 更 新 取消 第 三方参 与，有 标 签 数 据 持有 方 主导，差 分隐 私 模 型分 散存 储，中心服务 器 储 存 结 构
+
+梯度上升树SecureBoost[47] 去中心 同态加密，特征分桶聚合，保障准确率
+
+梯度 上升树 Si mFL [48]
+
+去中心 哈希表加密，加权梯度上升，通信效率高
+
+联邦支持向量机 支持向量机Valentin[49]
+
+中心
+
+哈 希 表 加 密，次 梯度 更 新，隐 私性较 好
+
+联邦 深度 学习
+
+联邦神经网络 联邦卷积神经网络
+
+NN[8] CNN[55]
+
+中心 中心
+
+比传 统 神经网络收敛 更快，参 数联 合初始化时具 有更 好的收敛效果
+网络结 构比 R N N简单，收 敛 速 度 更快
+
+VGG11[51]
+
+中心
+
+non-I I D 数 据上，参 数 压 缩的优 化算 法收 敛 效 果较 差； 不压 缩的收 敛 效 果较 好，但参 数 量较 大
+
+联邦LSTM
+
+L STM[8,3 9,51]
+
+中心
+
+受 数 据 分布影 响 较 大，不同的参 数 聚合方 式 效 果 不同
+
+传 统的联 邦 学习算法 ——Fed Avg算法。 Fed Avg算法[8]是目前最 常用的联 邦
+学习优化算法。与常 规的优化算法[37-38]不 同，其本质思想是 对数 据持有方采用局部 随 机 梯度 下 降 的 方 法 进行本 地 模 型 优 化， 在中心服务 器方[39]进行 聚合操作。目标函 数定义如下：
+
+ 
+
+（7）
+
+其中，M 表示参与联 合建模的数据持有方 的数量，ω表示模型当前的参数， 表示均 方差函数。Fed Avg算法 是一种比较 基 础 的 联 邦 优 化 算 法，其 部 署 相 对来 说 比 较 简 单，应用领 域 很 广泛 [3 6 ]。
+
+4.1 从通信成本角度优化的联邦学习 算法
+机 器 学习算法，特别是 复 杂的深度学 习算法，在训练的过程中需要训练大 量的 参 数，比 如 CN N 可能 需 要训练 上百 万个 参 数，每一次更 新 过程需要更 新上百万个参 数；其次，网络通信的状态也可能导致很高
+
+的通信成 本，比 如不稳定的网络 情况、参 数 上传 和下 载 的 过 程中速 度 不一 致 都 会 导 致 整 个 算 法 的 模 型 训练 成 本 过 大。因此 需 要 根 据 这 些 特 性 来考虑 如何从 通信成 本 的 角度优化联邦学习算法[8]。可以从以下角度 考虑减少通信成本。
+4.1.1 增加客户端计算成本 在 联 邦 学习体系中，有时 终端节点 只
+会在 有Wi-Fi时参 与联邦学习训练，或者 有时网络 状况 不佳，在 这 些 情况下，更 多 的 计 算 可以 在 本 地 进 行，从而 减 少 通 信 的 次 数 。很 多算 法 是 从 这个 角度 来 优 化 通 信成 本的。比 如Kone č ný J[21]考虑了优化 Fed Avg算法，增加每一 轮 迭代 在每 个客户 端的本地更 新参数的计算次数，并且与每 一 轮 服 务 器 参 数 更 新只需要一次客户端 本 地 更 新的FedSGD算法进行了对比，实验 通 过 MINSTCNN模 型测试 表明，当数 据为 I I D 时，算 法可 以明 显 减 少 通 信 成 本，当数 据为non-IID时，算法只能轻微地减少通信 成本。Sahu A K等人 提 [39] 出了一种更通用 的Fe d P rox 算 法，这 种 算 法在 数 据为no nI I D 时优 化 效 果更明显，因为联 合 训练的
+
+2020055-11
+
+STUDY 研究 75
+
+终 端 参 与 方 的 数 据、运 算能 力都 是 不 均 衡 的，因此每一次参数更新时，不同的参与方 要参与的运算次 数都统一的话，会导致客 户端的计算资源 不能 充分利用。为了避免 这种情况，优化通信效率，FedProx算法可 以动态 地 更 新 不同客户端 每 一 轮 需要本 地 计 算 的 次 数，使 得 算 法 更 适合 非 独 立同 分 布的联合建模场景。Liu Y等人[54]使用同样 的优化思路 优化联邦优化算法，并且在纵 向联邦学习的框架下进行学习。LI X等人[56] 则分析了Fed Avg 算 法的收 敛性，并证明 了数 据 的异质 性会 导 致 联 邦 学 习收 敛 速 度降低。
+4.1.2 模型压缩 有的优化算法目的是减少每一轮 通信
+的参 数 量，例如通 过 模型 压缩的技 术（比 如量化、二次 抽样的方 式）来减 少每一次 参数更新要 传 递的参数总量。Konečný J 等人[9]提出了一种结 构化的模型更 新方 式 来 更 新 服 务 器 参 数，在 每 一 轮 的 参 数 通 信过程中，减小参与方传 递给服务器的模 型更 新 参 数的大小，从而减 少 通信。结 构 化更 新是 指 通 过 提前定 义 上传模 型参 数 的 矩 阵 结 构 来 上传 模 型，轮 廓 更 新 是 指 每 次更新的参数需要在参与方进行压缩编 码；模型最 后 通 过CIFAR-10图像算法进 行 验 证，实 验 表明，参 与 方 越 多，压 缩 效 果越好；Caldas S等人[57]考虑的是从服务 器 到 参 与 方 的 模 型 参 数传 递 优 化，通 过 有损 压 缩以 及联 邦 参 数 筛 选（federated d rop out）的 方 式 来减 少从 服务 器 到客户端 需要 传递的参数数量，降低通信成本的代 价是在一定程度上降低模型的准确率。
+在 实 现 联 邦 学 习 时，通 信 是 一 个 瓶 颈。降低通信成本是非常 重要的一个优化 环 节。有 的 优 化以 增 加 参 与 方 的 本 地计 算 为 代 价，有 的 优 化以 降 低 整 个 模 型 的 准 确
+
+性为代价。在实际优化的过程中，可以根据 实际情况和需求决定采用何种方式降低通 信成本。
+4.2 从客户端选择角度优化的联邦学 习算法
+联邦学习的客户端设备具 有异构性的 特征，并且不同的客户端的资源是有限的。 通常，客户端随机 选 择参与联邦学习的模 型训练 过 程。因此，在联 邦 学习训练的过 程中，有的算法 会考虑从客户端 选 择的角 度进行优化。
+不同的客户端的网络速 度、运 算能力 等不同，每 个客户端拥有的数 据分布也是 不平衡的，如果让 所有的客户端都 参与联 邦学习的训练 过程，将会有迭代落后的参 与 方出现，某些客户端长时间没有响应可 能 会 导 致 整 个系 统 无 法 完 成 联 合 训练。 因此，需要考虑如何选 择参 与训练的客户 端。Fed Avg算法随 机 选 择 参 与训练的客户 端。但 在网络 结 构 复 杂以 及 数 据 非 独 立同 分布 的 情况下，Fe d Avg 算 法 模 型 并不一 定 有好的表现。下 面 两篇参考文献介 绍了一 些优化方案。
+Nishio T等人[58]提出了一种FedCS算 法，设 计了一 种 贪心算 法 的 协议 机 制，以 达 到在联合训练的每一次更新中都选择模型 迭 代 效 率最 高的 客户端 进 行 聚 合更 新 的目 的，从而优化整个联邦学习算法的收敛 效 率。实验 表明，FedCS算法可以 达 到更 高 的准确性，但缺点是只有在模型比较基 础 的情况下，如基 础的 动态 神经网络，才有 好 的 表 现，对于网络 结 构 或 参 数 数 量 较 为 复 杂的情况来说，FedCS选择 最优的聚合客 户端 的 效 率 会 降 低，造 成 通 信 次 数 的 增多 和时间效率的降低。
+Yoshida N等人[59]提出了一种HybridFL 的 协议 算 法，该 协议 可以 处 理 数 据 集 为
+
+2020055-12
+
+76 BIG DATA RESEARCH 大数据
+
+non-I I D的 客户端 数 据，解 决 基 于 non-I I D 数 据在FedAvg算法上性能不好的问题。 Hybr id-FL协议使得服 务 器 通 过 资 源请求 的步骤来选择 部分客户端，从而在本地建 立一 种 近 似 独 立同分布的 数 据 集 用于联 邦 学习的训练 和迭代。他们通 过 实 验 表明，对 于 non-I I D 数 据 类 型 的联 邦 学习分 类 算 法 来说，Hybrid-FL有较好的准确率表现。
+4.3 从异步聚合角度优化的联邦学习 算法
+在FedAvg的算法中，聚合是与模型的 更 新保 持同步的。每一次 更 新，服务 器 都 同步聚合模型参数，然后将聚合参数发 送 给 每一个客户端。在同步 聚合中，服务 器 需要 在 接收 到所有参 与训练的 客户端的参 数 之 后才可以开始 聚合，但是有的客户端 运算传输快，有的客户端运算传输慢，为了 避 免 出现 通 信 迟滞 现 象，有 研 究 者 考虑用 异步的方 式进行聚合，从而优化联邦学习 算法。
+Sprague M R等人[60]提出了一种在联
+
+邦训练 的 过 程中 加 入客户端的异 步 聚 合方 法，并且 通 过实例证明了这种方 法的鲁棒 性。当服务器接收 到任何客户端的更新参 数时，就 进行 一次 聚合。但 是 这种算法的 弊 端是当模型数 据为non-IID的时候，模 型的收敛会出现很大的问题。
+Xie C等人[61]为了解决异步同步的算法 在non-IID 数 据上的适用性的问题，提出 了另一种Fed Asy nc 算 法，加入 加 权 聚合 的 方法，使得服务器在接收 到客户端的参数 后，会 通 过当前训练的更 新次 数 来设计加 权 聚合，从而解 决non-IID 数 据的异 步 聚 合的算法收敛问题。该参考文献 理论上证 明了在非凸性问题上FedAsync算法具 有 更好的收敛性。
+联邦学习算法的优化分类方法见表2。
+5 结束语
+本 文 讨 论了 联 邦 学 习目前 的 发 展 状 况，从联邦学习算法的角度出发，将联邦学 习相关算 法 分为联 邦 优 化 算 法 和 联 邦 机 器
+
+优化角度 通信成本
+客户端 选 择 异步聚合
+
+表 2  联邦学习算法的优化分类方法
+
+文献方法
+
+优化方法
+
+优缺点
+
+FedAvg[8]
+
+IID 数据；增加参与方本地计算
+
+增 加计 算成 本；non-I I D 数 据 优 化 效 果 差
+
+FedProx[39]
+
+non-I I D 数 据；增 加 本 地计 算
+
+增 加 计 算成 本，可优 化 non-I I D 数 据，代价 是 准 确 性降低
+
+VFL[54]
+
+纵向联邦算法；增加本地计算
+
+增加计算成本，代价是降低准确性
+
+结 构 和 轮 廓 更 新 压 缩传输 模 型，提升参 与 方到服务 参与方到服务器参数压缩，代价是复杂的模型结
+
+机制[9]
+
+器的通信效率
+
+构可能出现收敛问题
+
+服务器-客户端更 压 缩传输 模 型，提升服务 器到参 与 服务器到参与方参数 压缩，代价是准确性降低，
+
+新[57]
+
+方的通信效率
+
+可能有收敛问题
+
+FedCS[58]
+
+选 择 迭 代 效 率 最 优 的 模 型 训 练 参 比FedAvg更准确，但是只能被应用于简单的NN
+
+与方
+
+模 型，不适合 复 杂 模 型
+
+Hybrid-FL[59]
+
+服 务 器 选 择 客 户 端 数 据 组 成 近 似 non-IID数据收敛有问题 IID的数据集
+
+AsyncFedAvg[60] 服务器接收 到客户端参数更新就立 存在non-IID数据收敛问题 刻聚合
+
+FedAsync[61]
+
+服务端通过加权聚合的方式获取客 难调参数，存在收敛问题 户端的模型参数
+
+2020055-13
+
+STUDY 研究 77
+
+学 习算 法，对 适 合 中 心 和 去 中 心 两 种联 邦 学习结 构的相关算法进行了论 述，同时将 联 邦 学习框 架下的 机 器 学习算 法和 联 邦 深 度 学 习模 型 分 别 进 行总 结 讨 论。在 联 邦 算 法 优化的过 程中，从降 低 通信成 本、最优 客户端 选 择以 及优 化 模 型 聚合方 式 的角度 讨 论了 现 有 的 联 邦 优 化 算 法 之 间的 差异 和 优缺点。
+联 邦 学 习目前依 然 处 于 快 速 发 展 的阶 段，关于联邦学习在实际中的应用有大 量 的 研 究 与 讨 论，但 是 在 实 现 联 邦 学 习的 过 程中，还有很多难题和挑战，本文给出了以 下3 类 主要 难 题，即通 信 难 题、系 统 异 构 难 题以及数据异构难题。
+● 通信难题。在联邦学习系统中，联邦 网络可能由大 量的设备组成。因此网络中 的通信 效 率 会对整 体 速 度 产生较 大 的影 响。因此，开发 通信 效率 高的 方 法就 显得 尤 为 重 要。通 常 可 以 从 降 低 传 输 频 率 和 减 少 每 轮 传 输 的 信息 量 着 手。降 低 传 输 频 率主 要 依 靠 减 少客户端与中心服 务 器 梯度的交 换 次 数，为此可以适当提高一次 全局迭代中客户端本地优化的次 数。而减 少 信息 量 则主要 依 靠降 低 客户端与中心 服务器的交换 次数 来实现。为此可以进行 适当的梯度 压缩或者 量化，以减少通信占 用的带宽。
+● 系统异构难题。在联邦学习系统中， 另一大 问 题 就 是 众 多客户端 设备之 间的异 构性，包 括存 储、CPU计 算能 力、网络 传 输 等多个方面的差异。这些异 构性使得设备 的计算时间不同，甚至导致个 别设备直接 掉线。异步 通信解决了设备完成一次本地 更 新的时间不同、中心服务器等待 过久的 问题。此前分布式 机器 学习的研究已经充 分应用了异 步 通信的 方 式。此 外，提升系 统的鲁棒性同样也能减轻系统异构对联邦 学 习产生 的 影 响。在 众 多设备 参 与 的 情 况 下，需要 提高 系 统的 容 错 能 力，提 升系 统的
+
+冗余度。 ● 数 据异 构难题。联邦学习中设备经
+常以非 独 立同分布的 方 式 在网络 中生 成 和 收集数据，例如，移动端的用户在进行输入 法下一单词预测的任 务时，使 用不同的语 言会导致 数 据异 构问题。此外，跨 设备的 数 据 持有 方 持有的 数 据 数 量 很可能 分布不 均匀。因此，许多常见的针对独立同分布数 据 假 设 的 优 化 算 法 对于联 邦 学习来 说 都 是 不适 用的。因此，如何使优化算法更 加兼 容 联 邦 学习实际 使 用中复 杂 的 数 据 结 构， 成 为联 邦 学 习未 来 发 展 的 一 个 研 究 方向。 元 学习和多 任 务 学习的思 想都支 持 个 性 化 或 基 于 特 定 设备 的建 模，是 处 理 数 据 统计 异质性的一种有效的方法。元学习通 过使 参 与联 邦 学 习的 各 客户端 本 地 模 型学 习独 立但相关的模型，实现各 个参与方本地模 型的个 性化，是一种应对联邦学习数 据异 构性的可行方案。
+最 后，笔者针对联邦学习的未 来发 展 提出以下展望。
+● 增加算法的联邦部署。本文讨论了 目前存在的联邦学习算法，但是有关机 器 学 习、深 度 学 习算 法在 联 邦 框 架 下的 部 署 研究问题 还处于发展阶段。使用联邦学习 框架进行机器 学习、深度学习算法实现是 人工智能领域落地的一个可行方案，也是更 高效、更全面的边缘数据利用方法。
+● 联邦学习的隐私性保证。数 据隐私 性 的 保证 是 联 邦 学 习理 念 的 关 键 点 之一。 尽管目前 有许 多与 联 邦 学 习隐 私性 相关 的 研究，但是在联邦学习实际应用的过程中， 依然会面临许多复杂的隐私性 挑战。联邦 学 习系 统需 要 时 刻 提 升对各 类 不良 攻击 的 防御能力，保障用户数据的隐私性。
+● 联邦学习的多领域协同发展。联邦 学习的系统发展与多个 领域有所关联，如 边 缘 计算[62-63]、区块 链[64-65]、网络安 全[66-6 7 ] 等。多 领 域 的 协 同 发 展 可 以 提 升联 邦 学 习
+2020055-14
+
+78 BIG DATA RESEARCH 大数据
+
+的性能，同时更好地发挥联邦学习的便 捷 性、隐私性等优势。
+参考文献：
+[1]	 LECU N Y, BENGIO Y, HI NTON G. Deep learning[J]. Nature, 2015, 521(7553): 436-444.
+[2]	王  健宗, 黄章成, 肖京. 人工智能赋能金融科技 [J]. 大数据, 2018, 4(3): 114-119.
+	W  ANG J Z, HUANG Z C, XIAO J. Artificial intelligence energize Fintech[J]. Big Data Research, 2018, 4(3): 114-119.
+[3]	 K AIROUZ P, MCMAHAN H B, AVENT B, et al. Advances and open problems in federated learning[J]. arXiv preprint, 2019, arXiv:1912.04977.
+[4]	 YANG Q, LIU Y, CHEN T, et al. Federated machine learning: concept and applications[J]. ACM Transactions on Intelligent Systems and Technology, 2019, 10(2): 1-19.
+[5]	 LI T, SAHU A K, TALWALKAR A, et al. Federated learning: challenges, methods, and future directions[J]. IEEE Signal Processing Magazine, 2020, 37(3): 50-60.
+[6]	 M E H M O O D A , N AT G U N A N AT H A N I , XIANG Y, et al. Protection of big data privacy[J]. IEEE Access, 2016, 4: 1821-1834.
+[7]	方  滨兴, 贾焰, 李爱平, 等. 大数据隐私保护技 术综述[J]. 大数据, 2016, 2(1): 1-18.
+	F  A NG B X, J I A Y, LI A P, et al. P r ivacy preservation in big data: a survey[J]. Big Data Research, 2016, 2(1): 1-18.
+[8]	 KONEČNÝ J, MCMAHAN H B, R AMAGE D, et al. Federated optimization: distributed machine learning for on-device intelligence[J]. arXiv preprint, 2016, arXiv:1610.02527.
+[9]	 KONEČNÝ J, MCMAHAN H B, YU F X, et al. Federated learning: strategies for improving communication efficiency[J]. arXiv preprint, 2016, arXiv:1610.05492.
+[10]	 MCMAHAN H B, MOORE E, RAMAGE D, et
+2020055-15
+
+al. Federated learning of deep networks using model averaging[J]. arXiv preprint, 2016, arXiv:1602.05629. [11]	 MCMAHAN H B, MOORE E, RAMAGE D, et al. Communication-efficient learning of deep networks from decentralized data[C]//Conference on Artificial Intelligence and Statistics. [S.l.:s.n.], 2017. [12]	 LI T, SANJABI M, BEIRAMI A, et al. Fair resource allocation in federated learning[J]. arXiv preprint, 2019, arXiv:1905.10497. [13]	 CHEN Y, SU N X Y, JIN Y C. Communication-efficient federated deep learning with layer wise asynchronous model update and temporally weighted aggregation[J]. IEEE Transactions on Neural Networks and Learning Systems, 2019: Accepted. [14]	 REHAK D R, DODDS P, LANNOM L. A model and infrastructure for federated learning content repositories[C]//Interoperability of Web-Based Educational Systems Workshop. [S.l.:s.n.], 2005. [15]	 LI M, ANDERSEN D G, PARK J W, et al. Scaling distributed machine learning with the parameter server[C]//The 11th USENIX Symposium on Operating Systems Design and Implementation. [S.l.:s.n.], 2014: 583-598. [16]	 LIN Y J, HAN S, MAO H Z, et al. Deep gradient compression: reducing the communication bandwidth for distributed training[J]. arXiv preprint, 2017, arXiv:1712.01887. [17]	 DAI W, KUMAR A, WEI J, et al. High-performance distributed ML at scale through parameter server consistency models[C]//AAAI Conference on Artificial Intelligence. New York: ACM Press, 2015. [18]	 RECHT B, RE C, WRIGHT S, et al. Hogwild: a lock-free approach to parallelizing stochastic gradient descent[C]//Advances in Neural Information Processing Systems. [S.l.:s.n.], 2011: 693701. [19]	 HO Q, CIPAR J, CUI H G, et al. More effective distributed ml via a stale synchronous parallel parameter server[C]//Advances in Neural In-
+
+STUDY 研究 79
+
+formation Processing Systems. [S.l.:s.n.], 2013: 1223-1231. [20]	 FENG S W, YU H. Multi-participant multi-class vertical federated learning[J]. arXiv preprint, 2020, arXiv:2001.11154. [21]	 KONEČNÝ J. Stochastic, distributed and federated optimization for machine learning[J]. arXiv preprint, 2017, arXiv:1707.01155. [22]	 LIU X Y, LI H W, XU G W, et al. Adaptive privacy-preserving federated learning[J]. Peer-toPeer Networking and Applications, 2020. [23]	 HU R, GONG Y M, GUO Y X. CPFed: communication-efficient and privacy-preserving federated learning[J]. arXiv preprint, 2020, arXiv:2003.13761. [24]	 RYFFEL T, TRASK A, DAHL M, et al. A generic framework for privacy preserving deep learning[J]. arXiv preprint, 2018, arXiv:1811.04017. [25]	 ANTONIOUS M, DEEPESH D, SUHAS D, et al. Shuffled model of federated learning: privacy, communication and accuracy trade-offs[J]. arXiv preprint, 2020, arXiv:008.07180. [26]	 SMITH V, CHIANG C K, SANJABI M, et al. Federated multi-task learning[C]//Advances in Neural Information Processing Systems. [S.l.:s. n.], 2017: 4424-4434. [27]	 CORINZIA L, BUHMANN J M. Variational federated multi-task learning[J]. arXiv preprint, 2019, arXiv:1906.06268. [28]	 CA LDAS S, SM I T H V, TA LWA LK A R A. Federated kernelized multi-task learning[C]// SysML Conference 2018. [S.l.:s.n.], 2018. [29]	 KALLMAN R, KIMURA H, NATKINS J, et al. H-store: a high-performance, distributed main memory transaction processing system[J]. Proceedings of the VLDB Endowment, 2008, 1(2): 1496-1499. [30]	 YANG K, JIANG T, SHI Y M, et al. Federated learning via over-the-air computation[J]. IEEE Transactions on Wireless Communications, 2020, 19(3): 2022-2035. [31]	 NISHIO T, YONETANI R. Client selection for federated learning with heterogeneous resources
+
+in mobile edge[C]//2019 IEEE International Conference on Communications. Piscataway: IEEE Press, 2019: 1-7. [32]	 WANG J Y, SAHU A K, YANG Z Y, et al. MATCHA: speeding up decentralized SGD via matching decomposition sampling[J]. arXiv preprint, 2019, arXiv:1905.09435. [33]	 REISIZADEH A, MOKHTARI A, HASSANI H, et al. Fedpaq: a communication-efficient federated learning method with periodic averaging and quantization[J]. arXiv preprint, 2019, arXiv:1909.13014. [34]	 KHALED A, MISHCHENKO K, RICHTÁRIK P. Better communication complexity for local SGD[J]. arXiv preprint, 2019, arXiv:1909.04746. [35]	 LI S Y, CHENG Y, LIU Y, et al. Abnormal client behavior detection in federated learning[J]. arXiv preprint, 2019, arXiv:1910.09933. [36]	 SATTLER F, WIEDEMANN S, MÜLLER K R, et al. Robust and communication-efficient federated learning from non-IID data[J]. IEEE Transactions on Neural Networks and Learning Systems, 2019. [37]	 CROTTY A, GALAKATOS A, KRASKA T. Tupleware: distributed machine learning on small clusters[J]. IEEE Data Engineering Bulletin, 2014, 37(3): 63-76. [38]	 JOLFAEI A, OSTOVARI P, ALAZAB M, et al. Guest editorial special issue on privacy and security in distributed edge computing and evolving IoT[J]. IEEE Internet of Things Journal, 2020, 7(4): 2496-2500. [39]	 SAHU A K, LI T, SANJABI M, et al. Federated optimization for heterogeneous networks[J]. arXiv preprint, 2018, arXiv:1812.06127. [40]	 YANG K, FAN T, CHEN T J, et al. A quasinewton method based vertical federated learning framework for logistic regression[J]. arXiv preprint, 2019, arXiv:1912.00513. [41]	 YA N G S W, R E N B , Z H O U X H , e t a l . Parallel distributed logistic regression for vertical federated learning without thirdparty coordinator[J]. arXiv preprint, 2019,
+2020055-16
+
+80 BIG DATA RESEARCH 大数据
+
+arXiv:1911.09824. [42]	 GAO D S, J U C, WEI X G, et al. HHHFL:
+hierarchical heterogeneous horizontal federated learning for electroencephalography[J]. arXiv preprint, 2019, arXiv:1909.05784. [43]	 LI U Y, K A NG Y, Z H A NG X W, e t a l. A communication efficient vertical federated learning framework[J]. arXiv preprint, 2019, arXiv:1912.11187. [44]	 SHARMA S, XING C P, LIU Y, et al. Secure and efficient federated transfer learning[J]. arXiv preprint, 2019, arXiv:1910.13271. [45]	 ZH AO Y, LI M, LA I L Z, et al. Federated learning with non-IID data[J]. arXiv preprint, 2018, arXiv:1806.00582. [46]	 LIU Y, LIU Y T, LIU Z J, et al. Federated forest[J]. IEEE Transactions on Big Data, 2020: Accepted. [47]	 C H E N G K W, FA N T, J I N Y L , e t a l . SecureBoost: a lossless federated learning framework[J]. arXiv preprint, 2019, arXiv:1901.08755. [48]	 LI Q B, WEN Z Y, HE B S. Practical federated gradient boosting decision trees[J]. arXiv preprint, 2019, arXiv:1911.04206. [49]	 HARTMANN V, MODI K, PUJOL J M, et al. Privacy-preserving classification with secret vector machines[J]. arXiv preprint, 2019, arXiv:1907.03373. [50]	 ZHU X H, WANG J, HONG Z, et al. Federated learning of unsegmented Chinese text recognition model[C]//2019 IEEE 31st International Conference on Tools with Artificial Intelligence. Piscataway: IEEE Press, 2019: 1341-1345. [51]	 BHOWMICK A, DUCHI J, FREUDIGER J, et al. Protection against reconstruction and its applications in private federated learning[J]. arXiv preprint, 2018, arXiv:1812.00984. [52]	 DUCHI J, JORDAN M I, MCMAHAN B. Estimation, optimization, and parallelism when data is sparse[C]//In Advances in Neural Information Processing Systems. New York: ACM Press, 2013.
+2020055-17
+
+[53]	 CHILIMBI T, SUZUE Y, APACIBLE J, et al. Project adam: building an efficient and scalable deep learning training system[C]//The 11th USENIX Symposium on Operating Systems Design and Implementation. New York: ACM Press, 2014: 571-582.
+[54]	 LIU Y, MUPPALA J K, VEERARAGHAVAN M, et al. Data center networks: topologies, architectures and fault-tolerance characteristics[M]. Heidelberg: Springer Science & Business Media, 2013.
+[55]	 BONAWITZ K, EICHNER H, GRIESKAMP W, et al. Towards federated learning at scale: system design[J]. arXiv preprint, 2019, arXiv:1902.01046.
+[56]	 LI X, HUANG K, YANG W, et al. On the convergence of FedAvg on non-IID data[J]. arXiv preprint, 2019, arXiv:1907.02189.
+[57]	 CALDAS S, KONEČNY J, MCMAHAN H B, et al. Expanding the reach of federated learning by reducing client resource requirements[J]. arXiv preprint, 2018, arXiv:1812.07210.
+[58]	 NISHIO T, YONETANI R. Client selection for federated learning with heterogeneous resources in mobile edge[C]//ICC 2019-2019 IEEE International Conference on Communications. Piscataway: IEEE Press, 2019: 1-7.
+[59]	 YOSHIDA N, NISHIO T, MORIKURA M, et al. Hybrid-FL for wireless networks: cooperative learning mechanism using non-IID data[J]. arXiv preprint, 2019, arXiv:1905.07210.
+[60]	 SPRAGUE M R, JALALIRAD A, SCAVUZZO M, et al. Asynchronous federated learning for geospatial applications[C]//Joint European Conference on Machine Learning and Knowledge Discovery in Databases. Heidelberg: Springer, 2018: 21-28.
+[61]	 XIE C, KOYEJO S, GUPTA I. Asynchronous federated optimization[J]. arXiv preprint, 2019, arXiv:1903.03934.
+[62]	 YANG J L, DUAN Y X, QIAO T, et al. Prototyping federated learning on edge computing systems[J]. Frontiers of Computer Science, 2020,
+
+STUDY 研究 81
+
+14: 1-3. [63]	 WANG S Q, TUOR T , SALONIDIS T, et al.
+Adaptive federated learning in resource constrained edge computing systems[J]. IEEE Journal on Selected Areas in Communications, 2019, 37(6): 1205-1221. [64]	 ZH AO Y, ZH AO J, JIANG L S, et al. Mobile edge computing, blockchain and reputation-based crowd-sou rcing IoT federated learning: a secure, decentralized and privacy-preserving system[J]. arXiv preprint, 2019, arXiv:1906.10893. [65]	 LI Z Y, LIU J, HAO J L, et al. CrowdSFL: a secure crowd computing framework based on
+
+blockchain and federated learning[J]. Electronics, 2020, 9(5): 773. [66]	 KANG J W, XIONG Z H, NIYATO D, et al. Incentive design for efficient federated learning in mobile networks: a contract theory approach[C]//2019 IEEE VTS Asia Pacific Wireless Communications Symposium. Piscataway: IEEE Press, 2019: 1-5. [67]	 ISAKSSON M, NORRMAN K. Secure federated learning in 5G mobile networks[J]. arXiv preprint, 2020, arXiv: 2004.06700.
+
+作者简介
+
+王健宗（19 8 3- ），男，博士，平 安科 技（深 圳）有限 公司副总 工 程 师，资深人 工智能 总 监，联 邦 学习技 术 部总 经 理。美国佛罗里 达 大 学人 工智能 博士后，中国计 算 机 学会（CCF）高级会员，CCF 大 数 据 专家委员 会委员，曾任 美国莱斯 大学电子与计算 机 工程 系研究员，主要 研究方向为联邦学习和人 工智能等。
+
+孔令炜（1995- ），男，平 安科 技（深 圳）有限公司联 邦 学习团队算法工程 师，CCF会员，主要 研究 方向为 联 邦 学习系 统 和 安 全 通信 等。
+
+黄章成（1990- ），男，平 安科 技（深 圳）有限公司联 邦 学习团队资深算法工程 师，人 工智能专家，CCF会 员，主要 研究方向为联邦学习、分布 式计算及 系统和加密通信等。
+2020055-18
+
+82 BIG DATA RESEARCH 大数据
+陈霖捷（19 9 4- ），男，平 安 科 技（深 圳）有限 公司 联 邦 学习团队算 法工 程 师，主要 研 究 方向为联 邦 学习 与隐私保 护、机 器 翻 译 等。
+刘懿（19 9 4- ），女，平 安 科 技（深 圳）有限 公司 联 邦 学习团队算 法工 程 师，主要 研 究 方向为联 邦 学习系 统等。
+何安珣（1990- ），女，平 安科 技（深 圳）有限公司联邦 学习团队高级算法工程师，CCF会员，主要 研究方 向为联邦学习技 术 在 金融领域的落地 应用、联邦学习框 架 搭建、加密算法研究和模型融合技 术。
+肖京（1972- ），男，博士，中国平 安 保险（集团）股份有限公司首席 科 学家。2019 年 吴 文俊人 工智能 科 学 技 术奖 杰出贡献 奖 获得 者，CCF 深 圳会员活 动中心副 主 席，主要 研 究 方向为计 算 机图 形 学 学 科、自动驾 驶、3D显 示、医疗诊断、联邦学习等。
+收稿日期：2020-04-21 基金项目：国家重点研发计划基金资助项目（No.2018YFB1003503，No.2018YFB0204400，No.2017YFB1401202） Foundation Items: The National Key Research and Development Program of China (No.2018YFB1003503, No.2018YFB0204400, No.2017YFB1401202)
+2020055-19
+

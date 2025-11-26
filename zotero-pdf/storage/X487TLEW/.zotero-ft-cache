@@ -1,0 +1,83 @@
+ 
+Skip to main content 
+Cornell University 
+We gratefully acknowledge support from 
+the Simons Foundation and member institutions. 
+arxiv logo > cs > arXiv:1610.02527 
+ 
+Help | Advanced Search 
+Search 
+Computer Science > Machine Learning 
+(cs) 
+[Submitted on 8 Oct 2016] 
+Title: Federated Optimization: Distributed Machine Learning for On-Device Intelligence 
+Authors: Jakub Konečný , H. Brendan McMahan , Daniel Ramage , Peter Richtárik 
+Download PDF 
+ 
+    Abstract: We introduce a new and increasingly relevant setting for distributed optimization in machine learning, where the data defining the optimization are unevenly distributed over an extremely large number of nodes. The goal is to train a high-quality centralized model. We refer to this setting as Federated Optimization. In this setting, communication efficiency is of the utmost importance and minimizing the number of rounds of communication is the principal goal. 
+    A motivating example arises when we keep the training data locally on users' mobile devices instead of logging it to a data center for training. In federated optimziation, the devices are used as compute nodes performing computation on their local data in order to update a global model. We suppose that we have extremely large number of devices in the network --- as many as the number of users of a given service, each of which has only a tiny fraction of the total data available. In particular, we expect the number of data points available locally to be much smaller than the number of devices. Additionally, since different users generate data with different patterns, it is reasonable to assume that no device has a representative sample of the overall distribution. 
+    We show that existing algorithms are not suitable for this setting, and propose a new algorithm which shows encouraging experimental results for sparse convex problems. This work also sets a path for future research needed in the context of \federated optimization.  
+ 
+Comments: 	38 pages 
+Subjects: 	Machine Learning (cs.LG) 
+Cite as: 	arXiv:1610.02527 [cs.LG] 
+  	(or arXiv:1610.02527v1 [cs.LG] for this version) 
+Submission history 
+From: Jakub Konečný [ view email ] 
+[v1] Sat, 8 Oct 2016 13:25:15 UTC (243 KB) 
+Full-text links: 
+Download: 
+ 
+    PDF 
+    Other formats  
+ 
+( license ) 
+Current browse context: 
+cs.LG 
+< prev   |   next > 
+new | recent | 1610 
+Change to browse by: 
+cs 
+References & Citations 
+ 
+    NASA ADS 
+    Google Scholar 
+    Semantic Scholar 
+ 
+DBLP - CS Bibliography 
+listing | bibtex 
+Jakub Konecný 
+H. Brendan McMahan 
+Daniel Ramage 
+Peter Richtárik 
+a export bibtex citation Loading... 
+Bookmark 
+BibSonomy logo Mendeley logo Reddit logo ScienceWISE logo 
+Bibliographic Tools 
+Bibliographic and Citation Tools 
+Bibliographic Explorer Toggle 
+Bibliographic Explorer ( What is the Explorer? ) 
+Litmaps Toggle 
+Litmaps ( What is Litmaps? ) 
+scite.ai Toggle 
+scite Smart Citations ( What are Smart Citations? ) 
+Code & Data 
+Demos 
+Related Papers 
+About arXivLabs 
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? ) 
+ 
+    About 
+    Help 
+ 
+    contact arXiv Click here to contact arXiv Contact 
+    subscribe to arXiv mailings Click here to subscribe Subscribe 
+ 
+    Copyright 
+    Privacy Policy 
+ 
+    Web Accessibility Assistance 
+ 
+    arXiv Operational Status 
+    Get status notifications via email or slack 
+ 

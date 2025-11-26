@@ -1,0 +1,279 @@
+Natural Hazards Research 1 (2021) 103–108 Contents lists available at ScienceDirect
+Natural Hazards Research
+journal homepage: www.editorialmanager.com/NHRES/default.aspx
+
+AutoGluon: A revolutionary framework for landslide hazard analysis
+Wenwen Qi a,b, Chong Xu a,b,*, Xiwei Xu a
+a National Institute of Natural Hazards, Ministry of Emergency Management of China, Beijing, 100085, China b Southern Yunnan Observatory for Cross-block Dynamic Process, Yuxi Yunnan, 652799, China
+
+ARTICLE INFO
+Keywords: AutoGluon Machine learning Landslide hazard analysis Coseismic landslides Jiuzhaigou earthquake
+
+ABSTRACT
+Landslide hazard analysis is important to mitigate possible landslide hazards and ensure sustainable development of society and economy. Integrating machine learning models into landslide hazard analysis is a common but challenging task for researchers in general. In this work, we introduce a revolutionary framework, the Amazon's AutoGluon, a new open-source library of machine learning models, to analyze landslide hazards related to the 2017 Jiuzhaigou earthquake in west China. We use 11 mathematical models in the AutoGluon to perform the analysis. For each model, the coseismic landslide inventory and 10 environmental and triggering factors are used as model inputs to perform landslide hazard analysis. These 10 factors are altitude, slope, aspect, slope position, distance parallel to the seismogenic fault, distance vertical to the seismogenic fault, distance to the epicenter, lithology, distance to rivers, and distance to roads. The same number (4,834) of random points in landslide and non-landslide areas are selected, 70 % of which are used as training points, and the remaining 30 % used as validation points. It takes 47.33 s for data preprocessing and model training for 11 machine learning models and the best result measured by Roc-AUC score is 0.94. Our work shows that AutoGluon can greatly improve the efﬁciency of landslide hazard analysis.
+
+1. Introduction
+Coseismic landslides are one of the most frequent and serious geologic hazards in mountainous regions in the world (Froude and Petley, 2018). Landslide hazard mapping is crucial data to show the time and location of potential landslides and is of great signiﬁcance for risk analysis and disaster preparedness (Jibson et al., 2000).
+Where and when landslides occur are determined by internal environmental and external triggering factors (Keefer and Larsen, 2007). Internal environmental factors include slope, geology, hydrology, soil or rock mechanical strength conditions, etc., which determine the spatial susceptibility of landslides (Xu et al., 2012a). External triggering factors are seismic activity, meteorological conditions, and anthropogenic interventions (Flentje et al., 2007) that determine the time, location and magnitude of landslides (Fell et al., 2008).
+Landslide susceptibility analysis is a quantitative or qualitative assessment of where landslides may occur in a region (Fell et al., 2008). Landslide susceptibility indicates the preference of a geologic unit (a slope) to experience landslides given a certain combination of internal environmental factors (Reichenbach et al., 2018). However, the time and especially the magnitude of a landslide are determined by the triggering
+
+factors. By adding external triggering factors, landslide hazard mapping could quantitatively or qualitatively predict the time and magnitude of landslides in a region (Fell et al., 2008; Guzzetti et al., 2005).
+Quantifying the relation between internal environmental and external triggering factors and landslide inventories is the fundamental way in landslide hazard analysis. (Xu et al., 2012a; Hong et al., 2015). Landslide inventories are landslide distribution maps possibly with other attributes such as time of occurrence, geology of the slope, speed, area, volume etc. (Harp et al., 2011). Physical (Jibson et al., 2000) and statistical models are two major ways to establish the relation between landslide inventories and environmental and triggering factors. To perform physical models, extensively detailed in-situ parameters are needed as model inputs. In comparison, statistical models (often used interchangeably as machine learning models) are much easier and more ﬂexible and are thus widely used in landslide hazard analysis.
+For statistical models, landslide inventory is used as a dependent variable and environmental and triggering factors are used as independent variables (Xu et al., 2012b). The logic of using machine learning models to perform landslide hazard analysis is that locations with similar environmental and triggering conditions to landslide sites may also be prone to landsliding. To perform these models, training samples are used
+
+* Corresponding author. National Institute of Natural Hazards, Ministry of Emergency Management of China, Beijing, 100085, China. E-mail address: chongxu@ninhm.ac.cn (C. Xu).
+https://doi.org/10.1016/j.nhres.2021.07.002 Received 30 March 2021; Received in revised form 30 July 2021; Accepted 30 July 2021 Available online 2 August 2021 2666-5921/© 2021 National Institute of Natural Hazards, Ministry of Emergency Management of China. Publishing services provided by Elsevier B.V. on behalf of
+KeAi Communications Co. Ltd. This is an open access article under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+W. Qi et al.
+
+Natural Hazards Research 1 (2021) 103–108
+
+Fig. 1. Map of the study area. The location of the Jiuzhaigou Ms 7.0 Earthquake (a, b) and the landslide inventory map (c).
+
+Table 1 List of environmental and triggering factors used in this work.
+
+Environmental factors Triggering factors
+
+altitude slope aspect distance to roads distance to rivers TPI index (slope position) lithology distance parallel to the seismogenic fault distance vertical to the seismogenic fault distance to epicenter
+
+in the ﬁrst place to tune model parameters. Then, independent variables in validating samples are put into the ﬁne-tuned models to produce landslide hazard maps, which are compared against dependent variables in the validating samples to assess the performance of the model (Mondini et al., 2011; Stumpf and Kerle, 2011).
+By using multiple machine learning algorithms, better predictions can be achieved in ensemble learning methods than the single learning method. Random Forest is a frequently used ensemble learning method in landslide mappings that integrates many decision trees (Stumpf and Kerle, 2011). In recent years, the ensemble learning method that uses different types of techniques and classiﬁers have been used (Nguyen et al., 2019; Hong et al., 2020; Song et al., 2020). For example, support vector machine (SVM) classiﬁer or alternating decision trees (ADT) classiﬁer with different ensemble learning techniques such as bagging, boosting and stacking algorithms were constructed for landslide susceptibility analysis (Nguyen et al., 2019; Hong et al., 2020). Four tree-based ensemble classiﬁers of random forest (RF), extremely randomized tree (ERT), gradient boosting decision trees (GBDT), and
+
+Fig. 2. AutoGluon's multi-layer stacking strategy, a case of two stacking layers and n types of machine learning models (Erickson et al., 2020).
+extreme gradient boosting decision trees (XGBoost) were used for landslide susceptibility assessment (Song et al., 2020). Although the ensemble learning method has better performance in landslide mappings than the single machine learning model, it requires much more extra time of computation and is more difﬁcult to manipulate, limiting its wide use.
+Although some easy-to-use machine learning tools, such as Scikitlearn library (in Python) and Waikato Environment for Knowledge Analysis software, have been proposed (Eibe et al., 2016; Pedregosa et al., 2011), there are other major challenges to use machine learning
+
+104
+
+W. Qi et al.
+
+Table 2 Performance of different machine learning models imbedded in the AutoGluon.
+
+No.
+
+Models
+
+Training performance
+
+Time (s)
+
+AUC (%)
+
+1
+
+Random Forest (Gini)
+
+1.56
+
+2
+
+Random Forest (Entropy)
+
+1.57
+
+3
+
+Extra Trees (Gini)
+
+1.2
+
+4
+
+Extra Trees (Entropy)
+
+1.38
+
+5
+
+KNN (Uniform)
+
+0.02
+
+6
+
+KNN (Distance)
+
+0.01
+
+7
+
+LightGBM
+
+2.88
+
+8
+
+LightGBM (Custom)
+
+3.78
+
+9
+
+Catboost
+
+9.13
+
+10
+
+Neural Network
+
+23.98
+
+11
+
+Weighted ensemble model (Level 2)
+
+1.82
+
+94.71 94.68 93.13 93.04 93.29 92.76 94.64 94.9 94.91 94 95.42
+
+Natural Hazards Research 1 (2021) 103–108
+
+Testing performance (%)
+
+AUC
+
+Precision
+
+93.77 93.68 92.85 92.87 91.17 91.52 93.13 93.55 93.62 92.22 94.07
+
+87.01 87.31 86.31 86.61 84.68 84.68 89.12 88.18 – 87.69 89.12
+
+Recall
+85.21 85.5 85.8 86.09 89.94 89.94 88.46 87.28 – 93.2 94.97
+
+Accuracy
+86.11 86.85 86.85 86.85 86.85 86.85 88.03 88.04 87.74 87.59 88.92
+
+2. Data and methods
+
+2.1. Data
+
+Fig. 3. ROC curve of the models used test dataset for model evaluation, RocAUC score is the area under the ROC curve.
+methods in landslide hazard analysis. First, knowledge of statistical models, mathematical principles of these algorithms and data processing are required. Second, model selection, training and validation often require coding expertise to construct massive models. Third, some complex models (e.g., ensemble learning algorithms or deep learning algorithms) have numerous parameters, and determining optimal parameters poses further challenges to practitioners.
+To better facilitate landslide hazard mapping, this work introduces AutoGluon to simplify regional landslide hazard analysis by using machine learning models and ensemble learning methods. AutoGluon is an open source toolkit released by the Amazon Ltd and is an easy-to-use and easy-to-extend machine learning toolkit. It provides automatic services on data processing, model selection, model architecture search and hyperparameter tuning. In this work, the coseismic landslides inventory maps and environmental factors of the 2017 Jiuzhaigou earthquake in Sichuan Province, China are used to test the performance of AutoGluon in landslide hazard analysis.
+
+On August 8, 2017, a Ms. 7.0 earthquake struck the famous Jiuzhaigou Natural Reserve, Sichuan Province, with a focal depth of 20 km. The geographic coordinate of the epicenter is 33.2N 103.82E, near the Bimang Village, ~5 km west of this center of the natural reserve.
+Landslide inventory maps of the 2017 Jiuzhaigou Earthquake in this work are from Xu et al. (2018), Tian et al. (2019a) and Ma et al. (2019). By using high-resolution remote sensing images before and after the Jiuzhaigou earthquake, 4834 coseismic landslide polygons were manually interpreted in an area of 434 km2 and validated by ﬁeld investigations (Fig. 1, c). The total coverage area of these coseismic landslides is 9.63 km2, and the density of landslide points is 11.13/km2 (Xu et al., 2018; Tian et al., 2019a; Ma et al., 2019).
+To perform landslide susceptibility analysis, this work uses the same sample dataset and same ratios of training and validating samples with Ma et al. (2019). Within the study area, 4834 random points of landslides and the same number of random points of the non-landslide area are selected. Landslide sample points are randomly selected based on 4834 landslide polygons. Non-landslide sample points are randomly selected in the 100 m buffer zone around the landslide sample points. In total, 70 % of sample points (6768) are used as training points and the remaining 30 % (2899) are used as validation data to evaluate the performance of the models. This work integrates 10 environmental factors to perform landslide hazard analysis for the 2017 Jiuzhaigou earthquake. 10 dependent variables including altitude, slope, aspect, slope position, distance parallel to the seismogenic fault, distance vertical to the seismogenic fault, distance to the epicenter, lithology, distance to rivers, and distance to roads are used (Table 1). At any random points (samples), there are 10 independent variables and a binary independent variable derived from the landslide inventory.
+2.2. Methods
+Machine learning models in this work are embedded in the AutoGluon and are used to perform landslide hazard analysis. AutoGluon is integrated in Python 3.7 based on the Linux operating system with NVIDIA GeForce GTX 1080 Ti GPU (12 GB memory). It was developed and distributed by the Amazon Co. Ltd., and provides a platform for automated design and use of machine learning models for various researchers.
+AutoGluon has the capacity to automatically optimize many procedures for machine learning models including data pre-processing, modelarchitecture search, hyper-parameter tuning, etc. The data preprocessing procedure on the platform involves classifying and formatting the input sampling data. Model-architecture search involves automating architecture engineering, which enables developers to ﬁnd the best design for their machine learning models. Hyper-parameters tuning
+
+105
+
+W. Qi et al.
+
+involves searching and selection of optimal architecture of the machine learning model.
+This study uses the AutoGluon's Tabular Prediction function to map coseismic landslide hazards. The Tabular Prediction function uses structured data (csv or txt format, etc.) to achieve classiﬁcation or regression. Each column of the structured data represents a feature of the samples, and each row is a sample.
+Python Code 1:
+
+Step 1. from TabularPredictor
+
+autogluon.tabular
+
+import
+
+TabularDataset,
+
+Step 2. predictor ¼ TabularPredictor(label ¼ 'class').ﬁt(train_data ¼ TabularDataset(‘train.csv'))
+
+Step 3. predictions ¼ predictor.predict(test_data ¼ TabularDataset(‘test.csv'))
+
+Step 4. performance ¼ predictor.evaluate(test_data ¼ TabularDataset(‘test.csv'))
+These lines of code are used to perform machine learning with AutoGluon. The ﬁrst four lines of the code are shown in Code 1. Step 2 is used to machine learning models training and hyper-parameters tuning. Deploying and application of the training model is performed in Step 3. Finally, training machine learning models are evaluated in Step 4.
+Data preprocessing of training dataset and test dataset in the AutoGluon is implemented through the TabularDataset() module. The ﬁt() module performs determining the type of prediction problems (binary classiﬁcation, multi-classiﬁcation or regression, etc.), dividing dataset (training set and validation set), selection of algorithms, model training and hyper-parameters tuning, etc. Trained models saved in the physical storage device are deployed and applied to prediction based on test dataset through predict() module. The evaluate() module is used to evaluate the performance of the trained models. For classiﬁcation task, the evaluate() module provides Accuracy, Balanced accuracy, F1 score, Roc-AUC score, Precision, Recall and Log loss. For regression task, this module calculates root mean squared error, mean squared error, mean absolute error, median absolute error and R squared. In this paper, the Roc-AUC score is used for model veriﬁcation and evaluation.
+
+2.2.1. Data preprocessing Data preprocessing in the AutoGluon includes two consecutive stages:
+model-agnostic preprocessing and model-speciﬁc preprocessing (Erickson et al., 2020). Model-agnostic preprocessing transforms the inputs into all models and standardizes the feature types of input data, including numeric, categorical, text, or date/time, etc. The text and date/time feature types are converted into suitable numeric vectors. For the missing discrete variables, AutoGluon creates an “Unknown” category to distinguish between the categories in which the prediction data set and the training data set are inconsistent.
+Model-speciﬁc preprocessing is only applied to a copy of the data used to train a particular model. For example, input data for neural network model is preprocessed speciﬁcally. For numerical features, the median value is used to obtain the missing values, the skewed distribution of numerical features is performed quantile normalization, and all variables are normalized to zero-mean and unit variance, etc. For classiﬁcation, the category of missing data is regarded as “Unknown” category, and the high-cardinality features with more than 100 possible levels are classiﬁed as the “Other” category.
+2.2.2. Model training and optimization According to the reliability of algorithms and difﬁcult levels of
+training, AutoGluon sets the training sequence of machine learning models with limited training time to ensure that the training is highly reliable and concise. Each model is saved to the physical storage device immediately after training to achieve fault tolerance of training. At the same time, according to the training time restrictions set by the
+
+Natural Hazards Research 1 (2021) 103–108
+researchers, the training time of each model is allocated in advance, and the required time of each model is estimated during training process. If assigned training time is exceeded, the program will jump directly to the next model in order to guarantee predictability and execution of automatic training and hyper-parameter optimization.
+2.2.3. Available machine learning algorithms The Tabular Prediction function of AutoGluon contains a series of
+customized models, including neural network algorithms (Neural Networks), random forest algorithms (Random Forest), extreme random tree algorithms (Extremely Randomized Trees), K-nearest neighbor algorithm (K-Nearest Neighbors), two boosting tree algorithms (including CatBoost, LightGBM), and ensemble learning algorithms.
+(1) Neural network algorithm
+The neural network model is built using the MXNet Gluon. Since tabular datasets are composed of various types of data, feedforward networks are the preferred framework for building the neural network model. AutoGluon is the ﬁrst AutoML toolkit to use the embedding layer (Erickson et al., 2020), which uses linear short connections to connect directly to output prediction of the network. Each dense block in the neural network comprises several convolutional layers, pooling layers, ReLU activation function layers, batch normalization layers and random inactivation regularization (dropout). This work adopts the Adam optimization function with weight attenuation penalty, early-stopping and L1 loss function for training of the neural network model.
+(2) Machine learning algorithms
+Random forest, extremely randomized trees and K-nearest neighbor algorithms are implemented through the scikit-learn library (Pedregosa et al., 2011). Random forest and extremely randomized trees algorithms use Entropy or Gini coefﬁcient (Gini) parameters to select best features. Entropy is a measure of uncertainties in random variables. The larger of the entropy, the greater uncertainty of the random variables. Gini coefﬁcient is a feature selection method similar to information entropy, which is used to deﬁne impurity of data.
+The KNN algorithm (K-nearest neighbor) is one of the simplest machine learning algorithms. It assigns to feature vectors among its k ‘nearest neighbors’. The number of neighboring proﬁles to be considered is equal to k. According to training instances of its k nearest neighbors, prediction is made based on the majority voting rule. For a new instance to be classiﬁed, k nearest neighbors of the instances are selected, then the major class of the k neighbors is assigned to the class of the new instance. Fast KNN search methods include brute force, k-d tree and ball tree, which are relatively simple, efﬁcient and perfectly suitable for the KNN algorithm (Nadkarni, 2016). Weighted KNN with uniform weights and distance-weighted KNN models are trained based on different weights setting methods k nearest neighbor instances.
+(3) Boosting tree algorithm
+The boosting tree algorithm is a machine learning method based on decision tree, optimized by forward stepwise algorithm and linear combination of trees (Li, 2019). Gradient boosting decision tree algorithm is often used optimization of boosting tree models difﬁcultly. Boosting is a method of converting weak learners to strong learners. A series of weak classiﬁers are trained based on sub-datasets obtained by splitting original datasets or changing weights of training samples. Then a series of weak classiﬁer are integrated into a strong classiﬁer. Boosting tree algorithms of AutoGluon include CatBoost and LightGBM algorithm. Both algorithms are optimized based on gradient boosting decision tree, which are able to handle huge amounts of data (Andrey et al., 2020; LightGBM, 2020; Prokhorenkova et al., 2018).
+
+106
+
+W. Qi et al.
+(4) Ensemble learning algorithm
+AutoGluon uses multi-layer stack ensembling strategy to improve accuracy of predictions. Ensembles that combine predictions from multiple models can perform individual models and drastically reduce the variance in the ﬁnal predictions (Erickson et al., 2020). In order to avoid algorithm selection and hyperparameter optimization, AutoGluon simply reuses all of basic layer models as stackers. These models are any type of machine learning models and have the same hyperparameter values. The predictions of lower-layer model concatenated with the original data features are the input vectors of the stacker models. So higher-layer stackers can revisit the original data features. The last layer of the stacker model uses ensemble selection to aggregate the predictions of the stacker models in a weighted manner. By repeating the above process, the multiple-layer stacker model is obtained. Fig. 2 indicates the AutoGluon's multi-layer stacking ensembling strategy, using two stacking layers case.
+3. Results
+In this work, ten different machine learning models and a weighted ensemble model are used from the AutoGluon table data prediction function to perform regional landslide hazard analysis. All these models use the same data of the Jiuzhaigou landslides. The training performances of these eleven models are shown in Table 2. In the training phase, Roc-AUC score of CatBoost model is the highest for ten individual models. The weighted ensemble model has the best performance by combining predictions of those ten models.
+In this work, the training time of different models ranges from 0.01 s to 23.98 s (Table 2). The mean training and the standard deviation time for these models are 4.3 s and 7.0 s, respectively. It totally takes 47.33 s for data preprocessing and model training for 11 machine learning models. The K-Neighbors require the least training time, whereas the Neural Network is the most difﬁcult training model.
+We further use four criteria to measure the testing performances of these models: the Roc-AUC score (Fig. 3), precision, recall and accuracy. Among the ﬁrst ten models, four different models have the best performance as measured by four different criteria. The Random Forest (Gini), LghtGBM, Neural Network and LightGBM (Custom) models have the highest Roc-AUC score, precision, recall and accuracy, respectively. The AutoGluon provides a weighted ensemble model, which integrates different model outputs. This weighted ensemble model has the best performance in all measuring criteria. The Roc-AUC score, precision, recall and accuracy of the ensemble model are 94.07 % (Fig. 3), 89.12 %, 94.97 % and 88.92 %, respectively. Despite using the same data, our RocAUC score is 3 % higher than that of logistic regression model in the work of Ma et al. (2019).
+4. Discussion
+4.1. Faster processing and robust performance of the AutoGluon in landslide hazard analysis
+Implementations of landslide hazard analysis often pose a challenge to stakeholders and there are two hurdles on the way for the general use: data preparation and model application. To carry out landslide hazard analysis, landslide inventories and other environmental maps should be derived in the ﬁrst place (Xu et al., 2012a). The generation of landslide inventories and selection of environmental factors require extensive expertise on landslides. Machine learning models are the most commonly used way to produce regional landslide hazard maps (Segoni et al., 2018). The logic of using machine learning models to perform landslide hazard analysis is to establish relations between environmental/triggering factors with landslide sites and use these relations to predict landslides in new regions that have known environmental/triggering factors. If all inﬂuencing factors have been updated
+
+Natural Hazards Research 1 (2021) 103–108
+after an initial earthquake, in theory, the well-trained landslide hazard models could probably predict coseismic landslides with high accuracy. In addition, by feeding nonlinear models (e.g., deep learning models) with all possible combinations of samples (landslides and corresponding inﬂuencing factors), it is promising to predict localities of coseismic landslides under new earthquakes in new regions.
+To use these models, parameters embedded in the model should be selected and optimized, which requires knowledge on principles of machine learning. Moreover, model selection and construction processes are time-consuming due to low transferability of machine learning models (Tian et al., 2019b; Cao et al., 2020).
+The AutoGluon Tabular Prediction function was used to map regional landslide hazards after the 2017 Jiuzhaigou earthquake. The Tabular Prediction function includes 11 machine learning models (Erickson et al., 2020) including neural network algorithms, machine learning algorithms, boosting tree algorithms, and ensemble learning algorithm. This platform can automatically select proper models and optimize model parameters according to training samples. In addition, this platform can integrate different model outputs into a weighted ensemble model and further improve the results, as shown in our work. The accuracy of seismic landslide hazard assessment based on AutoGluon is higher than traditional machine learning methods. In this case study, the highest Roc-AUC score of 11 models trained based on AutoGluon is 94.07 %, which is signiﬁcantly better than the results of Ma et al. (2019) by using the same data.
+To carry out landslide hazard analysis, this work uses a binary independent variable of landslide/non-landslide and groups of other environmental variables with continuous or discrete values as independent variables are. The input of the AutoGluon ﬁts the data structure required for landslide hazard analysis well. The structured dataset to perform regional landslide hazard analysis can be easily used by the AutoGluon Tabular Prediction function.
+The easy implementation of landslide hazard analysis based on the AutoGluon can greatly reduce time required to select, tune and train the model. AutoGluon provides support versions of CPU and GPU. This work uses 11 models of AutoGluon, on which training time of most selected models is only a few seconds (mean time of 4.3 s). The training and hyperparameter optimization of the 11 models in this work takes only 47.33 s, which effectively improves the operation efﬁciency. In addition, function modules of AutoGluon are highly integrated with multiple functions such as data preprocessing, algorithm construction, model training, hyperparameter optimization, and model evaluation. Researchers can use machine learning models, neural network models and so forth with only 4 lines of code. The model parameters are adjusted and optimized within the speciﬁed search space, and model veriﬁcation and evaluation are performed based on multiple types of indicators. AutoGluon adopted in this study can help landslide researchers from tedious coding and focus on solving professional problems.
+4.2. Limitations
+AutoGluon is still in its early developmental stage and supports a limited number of algorithms within the Linux and MAC operation system. Tabular data prediction, image classiﬁcation, target detection, and text classiﬁcation are four task types supporting by the platform. For the tabular data prediction function, there are 7 algorithms, which can extend to 11 models by adjusting the parameters. In addition, the documentation of AutoGluon remains not perfect at present (https:// autogluon.mxnet.io/index.html). The speciﬁc content of the parameters and tools are not sufﬁciently described yet.
+5. Conclusions
+This article illustrates the potential of applying AutoGluon to seismic landslide hazard analysis. Compared with previous studies that use the same dataset, the result of the landslide hazard analysis with AutoGluon
+
+107
+
+W. Qi et al.
+has higher accuracy. In addition, AutoGluon can automatically select algorithms, train models and optimize model hyperparameters with high efﬁciency, accuracy and robust results. This platform can be easily employed by researchers with little coding expertise to map regional landslide hazards.
+To test this approach, this work integrated 10 environmental factors to map landslide hazard analysis for the 2017 Ms. 7.0 Jiuzhaigou Earthquake, China. Of these 10 factors, the distance parallel to the seismogenic fault, distance vertical to the seismogenic fault, and distance to the epicenter are quantitative descriptions of the seismic triggering factors. Precipitation is ignored in this work, because of the main inﬂuence of earthquake and large-scale co-seismic landslides. Precipitation is the main factor of post-seismic landslides (Khan et al., 2013). At a future stage, precipitation will be considered as the main triggering factor for study of surface recovery at co-seismic landslides. Although it is not possible for this work to predict the time when these co-seismic landslides occur, this set of parameters have certain frequency or recurrence period in this speciﬁc geologic condition. Therefore, this work is a test of landslide hazard analysis. Similarly, AutoGluon can also be used in other types of regional landslide analysis, such as automatic landslide identiﬁcation and landslide susceptibility mapping.
+Author contributions
+WQ designed the framework of this work, conducted numerical analyses and wrote the manuscript. CX participated in designing the study, discussed the paper and made contribution to manuscript modiﬁcations. XX polished the manuscript. All authors have read and agreed to the published version of the manuscript.
+Funding
+This research was jointly funded by the Research grants from National Institute of Natural Hazards, Ministry of Emergency Management of China (Grant Number: ZDJ2020-01) and the National Key Research and Development Program of China (Grant Number: 2018YFC1504703).
+Declaration of competing interest
+The authors declare that they have no known competing ﬁnancial interests or personal relationships that could have appeared to inﬂuence the work reported in this paper.
+Acknowledgments
+We express our gratitude to the anonymous reviewers for their comments and suggestions that improved the quality of our paper.
+References
+Andrey, G., et al., 2020. CatBoost documentation. Available online: https://catboost .ai/docs/concepts/parameter-tuning.html (accessed on 18th June 2020).
+Cao, J., Zhang, Z., Du, J., Zhang, L., Song, Y., Sun, G., 2020. Multi-geohazards susceptibility mapping based on machine learning—a case study in Jiuzhaigou, China. Nat. Hazards 102, 851–871.
+Eibe, F., Mark, A.H., Ian, H.W., 2016. The WEKA Workbench. Online Appendix for "Data Mining: Practical Machine Learning Tools and Techniques, fourth ed. Morgan Kaufmann.
+
+Natural Hazards Research 1 (2021) 103–108
+Erickson, N., Mueller, J., Shirkov, A., Zhang, H., Larroy, P., Li, M., et al., 2020. AutoGluon-Tabular: Robust and Accurate AutoML for Structured Data. arXiv preprint arXiv:200306505.
+Fell, R., Corominas, J., Bonnard, C., Cascini, L., Leroi, E., Savage, W.Z., 2008. Guidelines for landslide susceptibility, hazard and risk zoning for land use planning. Eng. Geol. 102 (3), 85–98.
+Flentje, P.N., Miner, A., Whitt, G., Fell, R., 2007. Guidelines for landslide susceptibility, hazard and risk zoning for land use planning. Aust. Geomech J. 42 (1), 13–36.
+Froude, M., Petley, D., 2018. Global fatal landslide occurrence from 2004 to 2016. Nat. Hazards Earth Syst. Sci. 18 (8), 2161–2181, 1. In press.
+Guzzetti, F., Reichenbach, P., Cardinali, M., Galli, M., Ardizzone, F., 2005. Probabilistic landslide hazard assessment at the basin scale. Geomorphology 72 (1), 272–299.
+Harp, E.L., Keefer, D.K., Sato, H.P., Yagi, H., 2011. Landslide inventories: the essential part of seismic landslide hazard analyses. Eng. Geol. 122, 9–21.
+Hong, H., Pradhan, B., Xu, C., Tien, B.D., 2015. Spatial prediction of landslide hazard at the Yihuang area (China) using two-class kernel logistic regression, alternating decision tree and support vector machines. Catena 133, 266–281.
+Hong, H., Liu, J., Zhu, A.X., 2020. Modeling landslide susceptibility using LogitBoost alternating decision trees and forest by penalizing attributes with the bagging ensemble. Sci. Total Environ. 718, 137231.
+Jibson, R.W., Harp, E.L., Michael, J.A., 2000. A method for producing digital probabilistic seismic landslide hazard maps. Eng. Geol. 58 (3), 271–289.
+Keefer, D.K., Larsen, M.C., 2007. Assessing landslide hazards. Science 316 (5828), 1136–1138.
+Khan, S.F., Kamp, U., Owen, L.A., 2013. Documenting ﬁve years of landsliding after the 2005 Kashmir earthquake, using repeat photography. Geomorphology 197, 45–55.
+Li, H., 2019. Statistical Learning Methods, second ed. Tsinghua University Press, Beijing (in Chinese).
+LightGBM, 2020. User guild of LightGBM. Available online: https://lightgbm.readthedocs .io/en/latest/Parameters.html (accessed on 18th June 2020).
+Ma, S., Xu, C., Tian, Y., Xu, X., 2019. Application of logistic regression model for hazard assessment of earthquake-triggered landslides: a case study of 2017 Jiuzhaigou (China) Ms 7.0 event. Seismol. Geol. 41 (1), 165–180 (in Chinese).
+Mondini, A.C., Guzzetti, F., Reichenbach, P., Rossi, M., Cardinali, M., Ardizzone, F., 2011. Semi-automatic recognition and mapping of rainfall induced shallow landslides using optical satellite images. Remote Sens. Environ. 115 (7), 1743–1757.
+Nadkarni, P., 2016. Chapter 10 - core technologies: data mining and “big data”. In: Nadkarni, P. (Ed.), Clinical Research Computing. Academic Press, pp. 187–204.
+Nguyen, V.-T., Tran, T.H., Ha, N.A., et al., 2019. GIS based novel hybrid computational intelligence models for mapping landslide susceptibility: a case study at da lat city, vietnam. Sustainability 11 (24), 7118.
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., Duchesnay, E., 2011. Scikit-learn: machine learning in Python. J. Mach. Learn. Res. 12, 2825–2830.
+Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A., Gulin, A., 2018. CatBoost: unbiased boosting with categorical features. In: 32nd Conference on Neural Information Processing Systems (NIPS 2018), Montreal, Canada, pp. 1–11.
+Reichenbach, P., Rossi, M., Malamud, B.D., Mihir, M., Guzzetti, F., 2018. A review of statistically-based landslide susceptibility models. Earth Sci. Rev. 180, 60–91.
+Segoni, S., Tofani, V., Rosi, A., Catani, F., Casagli, N., 2018. Combination of rainfall thresholds and susceptibility maps for dynamic landslide hazard assessment at regional scale. Front. Earth Sci. 6, 85.
+Stumpf, A., Kerle, N., 2011. Object-oriented mapping of landslides using Random Forests. Remote Sens. Environ. 115 (10), 2564–2577.
+Song, J., Wang, Y., Fang, Z., Peng, L., Hong, H., 2020. Potential of ensemble learning to improve tree-based classiﬁers for landslide susceptibility mapping. IEEE J. Sel. Top. Appl. Earth Obs. Remote Sens. 13, 4642–4662.
+Tian, Y., Xu, C., Ma, S., Xu, X., Wang, S., Zhang, H., 2019a. Inventory and spatial distribution of landslides triggered by the 8th August 2017 MW 6.5 Jiuzhaigou earthquake, China. J. Earth Sci. 30 (1), 206–217.
+Tian, Y., Xu, C., Hong, H., Zhou, Q., Wang, D., 2019b. Mapping earthquake-triggered landslide susceptibility by use of artiﬁcial neural network (ANN) models: an example of the 2013 Minxian (China) Mw 5.9 event. Geomatics, Nat. Hazards Risk 10 (1), 1–25.
+Xu, C., Dai, F., Xu, X., Lee, Y.H., 2012a. GIS-based support vector machine modeling of earthquake-triggered landslide susceptibility in the Jianjiang River watershed, China. Geomorphology 145–146, 70–80.
+Xu, C., Xu, X., Dai, F., Saraf, A.K., 2012b. Comparison of different models for susceptibility mapping of earthquake triggered landslides related with the 2008 Wenchuan earthquake in China. Comput. Geosci. 46, 317–329.
+Xu, C., Wang, S., Xu, X., Zhang, H., Tian, Y., Ma, S., Fang, L., Lu, R., Chen, L., Tan, X., 2018. A panorama of landslides triggered by the 8 August 2017 Jiuzhaigou, sichuan ms 7.0 earthquake. Seismol. Geol. 40 (1), 233–260 (in Chinese).
+
+108
+

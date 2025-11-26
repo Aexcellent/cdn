@@ -1,0 +1,357 @@
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+193
+
+End-to-End Support for QoS-Aware Service Selection, Binding, and Mediation in VRESCo
+Anton Michlmayr, Student Member, IEEE, Florian Rosenberg, Member, IEEE, Philipp Leitner, Student Member, IEEE, and Schahram Dustdar, Senior Member, IEEE
+
+Abstract—Service-Oriented Computing has recently received a lot of attention from both academia and industry. However, current service-oriented solutions are often not as dynamic and adaptable as intended because the publish-find-bind-execute cycle of the Service-Oriented Architecture triangle is not entirely realized. In this paper, we highlight some issues of current web service technologies, with a special emphasis on service metadata, Quality of Service, service querying, dynamic binding, and service mediation. Then, we present the Vienna Runtime Environment for Service-Oriented Computing (VRESCo) that addresses these issues. We give a detailed description of the different aspects by focusing on service querying and service mediation. Finally, we present a performance evaluation of the different components, together with an end-to-end evaluation to show the applicability and usefulness of our system.
+Index Terms—Web services publishing and discovery, metadata of services interfaces, advanced services invocation framework.
+Ç
+
+1 INTRODUCTION
+
+DURING the last few years, Service-Oriented Architecture (SOA) and Service-Oriented Computing (SOC) [1] have gained acceptance as a paradigm for addressing the complexity that distributed computing generally involves. In theory, the basic SOA model consists of three actors that communicate in a loosely coupled way as shown in Fig. 1a. Service providers implement services and make them available in service registries. Service consumers (also called service requesters) query service information from the registry, bind to the corresponding service provider, and finally, execute the service. Due to platform-independent service descriptions, one can implement flexible applications with respect to manageability and adaptivity. For instance, services can easily be exchanged at runtime and service consumers can switch to alternative services seamlessly, which increases organizational agility. Web services [2] represent the most common realization of SOA, building on the standards SOAP [3] for communication, WSDL [4] for service interface descriptions, and UDDI [5] for registries.
+However, practice has shown that SOA solutions are often not as flexible and adaptable as claimed. We argue that there are some issues in current implementations of the SOA model. First and foremost, service registries such as UDDI and ebXML [6] did not succeed. We think this is partly due to their limited querying support that only
+. A. Michlmayr, P. Leitner, and S. Dustdar are with the Distributed Systems Group, Vienna University of Technology, Argentinierstrasse 8, 1040 Vienna, Austria. E-mail: {michlmayr, leitner, dustdar}@infosys.tuwien.ac.at.
+. F. Rosenberg is with Commonwealth Scientific and Industrial Research Organisation (CSIRO), GPO Box 664, Canberra ACT 2601, Australia. E-mail: florian.rosenberg@csiro.au.
+Manuscript received 26 May 2009; revised 26 Nov. 2009; accepted 20 Dec. 2009; published online 28 Apr. 2010. For information on obtaining reprints of this article, please send e-mail to: tsc@computer.org, and reference IEEECS Log Number TSCSI-2009-05-0146. Digital Object Identifier no. 10.1109/TSC.2010.20.
+
+provides keyword-based matching of registry content, and insufficient support for metadata and nonfunctional properties of services. This is also highlighted by the fact that Microsoft, SAP, and IBM have finally shut down their public UDDI registries in 2005. As a result, service registries are often missing in service-centric systems (i.e., no publish and find primitives). This leads to point-to-point solutions, where service endpoints are exchanged at design time (e.g., using e-mail) and service consumers statically bind to them (see Fig. 1b).
+Besides that, support for dynamic binding and invocation of services is often restricted to services having the same technical interface. In this regard, the lack of service metadata makes it difficult for service consumers to know if two services actually perform the same task. Furthermore, support for Quality of Service (QoS) is necessary to enable service selection based on nonfunctional QoS attributes such as response time (in addition to functional attributes).
+In this paper, we discuss the issues we see in current SOC research and practice by describing the problems that arise when building SOC applications with current tools and frameworks. The main contribution is the presentation of the VRESCo service runtime environment that aims at solving some of these issues. To be more specific, the present paper focuses on service metadata, QoS, and service querying, plus dynamic binding, invocation, and mediation of services. Additionally, we provide an extensive performance evaluation of the different components and an endto-end evaluation of the overall runtime, which shows the applicability of our approach.
+The remainder of the paper is organized as follows: Section 2 presents an illustrative example and summarizes some issues of SOC research and practice. Section 3 describes the details of the VRESCo runtime environment, while Section 4 gives a thorough evaluation of our work. Section 5 introduces related approaches and Section 6 finally concludes the paper.
+
+1939-1374/10/$26.00 ß 2010 IEEE Published by the IEEE Computer Society
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+194
+
+Service Registry
+
+Find
+Service Consumer
+
+Service Contract
+Bind/Execute
+
+Publish
+Service Provider
+
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+Service Consumer
+
+Service Contract
+Bind/Execute
+
+Service Provider
+
+Fig. 1. SOA theory versus practice (adapted from [7]). (a) SOA model. (b) SOA practice.
+
+2 MOTIVATION AND PROBLEM STATEMENT
+This section first introduces a motivating example, which is used throughout the paper. Then, we derive the problems developers face when engineering service-centric systems with current tools and frameworks.
+2.1 Motivating Example
+Fig. 2 shows a typical enterprise application scenario from the telecommunications domain. The overview of this case study is depicted in Fig. 2a.
+Cell phone operator CPO1 provides different kinds of services: Public Services (e.g., Rate Information Service) can be used by everyone. Customer Services (e.g., SMS Service) are used by customers of CPO1, whereas In-house Services (e.g., CRM Services) represent internal services that should only be accessed by the different departments of CPO1. Besides that, CPO1 consumes services from its partners (e.g., cell phone manufacturers and suppliers) and competitors (e.g., CPO2 and CPO3). As discussed later, this scenario bears several challenges that are typical in servicecentric software engineering.
+According to European law, consumers can keep their mobile phone number when switching to another CPO. Fig. 2b shows a simplified number porting process (depicted as oval boxes). This process is interesting because it contains both internal and external services (depicted as rectangles), and multiple service candidates. After the customer has been looked up using the CRM Service, the external Number Porting Service of the old CPO has to be invoked. If the number is portable, the porting is executed by the old CPO. If this step was successful, the new CPO is informed, which activates the new number using the Mobile Operation Service. Finally, a notification is sent to the customer using the preferred notification mechanism (e.g., SMS, e-mail, etc.).
+2.2 SOC Challenges
+Adaptive service-oriented systems bring along several distinct requirements, leading to a number of challenges that have to be addressed. In this section, we summarize the current challenges that we see most important. The contribution of VRESCo is to address these challenges in a comprehensive service runtime environment.
+. Service Metadata. Service interface description languages such as WSDL focus on the interface needed to invoke a service. However, from this interface, it is often not clear what a service actually does, and if it performs the same task as another service. Service
+
+(a)
+
+(b)
+
+Fig. 2. CPO case study. (a) Overview. (b) Number porting process.
+
+metadata [8] can give additional information about the purpose of a service and its interface (e.g., pre and postconditions). For instance, in the CPO case study without service metadata, it is not clear if the number porting services of CPO2 and CPO3 actually perform the same task. . Service Querying. Once services and associated metadata are defined, this information should be discovered and queried by the service consumers. This is the focus of service registry standards such as UDDI [5] and ebXML [6]. In practice, the service registry is often missing since there are no public registries and service providers often do not want to maintain their own registry [7]. Besides service discovery, another issue is how to select a service from a pool of service candidates [9] by means of a querying language. For instance, CPO1 may want to select the SMS Service with the highest availability. . QoS. In enterprise scenarios, QoS plays a crucial role [10]. This includes both network-level attributes (e.g., latency and availability) and application-level attributes (e.g., response time and throughput). The QoS model should be extensible to allow service providers to adapt it for their needs. Furthermore, QoS must be monitored accordingly so that users can be notified when the measured values violate Service Level Agreements (SLAs). . Dynamic Binding and Invocation. One of the main advantages of service-centric systems has always been the claim that service consumers can dynamically bind and invoke services from a pool of candidate services. However, in practice, this requires identical service interfaces, which is often not the case. Therefore, we argue that the bind and execute primitives of SOA are not solved sufficiently. This raises the need for mechanisms that mediate between alternative services possibly having different interfaces. Considering the CPO case study, the interfaces of CPO2’s and CPO3’s number porting service might differ, but the number porting process of CPO1 should still be able to seamlessly switch between them at runtime.
+Besides these core challenges, other aspects such as
+service versioning [11] or event processing [12] are of crucial
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+MICHLMAYR ET AL.: END-TO-END SUPPORT FOR QOS-AWARE SERVICE SELECTION, BINDING, AND MEDIATION IN VRESCO
+
+195
+
+Fig. 3. VRESCo overview architecture.
+importance for SOC. However, a detailed description is out of the scope of this paper, and the interested reader is referred to our previous work.
+
+3 SYSTEM DESCRIPTION
+This section describes in detail the VRESCo runtime, which was first sketched in [7]. Besides an architectural overview, we discuss service metadata and querying, as well as dynamic binding together with our service mediation approach.
+3.1 Overview
+The architectural overview of VRESCo is shown in Fig. 3, which is adapted from [13]. The VRESCo core services are provided as web services that can be accessed either directly using SOAP or by using the Client Library that provides a simple API. Furthermore, the DAIOS framework [14] has been integrated into the Client Library, and provides stubless, protocol-independent, and messagedriven invocation of services. The Access Control Layer guarantees that only authorized clients can access the core services, which is handled using claim-based access control and certificates [13]. Services and associated metadata are stored in the Registry Database, which is accessed using the Object-Relational Mapping (ORM) Layer. Finally, the QoS Monitor is responsible for regularly measuring the current QoS values. The overall system is implemented in C# using the Windows Communication Foundation [15]. Due to the platform-independent architecture, the Client Library can be provided for different platforms (e.g., C# and Java).
+There are several core services. The Publishing/Metadata Service is used to publish services and metadata into the Registry Database. Furthermore, the Management Service is responsible for managing user information (e.g., name, password, etc.), whereas the Query Engine is used to query the Registry Database. The Notification Engine informs users when certain events of interest occur inside the runtime, while the Composition Engine [16] provides mechanisms to compose services by specifying hard and soft constraints on QoS attributes. In this paper, we focus on the main requirements for our client-side mediation approach, which are the Metadata Service (including the models for metadata, services, and QoS), the Query Engine, and the dynamic binding, invocation, and mediation mechanisms.
+
+Fig. 4. Service metadata model [17].
+3.2 Service Metadata
+The VRESCo runtime provides a service metadata model capable of storing information about services. This is needed to capture the purpose of services, which enables mediation between services that perform the same task. In this section, we describe service metadata and give examples from the CPO case study.
+3.2.1 Metadata Model The VRESCo metadata model introduced in [17] is depicted in Fig. 4. The main building blocks of this model are concepts, which represent the definition of entities in the domain model. We distinguish among three different types of concepts:
+. Features represent concrete actions in the domain that implement the same functionality (e.g., Check_ Status and Port_Number). Features are associated with categories, which express the purpose of services (e.g., PhoneNumberPorting).
+. Data concepts represent concrete entities in the domain (e.g., customer or phone_number), which are defined using other data concepts and atomic elements such as strings or numbers.
+. Predicates represent domain-specific statements that are either true or false. Each predicate can have a number of arguments (e.g., for feature Port_Number, a predicate Portability_Status_Ok(Number) expresses the portability status of a given argument Number).
+Furthermore, features can have pre and postconditions expressing logical statements that have to hold before and after the execution of the feature. Both types of conditions are composed of multiple predicates, each having a number of optional arguments. These arguments refer to a concept in the domain model. There are two different types of predicates:
+. Flow predicates describe the data flow required or produced by a feature. For instance, the featureCheck_Status from our CPO case study could
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+196
+
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+TABLE 1 QoS Attributes
+
+Fig. 5. Service model to metadata model mapping.
+
+have the flow predicate requires(Customer) as precondition and produces(PortabilityStatus) as postcondition. . State predicates express global states that are valid before or after invoking a feature. For instance, state predicate notified(Customer) can be added as postcondition to feature Notify_Customer.
+3.2.2 Service Model
+The VRESCo service model constitutes the basic information of concrete services that are managed by VRESCo. The service model depicted on the lower half of Fig. 5 basically follows the web service notation as introduced by WSDL with extensions to enable service versioning and represent QoS on a service runtime level.
+A concrete service (e.g., Number Porting Service of CPO1) defines the basic information of a service (e.g., name, description, owner, etc.) and consists of a least one service revision. A service revision (e.g., the most recent version, or a stable one) contains all technical information that is necessary to invoke the service (e.g., a reference to the WSDL file) and represents a collection of operations (e.g., Check_Status). Every operation may have a number of input parameters (e.g., Customer), and may return one or more output parameters (e.g., PortabilityStatus). Revisions can have parent and child revisions that represent a complete versioning graph of a concrete service [11]. Both revisions and operations can have a number of QoS attributes (e.g., response time is 1,200 ms) representing all service-level attributes as described below. The distinction in revision and operation-specific QoS is necessary because attributes such as response time depend on the execution duration of an operation, whereas availability is typically given for the revision (if a service is not available, all operations are generally also unavailable). In Section 3.5, we show how concrete services are mapped to the metadata and service model in order to perform service mediation.
+3.2.3 QoS Model
+Besides functional attributes described in the metadata model, nonfunctional attributes are also important. For instance, in our case study, CPO1 may want to always bind to the Notification Service having the lowest response time. Therefore, QoS attributes can be associated with each service revision and operation in VRESCo. These QoS attributes can be either specified manually using the Management Service or measured automatically (e.g., using the QoS Monitor introduced in [18]).
+
+Table 1 briefly summarizes the QoS attributes that are currently considered in VRESCo. Latency represents the time a request needs on the wire. It is calculated as the average value of n individual measuring points. Response time consists of the latency for request and response plus the execution time of the service. Availability represents the probability a service is up and running (t0, t1 are time stamps, td is the total time the service was down). Accuracy is the probability of a service to produce correct results, where rf denotes the number of failed requests and rt denotes the total number of requests. Finally, throughput represents the maximum number of requests a service can process within a certain period of time (denoted by t1 À t0), where r is the total number of requests during that time. In addition to these predefined QoS attributes, users can define additional QoS properties for service revisions or operations.
+3.3 Querying Approach
+The VRESCo Query Language (VQL) provides a means to query all information stored in the registry (i.e., services and service metadata including QoS). In this section, we discuss the architecture of VQL followed by query specification and query processing.
+3.3.1 Architecture
+The VQL architecture was driven by the following requirements: First of all, declarative query languages such as SQL refer to database tables and columns, which makes queries invalid as soon as the database schema changes. Following the Query Object Pattern [19], queries can be built programmatically using query criteria that refer to classes and fields instead. These queries are finally translated into SQL statements, which makes them independent of the database schema. In this regard, VQL should provide such objectoriented querying interface and corresponding query expression library (similar to the Hibernate Criteria API [20]).
+Moreover, it should be possible to define both mandatory and optional criteria by introducing different querying strategies that enable fuzzy or priority-based querying (e.g., services must have a response time below 500 ms
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+MICHLMAYR ET AL.: END-TO-END SUPPORT FOR QOS-AWARE SERVICE SELECTION, BINDING, AND MEDIATION IN VRESCO
+
+197
+
+TABLE 2 VQL/SQL Translation
+
+Fig. 6. VQL architecture.
+
+and should be provided by company X). Finally, VQL queries should be type-safe (i.e., the query requester specifies the expected type of the query results) and secure (i.e., queries are protected against well-known security issues such as SQL injection).
+The architecture of the VQL framework is shown in Fig. 6. In general, the Client Library is used to invoke VRESCo core services (e.g., Publishing Service). Since these invocations represent remote method invocations, the Data Transfer Object pattern [19] is used to reduce the information sent from clients to the core services. Therefore, the VRESCo runtime operates on the core model (which represents the service metadata model introduced in Section 3.2), while clients operate on the user model. The task of the Data Access Layer (DAL) is to convert core objects into user objects and vice versa. The corresponding mapping between the two models is defined at design time using .NET attributes [21].
+The advantage of this architecture is that clients operate on the user model, which represents a restricted view of the core model. Therefore, some information can be hidden from the clients (e.g., database IDs or versioning information for optimistic locking). Consequently, the VQL framework has to provide view-based querying, to be able to query on both models (depending on whether the query is issued client or server-side). The task of the ORM Layer is then to map the entities of the core model to the database model (i.e., concrete database tables and columns), which is realized by NHibernate [20] using dedicated data access objects (DAOs).
+According to this architecture, user queries are formulated using the Client Library, which provides an objectoriented querying interface to define query criteria, which is discussed in the next section. The query is then sent to the VRESCo runtime (step 1) and forwarded to the VQL Engine (step 2). The details of query processing (steps 3-5) are described in Section 3.3.3. Finally, the results are sent back to the query requester (step 6).
+3.3.2 Query Specification
+After describing requirements and architecture of the querying framework, we present how queries are specified. In general, VQL queries consist of six elements as follows:
+. Return Type R defines the expected data type of the query results. The return type needs to be an element of the VRESCo metadata model (e.g., a list of Feature objects).
+
+. Mandatory Criteria Cm describe constraints that have to be fulfilled by the query (e.g., response time must be less than 500 ms).
+. Optional Criteria Co add constraints, which should optimally be fulfilled but are not required (e.g., service provider should be company X).
+. Ordering O can be used to specify the ordering of the query results (e.g., sort ascending by ID).
+. Querying Strategy S finally defines how the query should be executed (e.g., exact or fuzzy matches).
+. Result Limit L can be used to restrict the number of results (e.g., 10 or 0, which represents no limit).
+The most important elements are criteria since they actually represent the constraints of the query. Moreover, criteria have different execution semantics depending on the querying strategy, which is discussed in Section 3.3.4. However, the main motivation is to allow the specification of mandatory and optional criteria.
+In general, criteria consist of a set of expressions E that is used to define common constraints such as comparison (e.g., smaller, greater, equal, etc.) and logical operators (e.g., AND, OR, NOT, etc.). Table 2 shows criteria (C), expressions (E), and orderings (O), which are currently provided by VQL. Furthermore, the table indicates how each of these elements is translated into SQL, which is described in more detail later. It should be noted that VQL is extensible in that further expressions can be added easily.
+Listing 1 shows an example query for finding services that implement the Notify_Customer feature in our CPO case study. As described above, queries are parameterized using the expected return type. In this case, the type ServiceRevision (line 2) expresses that the result of the query is a list of service revisions. In our example, two Add criteria (lines 5-7) are used to state that services have to be active and that each service has to implement the Notify_Customer feature (by using the Eq expression). The first parameter of expressions is usually a string representing a path in the user or core model (e.g., Service.Owner.Company describes the company property of the service owner). These strings are central to VQL and are referred to as property paths. Additionally, three Match criteria are added in the example (lines 8-14).
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+198
+
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+The first criterion expresses that services provided by CompanyX are preferred, while the second criterion defines that revisions should have tags starting with “STABLE” (Like expression). The third criterion specifies an optional QoS constraint on response time, which should be less than 1,000 ms. The operator “&” in line 13 represents a shortcut for an And expression. All three Match criteria use priority values as third parameter to define the importance of a criterion.
+Listing 1. VQL sample query:
+
+are retrieved using the ORM Layer. The collected information is finally used to build FROM, WHERE, and ORDER clauses of the SQL query (lines 11-13), according to the VQL/ SQL translation shown in Table 2.
+Algorithm 1. processQueryðR; C; S; OÞ 1: if (isUserObject(R)) then 2: R MapUserToCoreObject(R) 3: end if 4: assocInfo R 5: for all (crit 2 C) do 6: for all (expr 2 GetExpressions(crit) ) do 7: assocInfo assocInfo [ ResolveAssoc(expr) 8: propInfo params [ ResolveProp(expr) 9: end for
+10: end for 11: query BuildFrom(assocInfo, propInfo, S) 12: query BuildWhere(query, assocInfo, propInfo, S) 13: query BuildOrder(query, O) 14: return query
+
+The query is finally executed (lines 17-20) by instantiating a querier object using the Client Factory, and invoking the FindByQuery method using the desired querying strategy (e.g., QueryMode.Priority). Furthermore, the result limit of the query is set in order to return only 10 results.
+3.3.3 Query Processing
+Query processing is illustrated in Fig. 6. When the query is sent to the VQL Engine, the specified querying strategy is executed, which is implemented using the strategy design pattern [22]. The query is forwarded to the Preprocessor component (step 3), which is responsible for analyzing the VQL query and generating the corresponding SQL query. Next, an NHibernate session is created to execute the generated SQL query on the database (step 4). After execution, the ResultBuilder component takes the results from the NHibernate session context. Since these results represent core objects, they may have to be converted back into the corresponding user objects (i.e., if the return type refers to the user model). This is done dynamically by invoking the constructor of the corresponding object using reflection. For both models, however, the ResultBuilder guarantees type safety of the results, which are finally sent back to the client (step 5).
+Algorithm 1 depicts the pseudocode of the Preprocessor. If the query refers to the user model, it is first transformed to the core model (lines 1-3). The Preprocessor then iterates over all criteria and expressions (lines 5-10). The ResolveAssoc function recursively analyzes the property paths of each expression to determine the necessary table joins. Similarly, the ResolveProp function extracts the property values of each expression. To give an example, reconsider line 8 of Listing 1: The property path Service.Owner.Company represents two associations Service and Owner that will be resolved using joins, and one property Company that will be compared with the expression’s property value CompanyX. The concrete association/table and property/column names
+
+3.3.4 Querying Strategies
+The querying strategy influences how queries are executed. More precisely, it defines the Preprocessor’s behavior during SQL generation. The basic transformation process can be summarized as follows: Add criteria are transformed into predicates within the SQL WHERE clause, whereas Match criteria are handled as SQL subselects (IN or JOIN, see Table 2).
+The exact querying strategy forces all criteria to be fulfilled, irrespective of whether this is Add or Match. However, there are scenarios where Match has to be used instead of Add in order to get the desired results (i.e., by enforcing subselects using IN instead of WHERE predicates). In particular, when mapping N:1 and N:M associations (i.e., collection mappings in Hibernate terminology), a query cannot have the same collection more than once in the WHERE predicate. The use of subselects eliminates this effect in VQL; otherwise, such queries would result in null since the associated tables are joined more than once. As an example, reconsider the query in Listing 1 using the exact strategy. When having only one criterion with respect to QoS, Add can be used. However, if there would be a second QoS criterion, Match is required.
+The priority querying strategy uses priority values for each criterion in order to accomplish a weighted matching of results. Therefore, each Match criterion allows to append a weight to specify its priority, which is internally added if the criterion is fulfilled. The query finally returns the results sorted by the sum of priority values. To give an example, the query in Listing 1 uses the priority values “1,” “3,” and “5.” This means that the constraint on response time is more important than the constraint on revision tags. More precisely, queries that fulfill only the third Match criterion are preferred over queries that fulfill the first and second Match criteria (since 5 > 3 þ 1).
+The relaxed querying strategy represents a special variant of priority querying, where each Match criterion has priority 1. Thus, this strategy simply distinguishes between optional and mandatory criteria. Results are then
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+MICHLMAYR ET AL.: END-TO-END SUPPORT FOR QOS-AWARE SERVICE SELECTION, BINDING, AND MEDIATION IN VRESCO
+
+199
+
+TABLE 3 Rebinding Strategies
+
+sorted based on the number of fulfilled Match criteria. This allows to define fuzzy queries by relaxing the criteria, which can be useful when no exact match can be found for a query. To achieve the necessary behavior, relaxed and priority querying both translate Match criteria into subselects using JOIN predicates.
+3.4 Dynamic Binding
+Dynamic binding is claimed to be one of the main advantages of SOA. In practice, however, services are often bound using pregenerated stubs that do not provide support for dynamic binding. Similar to querying strategies, we use the strategy pattern to implement a number of different rebinding strategies. We summarize all available strategies in Table 3.
+All rebinding strategies have their advantages and disadvantages. Fixed proxies are used in scenarios where rebinding is not needed (e.g., because of existing contractual obligations). Periodic rebinding causes background queries on a regular basis, which is inefficient if invocations happen infrequently. OnDemand rebinding results in low overhead but has the drawback that the binding is not always up-to-date. In contrast to this, OnInvocation rebinding guarantees accurate bindings but seriously degrades the service invocation time since service bindings are checked before every invocation. Finally, OnEvent rebinding uses the VRESCo Event Notification Engine [12] to combine the advantages of all strategies. Therefore, clients use subscriptions for defining in which situations to rebind, which is then triggered by events.
+3.5 Service Mediation
+Dynamic binding as described above naturally brings up the problem of how differences in service interfaces can be resolved at runtime. In this section, we introduce the VRESCo Mapping Framework (VMF) that handles the mapping from abstract features to concrete service operations (as described in Section 3.2), and perform mediation between different services that implement the same feature. The elements of the service model are mapped to our service metadata model as follows (see Fig. 5): Services are grouped into categories, where every service may belong to several categories at the same time. Services within the same category provide at least one feature of this category. Service operations are mapped to features, where every operation implements exactly one feature. However, we plan to provide support for more complex mappings using the VRESCo Composition Engine [16] (i.e., features will be represented as compositions of several service operations). The input and output parameters of service operations map to data concepts. Every parameter is represented by one or more concepts in the domain model. This means that all
+
+Fig. 7. VMF architecture.
+data that a service accepts as input or passes as output are well defined using data concepts and annotated with the flow predicates requires (for input) and produces (for output). The concrete mapping of service parameters to concepts is described using mapping scripts, which will be discussed extensively below.
+In general, the mediation approach follows the “featuredriven” metadata model. Therefore, a client that wants to invoke a service does not provide the input of the concrete service directly but in the conceptual high-level representation (i.e., the feature input in VRESCo terminology). The runtime takes care of lowering and lifting the feature input and output, respectively. Lowering represents the transformation from high-level concepts into a low-level format (i.e., feature input to SOAP input) whereas lifting is the inverse operation (i.e., SOAP output to feature output).
+Fig. 7 shows an overview of the VMF architecture. Generally, VMF comprises two main components. First, at mapping time, the Mapper component is used to create lifting and lowering scripts for each service. This information is stored in the VRESCo Registry Database using the Metadata Service. Second, at execution time, DAIOS is used as a dynamic service invocation framework. The Mediator component is used as an interceptor in DAIOS following the ideas presented in [23]. This mediator retrieves the lifting and lowering scripts from the VRESCo Metadata Service at runtime, and executes the corresponding mapping. This is done by applying all mapping functions sequentially, in the order they have been specified. In that sense, VMF implements an imperative, interpreted domain-specific language. In its current form, VMF does not optimize mapping scripts in any way.
+Mapping scripts are defined using the Mapping Library, which includes a number of Mapping Functions. Mapping functions are the atomic building blocks from which all mapping scripts are constructed. We have summarized the provided mapping functions in Table 4 (grouped into seven
+TABLE 4 VMF Mapping Functions
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+200
+
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+convert it with the ConvertToInt function to an integer which is finally assigned to operation’s input parameter AreaCodeSender. All further mappings from Fig. 8 are implemented analogously.
+Listing 2. VMF mapping example code:
+
+Fig. 8. VMF mapping example.
+
+categories). Probably, the most important function is Assign, which is used to map one input parameter or intermediary result to an output parameter (i.e., a web service operation parameter in case of a lowering script, a feature output parameter in case of a lifting script). Functions from the Constants group are used to create new data directly in the mapping. All remaining mapping functions are used to transform parameters in various ways, e.g., from one data type to another, using string manipulation, or using mathematical and logical operations. Furthermore, more complex mappings can be defined in the CSScript language [24]. Essentially, this allows to deploy custom mapping functions by using the full power of the C# programming language. For instance, this can be used to invoke external web services at mediation time.
+We give a concrete mapping example in Fig. 8. In this example, the abstract feature Notify_Customer from the CPO case study (see Section 2) is mapped to the concrete operation SendSMS1. The feature provides three input parameters and produces one output parameter. The parameter Message is identical in both interfaces, and can therefore be mapped directly (using only Assign). Note that for the Assign function to work, both sides need to be represented using the same data concept (in this case string). The parameter SenderNr is split into the area code and the actual number. This is done using the string operation SubString, which takes the start index of the string and the length of the substring as parameters. Afterward, both substrings are converted into integers using the ConvertToInt function. This is necessary since assigning a string to an integer is not possible. The ReceiverNr is handled similarly. So far, only input parameters have been mapped (i.e., all informations given so far form the lowering script for this service). The lifting script, which defines how the service output is mapped to the feature output, consists only of a ConvertToBoolean and another Assign function.
+Listing 2 illustrates the first two mappings (Message and SenderNr) in C# code. Lines 4 and 5 show how the Mapper is created for feature Notify_Customer and operation SendSMS1. Both objects have to be queried beforehand (not shown in Listing 2 for brevity). The Assign function is again used as a connector to link the Message from the feature to the Message of the operation, whereas mapper.AddMappingFunction() adds the function to the mapping. Lines 14-21 get the area code from the feature’s SenderNr as substring and
+
+4 EVALUATION
+In this section, we give an evaluation of the VRESCo runtime focusing on the topics covered in this paper. The purpose of this evaluation is twofold: First, we show the runtime performance regarding service querying, rebinding, and mediation by using synthetic data. The main goal of this evaluation is to analyze the performance impact of each aspect in isolation. Second, we combine these aspects into a coherent end-to-end evaluation using an order processing workflow. The main goal is to understand the influence of each aspect with regard to the overall process duration in a realistic setting. Additionally, we show how the individual results of the first part interrelate in an endto-end setting. All experiments have been executed on an Intel Xeon Dual CPU X5450 with 3.0 GHz and 32 GB RAM running under Windows Server 2007 SP1. Moreover, we use .NET v3.5 and MySQL Server v5.1.
+For mediation, rebinding, and end-to-end evaluation, we have created different sets of test services and QoS configurations (with varying response times) using the web service generation tool GENESIS [25]. These testbeds are described in detail in the corresponding sections.
+4.1 Querying Performance
+First of all, we show the performance of the VQL Engine, which has been measured using the query shown in Listing 1. The test data are generated automatically: In every step, five categories are inserted, each having five alternative services with 10 revisions, while every revision has one tag and 11 QoS attributes with random values. It should be noted that in every step, 20 percent of all services match the queried feature Notify_Customer and service owner CompanyX, while only 2 percent of all service revisions match all query criteria. To eliminate outliers, the results represent the median of 10 runs, while the database and Hibernate session cache are cleared after each run.
+Fig. 9 compares the performance of the queries generated by SQL, HQL, and VQL. Therefore, the query from Listing 1 was manually translated into HQL and SQL, while the VQL query is executed on core objects using the exact strategy without result limit (NL). The queries return only
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+MICHLMAYR ET AL.: END-TO-END SUPPORT FOR QOS-AWARE SERVICE SELECTION, BINDING, AND MEDIATION IN VRESCO
+
+201
+
+TABLE 5 VQL Query Processing (in Milliseconds, User/Core, L10)
+
+Fig. 9. Query performance (NL).
+the IDs of the matching revisions. Therefore, this table shows the performance of the native queries and does not include the time needed for converting the results back into ServiceRevision objects. The results indicate that the queries generated by all three approaches perform equally. In this regard, all approaches exhibit the same peaks, which are due to the internal processing of the database.
+Fig. 10 compares the querying strategies using the same query on user objects and limited to 10 results (L10). The limit was chosen since relaxed and priority return more revisions than exact (which influences the results). It can be seen that exact is much faster than relaxed, while relaxed and priority have similar performance. The reason for the significant difference is that relaxed and priority use different table joins, and need to sum up and order by the total sum of priority values, while the query in exact mode can be optimized by the database.
+Finally, Table 5 depicts the duration of the individual steps during VQL query processing. Therefore, the previous query is executed on both core and user objects using the exact strategy. Generation (G) indicates how long the Preprocessor needs to analyze and generate the query. Execution (E) depicts the actual query execution time, while Conversion (C) represents the time needed by the ResultBuilder to convert the query results.
+The results show that G is almost constant for core/user objects, while the latter is slightly slower since queries have to be translated to refer to core objects. Obviously, E is almost equal for both approaches. Finally, the table indicates that C
+
+is fast for core objects, while it takes some time for user objects. The main reason is that queries actually return IDs, while the corresponding entities are loaded from the NHibernate session context. Furthermore, revision objects have a number of collections (e.g., tags, QoS, etc.) that have to be converted by the ResultBuilder using reflection, which internally leads to a number of additional queries (since most collections are lazy-loaded [19]). In this setting, the time for C is constant for all revisions due to the result limit of 10.
+4.2 Rebinding Performance
+In the following section, we give an evaluation of the different rebinding strategies introduced in Section 3.4. For measuring the rebinding performance, we used GENESIS to simulate 10 services that implement the same feature. Then, we leveraged the QoS plug-in to continuously modify the response time of all services using a Gaussian distribution, and we additionally increased the variance after each step in order to simulate an environment where the QoS of services is subject to significant change. Finally, we implemented one client for each rebinding strategy and measured the average response time when invoking the service. As a result, we can see the impact of the different rebinding strategies for each client.
+The results of this experiment are depicted in Fig. 11. It should be noted that the response time of the best service is decreasing since we increase the variance. All services start with a (server-side) execution time of 2,000 ms. The (clientside) response time differs about 400 ms, which is caused by the network latency and the time needed for wrapping SOAP messages.
+
+Fig. 10. Querying strategies (user, L10).
+
+Fig. 11. Rebinding strategies performance.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+202
+
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+Fig. 12. Mediation performance (message size).
+
+Fig. 13. Mediation performance (mediation steps).
+
+Obviously, clients with fixed binding usually perceive the worst response time because they are always bound to the same service. Clients using periodic rebinding mostly use services with good response time. However, since rebinding is done in predefined intervals, the bindings are not always up-to-date (e.g., steps 17 and 18, 24 and 25, and 27 and 28 represent such situations). In contrast to that, clients with OnInvocation rebinding always invoke the best service since the rebinding is reconsidered just before the service is invoked. However, this leads to a constant overhead of about 400 ms, which is needed to check the binding and update if necessary. Finally, clients with OnEvent rebinding always bind to the best service without invocation overhead because the clients are notified asynchronously when the QoS changes and better services get available. However, the (optional) VRESCo eventing support must be turned on and the client needs a listener web service. It should be noted that the performance of the Event Engine is sufficient, which is detailed in [12]. Thus, all rebinding strategies have their strengths and weaknesses, and it depends on the specific situation which strategy to use.
+4.3 Mediation Performance
+Besides rebinding, we have also evaluated the overhead introduced by the VRESCo mediation facilities. We have again used the GENESIS tool for these tests.
+Fig. 12 depicts the response time of a single web service invocation depending on the size of the message sent to the service. We have evaluated five different scenarios:
+1. no mediation, 2. mediation using only constant mapping functions
+(replacing an input parameter with a constant string), 3. using mathematical functions (replacing a parameter
+with a calculated value), 4. using string modification functions (adding a con-
+stant string to a string parameter), and, finally, 5. using CS-Script (a simple script which exchanges the
+order of two parameters).
+Unsurprisingly, unmediated invocations are generally faster than any type of mediation. The performance of mediated invocations is similar no matter what type of mapping functions have been applied. However, in our experiments, mediation using string operations introduces slightly more overhead than the other types. This is due to
+
+the fact that string operations naturally become more expensive when the strings become bigger.
+In Fig. 13, we have studied the overhead introduced by different mapping functions in more detail. We have evaluated how the overhead introduced by mediation depends on the amount of mediation necessary (measured in the number of mapping functions applied). We have evaluated the same scenarios as before, but omitted the tests using unmediated invocations. Generally, the additional overhead introduced by a larger number of mapping functions is rather small: The difference between 1 and 100 mapping functions varies between 5 and 20 ms, which seems acceptable. As before, the overhead introduced by string operations heavily depends on the size of the strings to modify. Our experimentation string was rather sizable at 73 Kbytes, which explains the comparatively big overhead incurred by this type of mapping function. Note that the overhead of CS-Script mappings is constantly around 10 ms since the main overhead is the initialization of the scripting engine, while the execution of the actual script is negligible (as long as the script does not do any heavy computation, which would not be typical for mapping scenarios).
+4.4 End-to-End Evaluation and Discussion
+The end-to-end scenario combines all aforementioned aspects (i.e., querying, rebinding, mediation, and invocation) into a larger order processing case study with the goal of ordering new cell phone contracts online (including mobile phone and SIM card). We implemented this workflow in C#. It consists of 19 overall activities split into four subprocesses. Basically, the process starts upon receiving an order via the company website. Afterward, the internal stock is checked for the availability of the phone and the SIM card. If one of those components is missing, it is ordered by using one of the internal or external suppliers, which is followed by a contracting subprocess. This subprocess creates a new contract, and if necessary, it adds a new customer to the CRM system. If the customer wants to transfer her old number, the number porting subprocess as depicted in Fig. 2b is executed. Finally, the payment and shipping subprocesses are enacted and the cell phone number is activated in the GSM network.
+The services used in the case study have been deployed on a different machine using GENESIS [25]. For each internal service (e.g., CRM, contracting), we have deployed only one alternative, whereas for each external service (e.g., Credit Card Service), multiple alternatives are available (between 60
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+MICHLMAYR ET AL.: END-TO-END SUPPORT FOR QOS-AWARE SERVICE SELECTION, BINDING, AND MEDIATION IN VRESCO
+
+203
+
+Fig. 14. End-to-end performance.
+and 250). For the internal notification service which is used to notify customers of their order status (using SMS, e-mail, mail, etc.), 30 alternatives are provided. This service is the only one that requires significant mediation. We use GENESIS to simulate a response time of 30-100 ms for each service.
+In Fig. 14, we show the average process duration in this case study based on 40 concurrent clients running on one host that is also hosting the VRESCo environment. Each client continuously executes the process over an experiment time of 16 min. We have chosen the Periodic rebinding strategy for this scenario, to accommodate for our highly dynamic scenario with many alternatives for each external service. In order to get a big number of rebindings during our experiment time, we have chosen a rebinding interval of 5 sec. The x-axis of the figure shows the experiment time (in minutes) and the y-axis depicts the averaged process durations of the currently executing process instances. Right after bootstrapping the system, there is a steep incline in the overall duration because each client performs some initialization. This includes querying the available services (red part), as well as creating proxies and binding to one service candidate (blue part). Additionally, the services are invoked (green part) and a certain amount of mediation occurs (black part). After the initialization phase, the system stabilizes and the response times and mediation time are constant. The mediation overhead reflects our detailed mediation results from Fig. 12. Together, service response times and mediation account for about 92 percent of the average process duration after the initialization phase. The remaining 8 percent (blue part) represents other factors
+
+such as thread handling or the workflow business logics. Note that querying and an occasional rebinding still happens after the initialization phase, but it is no longer part of the average process execution times (on the y-axis). This is because the rebinding clients perform querying and rebinding asynchronously in a separate thread. Therefore, it solely depends on the rebinding strategy whether querying and rebinding is part of the process execution time or just part of the initialization phase (as shown in Fig. 14). In case of the OnInvocation rebinding strategy, there would be querying and rebinding overhead in the overall process execution time, whereas for OnDemand and OnEvent, the behavior would be similar as shown above.
+Generally, the decision which rebinding strategy to use depends on the particular domain and the requirements. For example, for the Number Porting Service, fixed binding is not a reasonable choice because even simple changes of the partner CPO’s services (e.g., a different endpoint) would break the process. OnDemand is only reasonable if changes happen infrequently, and adaptation to changes is not time critical. Periodic rebinding, on the other hand, is only adequate when services change frequently enough to warrant permanent polling for updates. Since number porting is not time critical, we could have also used the OnInvocation rebinding strategy, which has a constant invocation overhead but always finds the best available service, or even better OnEvent, which also eliminates this invocation overhead.
+5 RELATED WORK
+In this section, we review related work concerning service repositories and service metadata, as well as service selection, invocation, and mediation.
+Currently, several approaches and standards for service registries exist. We have compared some existing solutions with the VRESCo runtime, considering a carefully selected range of established standards, mature open-source frameworks, and commercial tools. We consider the standards UDDI [5] and ebXML [6] (with special emphasis on the registry), Mule ESB and Galaxy repository [26], WSO2 ESB and registry [27], and IBM WebSphere [28] (including ESB, service registry, and repository). Our comparison in Table 6 is structured according to the challenges introduced in Section 2.
+Generally, all systems allow to store service metadata. Mostly, this is done in an unstructured way (e.g., using tModels in UDDI). There is only limited support for
+
+TABLE 6 Related Enterprise Registry Approaches
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+204
+
+IEEE TRANSACTIONS ON SERVICES COMPUTING, VOL. 3, NO. 3, JULY-SEPTEMBER 2010
+
+structured metadata in most approaches, whereas WebSphere provides an extensive structured metadata model (e.g., supporting OWL). To access data and metadata within the registry, a query language or API is needed, which is provided by all approaches (WSO2 supports querying only based on Atom [29]). In contrast to VRESCo, type-safe queries are not supported by most approaches since querying is usually done on the unstructured service metadata model using languages such as SQL. Only WebSphere provides partial support by using XPath expressions for querying. Currently, explicit support for QoS attributes is not widely available. It is to some extent possible in WSO2 and WebSphere, and fully supported by VRESCo. WSO2 supports QoS only in terms of WS-Security and WSReliableMessaging. However, none of these frameworks except VRESCo provide QoS monitoring. Integration of dynamic binding, invocation, and mediation of services is obviously not supported by pure registries such as UDDI or the ebXML registry. The other systems provide support in this respect due to their integrated ESBs. All systems except UDDI and VRESCo allow to store multiple versions of service metadata in the registry. However, only VRESCo provides end-to-end versioning support, which enables to seamlessly rebind and invoke different service revisions at runtime [11]. Finally, all approaches provide basic event notifications (e.g., if services are published) using e-mail, web service notifications, or Atom. Only WebSphere and VRESCo allow clients to subscribe to more complex events and event patterns using a rich subscription language.
+Besides UDDI and ebXML, there are other standards for describing service metadata [8]. Some of them are used by semantic web service approaches [30] (such as OWL-S [31], WSML [32], and SAWSDL [33]). It should be noted, however, that the VRESCo service metadata model introduced in Section 3.2 is not intended to compete with these approaches. We aim at enterprise development, where metadata are an important business asset which should not be accessible for everyone, as opposed to the semantic web service community where domain ontologies should be public to facilitate integration among different providers and consumers.
+In general, several standards and research approaches have emerged that address the complexities of managing and deploying web services [34]. In these approaches, service querying and selection play a crucial role, especially regarding service composition (e.g., [10], [35], [16]). However, the query models of current registries and web service search engines [36] mainly focus on keyword-based matching of service properties, which often do not cover the rich semantics of service metadata.
+Yu and Bouguettaya [37] introduce a web service query algebra and optimization framework. This framework is based on a formal model using service and operation graphs that define a high-level abstraction of web services, and also includes a QoS model. Service queries are specified as algebraic operators on functionality, quality and composition of services, and finally, result in service execution plans. Optimization techniques are then applied to select the best service execution plan according to user-defined QoS properties. This work is complementary to ours: While the authors focus on their formal service model and introduce a query algebra for this model, we present a service runtime that provides end-to-end support for service management and querying functionality. Furthermore, we address dynamic binding and service mediation since service interfaces
+
+of different service providers are not always identical in practice. Dynamic binding of services has been addressed by other approaches (e.g., [38], [39]).
+Pautasso and Alonso [38] discuss various binding models for services, together with different points in time when bindings are evaluated. They present a flexible binding model in the JOpera system, where binding is done using reflection and does not require a specific language construct. Di Penta et al. [39] present the WS-Binder framework for enabling dynamic binding within WS-BPEL processes. Their approach uses proxies to separate abstract services from concrete service instances. Both approaches have in common that they rather focus on dynamic binding with respect to composition environments whereas VRESCo addresses binding at the core SOA level.
+6 CONCLUSION
+One of the main promises of SOC is the provisioning of loosely coupled applications based on the publish-find-bindexecute cycle. In practice, however, these promises can often not be kept due to the lack of expressive service metadata and type-safe querying facilities, explicit support for QoS, as well as support for dynamic binding and mediation. In this paper, we have proposed the QoS-aware VRESCo runtime environment, which has been designed with these requirements in mind. VRESCo offers an extensive structured metadata model and VQL as type-safe query language. Furthermore, we provide dynamic binding and mediation mechanisms that use predefined service mappings. We have evaluated our work regarding performance and discussed the results together with the experience gained in the CPO case study. The results show that the VRESCo runtime is applicable to large-scale adaptive service-centric systems.
+As part of our ongoing and future work, we want to link the VRESCo eventing [12] and composition [16] mechanisms. Furthermore, we envision to integrate SLA enforcement capabilities on top of VRESCo.
+ACKNOWLEDGMENTS
+The research leading to these results has received funding from the European Community’s Seventh Framework Programme (FP7/2007-2013) under grant agreement 215483 (S-Cube). Additionally, the authors would like to thank Lukasz Juszczyk for providing the web service testbed GENESIS, and their master students Andreas Huber and Thomas Laner for their contribution to VRESCo.
+REFERENCES
+[1] M.P. Papazoglou, P. Traverso, S. Dustdar, and F. Leymann, “Service-Oriented Computing: State of the Art and Research Challenges,” Computer, vol. 40, no. 11, pp. 38-45, Nov. 2007.
+[2] S. Weerawarana, F. Curbera, F. Leymann, T. Storey, and D.F. Ferguson, Web Services Platform Architecture: SOAP, WSDL, WSPolicy, WS-Addressing, WS-BPEL, WS-Reliable Messaging, and More. Prentice Hall PTR, 2005.
+[3] SOAP Version 1.2, World Wide Web Consortium (W3C), http:// www.w3.org/TR/soap, 2003.
+[4] Web Services Description Language (WSDL) 1.1, World Wide Web Consortium (W3C), http://www.w3.org/TR/wsdl, 2001.
+[5] Universal Description, Discovery and Integration (UDDI), Organization for the Advancement of Structured Information Standards (OASIS), http://oasis-open.org/committees/uddi-spec, 2005.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+
+MICHLMAYR ET AL.: END-TO-END SUPPORT FOR QOS-AWARE SERVICE SELECTION, BINDING, AND MEDIATION IN VRESCO
+
+205
+
+[6] ebXML Registry Services and Protocols, Organization for the Advancement of Structured Information Standards (OASIS), http://oasis-open.org/committees/regrep, 2005.
+[7] A. Michlmayr, F. Rosenberg, C. Platzer, M. Treiber, and S. Dustdar, “Towards Recovering the Broken SOA Triangle—A Software Engineering Perspective,” Proc. Second Int’l Workshop Service Oriented Software Eng. (IW-SOSWE ’07), 2007.
+[8] D. Bodoff, M. Ben-Menachem, and P.C. Hung, “Web Metadata Standards: Observations and Prescriptions,” IEEE Software, vol. 22, no. 1, pp. 78-85, Jan./Feb. 2005.
+[9] T. Yu, Y. Zhang, and K.-J. Lin, “Efficient Algorithms for Web Services Selection with End-to-End QoS Constraints,” ACM Trans. Web, vol. 1, no. 6, p. 6, 2007.
+[10] L. Zeng, B. Benatallah, A.H. Ngu, M. Dumas, J. Kalagnanam, and H. Chang, “QoS-Aware Middleware for Web Services Composition,” IEEE Trans. Software Eng., vol. 30, no. 5, pp. 311-327, May 2004.
+[11] P. Leitner, A. Michlmayr, F. Rosenberg, and S. Dustdar, “End-toEnd Versioning Support for Web Services,” Proc. Int’l Conf. Services Computing (SCC ’08), 2008.
+[12] A. Michlmayr, F. Rosenberg, P. Leitner, and S. Dustdar, “Advanced Event Processing and Notifications in Service Runtime Environments,” Proc. Second Int’l Conf. Distributed Event-Based Systems (DEBS ’08), 2008.
+[13] A. Michlmayr, F. Rosenberg, P. Leitner, and S. Dustdar, “Service Provenance in QoS-Aware Web Service Runtimes,” Proc. Seventh Int’l Conf. Web Services (ICWS ’09), 2009.
+[14] P. Leitner, F. Rosenberg, and S. Dustdar, “Daios—Efficient Dynamic Web Service Invocation,” IEEE Internet Computing, vol. 13, no. 3, pp. 72-80, May/June 2009.
+[15] J. Lo¨ wy, Programming WCF Services. O’Reilly, 2007.
+[16] F. Rosenberg, P. Celikovic, A. Michlmayr, P. Leitner, and S. Dustdar, “An End-to-End Approach for QoS-Aware Service Composition,” Proc. 13th Int’l Enterprise Computing Conf. (EDOC ’09), 2009.
+[17] F. Rosenberg, P. Leitner, A. Michlmayr, and S. Dustdar, “Integrated Metadata Support for Web Service Runtimes,” Proc. Middleware for Web Services Workshop (MWS ’08), 2008.
+[18] F. Rosenberg, C. Platzer, and S. Dustdar, “Bootstrapping Performance and Dependability Attributes of Web Services,” Proc. IEEE Int’l Conf. Web Services (ICWS ’06), 2006.
+[19] M. Fowler, Patterns of Enterprise Application Architecture. AddisonWesley, 2002.
+[20] Hibernate Reference Documentation v3.3.1, Red Hat, Inc., http:// www.hibernate.org, 2008.
+[21] J. Liberty and D. Xie, Programming C# 3.0. O’Reilly Media, Inc., 2007.
+[22] E. Gamma, R. Helm, R. Johnson, and J. Vlissides, Design Patterns: Elements of Reusable Object-Oriented Software. Addison-Wesley, 1995.
+[23] P. Leitner, A. Michlmayr, and S. Dustdar, “Towards Flexible Interface Mediation for Dynamic Service Invocations,” Proc. Third Workshop Emerging Web Services Technology (WEWST ’08), 2008.
+[24] O. Shilo, “CS-Script—the C# Script Engine,” http://www. csscript.net, 2009.
+[25] L. Juszczyk, H.-L. Truong, and S. Dustdar, “GENESIS—a Framework for Automatic Generation and Steering of Testbeds of Complex Web Services,” Proc. 13th IEEE Int’l Conf. Eng. of Complex Computer Systems (ICECCS ’08), 2008.
+[26] Mule Galaxy, v1.5.1, MuleSoft, Inc., http://www.mulesoft.org/ display/GALAXY/Home, Nov. 2009.
+[27] WSO2 Registry, v2.0, WSO2, Inc., http://wso2.org/projects/ registry, Feb. 2009.
+[28] WebSphere Service Registry and Repository, v6.2, IBM, Inc., http:// www.ibm.com/software/integration/wsrr, July 2008.
+[29] R. Sayre, “Atom: The Standard in Syndication,” IEEE Internet Computing, vol. 9, no. 4, pp. 71-78, July/Aug. 2005.
+[30] S.A. McIlraith, T.C. Son, and H. Zeng, “Semantic Web Services,” IEEE Intelligent Systems, vol. 16, no. 2, pp. 46-53, Mar. 2001.
+[31] OWL-S: Semantic Markup for Web Services, World Wide Web Consortium (W3C), http://www.w3.org/Submission/OWL-S, 2004.
+[32] Web Service Modeling Language (WSML), ESSI WSMO Working Group, http://www.wsmo.org/wsml/wsml-syntax, 2008.
+[33] Semantic Annotations for WSDL and XML Schema, World Wide Web Consortium (W3C), http://www.w3.org/TR/sawsdl, 2007.
+
+[34] Q. Yu, X. Liu, A. Bouguettaya, and B. Medjahed, “Deploying and Managing Web Services: Issues, Solutions, and Directions,” The VLDB J., vol. 17, no. 3, pp. 537-572, 2008.
+[35] J. Harney and P. Doshi, “Selective Querying for Adapting Web Service Compositions Using the Value of Changed Information,” IEEE Trans. Services Computing, vol. 1, no. 3, pp. 169-185, July 2008.
+[36] C. Platzer and S. Dustdar, “A Vector Space Search Engine for Web Services,” Proc. Third European IEEE Conf. Web Services (ECOWS ’05), 2005.
+[37] Q. Yu and A. Bouguettaya, “Framework for Web Service Query Algebra and Optimization,” ACM Trans. Web, vol. 2, no. 1, pp. 135, 2008.
+[38] C. Pautasso and G. Alonso, “Flexible Binding for Reusable Composition of Web Services,” Proc. Fourth Int’l Workshop Software Composition (SC ’05), 2005.
+[39] M. Di Penta, R. Esposito, M.L. Villani, R. Codato, M. Colombo, and E. Di Nitto, “WS Binder: A Framework to Enable Dynamic Binding of Composite Web Services,” Proc. Int’l Workshop ServiceOriented Software Eng. (SOSE ’06), 2006.
+Anton Michlmayr received the MSc degree in computer science from the Vienna University of Technology in 2005. He is currently working toward the PhD degree in the Distributed Systems Group at the Vienna University of Technology, where he is a university assistant. His research interests include software architectures for distributed systems with an emphasis on distributed event-based systems and service-oriented computing. He is a student member of the IEEE. More information about his research can be found at http://www.infosys.tuwien.ac.at/Staff/michlmayr.
+Florian Rosenberg received the PhD degree in June 2009 for his thesis on “QoS-Aware Composition of Adaptive Service-Oriented Systems” while working as a research assistant at the Distributed Systems Group, Vienna University of Technology. He is currently a research scientist at the CSIRO ICT Centre in Australia. His general research interests include serviceoriented computing and software engineering. He is particularly interested in all aspects related to QoS-aware service composition and adaptation. He is a member of the IEEE. More information about his research can be found at http://www.florianrosenberg.com.
+Philipp Leitner received the BSc and MSc degrees in business informatics from Vienna University of Technology. He is currently working toward the PhD degree in the Distributed Systems Group at Vienna University of Technology, where he is a university assistant. His research is focused on middleware for distributed systems, especially for SOAP-based and RESTful web services. He is a student member of the IEEE. More information about his research can be found at http://www.infosys.tuwien.ac.at/Staff/leitner.
+Schahram Dustdar is a full professor of computer science with a focus on Internet Technologies heading the Distributed Systems Group, Vienna University of Technology (TU Wien). He is also an honorary professor of information systems in the Department of Computing Science at the University of Groningen (RuG), The Netherlands. Since 2009, he has been an ACM distinguished scientist. He is a senior member of the IEEE. More information about his research can be found at http://www.infosys.tuwien.ac.at/Staff/sd.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 11:20:22 UTC from IEEE Xplore. Restrictions apply.
+

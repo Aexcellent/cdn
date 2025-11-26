@@ -1,0 +1,126 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy. 
+Accept & Close 
+Loading [MathJax]/extensions/MathMenu.js 
+ 
+Skip to Main Content 
+ 
+    IEEE.org 
+    IEEE Xplore 
+    IEEE-SA 
+    IEEE Spectrum 
+    More Sites  
+ 
+SUBSCRIBE 
+ 
+    Cart  
+    Create Account 
+    Personal Sign In 
+ 
+IEEE Xplore logo - Link to home 
+ 
+    Browse 
+    My Settings 
+    Help 
+ 
+Institutional Sign In 
+IEEE logo - Link to IEEE main site homepage 
+ADVANCED SEARCH 
+Journals & Magazines > IEEE Transactions on Dependab... > Volume: 17 Issue: 4 
+Privacy-Preserving Tensor Decomposition Over Encrypted Data in a Federated Cloud Environment 
+Publisher: IEEE 
+Cite This 
+PDF 
+Jun Feng ; Laurence T. Yang ; Qing Zhu ; Kim-Kwang Raymond Choo 
+All Authors 
+29 
+Paper 
+Citations 
+1097 
+Full 
+Text Views 
+ 
+    Alerts 
+ 
+Abstract 
+Document Sections 
+ 
+    1 
+    Introduction 
+    2 
+    Preliminaries 
+    3 
+    Problem Statement 
+    4 
+    Privacy-Preserving Primitives Over Encrypted Data 
+    5 
+    Privacy-Preserving Tensor Decomposition for Cloud 
+ 
+Show Full Outline 
+Authors 
+Figures 
+References 
+Citations 
+Keywords 
+Metrics 
+Abstract: 
+Tensors are popular and versatile tools which model multidimensional data. Tensor decomposition has emerged as a powerful technique dealing with multidimensional data. With the booming development of cloud computing, a large number of users are inclined to outsource big data storage and computations to the cloud. However, because of the rise of various privacy concerns, sensitive data usually need to be encrypted prior to being outsourced to a cloud. Computations over encrypted data in the cloud without compromising the privacy of data is still a challenge. This paper presents a novel privacy-preserving tensor decomposition approach over semantically secure encrypted big data. The proposed approach leverages properties of homomorphic encryption and employs a federated cloud to securely decompose an encrypted tensor for multiple users, without the clouds learning any knowledge about users' data. This is, to our knowledge, the first attempt to solve privacy-preserving tensor decomposition without requiring interaction between users and cloud service providers. In addition, in our approach, we present the first secure integer division and integer square root schemes over encrypted data (the dividend, divisor and radicand are in encrypted format). Finally, we prove the security of our approach under semi-trusted model and empirically analyze its effectiveness, which demonstrates the utility of our proposed approach in cloud deployments. 
+Published in: IEEE Transactions on Dependable and Secure Computing ( Volume: 17 , Issue: 4 , July-Aug. 1 2020 ) 
+Page(s): 857 - 868 
+Date of Publication: 15 November 2018 
+ISSN Information: 
+INSPEC Accession Number: 19745680 
+DOI: 10.1109/TDSC.2018.2881452 
+Publisher: IEEE 
+Funding Agency: 
+1 Introduction 
+ 
+As an emerging paradigm, cloud computing can provide scalable computing resources such as infrastructure, platform, and software for users on a pay-as-you-use business model [1]. With its booming development, cloud computing attracts a large number of users to outsource their big data storage and computations to the cloud [2]. One could send his/her data to a cloud for processing (e.g., dimensionality reduction, prediction, recommendation, and clustering). There are, however, security and privacy concerns (e.g., exposure of user privacy and business information, insider attacks, and inference threats) when data are outsourced to the cloud [3], [4]. A naive mitigation strategy is to encrypt sensitive data (e.g., social relationships and personal preferences) prior to sending such data to the cloud. A major research challenge is to securely and effectively process encrypted data (outsourced to the cloud) [5]. 
+Sign in to Continue Reading 
+Authors 
+Figures 
+References 
+Citations 
+Keywords 
+Metrics 
+More Like This 
+An Improved Secure High-Order-Lanczos Based Orthogonal Tensor SVD for Outsourced Cyber-Physical-Social Big Data Reduction 
+ 
+IEEE Transactions on Big Data 
+ 
+Published: 2021 
+Achieving big data privacy via hybrid cloud 
+ 
+2014 IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS) 
+ 
+Published: 2014 
+Show More 
+References 
+References is not available for this document. 
+IEEE Personal Account 
+ 
+    Change username/password  
+ 
+Purchase Details 
+ 
+    Payment Options 
+    View Purchased Documents  
+ 
+Profile Information 
+ 
+    Communications Preferences 
+    Profession and Education 
+    Technical interests  
+ 
+Need Help? 
+ 
+    US & Canada: +1 800 678 4333 
+    Worldwide: +1 732 981 0060 
+    Contact & Support  
+ 
+Follow 
+ 
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | Privacy & Opting Out of Cookies 
+ 
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity. 
+ 
+© Copyright 2022 IEEE - All rights reserved. 

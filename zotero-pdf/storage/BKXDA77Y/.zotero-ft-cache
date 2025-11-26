@@ -1,0 +1,6611 @@
+Shuﬄed Model of Federated Learning: Privacy, Communication, and Accuracy Trade-oﬀs
+Antonious M. Girgis, Deepesh Data, Suhas Diggavi, Peter Kairouz, and Ananda Theertha Suresh ∗
+
+arXiv:2008.07180v2 [cs.LG] 23 Sep 2020
+
+Abstract
+We consider a distributed empirical risk minimization (ERM) optimization problem with communication eﬃciency and privacy requirements, motivated by the federated learning (FL) framework [KMA+19]. Unique challenges to the traditional ERM problem in the context of FL include (i) need to provide privacy guarantees on clients’ data, (ii) compress the communication between clients and the server, since clients might have low-bandwidth links, (iii) work with a dynamic client population at each round of communication between the server and the clients, as a small fraction of clients are sampled at each round. To address these challenges we develop (optimal) communication-eﬃcient schemes for private mean estimation for several ℓp spaces, enabling eﬃcient gradient aggregation for each iteration of the optimization solution of the ERM. We also provide lower and upper bounds for mean estimation with privacy and communication constraints for arbitrary ℓp spaces. To get the overall communication, privacy, and optimization performance operation point, we combine this with privacy ampliﬁcation opportunities inherent to this setup. Our solution takes advantage of the inherent privacy ampliﬁcation provided by client sampling and data sampling at each client (through Stochastic Gradient Descent) as well as the recently developed privacy framework using anonymization, which eﬀectively presents to the server responses that are randomly shuﬄed with respect to the clients. Putting these together, we demonstrate that one can get the same privacy, optimization-performance operating point developed in recent methods that use full-precision communication, but at a much lower communication cost, i.e., eﬀectively getting communication eﬃciency for “free”.
+
+1 Introduction
+
+In this paper we consider a federated learning (FL) framework [KMY+16, YLCT19, KMA+19], where the data is generated across m clients. The server wants to learn a machine learning model that minimizes a certain objective function using the m local datasets, without collecting the data at the central server due to privacy considerations. Speciﬁcally, each client i has a local dataset Di = {di1, . . . , dir} ⊂ Sr comprising r data points, where S is the set from which the i’th client’s data is from.1 The server wants to solve the following empirical risk minimization problem:
+
+arg min
+θ∈C
+
+F (θ)
+
+:=
+
+1 m
+
+m
+
+Fi(θ)
+
+.
+
+(1)
+
+i=1
+
+Here, C ⊂ Rd is a closed convex set, and Fi(θ) is a local loss function dependent on the local dataset Di at client i evaluated at the model parameters θ ∈ Rd; see Section 3.1 for more details on the problem setup. In
+
+∗Antonious M. Girgis, Deepesh Data and Suhas Diggavi are with the University of California, Los Angeles, USA. Email:
+amgirgis@g.ucla.edu, deepesh.data@gmail.com, suhas@ee.ucla.edu. Peter Kairouz and Ananda Theertha Suresh are with Google
+Research, USA. Email: kairouz@google.com, theertha@google.com. 1The data could be images with labels, e.g., 8 × 8 pixel blocks with labels, where each pixel is represented by 32 bits and
+each label is represented by an integer from {1 . . . , 10}, in which case S = F64 × G, where F = {1, . . . , 256} and G = {1, . . . , 10}. Another example is the text represented by words, in which case S = W∗, where W is the language alphabet and S are strings
+of letters from the alphabet.
+
+1
+
+order to generate a learning model using (1), the commonly used mechanism is Stochastic Gradient Descent
+
+(SGD) [Bot10]. Federated learning (FL) introduces several unique challenges to this traditional model that
+
+cause tension with the objective in (1): (i) we need to provide privacy guarantees on the locally residing data
+
+Di at client i, as the data not only needs to be remain at the clients but additionally needs to kept private according to certain requirements/guarantees; (ii) compress (as eﬃciently as possible) the communication
+
+between clients and the server, since the clients may connect with low-bandwidth (wireless) links; and (iii)
+
+work with a dynamic client population in each round of communication between the server and the clients.
+
+This happens due to scale (e.g., tens of millions of devices) and only a small fraction of clients are sampled
+
+at each communication round depending on their availability.
+
+These requirements make the problem challenging, especially when one wants to give strong privacy
+
+guarantees while training models that give good learning performance. Since we need to give privacy to the
+
+local data residing at the clients, the traditional framework to give guarantees is through the notion of local
+
+diﬀerential privacy, where the server is itself untrusted. The challenge is that the traditional privacy approach
+
+to the learning problem uses local diﬀerential privacy (LDP) [War65, ESAG04, DJW13, BNO08, KLN+11],
+
+which is known to give poor learning performance [DJW13, KLN+11, KBR16].
+
+In recent works, a new privacy framework using anonymization has been proposed in the so-called shuﬄing
+
+model [EFM+19, GGK+19, BBGN19b, GPV19, BBGN19a, GKMP20, CSU+19, BBGN19c, BBGN20]. This
+
+model enables signiﬁcantly better privacy-utility performance by amplifying privacy (scaling with number
+
+of
+
+clients
+
+as
+
+√1 m
+
+with
+
+respect
+
+to
+
+LDP)
+
+through
+
+this
+
+anonymization,
+
+which
+
+eﬀectively
+
+presents
+
+the
+
+central
+
+server with responses which are randomly shuﬄed with respect to the clients, providing additional privacy.
+
+Another mechanism to amplify privacy is through randomized sampling [BKN10, KLN+11, Ull17]. This
+
+naturally arises in the considered SGD framework, since clients do mini-batch sampling of local data and
+
+also there is sampling of clients themselves in each iteration, as in the federated learning framework [KMY+16,
+
+YLCT19, KMA+19].
+
+In this paper, we enable privacy ampliﬁcation for the FL problem using both forms of ampliﬁcation:
+
+shuﬄing and sampling (data and clients). Note that privacy ampliﬁcation by subsampling (both data and
+
+clients) happens automatically2, and we quantify that in this paper, while the secure shuﬄing (anonymiza-
+
+tion) is performed explicitly which adds an additional layer of privacy that allows transferring the local
+
+privacy guarantees to central privacy guarantees.
+
+Another important aspect is that of requiring communication eﬃciency instantiated through compres-
+
+sion of the gradients computed by each active client. There has been a signiﬁcant recent progress in this
+
+topic (see [AGL+17, KRSJ19, WXY+17, SCJ18, AHJ+18, KLSJ19, SCJ18, BDKD19, SDGD19, SDGD20] and
+
+references therein). However, there has been less work in combining privacy and compression in the optimiza-
+
+tion/learning framework of (1), with the notable exception of [ASY+18], which we will elaborate on soon.
+
+One question that arises is whether one pays a price to do compression in terms of the privacy-performance
+
+trade-oﬀ; a question we address in this paper.
+
+In this paper we (partially) solve the main problem of privately learning a model with compressed commu-
+
+nication, with good learning performance while giving strong guarantees on privacy. We believe that this is
+
+the ﬁrst result that analyses the optimization performance with schemes devised using compressed gradient
+
+exchange, mini-batch SGD while giving data privacy guarantees for clients using a shuﬄed framework. Our
+
+main contributions are as follows.
+
+• We prove that one can get communication eﬃciency “for free” by demonstrating schemes that use O(log d) bits per client (for several cases) to obtain the same privacy-performance operating point achieved by full precision gradient exchange.3 We do this using the shuﬄed privacy model and ampliﬁcation by sampling (client data through mini-batch SGD and clients themselves in federated sampling). Note that sampling of clients and data points together give non-uniform sampling of data points, so
+
+2In this paper, we use an abstraction for the federated learning model, where clients are sampled randomly. In practice, there are many more complicated considerations for sampling, including availability, energy usage, time-of-day etc., which we do not model.
+3Our work focuses on symmetric, private-randomness mechanisms. We do not assume the existence of public randomness in this work as we use the shuﬄing model.
+
+2
+
+we cannot use the existing results on ampliﬁcation by subsampling. We instead give one privacy proof that combines both sampling and shuﬄing techniques together and analyze the total privacy gain.
+• At each round of the iterative optimization, one needs to privately aggregate the gradients in a communication eﬃcient manner. To do this, we develop new private, compressed mean estimation techniques in a minimax estimation framework, that are (order optimal) under several ℓp geometries for the vectors. We develop both lower bounds and matching schemes for this problem. These results may also be of independent interest (see Section 4).
+• In order to complete the overall optimization-performance trade-oﬀ with privacy and communication, we use the ampliﬁcation by shuﬄing framework of [EFM+19, BBGN19c] adapted to our setup where we have mini-batch SGD, compression and client sampling (see Section 5).
+We will put our contributions in context to the existing literature next.
+1.1 Related Work
+Among the several main challenges in the recently developed FL framework (see [KMA+19] and references therein), we focus in this paper on the combination of privacy and communication eﬃciency, and examining its impact on model learning. We brieﬂy review some of the main developments in related papers on these topics below.
+1.1.1 Communication-Privacy Trade-oﬀs
+Distributed mean estimation and its use in training learning models has been studied extensively in the literature (see [SYKM17, AGL+17, GKMM19, MT20] and references therein). In [SYKM17], the authors have proposed a communication eﬃcient scheme for estimating the mean of set a of vectors distributed over multiple clients. In [ASZ19], Acharya et. al. studied the discrete distribution estimation under LDP. They proposed a randomized mechanism based on Hadamard coding which is optimal for all privacy regime and requires O (log (d)) bits per client, where d denotes the support size of the discrete distribution. In [AS19], the authors consider both private and public coin mechanisms, and show that the Hadamard mechanism is near optimal in terms of communication for both distribution and frequency estimation. However, the LDP mechanisms suﬀer from the utility degradation that motivates other work to ﬁnd alternative techniques to improve the utility under LDP. One of new developments in privacy is the use of anonymization to amplify the privacy by using secure shuﬄer. In [CSU+19,BBGN19c,BBGN20], the authors studied the mean estimation problem under LDP with secure shuﬄer, where they show that the shuﬄing provides better utility than the LDP framework without shuﬄing.
+1.1.2 Private Optimization
+In [CMS11], Chaudhuri et al. studied centralized privacy-preserving machine learning algorithms for convex optimization problem. The authors proposed a new idea of perturbing the objective function to preserve privacy of the training dataset. In [BST14], Bassily et al. derived lower bounds on the empirical risk minimization under central diﬀerential privacy constraints. Furthermore, they proposed a diﬀerential privacy SGD algorithm that matches the lower bound for convex functions. In [ACG+16], the authors have generalized the private SGD algorithm proposed in [BST14] for non-convex optimization framework. In addition, the authors have proposed a new analysis technique, called moment accounting, to improve on the strong composition theorems to compute the central diﬀerential privacy guarantee for iterative algorithms. However, the works mentioned, [CMS11, BST14, ACG+16], assume that there exists a trusted server that collects the clients’ data. This motivates other works to design a distributed SGD algorithms, where each client perturbs her own data without needing a trusted server. For this, the natural privacy framework is local diﬀerential privacy or LDP (e.g., see [War65, DJW13, ESAG04, BDF+18]). However, it is well understood that LDP does not give good performance guarantees as it requires signiﬁcant local randomization to give privacy
+3
+
+guarantees [DJW13, KLN+11, KBR16]. The two most related papers to our work are [EFM+20, ASY+18]
+
+which we describe below.
+
+In [EFM+20], the authors have proposed a distributed local-diﬀerential-privacy gradient descent algo-
+
+rithm, where each client has one sample. In their proposed algorithm, each client perturbs the gradient of
+
+her sample using an LDP mechanism. To improve upon the LDP performance guarantees, they use the
+
+newly proposed anonymization/shuﬄing framework [BBGN19c]. Therefore in their work, gradients of all
+
+clients are passed through a secure shuﬄer that eliminates the identities of the clients to amplify the central
+
+privacy guarantee. However, their proposed algorithm is not communication eﬃcient, where each client
+
+has to send the full-precision gradient without compression. Our work is diﬀerent from [EFM+20], as we
+
+propose a communication eﬃcient mechanism for each client that requires O(log d) bits per client, which
+
+can be signiﬁcant for large d. Furthermore, our algorithm consider multiple data samples at client, which is
+
+accessed through a mini-batch random sampling at each iteration of the optimization. This requires a careful
+
+combination of compression and privacy analysis in order to preserve the variance reduction of mini-batch
+
+as well as privacy.4 In addition we obtain a gain in privacy by using the fact that (anonymized) clients are
+
+sampled (i.e., not all clients are selected at each iteration) as motivated by the federated learning framework.
+
+[ASY+18] proposed a communication-eﬃcient algorithm for learning models with central diﬀerential pri-
+
+vacy. Let n be the number of clients per round and d be the dimensionality of the parameter space. They pro-
+
+posed
+
+cp-sgd,
+
+a
+
+communication
+
+eﬃcient
+
+algorithm,
+
+where
+
+clients
+
+need
+
+to
+
+send
+
+O(log(1
+
++
+
+d n
+
+ǫ2)
+
++
+
+log
+
+log
+
+log
+
+nd ǫδ
+
+)
+
+bits of communication per coordinate i.e., O
+
+d
+
+log(1
+
++
+
+d n
+
+ǫ2)
+
++
+
+log
+
+log
+
+log
+
+nd ǫδ
+
+bits per round to achieve the
+
+same local diﬀerential privacy guarantees of ǫ0 as the Gaussian mechanism. Their algorithm is based on a
+
+Binomial noise addition mechanism and secure aggregation. In contrast, we propose a generic framework
+
+to convert any LDP algorithm to a central diﬀerential privacy guarantee and further use recent results on
+
+ampliﬁcation by shuﬄing, that also achieves better compression in terms of number of bits per client.
+
+Organization. The paper is organized as follows. In Section 2, we set up the problem and notation, while giving preliminary background results on privacy ampliﬁcation through shuﬄing and sampling. We provide the main results of the paper in Section 3 and also give some interpretations. In Section 4 we analyze private vector minimax mean estimation for various geometrical constraints, applicable to gradient aggregation for optimization; providing schemes and impossibility results. In Section 5 examine the communication-privacy and optimization-performance trade-oﬀs of our schemes, putting together the results from Section 4 to give the proof of the main theorem 1. We conclude with a brief discussion in Section 6.
+
+2 Preliminaries
+In this section, we state some preliminary deﬁnitions that we use throughout the paper and also state some results from literature. We state the formal deﬁnitions of (local) diﬀerential privacy (DP) in Section 2.1 and strong composition theorem for DP in Section 2.2. As mentioned in Section 1, we use subsampling and shuﬄing techniques for privacy ampliﬁcation and we describe them in Section 2.3. Finally, we present one of our main ingredients in the proposed compressed and private SGD algorithm, which is a method of private mean estimation using compressed updates, in Section 2.4. We use this formulation to study the problem in the minimax framework and derive upper and lower bounds in a variety of settings in Section 4.
+2.1 Diﬀerential Privacy
+In this section, we formally deﬁne local diﬀerential privacy (LDP) and (central) diﬀerential privacy (DP). First we recall the standard deﬁnition of LDP [KLN+11].
+Deﬁnition 1 (Local Diﬀerential Privacy - LDP [KLN+11]). For ǫ0 ≥ 0 and b ∈ N+ := {1, 2, 3, . . .}, a randomized mechanism R : X → Y is said to be ǫ0-local diﬀerentially private (in short, ǫ0-LDP), if for every
+4The naive method of quantizing the aggregated mini-batch gradient will fail to preserve the required variance reduction.
+
+4
+
+pair of inputs x, x′ ∈ X , we have
+
+Pr[R(x) = y] ≤ exp(ǫ) Pr[R(x′) = y], ∀y ∈ Y.
+
+(2)
+
+In our problem formulation, since each client has a communication budget on what it can send in each SGD iteration while keeping its data private, it would be convenient for us to deﬁne two parameter LDP with privacy and communication budget.
+
+Deﬁnition 2 (Local Diﬀerential Privacy with Communication Budget - CLDP). For ǫ0 ≥ 0 and b ∈ N+, a randomized mechanism R : X → Y is said to be (ǫ0, b)-communication-limited-local diﬀerentially private (in short, (ǫ0, b)-CLDP), if for every pair of inputs x, x′ ∈ X , we have
+
+Pr[R(x) = y] ≤ exp(ǫ) Pr[R(x′) = y], ∀y ∈ Y.
+
+(3)
+
+Furthermore, the output of R can be represented using b bits.
+
+Here, ǫ0 captures the privacy level, lower the ǫ0, higher the privacy. When we are not concerned about the communication budget, we succinctly denote the corresponding (ǫ0, ∞)-CLDP, by its correspondence to the classical LDP as ǫ0-LDP [KLN+11].
+Let D = {x1, . . . , xn} denote a dataset comprising n points from X . We say that two datasets D = {x1, . . . , xn} and D′ = {x′1, . . . , x′n} are neighboring if they diﬀer in one data point. In other words, D and D′ are neighboring if there exists an index i ∈ [n] such that xi = x′i and xj = x′j for all j = i.
+Deﬁnition 3 (Central Diﬀerential Privacy - DP [DMNS06, DR14]). For ǫ, δ ≥ 0, a randomized mechanism M : X n → Y is said to be (ǫ, δ)-diﬀerentially private (in short, (ǫ, δ)-DP), if for all neighboring datasets D, D′ ∈ X n and every subset E ⊆ Y, we have
+
+Pr [M (D) ∈ E] ≤ exp(ǫ) Pr [M (D′) ∈ E] + δ.
+
+(4)
+
+Remark 1. For any ǫ0-LDP mechanism R : X → Y, it is easy to verify that the randomized mechanism M : X n → Y deﬁned by M (x1, . . . , xn) := (R (x1) , . . . , R (xn)) is (ǫ0, 0)-DP.
+Remark 2. Note that in this paper we make a clear distinction between the notation used for central diﬀerential privacy, denoted by (ǫ, δ)-DP (see Deﬁnition 3), local diﬀerential privacy ǫ0-LDP (see deﬁnition 1) and communication limited local diﬀerential privacy, denoted by (ǫ0, b)-CLDP (see Deﬁnition 2).
+The main objective of this paper is to make SGD diﬀerentially private and communication-eﬃcient, suitable for federated learning. For that we compress and privatize gradients in each SGD iteration. Since the parameter vectors in any iteration depend on the previous iterations, so do the gradients, which makes this procedure a sequence of many adaptive DP mechanisms. We can calculate the ﬁnal privacy guarantees achieved at the end of this procedure by using composition theorems.
+
+2.2 Strong Composition [DRV10]
+Let M1 (I1, D) , . . . , MT (IT , D) be a sequence of T adaptive DP mechanisms, where Ii denotes the auxiliary input to the ith mechanism, which may depend on the previous mechanisms’ outputs and the auxiliary inputs {(Ij, Mj(Ij, D)) : j < i}. There are diﬀerent composition theorems in literature to analyze the privacy guarantees of the composed mechanism M(D) = (M1 (I1, D) , . . . , MT (IT , D)).
+Dwork et al. [DRV10] provided a strong composition theorem (which is stronger than the basic composition theorem in which the privac√y parameters scale linearly with T ) where the privacy parameter of the composition mechanism scales as T with some loss in δ. Below, we provide a formal statement of that result from [DR14].
+
+5
+
+Lemma 1 (Strong Composition [DR14, Theorem 3.20]). Let M1, . . . , MT be T adaptive (ǫ, δ)-DP mechanisms, where ǫ, δ ≥ 0. Then, for any δ′ > 0, the composed mechanism M = (M1, . . . , MT ) is (ǫ, δ)-DP,
+where ǫ = 2T log (1/δ′)ǫ + T ǫ eǫ − 1 , δ = T δ + δ′.
+
+In particular, when ǫ = O
+
+log(1/δ′ ) T
+
+, we have ǫ = O ǫ
+
+T log (1/δ′) .
+
+Note that training large-scale machine learning models (e.g., in deep learning) typically requires running SGD for millions of iterations, as the dimension of the model parameter is quite large. We can make it diﬀerentially private by adding noise to the gradients in each iteration, and appeal to the strong composition theorem to bound the privacy loss of the entire process (which in turn dictates the amount of noise to be added in each iteration).
+
+2.3 Privacy Ampliﬁcation
+In this section, we describe the techniques that can be used for privacy ampliﬁcation. The ﬁrst one ampliﬁes privacy by subsampling the data (to compute stochastic gradients) as well as the clients (as in FL), and the other one ampliﬁes privacy by shuﬄing.
+
+2.3.1 Privacy Ampliﬁcation by Subsampling
+
+Suppose we have a dataset D′ = {U1, . . . , Ur1} ∈ U r1 consisting of r1 elements from a universe U . A subsampling procedure takes a dataset D′ ∈ Ur1 and subsamples a subset from it as formally deﬁned below.
+
+Deﬁnition 4 (Subsampling). as input and selects uniformly
+
+aTthreansudbosmamapsluinbgseotpDer′′atoifonr2s≤amrp1 re1 ,lre2m:eUntrs1
+
+→ U r2 takes a dataset D′ ∈ U r1 from D′. Note that each element
+
+of
+
+D′
+
+appears
+
+in
+
+D′′
+
+with
+
+probability
+
+q
+
+=
+
+r2 r1
+
+.
+
+The following result states that the above subsampling procedure ampliﬁes the privacy guarantees of a DP mechanism.
+
+Lemma 2 (Ampliﬁcation by Subsampling [KLN+11]). Let M : Ur2 → V be an (ǫ, δ)-DP mechanism. Then,
+
+the mechanism M′ : and δ′ = qδ with q =
+
+U r1
+
+r2 r1
+
+.
+
+→ In
+
+V deﬁned particular,
+
+by M′ = when ǫ <
+
+M 1,
+
+M ◦ s′amisp(rO1,(rq2 ǫi)s,
+
+(ǫ′, δ′)-DP, qδ)-DP.
+
+where
+
+ǫ′
+
+=
+
+log(1
+
++
+
+q(eǫ
+
+−
+
+1))
+
+Note that in the case of subsampling the data for computing stochastic gradients, where client i selects a mini-batch of size s from its local dataset Di that has r data points, we take D′ = Di, r1 = r, and r2 = s. In the case of subsampling the clients, k clients are randomly selected from the m clients, we take D′ = {1, 2, . . . , m}, r1 = m, and r2 = k. An important point is that such a sub-sampling is not uniform overall (i.e., this does not imply that any subset of ks data points is chosen with equal probability) and we cannot directly apply the above result. We need to revisit the proof of Lemma 2 to adapt it to our case,
+and we do it in Lemma 10, which is proved in Appendix A. In fact, the proof of Lemma 10 is more general
+than just adapting the ampliﬁcation by subsampling to our setting, it also incorporates the ampliﬁcation by shuﬄing, which is crucial for obtaining strong privacy guarantees. We describe it next.
+
+2.3.2 Privacy Ampliﬁcation by Shuﬄing
+Consider a set of m clients, where client i ∈ [m] has a data xi ∈ X . Let R : X → Y be an ǫ0-LDP mechanism. The i-th client applies R on her data xi to get a private message yi = R(xi). There is a secure shuﬄer Hm : Ym → Ym that receives the set of m messages (y1, . . . , ym) and generates the same set of messages in a uniformly random order.
+The following lemma states that the shuﬄing ampliﬁes the privacy of an LDP mechanism by a factor of √1m .
+
+6
+
+Lemma 3 (Ampliﬁcation by Shuﬄing). Let R be an ǫ0-LDP mechanism. Then, the mechanism M(x1, . . . , xm) := Hm ◦ (R(x1), . . . , R(xm)) satisﬁes (ǫ, δ)-diﬀerential privacy, where
+
+1.
+
+[BBGN19c,
+
+Corollary
+
+5.3.1].
+
+If
+
+ǫ0
+
+≤
+
+log(m/
+
+log(1/δ)) 2
+
+,
+
+then
+
+for
+
+any
+
+δ
+
+>
+
+0,
+
+we
+
+have
+
+ǫ = O min{ǫ0, 1}eǫ0
+
+log(1/δ) m
+
+.
+
+2.
+
+[EFM+19,
+
+Corollary
+
+9].
+
+If
+
+ǫ0
+
+<
+
+1 2
+
+,
+
+then
+
+for
+
+any
+
+δ
+
+∈
+
+(0,
+
+1 100
+
+)
+
+and
+
+m
+
+≥
+
+1000,
+
+we
+
+have
+
+ǫ
+
+=
+
+12ǫ0
+
+log(1/δ) m
+
+.
+
+In our proposed algorithm, only k ≤ m clients send messages and each client sends a mini-batch of s gradients. So, in total, shuﬄer applies the shuﬄing operation on ks gradients. In our algorithm, though sampling and shuﬄing are applied one after another (ﬁrst k clients are sampled, then each client samples s data points, and then shuﬄing of these ks data points is performed), we analyze the privacy ampliﬁcation we get using both of these techniques by analyzing them together; see Lemma 10 proved in Appendix A.
+
+2.4 Compressed and Private Mean Estimation via Minimax Risk
+
+Recall that in each SGD iteration, server sends the current parameter vector to all clients, upon receiving
+
+which they compute stochastic gradients from their local datasets and send them to the server, who then
+
+computes the average/mean of received gradients and updates the parameter vector. Note that these gradi-
+
+ents (over the entire execution of algorithm) may also leak information about the datasets. As mentioned in
+
+Section 1, we also compress the gradients to mitigate the communication bottleneck.
+
+In this section, we formulate the generic mimimax estimation framework for mean estimation of a given
+
+set of n vectors that preserves privacy and is also communication-eﬃcient. We then apply that method
+
+at the server in each SGD iteration for aggregating the gradients. We derive upper and lower bounds for
+
+various ℓp geometries for p ≥ 1 including the ℓ∞-norm. Let us setup the problem. For any p ≥ 1 and d ∈ N,
+
+let Bpd (a) = {x ∈ Rd : x p ≤ a} denote the p-norm ball with radius a centered at the origin in Rd,5 where
+
+x p=
+
+d j=1
+
+|xj
+
+|p
+
+1/p
+. Each client i ∈ [n] has an input vector xi ∈ Bpd(a) and the server wants to estimate
+
+the
+
+mean
+
+x
+
+:=
+
+1 n
+
+n i=1
+
+xi
+
+.
+
+We
+
+have two constraints:
+
+(i) each client has a communication budget of b bits
+
+to transmit the information about its input vector to the server, and (ii) each client wants to keep its input
+
+vector private from the server. We develop private-quantization mechanisms to simultaneously address these
+
+constraints. Speciﬁcally, we design mechanisms Mi : Bpd(a) → {0, 1}d for i ∈ [n] that are quantized in the sense that they produce a b-bit output and are also locally diﬀerentially private. In other words, Mi is
+
+(ǫ0, b)-LDP for some ǫ0 ≥ 0 (see Deﬁnition 2).
+
+The procedure goes as follows. client i ∈ [n] applies a private-quantization mechanism Mi on her input
+
+xi and obtains a private output yi = server applies a decoding function to
+private-quantization mechanisms Mi
+
+Mi(xi) and
+estimate the : Bpd(a) →
+
+sends it to the server.
+
+mean vector x = {0, 1}d for all i ∈
+
+1 n
+[n]
+
+Upon receiving yn =
+
+n i=1
+
+xi.
+
+Our objective
+
+[y1, . is to
+
+. . , yn], design
+
+and also a (stochastic) decoding
+
+function x : {0, 1}b n → Bpd that minimizes the worst-case expected error sup{xi}∈Bpd E x − x(yn) 2. In
+
+other words, we are interested in characterizing the following quantity.
+
+rǫp,,bd,n(a)
+
+=
+
+inf
+{Mi∈Q(ǫ,b) }
+
+inf
+x
+
+sup
+{xi }∈Bpd (a)
+
+E
+
+x − x(yn)
+
+2 2
+
+,
+
+(5)
+
+where Q(ǫ,b) is the set of all (ǫ, b)-LDP mechanisms, and the expectation is taken over the randomness of {Mi : i ∈ [n]} and the estimator x. Note that in (5) we do not assume any probabilistic assumptions on the vectors x1, . . . , xn.
+
+Now we extend the formulation in (5) to a probabilistic model. Let Ppd(a) denote the set of all probability density functions on Bpd(a). For every distribution q ∈ Ppd(a), let µq denote its mean. Since the support
+5Assuming that the ball is centered at origin is without loss of generaility; otherwise, we can translate the ball to origin and work with that.
+
+7
+
+Symbol
+[n] m k r s n q1 q2 q Di D ǫ0 ǫ θ C D L Bpd (a)
+
+Description
+
+= {1, 2, . . . , n}, for any n ∈ N
+
+Total number of clients in the system
+
+(≤ m) Number of clients chosen per iteration
+
+Total number of samples per client
+
+(≤ r) Number of samples chosen per client per iteration
+
+(= mr) Total number of samples in the dataset
+
+(=
+
+s r
+
+)
+
+(= Can be
+
+k m
+
+)
+
+Can
+
+be
+
+seen
+
+as
+
+seen as probability
+
+probability of choosing a client in any iteration of picking a sample (from a chosen client) in any
+
+iteration
+
+(=
+
+q1q2
+
+=
+
+ks mr
+
+)
+
+Can
+
+be
+
+seen
+
+as
+
+probability
+
+of
+
+choosing
+
+a
+
+sample
+
+in
+
+any
+
+iteration
+
+Local dataset of client i for i ∈ [m]
+
+(
+
+m i=1
+
+Di)
+
+The
+
+entire
+
+dataset
+
+Local diﬀerential privacy parameter
+
+Central diﬀerential privacy parameter
+
+(∈ Rd) Model parameter vector
+
+(⊂ Rd) convex set of interest
+
+(= C 2) Diameter of the set C
+
+Lipschitz continuous parameter
+
+ℓp norm ball of radius a
+
+Table 1: Notation used throughout the paper
+
+of each distribution q ∈ Ppd is Bpd(a) and ℓp is a norm, we have that µq ∈ Bpd(a). For a given unknown distribution q ∈ Ppd(a), client i ∈ [n] observes xi, where x1, . . . , xn are i.i.d. according to q, and the goal for the server is to estimate µq, while satisfying the same two constraints as above, i.e., only b bits of communication is allowed from any client to the server while preserving the privacy of clients’ inputs.
+Analogous to (5), we are interested in characterizing the following quantity.
+
+Rǫp,,bd,n(a)
+
+=
+
+inf
+{Mi∈Q(ǫ,b) }
+
+inf
+x
+
+sup
+q∈Ppd (a)
+
+E
+
+µq − x(yn)
+
+2 2
+
+,
+
+(6)
+
+where the expectation is taken over the randomness of the output yn and the estimator x.
+In this paper, we design private-quantization mechanisms {M1, . . . , Mn} such that they are symmetric (i.e., Mi’s are same for all i ∈ [n]) and any client uses only private source of randomness that is not accessible by any other party in the system.
+
+3 Main Results
+This section is divided into two parts. In Section 3.1, we setup the problem, describe our algorithm, state our main results for optimization, including the results on convergence, privacy, and communication bits used. We also discuss their implications. One of the main ingredients in obtaining these results is the compressed & private mean estimation, which we study in a variety of settings; the corresponding results are presented in Section 3.2. A summary of the notation used throughout the paper is given in Table 1.
+
+3.1 Optimization
+
+In the subsection, we present a compressed and diﬀerentially-private stochastic gradient descent algorithm for
+
+the federated learning problem and state our main results about its privacy, communication, and convergence.
+
+The problem that we study is as follows. There are m clients, each client i ∈ [m] has a local dataset
+
+Di = {di1, . . . , dir} ∈ Sr consisting of r data points. Let Fi(θ) denotes the local loss function induced
+
+by
+
+Di
+
+at
+
+client
+
+i
+
+evaluated
+
+at
+
+the
+
+model
+
+parameter
+
+vector
+
+θ
+
+∈
+
+Rd,
+
+where
+
+Fi(θ)
+
+=
+
+1 r
+
+r j=1
+
+f
+
+(θ;
+
+dij
+
+),
+
+where
+
+8
+
+Algorithm 1 Acldp: CLDP-SGD
+
+1: Inputs: Datasets D =
+
+i∈[m] Di,
+
+Di
+
+=
+
+{di1, . . . , dir},
+
+loss
+
+function
+
+F (θ)
+
+=
+
+1 mr
+
+m i=1
+
+r j=1
+
+f
+
+(θ;
+
+dij ),
+
+LDP privacy parameter ǫ0, gradient norm bound C, and learning rate ηt.
+
+2: Initialize: θ0 ∈ C
+
+3: for t ∈ [T ] do
+
+4: Sampling of clients: A random set Ut of k clients is chosen.
+
+5: for clients i ∈ Ut do
+
+6:
+
+Sampling of data: Client i chooses uniformly at random a set Sit of s samples.
+
+7:
+
+for Samples j ∈ Sit do
+
+8:
+
+Compute gradient: gt (dij) ← ∇θtf (θt; dij )
+
+9:
+
+Clip gradient: g˜t (dij ) ← gt (dij) / max
+
+1,
+
+gt(dij ) p C
+
+6
+
+10:
+
+LDP-compressed gradient: qt (dij) ← Rp (g˜t (dij))
+
+11:
+
+Client i sends the set of private-compressed gradients {qt (dij) : j ∈ Sit} to the shuﬄer.
+
+12:
+
+Aggregate:
+
+gt
+
+←
+
+1 ks
+
+i∈U
+
+j∈Sit qt (dij )
+
+13: Gradient Descent θt+1 ← C (θt − ηtgt)
+
+14: Output: The model θT and the privacy parameters ǫ, δ
+
+f (θ; ·) : C → R is a convex function. The goal of the server is to ﬁnd an optimal model parameter vector
+
+θ∗ ∈ C that minimizes minθ∈C
+
+F (θ)
+
+=
+
+1 m
+
+m i=1
+
+Fi(θ)
+
+; also
+
+see
+
+(1),
+
+while satisfying
+
+the
+
+privacy constraint of
+
+a single data point at any client, as formalized in Section 2, and also the communication constraints.
+
+In our proposed compressed and diﬀerentially-private SGD algorithm, at each step, we choose at random
+
+a set Ut of k ≤ m clients out of m clients. Each client i ∈ Ut computes the gradient ∇θtf (θt; dij ) for a random subset Sit of s ≤ r samples. The i’th client clips the ℓp-norm of the gradient ∇θt f (θt; dij ) for each j ∈ Sit and applies the LDP-compression mechanism Rp (with the privacy parameter ǫ0) to the clipped gradients.
+After that, each client i sends the set of s LDP-compressed gradients {Rp (gt (dij ))}j∈Sit in a communicationeﬃcient manner to the secure shuﬄer. The shuﬄer randomly shuﬄes (i.e., outputs a random permutation
+
+of) all the received ks gradients and sends them to the server. Finally, the server takes the average of the
+
+received gradients and updates the parameter vector. We describe this procedure in Algorithm 1. Let ℓg
+
+denote
+
+the
+
+dual
+
+norm
+
+of
+
+ℓp
+
+norm,
+
+where
+
+1 p
+
++
+
+1 g
+
+=
+
+1
+
+and
+
+p, g
+
+≥
+
+1.
+
+Thus,
+
+when
+
+the
+
+loss
+
+function
+
+f (θ, dij )
+
+is
+
+convex and L-Lipschitz continuous with respect to ℓg-norm, then the gradient ∇θf (θ; .) has a bounded ℓp
+
+norm [SS+12, Lemma 2.6]. In this case, we do not need the clipping step.
+
+In the next theorems, we state the privacy guarantees, the communication cost per client, and the privacy-
+
+convergence trade-oﬀs for the CLDP-SGD Algorithm. Let n = mr denote the total number of data points
+
+in the dataset D. Observe that the probability that an arbitrary data point dij ∈ D is chosen at time t ∈ [T ]
+
+is
+
+given
+
+by
+
+q
+
+=
+
+ks mr
+
+.
+
+Theorem 1. Let the set C be convex with diameter D,7 and the function f (θ; .) : C → R be convex and L-
+
+Lipschitz continuous with respect to the ℓg-norm, which is the dual of the ℓp-norm.8 Let θ∗ = arg minθ∈C F (θ)
+
+denote the minimizer of the problem (1).
+
+For s = 1 and q =
+
+k mr
+
+,
+
+if
+
+we
+
+run
+
+Algorithm
+
+Acldp
+
+with
+
+ǫ0
+
+=
+
+O
+
+n log(2/δ) qT log(2qT /δ)
+
+, then we have
+
+6Note that gradient clipping may not preserve unbiasedness of the stochastic gradients. However for the case when the loss
+
+function f is L-Lipschitz, this is not necessary for the following reason. If the loss function f is L-Lipschitz (with respect to
+
+the
+
+model
+
+parameters)
+
+in
+
+the
+
+dual
+
+norm
+
+ℓg ,
+
+where
+
+1 p
+
++
+
+1 g
+
+=
+
+1, p, g
+
+≥
+
+1,
+
+then
+
+the
+
+norm
+
+of
+
+the
+
+gradients
+
+(with
+
+respect
+
+to
+
+some
+
+ℓp-norm, for p ≥ 1) is bounded, and hence we do not need to clip it.
+
+7Diameter of a bounded set C ⊆ Rd is deﬁned as supx,y∈C x − y . 8For any data point d ∈ S, the function f : C → R is L-Lipschitz continuous w.r.t. ℓg-norm if for every θ1, θ2 ∈ C, we have
+
+|f (θ1; d) − f (θ2; d)| ≤ L θ1 − θ2 g.
+
+9
+
+1. Privacy: Acldp is (ǫ, δ)-DP, where δ > 0 is arbitrary, and
+
+ǫ = O ǫ0
+
+qT log (2qT /δ) log (2/δ) n
+
+.
+
+(7)
+
+2.
+
+Communication:
+
+Acldp
+
+requires
+
+k m
+
+s×
+
+log (e) + log
+
+s+2b −1 s
+
+bits of communication in expectation9
+
+per client per iteration, where expectation is taken with respect to the sampling of clients. Here, b =
+
+log (d) + 1 if p ∈ {1, ∞} and b = d (log (e) + 1) otherwise.
+
+3.
+
+Convergence:
+
+For G2
+
+=
+
+L2
+
+max{d1−
+
+2 p
+
+,
+
+1}
+
+schedule
+
+ηt
+
+=
+
+D√ Gt
+
+,
+
+then
+
+we
+
+have
+
+1
+
++
+
+cd qn
+
+eǫ0 +1 eǫ0 −1
+
+2
+
+, if we run Acldp with learning rate
+
+E [F (θT )] − F (θ∗) ≤ O
+
+LD
+
+log(T
+
+)
+
+√max{d
+
+1 2
+
+−
+
+1 p
+
+,
+
+1}
+
+T
+
+cd qn
+
+eǫ0 + 1 eǫ0 − 1
+
+.
+
+(8)
+
+where c is an absolute constant, see Lemma 11 on page 22.
+
+We prove Theorem 1 in Section 5.
+
+Remark 3 (Arbitrary SGD mini-batch size s). The communication and convergence results in Theorem 1 are general and hold for any s ∈ [r], but the privacy result is stated when s = 1, i.e., each client only samples a single data point in each SGD iteration. We also have results for any mini-batch size s ∈ [r] (see Appendix A), and the desired privacy ampliﬁcation occurs when k = m, i.e., when we select all the clients in every iteration, but for other cases it is unclear if we get the same result (see Appendix A for more details) .
+
+Remark 4 (Recovering the Result [EFM+20, ESA]). In [EFM+20], each client has only one data point and all clients participate in each iteration, and gradients have bounded ℓ2-norm. If we put p = 2, T = n/ log2(n), and q = 1 in (8), we get the following privacy-accuracy trade-oﬀ, which is the same as that in [EFM+20, Theorem VI.1].
+
+E [F (θT )] − F (θ∗) ≤ O
+
+LD
+
+log2
+
+√ (n) d
+
+n
+
+eǫ0 + 1 eǫ0 − 1
+
+;
+
+ǫ=O
+
+ǫ0
+
+T log (T /δ) log (1/δ) n
+
+We want to emphasize that the above privacy-accuracy trade-oﬀ in [EFM+20] is achieved by full-precision gradient exchange, whereas, we can achieve the same trade-oﬀ with compressed gradients. Moreover, our results are in more general setting, where clients’ local datasets have multiple data-points (no bound on that) and we do two types of sampling, one of clients and other of data for SGD.
+
+Remark 5 (Optimality of CLDP-SGD for ℓ2-norm case). Suppose ǫ = O (log(1/δ)), which includes ǫ = O(1),
+
+as δ ≪ 1. Substituting ǫ0 = ǫ
+
+qT
+
+n log(2qT /δ)
+
+log(2/δ)
+
+,
+
+T
+
+=
+
+n/q,
+
+and
+
+p
+
+=
+
+2
+
+in
+
+(8),
+
+we
+
+get
+
+
+
+
+
+LD
+
+log
+
+3 2
+
+E [F (θT )] − F (θ∗) = O 
+
+n δ
+nǫ
+
+d log
+
+1 δ
+
+.
+
+(9)
+
+This matches the optimal excess risk of central diﬀerential privacy presented in [BST14]. Note that the results in [BST14] are for centralized SGD with full precision gradients, whereas, our results are for federated learning (which is a distributed setup) with compressed gradient exchange.
+9A client communicates in an iteration only when that client is selected (sampled) in that iteration.
+
+10
+
+3.2 Compressed and Private Mean Estimation
+
+In this subsection, we state our lower and upper bound results on minimax risks both in the worst case
+model (see (5)) and the probabilistic model (see (6)). For the lower bounds, we state our results when there is no communication constraints, and for clarity, we denote the corresponding minimax risks by rǫp,,∞ d ,n(a) and Rǫp,,∞ d ,n(a).
+
+Theorem 2. For any d, n ≥ 1, a, ǫ0 > 0, and p ∈ [1, ∞], the minimax risk in (6) satisﬁes
+
+ Ω Rǫp,,∞ d ,n(a) ≥ Ω
+
+a2 min
+
+1,
+
+d nǫ20
+
+a2
+
+d1−
+
+2 p
+
+min
+
+1,
+
+d n min{ǫ0,ǫ20}
+
+if 1 ≤ p ≤ 2, if p ≥ 2.
+
+Theorem 3. For any d, n ≥ 1, a, ǫ0 > 0, and p ∈ [1, ∞], the minimax risk in (5) satisﬁes
+
+
+
+rǫp,,∞ d ,n(a)
+
+≥
+
+Ω Ω
+
+a2 min
+
+1,
+
+d nǫ20
+
+a2
+
+d1−
+
+2 p
+
+min
+
+1,
+
+n
+
+d min{ǫ0 ,ǫ20 }
+
+if 1 ≤ p ≤ 2, if p ≥ 2.
+
+We prove Theorem 2 and Theorem 3 in Section 4.1 and Section 4.2, respectively.
+
+Theorem 4. For any private-randomness, symmetric mechanism R with communication budget b < log (d)
+
+bits
+
+per
+
+client,
+
+and
+
+any
+
+decoding
+
+function
+
+g
+
+:
+
+{0, 1}b
+
+→
+
+Rd,
+
+when
+
+x
+
+=
+
+1 n
+
+n i=1
+
+g
+
+(R (xi)),
+
+we
+
+have
+
+rǫp,,bd,n(a) > a2 max
+
+1,
+
+d1−
+
+2 p
+
+.
+
+(10)
+
+Remark 6. Note that Theorem 4 works only when the estimator x applies the decoding function g on individual responses and then takes the average. We leave its extension for arbitrary decoders as a future work.
+
+We prove Theorem 4 in Section 4.3. Though our lower bound results are for arbitrary estimators x(yn), for the minimax risk estimation problems (5) and (6), we can show that the optimal estimator x(yn) is a deterministic function of yn.
+In other words, the randomized decoder does not help in reducing the minimax risk. See Lemma 13 in
+Appendix B.
+
+Theorem 5 (ℓ1-norm). For any d, n ≥ 1, a, ǫ0 > 0, we have
+
+rǫ10,d,b,n (a)
+
+≤
+
+a2d n
+
+eǫ0 + 1 2 eǫ0 − 1
+
+and
+
+Rǫ10,d,b,n (a)
+
+≤
+
+4a2d n
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+,
+
+for b = log(d) + 1.
+
+Theorem 6 (ℓ2-norm). For any d, n ≥ 1, a, ǫ0 > 0, we have
+
+rǫ20,d,b,n (a)
+
+≤
+
+6a2d n
+
+eǫ0 + 1 2 eǫ0 − 1
+
+and
+
+Rǫ20,d,b,n (a)
+
+≤
+
+14a2d n
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+,
+
+for b = d log(e) + 1.
+
+Theorem 7 (ℓ∞-norm). For any d, n ≥ 1, a, ǫ0 > 0, we have
+
+rǫ∞0 ,,bd,n (a)
+
+≤
+
+a2d2 n
+
+eǫ0 + 1 2 eǫ0 − 1
+
+and
+
+Rǫ∞0,,bd,n(a)
+
+≤
+
+4a2d2 n
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+,
+
+for b = log(d) + 1.
+
+11
+
+We prove Theorem 5, Theorem 6, and Theorem 7, in Section 4.4, Section 4.5, and Section 4.6, respectively.
+Note that when ǫ0 = O(1), then the upper and lower bounds on minimax risks match for p ∈ [1, 2]. Furthermore, when ǫ0 ≤ 1, then they match for all p ∈ [1, ∞].
+Now we give a general achievability result for any ℓp-norm ball Bpd(a) for any p ∈ [1, ∞). For this, we use standard inequalities between diﬀerent norms, and probabilistically use the mechanisms for ℓ1-norm or ℓ2norm with expanded radius of the corresponding ball. We assume that every work can pick any mechanisms
+with the same probability p¯ ∈ [0, 1]. This gives the following result, which we prove in Section 4.7.
+
+Corollary 1 (General ℓp-norm, p ∈ [1, ∞)). Suppose clients pick the mechanism for ℓ1-norm with probability p¯ ∈ [0, 1]. Then, for any d, n ≥ 1, a, ǫ0 > 0, we have:
+
+rǫp0,d,b,n(a)
+
+≤
+
+p¯
+
+d2−
+
+2 p
+
+·
+
+rǫ10,d,b,n(a)
+
++
+
+(1
+
+−
+
+p¯) max
+
+d1−
+
+2 p
+
+,
+
+1
+
+· rǫ20,d,b,n(a),
+
+Rǫp0,d,b,n(a)
+
+≤
+
+p¯
+
+d2−
+
+2 p
+
+·
+
+Rǫ10,d,b,n(a)
+
++
+
+(1
+
+−
+
+p¯) max
+
+d1−
+
+2 p
+
+,
+
+1
+
+· Rǫ20,d,b,n(a).
+
+(11) (12)
+
+for b = p¯log(d) + (1 − p¯)d log(e) + 1. Note that this communication is in expectation, which is taken over the sampling of selecting ℓ1 or ℓ2 mechanisms.
+
+We can recover Theorem 5 by setting p = 1 and p¯ = 1 and Theorem 6 by setting p = 2 and p¯ = 0.
+
+4 Compressed and Private Mean Estimation
+In this section, we study the private mean-estimation problem in the minimax framework given in Section 2.4. Note that in this section we focus on giving (ǫ0, b)-CLDP) privacy-communication guarantees for the meanestimation problem and give the performance of schemes in terms of the associated minimax risk. This framework is applied at each round of the optimization problem, and is then converted to the eventual central DP privacy guarantees using the shuﬄing framework in Section 5, yielding the main result Theorem 1 stated in Section 3.
+This section is divided into six subsections. We prove the lower bound results (Theorems 2, 3) in the ﬁrst two subsections and the achievable results (Theorems 5, 6, 7, and Corollary 1) in the last four subsections, respectively.
+We prove lower bounds for private mechanisms with no communication constraints, and for clarity, we denote such mechanisms by (ǫ, ∞)-CLDP mechanisms. Our achievable schemes use ﬁnite amount of randomness.
+For lower bounds, for simplicity, we assume that the inputs come from an ℓp-norm ball of unit radius – the bounds will be scaled by the factor of a2 if inputs come from an ℓp-norm ball of radius a. For convenience, we denote Bpd(1), Ppd(1), rǫp,,bd,n(1), and Rǫp,,bd,n(1) by Bpd, Ppd, rǫp,,bd,n, and Rǫp,,bd,n, respectively.
+4.1 Lower Bound on Rǫp,,∞d ,n: Proof of Theorem 2
+Theorem 2 states separate lower bounds on Rǫp,,∞ d ,n depending on whether p ≥ 2 or p ≤ 2 (at p = 2, both bounds coincide), and we prove them below in Section 4.1.1 and Section 4.1.2, respectively.
+
+4.1.1 Lower bound for p ∈ [2, ∞]
+
+The main idea of the lower bound is to transform the problem to the private mean estimation when the
+
+inputs are sampled from Bernoulli distributions. Recall that Ppd denote the set of all distributions on the
+
+d
+
+p-norm ball Bpd. Let PpB,edrn denote the set of Bernoulli distributions on
+
+0,
+
+1 d1/p
+
+, i.e., any element of PpB,edrn
+
+is a product of d independent Bernoulli distributions, one for each coordinate. We ﬁrst prove a lower bound
+
+on Rǫp,,∞ d ,n when the input distribution belongs to PpB,edrn.
+
+12
+
+Lemma 4. For any p ∈ [2, ∞], we have
+
+inf inf sup E
+{Mi }∈Q(ǫ,∞) x q∈PpB,edrn
+
+µq − x (yn)
+
+2 2
+
+≥
+
+Ω
+
+d1−
+
+2 p
+
+min
+
+1,
+
+n
+
+d min{ǫ,
+
+ǫ2}
+
+.
+
+(13)
+
+Proof. The proof is straightforward from the proof of Duchi and Rogers [DR19, Corollary 3]. In their setting,
+
+PpB,edrn is supported on {0, 1}d, and they proved a lower bound of Ω
+
+min
+
+1,
+
+d n min{ǫ,ǫ2}
+
+. In our setting,
+
+d
+
+since PpB,edrn is supported on
+
+0,
+
+1 d1/p
+
+, we can simply scale the elements in the support of PpB,edrn by a factor
+
+of 1/d1/p, which will also scale the mean µq by the same factor. Note that the best estimator x will be equal
+
+to the scaled version of the best estimator from [DR19, Corollary 3] with the same value 1/d1/p. This proves
+
+Lemma 4.
+
+In order to use Lemma 4, ﬁrst observe that for every x ∈ PpB,edrn, we have x p ≤ 1, which implies that x ∈ Ppd. Thus we have PpB,edrn ⊂ Ppd. Now our bound on Rǫp,,∞ d ,n trivially follows from the following inequalities:
+
+Rǫp,,∞ d ,n
+
+=
+
+inf
+{Mi }∈Q(ǫ,∞)
+
+inf
+x
+
+sup
+q∈Ppd
+
+E
+
+µq − x (yn)
+
+2 2
+
+≥
+
+inf
+{Mi }∈Q(ǫ,∞)
+
+inf
+x
+
+sup
+q∈PpB,edrn
+
+E
+
+µq − x (yn)
+
+2 2
+
+≥Ω
+
+d1−
+
+2 p
+
+min
+
+1,
+
+n
+
+d min{ǫ,
+
+ǫ2}
+
+,
+
+(14)
+
+where the last inequality follows from (13).
+
+4.1.2 Lower bound for p ∈ [1, 2]
+
+Fix an arbitrary p ∈ [1, 2]. Note that x p ≤ x 1, which implies that B1d ⊂ Bpd, and therefore, we have P1d ⊂ Ppd. These imply that the lower bound derived for P1d also holds for Ppd, i.e., Rǫp,,∞ d ,n ≥ Rǫ1,,∞ d ,n holds for any p ∈ [1, 2]. So, in the following, we only lower-bound Rǫ1,,∞ d ,n.
+The main idea of the lower bound is to transform the problem to the private discrete distribution es-
+
+timation when the inputs are sampled from a discrete distribution taken from a simplex in d dimensions.
+
+Recall that P1d denotes all probability density functions q over the 1-norm ball B1d. Note that q may be a
+
+continuous distribution supported over all of B1d. Let P1d denote a set of all discrete distributions q sup-
+
+ported over the d standard basis vectors e1, . . . , ed, i.e., the distribution has support on {e1, . . . , ed}. Since
+
+{e1, . . . , ed} ⊂ B1d, we have P1d ⊂ P1d. Moreover, since any q ∈ P1d is a discrete distribution, by abusing
+
+notation, we describe q through a d−dimensional vector q of its probability mass function. Note that, for
+
+any q ∈ P1d, the average over this distribution is µq = Eq[U], where Eq[·] denotes the expectation over
+
+the distribution q for a discrete random variable U ∼ q, where we denote qi = Pr[U = ei]. Therefore we
+
+have µq =
+
+d i=1
+
+qi
+
+ei
+
+=
+
+(q1, . . . , qd)T
+
+= q, for every q ∈ P1d.
+
+Let ∆d
+
+denote the probability simplex in d
+
+dimensions. Since the discrete distribution q ∈ P1d is representable as q ∈ ∆d, we have an isomorphism
+
+between ∆d and P1d, i.e., we can equivalently think of P1d = ∆d. Fix arbitrary (ǫ, ∞)-CLDP mechanisms
+
+{Mi : i ∈ [n]} and an estimator x. Using the above notations and observations, we have:
+
+sup E
+q∈P1d
+
+µq − x (yn)
+
+2 2
+
+≥
+
+sup
+
+E
+
+q∈P1d
+
+µq − x (yn)
+
+2 2
+
+=
+
+sup
+
+E
+
+q∈P1d
+
+q − x (yn)
+
+2 2
+
+.
+
+(15)
+
+Using P1d = ∆d, and taking the inﬁmum in (15) over all (ǫ, ∞)-CLDP mechanisms {Mi : i ∈ [n]} and estimators x, we get
+
+inf inf sup E
+{Mi∈Q(ǫ,∞)} x q∈P1d
+
+µq − x (yn)
+
+2 2
+
+≥
+
+inf inf
+{Mi∈Q(ǫ,∞)} x
+
+sup
+q∈∆d
+
+E
+
+q − x (yn)
+
+2 2
+
+.
+
+(16)
+
+13
+
+Girgis et al. [GDC+20, Theorem 1] lower-bounded the RHS of (16) in the context of characterizing a privacy-
+
+utility-randomness tradeoﬀ in LDP. When specializing to our setting, where we are not concerned about the
+
+amount of randomness used, their lower bound result gives inf{Mi∈Q(ǫ,∞)} infx supq∈∆d E
+
+q − x (yn)
+
+2 2
+
+≥
+
+Ω
+
+min
+
+1,
+
+d nǫ2
+
+. Substituting this in (16) gives
+
+Rǫ1,,∞ d ,n
+
+=
+
+inf
+{Mi ∈Q(ǫ,∞) }
+
+inf
+x
+
+sup
+q∈P1d
+
+E
+
+µq − x (yn)
+
+2 2
+
+≥
+
+Ω
+
+min
+
+1,
+
+d nǫ2
+
+.
+
+(17)
+
+4.2 Lower Bound on rǫp,,∞d ,n: Proof of Theorem 3
+Similar to Section 4.1, we prove the lower bound on rǫp,,∞ d ,n separately depending on whether p ≥ 2 or p ≤ 2 (at p = 2, both bounds coincide) below in Section 4.2.1 and Section 4.2.2, respectively. In both the proofs, the main idea is to transform the worst-case lower bound to the average case lower bound and then use relation between diﬀerent norms.
+
+4.2.1 Lower bound for p ∈ [2, ∞]
+
+Fix arbitrary (ǫ, ∞)-CLDP mechanisms {Mi : i ∈ [n]} and an estimator x. It follows from (14) that there
+
+exists
+
+a
+
+distribution
+
+q
+
+∈
+
+Ppd,
+
+such
+
+that
+
+if
+
+we
+
+sample
+
+(q)
+xi
+
+∼
+
+q,
+
+i.i.d.
+
+for
+
+all
+
+i
+
+∈
+
+[n]
+
+and
+
+letting
+
+yi
+
+=
+
+Mi(xi(q)),
+
+we would have E
+
+µq − x (yn)
+
+2 2
+
+≥
+
+Ω
+
+d1−
+
+2 p
+
+min
+
+1,
+
+d n min{ǫ,ǫ2}
+
+. We have
+
+sup E
+{xi }∈Bpd
+
+1 n
+
+n
+
+2 (a)
+xi − x (yn) ≥ E
+
+i=1
+
+2
+
+1 n
+
+n
+
+2
+
+(q)
+xi
+
+−
+
+x
+
+(yn)
+
+i=1
+
+2
+
+(b)
+≥
+
+1 E
+2
+
+µq − x (yn)
+
+2 2
+
+−
+
+E
+
+1 n
+
+n
+
+(q)
+xi
+
+−
+
+µq
+
+2
+
+i=1
+
+2
+
+(c)
+≥Ω
+
+d1−
+
+2 p
+
+min
+
+1,
+
+n
+
+d min{ǫ,
+
+ǫ2}
+
+−
+
+d1−
+
+2 p
+
+n
+
+(d)
+≥Ω
+
+d1−
+
+2 p
+
+min
+
+1,
+
+n
+
+d min{ǫ,
+
+ǫ2}
+
+(18) (19)
+
+In the LHS of (a), the expectation is taken over the randomness of the mechanisms {Mi} and the estimator x;
+
+whereas, in the RHS of (a), in addition, the expectation is also taken over sampling xi’s from the distribution
+
+q. Moreover (a) holds since the LHS is supremum {xi} ∈ Bpd and the RHS of (a) takes expectation w.r.t. a
+
+distribution over Bpd and hence lower-bounds the LHS. The inequality (b) follows from the Jensen’s inequality
+
+2
+
+u
+
+2 2
+
++
+
+2
+
+v
+
+2 2
+
+≥
+
+u+v
+
+2 2
+
+by
+
+setting
+
+u
+
+=
+
+1 n
+
+n (q)
+i=1 xi
+
+−
+
+x(yn)
+
+and
+
+v
+
+=
+
+µq
+
+−
+
+1 n
+
+n i=1
+
+xi(q).
+
+In
+
+(c)
+
+we
+
+used
+
+E1
+n
+
+n i=1
+
+(q)
+xi
+
+−
+
+µq
+
+2 2
+
+≤
+
+d1−
+
+2 p
+
+n
+
+,
+
+which
+
+we
+
+show
+
+below.
+
+In
+
+(d),
+
+we
+
+assume
+
+min{ǫ, ǫ2}
+
+≤
+
+O(d).
+
+Note that for any vector u ∈ Rd, we have
+
+u
+
+2
+
+≤
+
+d1 2
+
+−
+
+1 p
+
+u
+
+p,
+
+for
+
+any
+
+p ≥ 2.
+
+Since
+
+each
+
+(q)
+xi
+
+∈ Bpd,
+
+which
+
+implies
+
+(q)
+xi
+
+p ≤ 1, we have that
+
+(q)
+xi
+
+2
+
+≤
+
+d1 2
+
+−
+
+1 p
+
+.
+
+Hence, E
+
+(q)
+xi
+
+2 2
+
+≤
+
+d1−
+
+2 p
+
+holds for all i ∈ [n].
+
+Now, since
+
+xi’s are i.i.d. with E[xi(q)] = µq, we have
+
+E
+
+1 n
+
+n
+
+2
+
+(q)
+xi
+
+−
+
+µq
+
+=
+
+1 n2
+
+n
+E
+
+i=1
+
+2
+
+i=1
+
+(q)
+xi
+
+−
+
+µq
+
+2 2
+
+(a)
+≤
+
+1 n2
+
+n
+E
+i=1
+
+(q)
+xi
+
+2 2
+
+≤
+
+1 n2
+
+n
+
+d1−
+
+2 p
+
+i=1
+
+=
+
+d1−
+
+2 p
+
+n
+
+,
+
+(20)
+
+where
+
+(a)
+
+uses E
+
+x − E[x]
+
+2 2
+
+≤
+
+E
+
+x
+
+2 2
+
+,
+
+which
+
+holds
+
+for any random vector x.
+
+14
+
+Taking supremum in (19) over all (ǫ, ∞)-CLDP mechanisms {Mi : i ∈ [n]} and estimators x, we get
+
+rǫp,,∞ d ,n
+
+=
+
+inf inf
+{Mi∈Q(ǫ,∞)} x
+
+sup
+{xi }∈Bpd
+
+E
+
+1 n
+
+n
+
+xi − x (yn)
+
+2
+≥Ω
+
+i=1
+
+2
+
+d1−
+
+2 p
+
+min
+
+1,
+
+n
+
+d min{ǫ,
+
+ǫ2}
+
+.
+
+(21)
+
+4.2.2 Lower bound for p ∈ [1, 2]
+
+Similar to the argument given in Section 4.1.2, since rǫp,,∞ d ,n ≥ rǫ1,,∞ d ,n holds for any p ∈ [1, 2], it suﬃces to
+
+lower-bound rǫ1,,∞ d ,n.
+
+Fix arbitrary (ǫ, ∞)-CLDP mechanisms {Mi : i ∈ [n]} and an estimator x. It follows from (17) that there
+
+exists
+
+a
+
+distribution
+
+q
+
+∈
+
+Ppd,
+
+such
+
+that
+
+if
+
+we
+
+sample
+
+(q)
+xi
+
+∼
+
+q,
+
+i.i.d.
+
+for
+
+all
+
+i
+
+∈
+
+[n]
+
+and
+
+letting
+
+yi
+
+=
+
+Mi(xi(q)),
+
+we would have E
+
+µq − x (yn)
+
+2 2
+
+≥
+
+Ω
+
+min
+
+1,
+
+d nǫ2
+
+. Now, by the same reasoning using which we obtained
+
+(18), we have
+
+sup E
+{xi }∈Bpd
+
+1 n
+
+n
+
+xi − x (yn)
+
+2
+
+≥
+
+1 E
+2
+
+i=1
+
+2
+
+µq − x (yn)
+
+2 2
+
+−
+
+E
+
+1 n
+
+n
+
+(q)
+xi
+
+−
+
+µq
+
+2
+
+i=1
+
+2
+
+(a)
+≥Ω
+
+min
+
+1,
+
+d nǫ2
+
+−
+
+1 n
+
+(b)
+≥
+
+Ω
+
+min
+
+1,
+
+d nǫ2
+
+(22)
+
+In (a) we used
+
+E
+
+1 n
+
+n
+
+(q)
+xi
+
+−
+
+µq
+
+2
+
+≤
+
+1 n
+
+,
+
+i=1
+
+2
+
+(23)
+
+which can be obtained by ﬁrst noting that for any u ∈ Rd, we have u 2 ≤√ u p for p ∈ [1, 2], and then using this in the set of inequalities which give (20). In (b), we assume ǫ ≤ O( d).
+
+Taking supremum in (19) over all (ǫ, ∞)-CLDP mechanisms {Mi : i ∈ [n]} and estimators x, we get
+
+rǫ1,,∞ d ,n ≥ Ω
+
+min
+
+1,
+
+d nǫ2
+
+.
+
+4.3 Lower Bound on rǫp,,bd,n: Proof of Theorem 4
+
+Let M = 2b < d be the total number of possible outputs of the mechanism R. Let {o1, o2, . . . , oM } be the
+
+set of M possible outputs of R. For every i ∈ [M ], let qi = g(oi). We can write the M possible outputs
+
+of R as columns of a d × M matrix Q = [q1, . . . , qM ]. Since M < d, the rank of the matrix Q is at most
+
+M . Let x ∈ Rd be a vector in the null space of the matrix Q, i.e., xT qj = 0 for all j ∈ [M ]. Then, we set
+
+the sample of each client by xi = x =
+
+x xp
+
+for all i ∈ [n], and hence, xi ∈ Bpd.
+
+Observe that the
+
+estimator
+
+xˆ
+
+=
+
+1 n
+
+n i=1
+
+g
+
+(M
+
+(xi))
+
+is
+
+in
+
+the
+
+column
+
+space
+
+of
+
+the
+
+matrix
+
+Q.
+
+Thus,
+
+we
+
+get
+
+rǫp,,bd,n ≥ E
+
+x
+
+−
+
+1 n
+
+n
+
+g (R (xi))
+
+i=1
+
+2
+(=a)
+2
+
+x
+
+2 2
+
++
+
+E
+
+1 n
+
+n
+
+g (R (xi))
+
+i=1
+
+2
+≥ max
+2
+
+1,
+
+d1−
+
+2 p
+
+where step (a) follows from the fact that x is in the null space of Q, while the estimator xˆ is in the column space of Q. This completes the proof of Theorem 4.
+
+4.4 Achievability for ℓ1-norm Ball: Proof of Theorem 5
+In this section, we propose an ǫ0-LDP mechanism that requires O (log(d))-bits of communication per client using private randomness and 1-bit of communication per client using public randomness. In other words we can guarantee (ǫ0, O (log(d)))-CLDP with private randomness and (ǫ0, 1)-CLDP using public randomness. The proposed mechanism is based on the Hadamard matrix and is inspired from the Hadamard mechanism
+
+15
+
+proposed by Acharya et al. [ASZ19]. We assume that d is a power of 2. Let Hd denote the Hadamard matrix of order d, which can be constructed by the following recursive mechanism:
+
+Hd =
+
+Hd/2 Hd/2
+
+Hd/2 −Hd/2
+
+H1 = 1
+
+Client i interval
+
+has an [−a/√d,
+
+input a/√d].
+
+xi ∈ B1d Client i
+
+(a). It selects
+
+computes yi = j ∼ Unif [d] and
+
+√1 d
+
+Hd
+
+xi
+
+.
+
+quantize
+
+Note that each coordinate of yi lies in the yi,j privately according to (24) and obtains
+
+zi ∈
+
+± aHd(j)
+
+eǫ0 +1 eǫ0 −1
+
+, which can be represented using only 1-bit. Here, Hd(j) denotes the j-th column
+
+of the Hadamard matrix Hd. Server receives the n messages {z1, . . . , zn} from the clients and outputs their
+
+average
+
+1 n
+
+n i=1
+
+zi.
+
+We
+
+present
+
+this
+
+mechanism
+
+in
+
+Algorithm
+
+2
+
+–
+
+we
+
+only
+
+present
+
+the
+
+client-side
+
+part
+
+of
+
+the
+
+algorithm, as server only averages the messages received from the clients.
+
+Algorithm 2 ℓ1-MEAN-EST (R1: the client-side algorithm)
+
+1: Input: Vector x ∈ B1d (a), and local privacy level ǫ0 > 0.
+
+2:
+
+Construct y =
+
+√1 d
+
+Hd
+
+x
+
+3: Sample j ∼ Unif[d] and quantize yj as follows:
+
+  +aHd (j) z =  −aHd (j)
+
+eǫ0 +1 eǫ0 −1 eǫ0 +1 eǫ0 −1
+
+√
+
+w.p.
+
++ 1
+
+dyj eǫ0 −1
+
+2
+
+√2a eǫ0 +1
+
+w.p.
+
+1 2
+
+−
+
+dyj eǫ0 −1 2a eǫ0 +1
+
+4: Return z.
+
+(24)
+
+Lemma 5. The mechanism R1 presented in Algorithm 2 satisﬁes the following properties, where ǫ0 > 0:
+
+1. R1 is (ǫ0, log (d) + 1)-CLDP and requires only 1-bit of communication using public randomness.
+
+2. R1 is unbiased and has bounded variance, i.e., for every x ∈ B1d (a), we have
+
+E [R1 (x)] = x
+
+and
+
+E
+
+R1 (x) − x
+
+2 2
+
+≤
+
+a2d
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+We prove Lemma 5 in Appendix C.1.
+
+Now we are ready to prove Theorem 5. Let R1(x) denote the output of Algorithm 2 on input x. As
+
+mentioned above, the server employs a simple estimator that simply averages the n received messages, i.e.,
+
+the
+
+server
+
+outputs
+
+x(zn)
+
+=
+
+1 n
+
+n
+i=1 zi
+
+=
+
+1 n
+
+n i=1
+
+R1(xi).
+
+In the following, ﬁrst we show the bound on
+
+rǫ10,d,b,n (a) and then on Rǫ10,d,b,n (a) for b = log(d) + 1.
+
+For rǫ10,d,b,n (a) :
+
+sup
+
+E
+
+x − x(zn)
+
+2 2
+
+=
+
+sup
+
+E
+
+{xi }∈B1d (a)
+
+{xi }∈B1d (a)
+
+1 n
+
+n
+
+2
+(xi − R1(xi))
+
+i=1
+
+2
+
+(=a)
+
+sup
+{xi }∈B1d (a)
+
+1 n2
+
+n i=1
+
+E
+
+xi − R1(xi)
+
+2 2
+
+(b)
+≤
+
+a2d n
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+,
+
+(25)
+
+where (a) uses the fact that all clients use independent private randomness (which makes the random variables
+
+xi −R1(xi) independent for diﬀerent i’s and also that R1 is unbiased. (b) uses that R1 has bounded variance.
+
+Taking inﬁmum in (25) over all (ǫ0, b)-CLDP mechanisms (where b = log(d) + 1) and estimators x, we have
+
+that
+
+rǫ10,d,b,n (a)
+
+≤
+
+a2 d n
+
+eǫ0 +1 eǫ0 −1
+
+2
+, which is O
+
+a2 d nǫ20
+
+when ǫ0 = O(1).
+
+16
+
+For Rǫ10,d,b,n (a) :
+
+sup E
+q∈P1d (a)
+
+µq − x(zn)
+
+2 2
+
+(c)
+≤
+
+sup
+q∈P1d(a)
+
+2E
+
+µq − x
+
+2 2
+
++
+
+2E
+
+(d)
+≤
+
+2a2 n
+
++
+
+2a2d n
+
+eǫ0 + 1 2 eǫ0 − 1
+
+x − x(zn)
+
+2 2
+
+(26)
+
+In the LHS of (c), for any q ∈ P1d (a), ﬁrst we generate n i.i.d. samples x1, . . . , xn and then compute
+
+zi = R1(xi) for all i ∈ [n]. We use the Jensen’s inequality in (c). We used E
+
+µq − x
+
+2 2
+
+≤
+
+a2 n
+
+(see
+
+(23))
+
+in
+
+(d). Taking inﬁmum in (26) over all (ǫ0, b)-CLDP mechanisms (where b = log(d) + 1) and estimators x, we
+
+have
+
+that
+
+Rǫ10,d,b,n (a)
+
+≤
+
+2a2 n
+
++
+
+2a2 d n
+
+eǫ0 +1 eǫ0 −1
+
+2
+, which is O
+
+a2 d nǫ20
+
+when ǫ0 = O(1).
+
+This completes the proof of Theorem 5.
+
+4.5 Achievability for ℓ2-norm Ball: Proof of Theorem 6
+In this section, we propose an ǫ0-LDP mechanism that requires O (d)-bits of communication per client using private randomness. Our proposed mechanism is a combination of the private-mechanism Priv of Duchi et al. [DJW18, Section 4.2.3] and the non-private quantization mechanism Quan of Mayekar and Tyagi [MT20, Section 4.2]. For completeness, we describe both these mechanisms in Algorithm 4 and Algorithm 5, respectively, and our proposed mechanism in Algorithm 3. Each client i ﬁrst privatize its input xi ∈ B2d (a) using Priv and then quantize the privatized result using Quan and sends the ﬁnal result zi = Quan(Priv(xi)) to the server, which outputs the average of all the received n messages. Since the server is only taking an average of the received messages, we only present the client side of our mechanism in Algorithm 3.
+Algorithm 3 ℓ2-MEAN-EST (R2: the client-side algorithm)
+1: Input: Vector x ∈ B2d (a), and local privacy level ǫ0 > 0. 2: Apply the randomized mechanism y = Priv (x). 3: Return z = Quan (y).
+
+Algorithm 4 Priv (a private mechanism from [DJW18])
+
+1: Input: Vector x ∈ B2d (a), and local privacy level ǫ0 > 0.
+
+2: Compute x =
+
++a x
+x2
+−a x
+x2
+
+w.p.
+
+1 2
+
++
+
+x2 2a
+
+w.p.
+
+1 2
+
+−
+
+x2 2a
+
+3: Sample U ∼ Bernoulli
+
+eǫ0 eǫ0 +1
+
+4: M
+
+√
+
+a
+
+π 2
+
+Γ(
+
+d−1 2
+
++1)
+
+Γ(
+
+d 2
+
++1)
+
+eǫ0 +1 eǫ0 −1
+
+5: z =
+
+Unif y : yT x > 0, y 2 = M Unif y : yT x ≤ 0, y 2 = M
+
+if U = 1 if U = 0
+
+6: Return z.
+
+Lemma 6 ( [DJW18, Appendix I.2]). The mechanism Priv presented in Algorithm 4 is unbiased and outputs a bounded length vector, i.e., for every x ∈ B2d (a), we have
+
+E[Priv(x)] = x and
+
+Priv(x)
+
+2 2
+
+= M2
+
+≤ a2d
+
+3√π eǫ0 + 1 4 eǫ0 − 1
+
+2
+.
+
+17
+
+Algorithm 5 Quan (a quantization mechanism from [MT20])
+
+1: Input: Vector x ∈ B2d (a), where a is the radius of the ball.
+
+2: Compute x =
+
+x x1
+−x
+x1
+
+w.p. 1+ √x 1
+2a d
+w.p. 1− √x 1
+2a d
+
+3: Generate a discrete distribution µ = (|x1|, . . . , |xd|) where Pr[µ = i] = |xi|.
+
+4: 5:
+
+Construct a Return z =
+
+d1d-dimdj=e1nsiao√nadl·
+
+vector y sgn(xyj )
+
+by sampling · eyj .
+
+yj
+
+∼µ
+
+for
+
+j
+
+∈ [d]
+
+Lemma 7 ( [MT20, Theorem 4.2]). The mechanism Quan presented in Algorithm 5 is unbiased and has bounded variance, i.e., for every x ∈ B2d(a), we have
+
+E[Quan(x)] = x
+
+and
+
+E
+
+Quan(x) − x
+
+2 2
+
+≤
+
+2
+
+x
+
+2
+
+≤ 2a2.
+
+Furthermore, it requires d (log(e) + 1)-bits to represent its output.
+
+Note that the radius a in Lemma 7 is equal to the length of any output of Priv, which is M (see line 4 of Algorithm 4).
+
+Lemma 8. The mechanism R2 presented in Algorithm 3 satisﬁes the following properties, where ǫ0 > 0:
+
+1. R2 is (ǫ0, d(log(e) + 1))-CLDP.
+
+2. R2 is unbiased and has bounded variance, i.e., for every x ∈ B2d (a), we have
+
+E [R2 (x)] = x
+
+and
+
+E
+
+R2 (x) − x
+
+2 2
+
+≤
+
+6a2d
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+We prove Lemma 8 in Appendix C.2.
+
+Now we are ready to prove Theorem 6. In order to bound rǫ20,d,b,n (a) for b = d(log(e) + 1), we follow
+
+exactly the same steps that we used to bound rǫ10,d,b,n (a) and arrived at (25). This would give rǫ20,d,b,n (a) ≤
+
+6a2d n
+
+eǫ0 +1 eǫ0 −1
+
+2
+, which is O
+
+a2 d nǫ20
+
+when ǫ0 = O(1). To bound Rǫ20,d,b,n (a), ﬁrst note that when x1, . . . , xn ∈
+
+B2d (a), then we have from (23) that E
+
+µq − x
+
+2 2
+
+≤
+
+a2 n
+
+.
+
+Here
+
+q
+
+∈ P2d (a)
+
+and
+
+x1, . . . , xn
+
+are
+
+sampled
+
+from
+
+q i.i.d. Now, following exactly the same steps that we used to bound Rǫ10,d,b,n (a) and arrived at (26). This
+
+would
+
+give
+
+Rǫ20,d,b,n (a)
+
+≤
+
+2a2 n
+
++
+
+12a2 d n
+
+eǫ0 +1 eǫ0 −1
+
+2 for b = d(log(e) + 1). Note that Rǫ20,d,b,n (a) = O
+
+a2 d nǫ20
+
+when
+
+ǫ0 = O(1).
+
+This completes the proof of Theorem 6.
+
+4.6 Achievability for ℓ∞-norm Ball: Proof of Theorem 7
+
+In this section, we propose an ǫ0-LDP mechanism that requires O (log (d))-bits per client using private
+
+randomness and 1-bit of communication per client using public randomness. Each client i has an input
+
+xi ∈ B∞ d (a). It selects j ∼ Unif[d] and quantize xi,j according to (27) and obtains zi ∈
+
+± ad
+
+eǫ0 +1 eǫ0 −1
+
+ej
+
+,
+
+which can be represented using only 1 bit, where ej is the j’th standard basis vector in Rd. Client i sends zi to
+
+the
+
+server.
+
+Server
+
+receives
+
+the
+
+n
+
+messages
+
+{z1, . . . , zn}
+
+from
+
+the
+
+clients
+
+and
+
+outputs
+
+their
+
+average
+
+1 n
+
+n i=1
+
+zi
+
+.
+
+We present this mechanism in Algorithm 6 – we only present the client-side part of the algorithm, as server
+
+only averages the messages received from the clients.
+
+Lemma 9. The mechanism R∞ presented in Algorithm 6 satisﬁes the following properties, where ǫ0 > 0:
+
+18
+
+Algorithm 6 ℓ∞-MEAN-EST (R∞: the client-side algorithm)
+
+1: Input: Vector x ∈ B∞ d (a), and local privacy level ǫ0 > 0. 2: Sample j ∼ Unif[d] and quantize xj as follows:
+
+
+
+ +ad z =  −ad
+
+eǫ0 +1 eǫ0 −1 eǫ0 +1 eǫ0 −1
+
+ej ej
+
+w.p.
+
++ 1 xj eǫ0 −1
+2 2a eǫ0 +1
+
+w.p.
+
+− 1 xj eǫ0 −1
+2 2a eǫ0 +1
+
+(27)
+
+where ej is the j’th standard basis vector in Rd 3: Return z.
+
+1. R∞ is (ǫ0, log (d) + 1)-CLDP and requires only 1-bit of communication using public randomness.
+
+2. R∞ is unbiased and has bounded variance, i.e., for every x ∈ B∞ d (a), we have
+
+E [R∞ (x)] = x
+
+and
+
+E
+
+R∞ (x) − x
+
+2 2
+
+≤
+
+a2d2
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+We prove Lemma 9 in Appendix C.3.
+
+Now we are ready to prove Theorem 7. In order to bound rǫ∞0,,bd,n (a) for b = log (d)+1, we follow exactly the
+
+same
+
+steps
+
+that
+
+we
+
+used
+
+to
+
+bound
+
+rǫ10,d,b,n (a)
+
+and
+
+arrived
+
+at
+
+(25).
+
+This
+
+would
+
+give
+
+rǫ∞0,,bd,n (a)
+
+≤
+
+a2 d2 n
+
+, eǫ0 +1 2
+eǫ0 −1
+
+which is O
+
+a2 d2 nǫ20
+
+when ǫ0 = O(1). To bound Rǫ∞0,,bd,n (a), ﬁrst note that when x1, . . . , xn ∈ B∞ d (a), then
+
+we have from (20) (by substituting p = ∞) that E
+
+µq − x
+
+2 2
+
+≤
+
+a2 d n
+
+.
+
+Here q ∈ P∞ d (a) and x1, . . . , xn are
+
+sampled from q i.i.d. Now, following exactly the same steps that we used to bound Rǫ10,d,b,n (a) and arrived at
+
+(26).
+
+This would give Rǫ∞0,,bd,n (a)
+
+≤
+
+2a2 n
+
+d
+
++
+
+2a2 d2 n
+
+eǫ0 +1 eǫ0 −1
+
+2,d for b = log (d)+1. Note that Rǫ∞0,,bd,n (a) = O
+
+a2 d2 nǫ20
+
+when ǫ0 = O(1).
+
+This completes the proof of Theorem 7.
+
+4.7 Achievability for ℓp-norm Ball for p ∈ [1, ∞): Proof of Corollary 1
+
+In this section, ﬁrst we propose two ǫ0-LDP mechanisms for ℓp-norm ball Bpd(a) for p ∈ [1, ∞) based on the
+
+inequalities between diﬀerent norms, and our ﬁnal mechanism will be chosen probabilistically from these
+
+two. The ﬁrst mechanism, which we denote by R(p1), is based on the private mechanism R1 (presented in
+
+Algorithm 2) that requires O (log (d)) bits per client. The second mechanism, which we denote by R(p2) is
+
+based on the private mechanism R2 (presented in Algorithm 3) that requires O (d) bits per client. Observe
+
+that for any 1 ≤ p ≤ q ≤ ∞, using the relation between diﬀerent norms ( u q ≤
+
+u
+
+p
+
+≤
+
+d1 p
+
+−
+
+1 q
+
+u q), we
+
+have
+
+Bqd (a) ⊆ Bpd (a) ⊆ Bqd
+
+ad
+
+1 p
+
+−
+
+1 q
+
+.
+
+(28)
+
+1. Description of the private mechanism R(p1): Each client has a vector xi ∈ Bpd (a) ⊆ B1d
+
+ad1−
+
+1 p
+
+. Thus,
+
+each
+
+client
+
+runs
+
+the
+
+private
+
+mechanism
+
+R1 (xi)
+
+presented
+
+in
+
+Algorithm
+
+2
+
+with
+
+radius
+
+ad1−
+
+1 p
+
+.
+
+Thus,
+
+the mechanism R(p1) for p ∈ [1, ∞) satisﬁes the following properties, where ǫ0 > 0:
+
+• R(p1) is (ǫ0, log (d) + 1)-CLDP and requires only 1-bit of communication using public randomness. • R(p1) is unbiased and has bounded variance, i.e., for every x ∈ Bpd (a), we have
+
+E R(p1) (x) = x
+
+and
+
+E
+
+R(p1) (x) − x
+
+2 2
+
+≤
+
+a2
+
+d3−
+
+2 p
+
+eǫ0 + 1 2 eǫ0 − 1 .
+
+19
+
+2. Description of the private mechanism R(p2): Each client has a vector xi ∈ Bpd (a) ⊆ B2d
+
+a
+
+max{d
+
+1 2
+
+−
+
+1 p
+
+,
+
+1}
+
+.
+
+Thus,
+
+each
+
+client
+
+runs
+
+the
+
+private
+
+mechanism
+
+R2
+
+(xi
+
+)
+
+presented
+
+in
+
+Algorithm
+
+3
+
+with
+
+radius
+
+a
+
+max{d
+
+1 2
+
+−
+
+1 p
+
+,
+
+1}.
+
+Thus, the mechanism R(p2) for p ∈ [1, ∞) satisﬁes the following properties, where ǫ0 > 0:
+
+• R(p2) is (ǫ0, d (log (e) + 1))-CLDP. • R(p2) is unbiased and has bounded variance, i.e., for every x ∈ Bpd (a), we have
+
+E R(p2) (x) = x
+
+and
+
+E
+
+R(p2) (x) − x
+
+2 2
+
+≤
+
+6a2
+
+max{d2−
+
+2 p
+
+,
+
+d}
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+Note that R(p1) requires low communication and has high variance, whereas, R(p2) requires high communication and has low variance: R(p2) requires exponentially more communication than R(p1), whereas, R(p1) has a factor of d more variance than R(p2).
+To deﬁne our ﬁnal mechanism Rp for any norm p ∈ [1, ∞), we choose R(p1) with probability p¯ and R(p2) with probability (1 − p¯), where p¯ is any number in [0, 1]. Note that Rp is ǫ0-LDP and requires
+p¯log(d) + (1 − p¯)d log(e) + 1 expected communication, where expectation is taken over the sampling of choosing R(p1) or R(p2). We have the following bounds on rǫp0,d,b,n(a) and Rǫp0,d,b,n(a):
+
+rǫp0,d,b,n(a)
+
+≤
+
+p¯
+
+d2−
+
+2 p
+
+rǫ10,d,b,n(a)
+
++
+
+(1
+
+−
+
+p¯)
+
+max{d1−
+
+2 p
+
+,
+
+1}rǫ20,d,b,n(a)
+
+For Rǫp0,d,b,n(a)
+
+≤
+
+p¯
+
+d2−
+
+2 p
+
+Rǫ10,d,b,n(a)
+
++
+
+(1
+
+−
+
+p¯)
+
+max{d1−
+
+2 p
+
+,
+
+1}Rǫ20,d,b,n(a)
+
+This completes the proof of Corollary 1.
+
+5 Optimization: Privacy, Communication, and Convergence Analyses
+In this section, we establish the privacy, communication, and convergence guarantees of Algorithm 1 and prove Theorem 1. We show these three results on privacy, communication, and convergence separately in the next three subsections.
+
+5.1 Proof of Theorem 1: Privacy
+
+Recall from Algorithm 1 that each client applies the compressed LDP mechanism Rp (hereafter denoted
+
+by R, for simplicity) with privacy parameter ǫ0 on each gradient. This implies that the mechanism Acldp
+
+guarantees local diﬀerential privacy ǫ0 for each sample dij per epoch. Thus, it remains to analyze the central
+
+DP of the mechanism Acldp.
+
+Fix an iteration number t ∈ [T ]. Let Mt (θt, D) denote the private mechanism at time t that takes
+
+the dataset D and an auxiliary input θt (which is the parameter vector at the t’th iteration) and generates
+
+the parameter θt+1 as an output. Recall that the input dataset at client i ∈ [m] is denoted by Di =
+
+{di1, di2, . dataset D
+
+.., =
+
+dir} ∈ Sr
+
+m i=1
+
+Di
+
+∈
+
+and Sn
+
+D= can be
+
+m i=1
+
+Di
+
+denotes
+
+deﬁned as:
+
+the
+
+entire
+
+dataset.
+
+Thus,
+
+the
+
+mechanism
+
+Mt
+
+on
+
+any
+
+input
+
+Mt(θt; D) = Hks ◦ sampm,k (G1, . . . , Gm) ,
+
+(29)
+
+where Gi = sampr,s (R(xti1), . . . , R(xtir)) and xtij = ∇θtf (θt; dij ), ∀i ∈ [m], j ∈ [r]. Here, Hks denotes the shuﬄing operation on ks elements and sampm,k denotes the sampling operation for choosing a random subset of k elements from a set of m elements.
+For convenience, in the rest of the proof, we suppress the auxiliary input θt and simply denote Mt(θt; D) by Mt(D). We can do this because θt only aﬀects the gradients, and the analysis in this section is for an arbitrary set of gradients.
+In the following lemma, we state the privacy guarantee of the mechanism Mt for each t ∈ [T ].
+
+20
+
+Lemma
+
+10.
+
+Let
+
+s=1
+
+and
+
+q
+
+=
+
+k mr
+
+.
+
+Suppose
+
+R
+
+is
+
+an
+
+ǫ0-LDP
+
+mechanism,
+
+where
+
+ǫ0
+
+≤
+
+log(qn/ log(1/δ˜))
+2
+
+and
+
+δ˜ > 0 is arbitrary. Then, for any t ∈ [T ], the mechanism Mt is ǫ, δ -DP, where ǫ = ln(1 + q(eǫ˜− 1)), δ = qδ˜
+
+with ǫ˜ = O min{ǫ0, 1}eǫ0
+
+log(1/δ˜)
+qn
+
+. In particular, if ǫ0 = O (1), we get ǫ = O
+
+ǫ0
+
+q log(1/δ˜)
+n
+
+.
+
+We prove Lemma 10 in Appendix A. In the statement of Lemma 10, we are amplifying the privacy by
+
+using the subsampling as well as shuﬄing ideas. For subsampling, note that we do not pick a uniformly
+
+random subset of size ks from n points. So, we cannot directly apply the ampliﬁcation by subsampling result
+
+stated in Lemma 2. However, as it turns out that the only property we will need for privacy ampliﬁcation
+
+by
+
+subsampling
+
+is
+
+that
+
+each
+
+data
+
+point
+
+is
+
+picked
+
+by
+
+probability
+
+q
+
+=
+
+ks mr
+
+,
+
+which
+
+holds
+
+true
+
+in
+
+our
+
+setting.
+
+See
+
+Appendix A for more details.
+
+Note that the Algorithm Acldp is a sequence of T adaptive mechanisms M1, . . . , MT , where each Mt for t ∈ [T ] satisﬁes the privacy guarantee stated in Lemma 10. Now, we invoke the strong composition stated
+
+in Lemma 1 to obtain the privacy guarantee of the algorithm Acldp. We can conclude that for any δ′ > 0,
+
+Acldp is (ǫ, δ)-DP for
+
+ǫ = 2T log (1/δ′)ǫ + T ǫ eǫ − 1 , δ = qT δ˜ + δ′,
+
+where ǫ is from Lemma 10. We have from Lemma 1 that if ǫ = O
+
+log(1/δ′) T
+
+, then ǫ = O ǫ
+
+T log (1/δ′) .
+
+If ǫ0 = O(1), then we can satisfy this condition on ǫ by choosing ǫ0 = O
+
+n log(1/δ′) qT log(1/δ˜)
+
+.
+
+By substituting
+
+the bound on ǫ = O ǫ0
+
+q log(1/δ˜)
+n
+
+from Lemma 10, we have ǫ = O ǫ0
+
+qT log(1/δ˜) log(1/δ′)
+n
+
+. By setting
+
+δ˜ =
+
+δ 2qT
+
+and δ′ =
+
+δ 2
+
+,
+
+we
+
+get
+
+ǫ0
+
+=
+
+O
+
+n log(2/δ) qT log(2qT /δ)
+
+and ǫ = O ǫ0
+
+qT log(2qT /δ) log(2/δ) n
+
+. This completes
+
+the proof of the privacy part of Theorem 1.
+
+5.2 Proof of Theorem 1: Communication
+
+The (ǫ0, b)-CLDP mechanism Rp : X → Y used in Algorithm 1 has output alphabet Y = {1, 2, . . . , B = 2b}.
+
+So, the output of Rp on any input can be represented by b bits. Therefore, the na¨ıve scheme for any client to
+
+send the s compressed and private gradients requires sb bits per iteration. We can reduce this communication
+
+cost by using the histogram trick from [MT20] which was applied in the context of non-private quantization.
+
+The idea is as follows. Since any client applies the same randomized mechanism Rp to the s gradients,
+
+the output of these s identical mechanisms can be represented accurately using the histogram of the s
+
+outputs, which takes value from the set AsB = {(n1, . . . , nB) :
+
+B j=1
+
+nj
+
+=
+
+s
+
+and
+
+nj
+
+≥
+
+0, ∀j
+
+∈
+
+[B]}.
+
+Since
+
+the
+
+cardinality of this set is
+
+s+B−1 s
+
+≤
+
+e(s+B−1) s
+
+s
+, it requires at most s
+
+log (e) + log
+
+s+B−1 s
+
+bits to send
+
+the s compressed gradients. Since the probability that the client is chosen at any time t ∈ [T ] is given by
+
+k m
+
+,
+
+the
+
+expected
+
+number
+
+of
+
+bits
+
+per
+
+client
+
+in
+
+Algorithm
+
+Acldp
+
+is
+
+given
+
+by
+
+k m
+
+×T
+
+×s
+
+log (e) + log
+
+s+B−1 s
+
+bits, where expectation is taken over the sampling of k out of m clients in all T iterations.
+
+This completes the proof of the second part of Theorem 1.
+
+5.3 Proof of Theorem 1 : Convergence
+
+At iteration t ∈ [T ] of Algorithm 1, server averages the ks received compressed and privatized gradients and
+
+obtains
+
+gt
+
+=
+
+1 ks
+
+i∈Ut
+
+j∈Sit qt(dij ) (line 12 of Algorithm 1) and then updates the parameter vector as
+
+θt+1 ← C (θt − ηtgt). Here, qt(dij ) = Rp (∇θtf (θt; dij )). Since the randomized mechanism Rp is unbiased,
+
+the average gradient gt is also unbiased, i.e., we have E [gt] = ∇θt F (θt), where expectation is taken with
+
+respect to the random sampling of clients and the data points as well as the randomness of the mechanism
+
+Rp. Now we show that gt has a bounded second moment.
+
+21
+
+Lemma 11. For any d ∈ S, if the function f (θ; .) : C → R is convex and L-Lipschitz continuous with respect to the ℓg-norm, which is the dual of ℓp-norm, then we have
+
+E
+
+gt
+
+2 2
+
+≤
+
+L2
+
+max{d1−
+
+2 p
+
+,
+
+1}
+
+1
+
++
+
+cd qn
+
+eǫ0 + 1 2 eǫ0 − 1
+
+,
+
+(30)
+
+where c is a global constant: c = 4 if p ∈ {1, ∞} and c = 14 if p ∈/ {1, ∞}.
+
+Proof. Under the conditions of the lemma, we have from [SS+12, Lemma 2.6] that ∇θf (θ; d) ≤ L for all d ∈ S, which implies that ∇θF (θ) ≤ L. Thus, we have
+
+E
+
+gt
+
+2 2
+
+=
+
+E [gt]
+
+2 2
+
++
+
+E
+
+gt − E [gt]
+
+2 2
+
+(a)
+≤
+
+max{d1−
+
+2 p
+
+,
+
+1}L2
+
++
+
+E
+
+gt − E [gt]
+
+2 2
+
+(b)
+≤
+
+max{d1−
+
+2 p
+
+,
+
+1}L2
+
++
+
+cL2
+
+max{d2−
+
+2 p
+
+,
+
+d}
+
+ks
+
+(=c)
+
+max{d1−
+
+2 p
+
+,
+
+1}L2
+
++
+
+cL2
+
+max{d2−
+
+2 p
+
+qn
+
+,
+
+d}
+
+eǫ0 + 1 2
+
+eǫ0 − 1
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+,
+
+where c is a global constant, and c = 4 if p ∈ {1, ∞} and c = 14 if p ∈/ {1, ∞}. Step (a) follows from the
+
+fact that
+
+∇θt F (θt)
+
+≤ L together with the norm inequality
+
+u q≤
+
+u
+
+p
+
+≤
+
+d1 p
+
+−
+
+1 q
+
+u q for 1 ≤ p ≤ q ≤ ∞.
+
+Step (b) follows from Corollary 1 with p = 1, i.e., for any p-norm, we use the mechanism for ℓ2-norm ball
+
+only
+
+(together
+
+with
+
+norm
+
+inequality)
+
+which
+
+gives
+
+the
+
+smallest
+
+variance.
+
+Step
+
+(c)
+
+uses
+
+q
+
+=
+
+ks n
+
+.
+
+Now, we can use standard SGD convergence results for convex functions. In particular, we use the following result from [SZ13].
+
+Lemma 12 (SGD Convergence [SZ13]). Let F (θ) be a convex function, and the set C has diameter D.
+
+Consider a stochastic gradient descent algorithm θt+1 ← C (θt − ηtgt), where gt satisﬁes E [gt] = ∇θtF (θt)
+
+and E
+
+gt
+
+2 2
+
+≤
+
+G2.
+
+By
+
+setting ηt =
+
+D√ Gt
+
+,
+
+we
+
+get
+
+E [F
+
+(θT )]
+
+−
+
+F
+
+(θ∗)
+
+≤
+
+2DG 2
+
++√log (T ) T
+
+=
+
+O
+
+DG lo√g (T ) T
+
+.
+
+(31)
+
+As shown in Lemma 11 and above that Algorithm 1 satisﬁes the premise of Lemma 12. Now, using the bound on G2 from Lemma 11, we have that the output θT of Algorithm 1 satisﬁes
+
+E [F (θT )] − F (θ∗) ≤ O
+
+LD
+
+log(T
+
+)
+
+√max{d
+
+1 2
+
+−
+
+1 p
+
+,
+
+1}
+
+T
+
+1+
+
+cd eǫ0 + 1 qn eǫ0 − 1
+
+,
+
+(32)
+
+where we used the inequality
+
+1
+
++
+
+cd qn
+
+≤ eǫ0 +1 2
+eǫ0 −1
+
+1+
+
+cd eǫ0 +1 qn eǫ0 −1
+
+.
+
+Note that if
+
+cd qn
+
+eǫ0 +1 eǫ0 −1
+
+≤ O(1), then we recover the convergence rate of vanilla SGD without privacy.
+
+So, the interesting case is when
+
+cd qn
+
+eǫ0 +1 eǫ0 −1
+
+≥ Ω(1), which gives
+
+E [F (θT )] − F (θ∗) ≤ O
+
+LD
+
+log(T
+
+)
+
+√max{d
+
+1 2
+
+−
+
+1 p
+
+,
+
+1}
+
+T
+
+cd qn
+
+eǫ0 + 1 eǫ0 − 1
+
+.
+
+This completes the proof of the third part of Theorem 1.
+
+22
+
+6 Discussion
+In this paper we have developed a compressed, private optimization solution for a problem motivated by federated learning, where distributed clients jointly build a common learning model. The main technical contributions were developing order-optimal schemes for private mean-estimation and combining them with privacy ampliﬁcation by sampling (of data and clients) as well as shuﬄing. We demonstrated that iterative application of this enables us to get the same privacy, optimization performance operating point as reported in [EFM+20], while obtaining order-wise improvement in the number of bits required, per iteration, thereby getting these communication gains for “free”. Moreover, when the functions are L-Lipschitz with respect to the ℓ2-norm, our scheme obtains the optimal excess risk of the central diﬀerential privacy obtained in [BST14], while operating in a distributed manner.
+There are several open questions which are part of ongoing investigations. These include sharper privacy analyses for these schemes, which can improve the constants associated with the performance parameters. It would also be important to extend these ideas to non-convex functions and examine their numerical performance for large-scale neural network models.
+
+7 Acknowledgment
+This work was supported in part by a Google Faculty Research Award, NSF grant 1740047, and the UC-NL grant LFR-18-548554.
+
+References
+
+[ACG+16] Martin Abadi, Andy Chu, Ian Goodfellow, H Brendan McMahan, Ilya Mironov, Kunal Talwar, and Li Zhang. Deep learning with diﬀerential privacy. In Proceedings of ACM CCS, pages 308–318, 2016.
+
+[AGL+17] Dan Alistarh, Demjan Grubic, Jerry Li, Ryota Tomioka, and Milan Vojnovic. QSGD: Communication-eﬃcient sgd via gradient quantization and encoding. In Advances in Neural Information Processing Systems, pages 1709–1720, 2017.
+
+[AHJ+18]
+
+Dan Alistarh, Torsten Hoeﬂer, Mikael Johansson, Nikola Konstantinov, Sarit Khirirat, and C´edric Renggli. The convergence of sparsiﬁed gradient methods. In Advances in Neural Information Processing Systems, pages 5973–5983, 2018.
+
+[AS19]
+
+Jayadev Acharya and Ziteng Sun. Communication complexity in locally private distribution estimation and heavy hitters. In Proceedings of the 36th International Conference on Machine Learning, volume 97. PMLR, 2019.
+
+[ASY+18] Naman Agarwal, Ananda Theertha Suresh, Felix Xinnan X Yu, Sanjiv Kumar, and Brendan McMahan. cpsgd: Communication-eﬃcient and diﬀerentially-private distributed sgd. In Advances in Neural Information Processing Systems, pages 7564–7575, 2018.
+
+[ASZ19]
+
+Jayadev Acharya, Ziteng Sun, and Huanyu Zhang. Hadamard response: Estimating distributions privately, eﬃciently, and with little communication. In The 22nd International Conference on Artiﬁcial Intelligence and Statistics, pages 1120–1129, 2019.
+
+[BBGN19a] Borja Balle, James Bell, Adria Gascon, and Kobbi Nissim. Diﬀerentially private summation with multi-message shuﬄing. arXiv preprint arXiv:1906.09116, 2019.
+
+[BBGN19b] Borja Balle, James Bell, Adria Gasco´n, and Kobbi Nissim. Improved summation from shuﬄing. arXiv preprint arXiv:1909.11225, 2019.
+
+23
+
+[BBGN19c] Borja Balle, James Bell, Adria Gasco´n, and Kobbi Nissim. The privacy blanket of the shuﬄe model. In Annual International Cryptology Conference, pages 638–667. Springer, 2019.
+
+[BBGN20] Borja Balle, James Bell, Adria Gascon, and Kobbi Nissim. Private summation in the multimessage shuﬄe model. arXiv preprint arXiv:2002.00817, 2020.
+
+[BDF+18] Abhishek Bhowmick, John Duchi, Julien Freudiger, Gaurav Kapoor, and Ryan Rogers. Protection against reconstruction and its applications in private federated learning. arXiv preprint arXiv:1812.00984, 2018.
+
+[BDKD19] Debraj Basu, Deepesh Data, Can Karakus, and Suhas Diggavi. Qsparse-local-SGD: Distributed sgd with quantization, sparsiﬁcation and local computations. In Advances in Neural Information Processing Systems, pages 14695–14706, 2019.
+
+[BKN10]
+
+Amos Beimel, Shiva Prasad Kasiviswanathan, and Kobbi Nissim. Bounds on the sample complexity for private learning and private data release. In Theory of Cryptography Conference, pages 437–454. Springer, 2010.
+
+[BNO08]
+
+Amos Beimel, Kobbi Nissim, and Eran Omri. Distributed private data analysis: Simultaneously solving how and what. In Annual International Cryptology Conference, pages 451–468. Springer, 2008.
+
+[Bot10]
+
+L´eon Bottou. Large-scale machine learning with stochastic gradient descent. In Proceedings of COMPSTAT’2010, pages 177–186. Springer, 2010.
+
+[BST14]
+
+Raef Bassily, Adam Smith, and Abhradeep Thakurta. Private empirical risk minimization: Eﬃcient algorithms and tight error bounds. In 2014 IEEE 55th Annual Symposium on Foundations of Computer Science, pages 464–473. IEEE, 2014.
+
+[CMS11] Kamalika Chaudhuri, Claire Monteleoni, and Anand D Sarwate. Diﬀerentially private empirical risk minimization. Journal of Machine Learning Research, 12(3), 2011.
+
+[CSU+19] Albert Cheu, Adam Smith, Jonathan Ullman, David Zeber, and Maxim Zhilyaev. Distributed diﬀerential privacy via shuﬄing. In Annual International Conference on the Theory and Applications of Cryptographic Techniques, pages 375–403. Springer, 2019.
+
+[DJW13]
+
+John C Duchi, Michael I Jordan, and Martin J Wainwright. Local privacy and statistical minimax rates. In Symposium on Foundations of Computer Science (FOCS), pages 429–438. IEEE, 2013.
+
+[DJW18]
+
+John C Duchi, Michael I Jordan, and Martin J Wainwright. Minimax optimal procedures for locally private estimation. Journal of the American Statistical Association, 113(521):182–201, 2018.
+
+[DMNS06] Cynthia Dwork, Frank McSherry, Kobbi Nissim, and Adam D. Smith. Calibrating noise to sensitivity in private data analysis. In Theory of Cryptography Conference (TCC), pages 265– 284, 2006.
+
+[DR14]
+
+Cynthia Dwork and Aaron Roth. The algorithmic foundations of diﬀerential privacy. Foundations and Trends R in Theoretical Computer Science, 9(3–4):211–407, 2014.
+
+[DR19]
+
+John C. Duchi and Ryan Rogers. Lower bounds for locally private estimation via communication complexity. In Conference on Learning Theory (COLT), pages 1161–1191, 2019.
+
+[DRV10]
+
+Cynthia Dwork, Guy N. Rothblum, and Salil P. Vadhan. Boosting and diﬀerential privacy. In 51th Annual IEEE Symposium on Foundations of Computer Science, FOCS 2010, October 23-26, 2010, Las Vegas, Nevada, USA, pages 51–60, 2010.
+
+24
+
+[EFM+19] U´ lfar Erlingsson, Vitaly Feldman, Ilya Mironov, Ananth Raghunathan, Kunal Talwar, and Abhradeep Thakurta. Ampliﬁcation by shuﬄing: From local to central diﬀerential privacy via anonymity. In SODA, pages 2468–2479. SIAM, 2019.
+[EFM+20] U´ lfar Erlingsson, Vitaly Feldman, Ilya Mironov, Ananth Raghunathan, Shuang Song, Kunal Talwar, and Abhradeep Thakurta. Encode, shuﬄe, analyze privacy revisited: formalizations and empirical evaluation. arXiv preprint arXiv:2001.03618, 2020.
+
+[ESAG04] Alexandre Evﬁmievski, Ramakrishnan Srikant, Rakesh Agrawal, and Johannes Gehrke. Privacy preserving mining of association rules. Information Systems, 29(4):343–364, 2004.
+
+[GDC+20] Antonious M. Girgis, Deepesh Data, Kamalika Chaudhuri, Christina Fragouli, and Suhas N. Diggavi. Successive reﬁnement of privacy. CoRR, abs/2005.11651, 2020.
+
+[GGK+19] Badih Ghazi, Noah Golowich, Ravi Kumar, Rasmus Pagh, and Ameya Velingker. On the power of multiple anonymous messages. IACR Cryptol. ePrint Arch., 2019:1382, 2019.
+
+[GKMM19] Venkata Gandikota, Daniel Kane, Raj Kumar Maity, and Arya Mazumdar. vqsgd: Vector quantized stochastic gradient descent. arXiv preprint arXiv:1911.07971, 2019.
+
+[GKMP20] Badih Ghazi, Ravi Kumar, Pasin Manurangsi, and Rasmus Pagh. Private counting from anonymous messages: Near-optimal accuracy with vanishing communication overhead. In ICML, 2020.
+
+[GPV19] Badih Ghazi, Rasmus Pagh, and Ameya Velingker. Scalable and diﬀerentially private distributed aggregation in the shuﬄed model. arXiv preprint arXiv:1906.08320, 2019.
+
+[KBR16] [KLN+11]
+
+Peter Kairouz, Keith Bonawitz, and Daniel Ramage. Discrete distribution estimation under local privacy. In ICML, pages 2436–2444, 2016.
+Shiva Prasad Kasiviswanathan, Homin K Lee, Kobbi Nissim, Sofya Raskhodnikova, and Adam Smith. What can we learn privately? SIAM Journal on Computing, 40(3):793–826, 2011.
+
+[KLSJ19]
+
+Anastasia Koloskova, Tao Lin, Sebastian U Stich, and Martin Jaggi. Decentralized deep learning with arbitrary communication compression. In International Conference on Learning Representations, 2019.
+
+[KMA+19]
+
+Peter Kairouz, H Brendan McMahan, Brendan Avent, Aur´elien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Keith Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. arXiv preprint arXiv:1912.04977, 2019.
+
+[KMY+16] Jakub Konen, H. Brendan McMahan, Felix X. Yu, Peter Richtarik, Ananda Theertha Suresh, and Dave Bacon. Federated learning: Strategies for improving communication eﬃciency. In NIPS Workshop on Private Multi-Party Machine Learning, 2016.
+
+[KRSJ19] Sai Praneeth Karimireddy, Quentin Rebjock, Sebastian Stich, and Martin Jaggi. Error feedback ﬁxes SignSGD and other gradient compression schemes. In ICML, pages 3252–3261, 2019.
+
+[MT20]
+
+Prathamesh Mayekar and Himanshu Tyagi. Limits on gradient compression for stochastic optimization. IEEE International Symposium on Information Theory (ISIT), 2020.
+
+[SCJ18]
+
+Sebastian U Stich, Jean-Baptiste Cordonnier, and Martin Jaggi. Sparsiﬁed sgd with memory. In Advances in Neural Information Processing Systems, pages 4447–4458, 2018.
+
+[SDGD19] Navjot Singh, Deepesh Data, Jemin George, and Suhas Diggavi. SPARQ-SGD: Event-triggered and compressed communication in decentralized stochastic optimization. arXiv preprint arXiv:1910.14280, 2019.
+
+25
+
+[SDGD20] Navjot Singh, Deepesh Data, Jemin George, and Suhas Diggavi. SQuARM-SGD: Communication-eﬃcient momentum sgd for decentralized optimization. arXiv preprint arXiv:2005.07041, 2020.
+
+[SS+12]
+
+Shai Shalev-Shwartz et al. Online learning and online convex optimization. Foundations and Trends R in Machine Learning, 4(2):107–194, 2012.
+
+[SYKM17] Ananda Theertha Suresh, Felix X Yu, Sanjiv Kumar, and H Brendan McMahan. Distributed mean estimation with limited communication. In Proceedings of the 34th International Conference on Machine Learning-Volume 70, pages 3329–3337. JMLR. org, 2017.
+
+[SZ13]
+
+Ohad Shamir and Tong Zhang. Stochastic gradient descent for non-smooth optimization: Convergence results and optimal averaging schemes. In International conference on machine learning, pages 71–79, 2013.
+
+[Ull17]
+
+Jonathan Ullman. Cs7880. rigorous approaches to data privacy, 2017.
+
+[War65]
+
+Stanley L Warner. Randomized response: A survey technique for eliminating evasive answer bias. Journal of the American Statistical Association, 60(309):63–69, 1965.
+
+[WXY+17] Wei Wen, Cong Xu, Feng Yan, Chunpeng Wu, Yandan Wang, Yiran Chen, and Hai Li. Terngrad: Ternary gradients to reduce communication in distributed deep learning. In Advances in neural information processing systems, pages 1509–1519, 2017.
+
+[YLCT19] Qiang Yang, Yang Liu, Tianjian Chen, and Yongxin Tong. Federated machine learning: Concept and applications. ACM Transactions on Intelligent Systems and Technology (TIST), 10(2):1–19, 2019.
+
+A Proof of Lemma 10
+
+Recall that the input dataset at client i ∈ [m] is denoted by Di = {di1, di2, . . . , dir} ∈ Sr and D =
+
+m i=1
+
+Di
+
+denotes the entire dataset. Recall from (29) that the mechanism Mt on input dataset D can be deﬁned as:
+
+Mt(D) = Hks ◦ sampm,k (G1, . . . , Gm) ,
+
+(33)
+
+where Gi = sampr,s (R(xti1), . . . , R(xtir)) and xtij = ∇θtf (θt; dij), ∀i ∈ [m], j ∈ [r]. We deﬁne a mechanism
+
+Z D(t) = Hks (R (xt1) , . . . , R (xtks)) which is a shuﬄing of ks outputs of local mechanism R, where D(t) denotes an arbitrary set of ks data points and we index xti’s from i = 1 to ks just for convenience. From
+
+the ampliﬁcation by shuﬄing result [BBGN19c, Corollary 5.3.1] (also see Lemma 3), the mechanism Z is
+
+(ǫ˜, δ˜)-DP,
+
+where
+
+δ˜ >
+
+0
+
+is
+
+arbitrary,
+
+and,
+
+if
+
+ǫ0
+
+≤
+
+log(ks/
+
+log(1/δ˜))
+2
+
+,
+
+then
+
+
+
+
+
+ǫ˜ = O min{ǫ0, 1}eǫ0
+
+log 1/δ˜ ks
+
+ .
+
+(34)
+
+Furthermore, when ǫ0 = O (1), we get ˜ǫ = O ǫ0
+
+log(1/δ˜)
+ks
+
+.
+
+Let T ⊆ {1, . . . , m} denote the identities of the k clients chosen at iteration t, and for i ∈ T , let
+
+Ti ⊆ {1, . . . , r} denote the identities of the s data points chosen at client i at iteration t.10 For any T ∈
+
+[m] k
+
+and Ti ∈
+
+[r] s
+
+,i
+
+∈
+
+T,
+
+deﬁne
+
+T
+
+= (T , Ti, i ∈ T ), DTi = {dj : j ∈ Ti} for i ∈ T , and DT = {DTi : i ∈ T }. Note
+
+10Though T and Ti, i ∈ T may be diﬀerent at diﬀerent iteration t, for notational convenience, we suppress the dependence on t here.
+
+26
+
+that T and Ti, i ∈ T are random sets, where randomness is due to the sampling of clients and of data points, respectively. The mechanism Mt can be equivalently written as Mt = Z(DT ).
+Observe that our sampling strategy is diﬀerent from subsampling of choosing a uniformly random subset of
+ks data points from the entire dataset D. Thus, we revisit the proof of privacy ampliﬁcation by subsampling
+(see, for example, [Ull17]) – which is for uniform sampling – to compute the privacy parameters of the mechanism Mt, where sampling is non-uniform. Deﬁne a dataset D′ = (D1′ ) (∪m i=2Di) ∈ Sn, where D1′ = {d′11, d12, . . . , d1r} is diﬀerent from the dataset D1 in the ﬁrst data point d11. Note that D and D′ are neighboring datasets – where, we assume, without loss of generality, that the diﬀering elements are d11 and d′11 .
+In order to show that Mt is (ǫ, δ)-DP, we need show that for an arbitrary subset S of the range of Mt, we have
+
+Pr [Mt (D) ∈ S] ≤ eǫ Pr [Mt (D′) ∈ S] + δ
+
+(35)
+
+Pr [Mt (D′) ∈ S] ≤ eǫ Pr [Mt (D) ∈ S] + δ
+
+(36)
+
+Note that both (35) and (36) are symmetric, so it suﬃces to prove only one of them. We prove (35) below.
+
+Let
+
+q
+
+=
+
+ks mr
+
+.
+
+We
+
+deﬁne
+
+conditional
+
+probabilities
+
+as
+
+follows:
+
+A11 = Pr Z(DT ) ∈ S|1 ∈ T and 1 ∈ T1
+
+A′11 = Pr
+
+Z
+
+′
+(D
+
+T
+
+)
+
+∈
+
+S|1
+
+∈
+
+T
+
+and 1 ∈ T1
+
+A10 = Pr Z(DT ) ∈ S|1 ∈ T and 1 ∈ T1
+
+= Pr
+
+Z
+
+′
+(D
+
+T
+
+)
+
+∈
+
+S|1
+
+∈
+
+T
+
+and 1 ∈ T1
+
+A0 = Pr Z(DT ) ∈ S|1 ∈ T
+
+= Pr
+
+Z
+
+′
+(D
+
+T
+
+)
+
+∈
+
+S|1
+
+∈
+
+T
+
+Let
+
+q1
+
+=
+
+k m
+
+and
+
+q2
+
+=
+
+s r
+
+,
+
+and
+
+hence
+
+q
+
+=
+
+q1q2.
+
+Thus,
+
+we
+
+have
+
+Pr [Mt (D) ∈ S] = qA11 + q1 (1 − q2) A10 + (1 − q1) A0 Pr [Mt (D′) ∈ S] = qA′11 + q1 (1 − q2) A10 + (1 − q1) A0
+
+Note that the mechanism Z is (ǫ˜, δ˜)-DP. Therefore, we have
+
+A11 ≤ eǫ˜A′11 + δ˜ A11 ≤ eǫ˜A10 + δ˜
+
+(37) (38)
+
+Here (37) is straightforward, but proving (38) requires a combinatorial argument, which we give at the end of this proof.
+We prove (35) separately for two cases, ﬁrst when s = 1 and other when s > 1; k is arbitrary in both cases.
+
+A.1 For s = 1 and arbitrary k ∈ [m]
+Since the mechanism Z is (ǫ˜, δ˜)-DP, in addition to (37)-(38), since s = 1, we also have the following inequality:
+
+A11 ≤ eǫ˜A0 + δ˜
+
+(39)
+
+Similar to (38), proving (39) requires a combinatorial argument, which we will give at the end of this proof.
+
+Note that (39) only holds for s = 1 and may not hold for arbitrary s.
+
+Inequalities q(eǫ˜ − 1) and δ
+
+(37)-(39) together imply A11 = qδ˜. Note that when s = 1,
+
+≤ eǫ˜ min{A′11, A10, A0} + δ˜. Now
+
+we
+
+have
+
+q1
+
+=
+
+k m
+
+,
+
+q2
+
+=
+
+1 r
+
+,
+
+and
+
+q
+
+=
+
+we prove
+
+k mr
+
+.
+
+(35)
+
+for
+
+ǫ
+
+=
+
+ln(1
+
++
+
+Pr [Mt (D) ∈ S] = qA11 + q1 (1 − q2) A10 + (1 − q1) A0
+
+27
+
+≤ q eǫ˜ min{A′11, A10, A0} + δ˜ + q1 (1 − q2) A10 + (1 − q1) A0
+
+= q (eǫ˜ − 1) min{A′11, A10, A0} + min{A′11, A10, A0} + q1 (1 − q2) A10 + (1 − q1) A0 + qδ˜
+
+(a)
+≤
+
+q(eǫ˜
+
+−
+
+1)
+
+min{A′11,
+
+A10,
+
+A0}
+
++
+
+qA′11
+
++
+
+q1
+
+(1
+
+−
+
+q2)
+
+A10
+
++
+
+(1
+
+−
+
+q1)
+
+A0
+
++
+
+qδ˜
+
+(b)
+≤
+
+q(eǫ˜
+
+−
+
+1)
+
+(qA′11
+
++
+
+q1(1
+
+−
+
+q2)A10
+
++
+
+(1
+
+−
+
+q1)A0))
+
++
+
+(qA′11
+
++
+
+q1
+
+(1
+
+−
+
+q2)
+
+A10
+
++
+
+(1
+
+−
+
+q1)
+
+A0)
+
++
+
+qδ˜
+
+= 1 + q eǫ˜ − 1 (qA′11 + q1 (1 − q2) A10 + (1 − q1) A0) + qδ˜
+
+= eln(1+q(eǫ˜−1)) Pr [Mt (D′) ∈ S] + qδ˜.
+
+Here, (a) follows from min{A′11, A10, A0} ≤ A′11, and (b) follows from the fact that minimum is upperbounded by the convex combination. By substituting the value of ˜ǫ from (34) and using ks = qn, we get
+
+that for ǫ0 = O (1), we have ǫ = O ǫ0
+
+q log(1/δ˜)
+n
+
+.
+
+A.2 For s > 1 and arbitrary k ∈ [m]
+
+Note that (37)-(38) and δ = qδ˜.
+
+together
+
+imply
+
+A11
+
+≤
+
+eǫ˜ min{A′11, A10} + δ˜.
+
+Now
+
+we
+
+prove
+
+(35)
+
+for
+
+ǫ
+
+=
+
+ln(1 + q2(eǫ˜ − 1))
+
+Pr [Mt (D) ∈ S] = qA11 + q1(1 − q2)A10 + (1 − q1)A0
+
+≤ q eǫ˜ min{A′11, A10} + δ˜ + q1(1 − q2)A10 + (1 − q1)A0
+
+= q (eǫ˜ − 1) min{A′11, A10} + min{A′11, A10} + q1(1 − q2)A10 + (1 − q1)A0 + qδ˜
+
+(a)
+≤q
+
+eǫ˜ − 1) min{A′11, A10}
+
++ qA′11 + q1(1 − q2)A10 + (1 − q1)A0 + qδ˜
+
+(b)
+≤q
+
+(eǫ˜ − 1)(q2A′11 + (1 − q2)A10)
+
++ (qA′11 + q1(1 − q2)A10 + (1 − q1)A0) + qδ˜
+
+= q2 (eǫ˜ − 1)(q1q2A′11 + q1(1 − q2)A10) + (qA′11 + q1(1 − q2)A10 + (1 − q1)A0) + qδ˜
+
+(c)
+≤ q2
+
+(eǫ˜ − 1)(qA′11 + q1(1 − q2)A10) + (1 − q1)A0
+
++ (qA′11 + q1(1 − q2)A10 + (1 − q1)A0) + qδ˜
+
+= 1 + q2 (eǫ˜ − 1) (qA′11 + q1(1 − q2)A10) + (1 − q1)A0 + qδ˜
+
+= eln(1+q2(eǫ˜−1)) Pr [Mt (D′) ∈ S] + qδ˜
+
+Here, (a) follows from min{A′11, A10} ≤ A′11, (b) follows from the fact that minimum is upper-bounded by the convex combination, and (c) holds because (1 − q1)A0 ≥ 0. By substituting the value of ǫ˜ from (34) and
+
+using ks = qn, we get that for ǫ0 = O (1), we have ǫ = O
+
+ǫ0
+
+q2 log(1/δ˜)
+q1 n
+
+. Note that when q1 = 1 (i.e., we
+
+select all the clients in each iteration), then this gives the desired privacy ampliﬁcation of q = q2. The proof of Lemma 10 is complete, except for that we have to prove (38) and (39). Before proving (38)
+and (39), we state an important remark about the privacy ampliﬁcation in both the cases.
+
+Remark 7. Note that when s = 1 and ǫ0 = O(1), we have ǫ = ln(1 + q(eǫ˜ − 1)) = O(qǫ˜). So we get a
+
+privacy
+
+ampliﬁcation
+
+by
+
+a
+
+factor
+
+of
+
+q
+
+=
+
+ks mr
+
+–
+
+the
+
+sampling
+
+probability
+
+of
+
+each
+
+data
+
+point
+
+from
+
+the
+
+entire
+
+dataset. Here, we get a privacy ampliﬁcation from both types of sampling, of clients as well of data points.
+
+On the other hand, when s > 1 and ǫ0 = O(1), we have ǫ = ln(1 + q2(eǫ˜ − 1)) = O(q2ǫ˜), which, unlike
+
+the
+
+case
+
+of
+
+s
+
+=
+
+1,
+
+only
+
+gives
+
+the
+
+privacy
+
+ampliﬁcation
+
+by
+
+a
+
+factor
+
+of
+
+q2
+
+=
+
+s r
+
+–
+
+the
+
+sampling
+
+probability
+
+of
+
+each data point from a client. So, unlike the case of s = 1, here we only get a privacy ampliﬁcation from
+
+sampling of data points, not from sampling of clients. Note that when k = m and any s ∈ [r] (which implies
+
+q1 = 1 and q = q2), we have ǫ = O ǫ0
+
+q2 log(1/δ˜)
+n
+
+, which gives the desired ampliﬁcation when we select
+
+all the clients in each iteration.
+
+28
+
+Proof of (38).
+
+First note that the number of subsets T1 ⊂ [r] such that |T1| = s, 1 ∈ T1 is equal to
+
+r−1 s−1
+
+and the number of subsets T1 ⊂ [r] such that |T1| = s, 1 ∈/ T1 is equal to
+
+r−1 s
+
+.
+
+It is easy to verify that
+
+(r − s)
+
+r−1 s−1
+
+=s
+
+r−1 s
+
+.
+
+Consider the following bipartite graph G = (V1 ∪ V2, E), where the left vertex set V1 has
+
+r−1 s−1
+
+vertices,
+
+one for each conﬁguration of T1 ⊂ [r] such that |T1| = s, 1 ∈ T1, the right vertex set V2 has
+
+r−1 s
+
+vertices,
+
+one for each conﬁguration of T1 ⊂ [r] such that |T1| = s, 1 ∈/ T1, and the edge set E contains all the edges
+
+between neighboring vertices, i.e., if (u, v) ∈ V1 × V2 is such that u and v diﬀer in only one element, then
+
+(u, v) ∈ E. Observe that each vertex of V1 has (r − s) neighbors in V2 – the neighbors of T1 ∈ V1 will be
+
+{(T1 \ {1}) ∪ {i} : i ∈ [m] \ T1} ⊂ V2. Similarly, each vertex of V2 has s neighbors in V1 – the neighbors of
+
+T1 ∈ V2 will be {(T1 \ {i}) ∪ {1} : i ∈ T1} ⊂ V1.
+
+Now, ﬁx any T ∈
+
+[m] k
+
+s.t. 1 ∈ T , and for i ∈ T \ {1}, ﬁx any Ti ∈
+
+[r] s
+
+,
+
+and
+
+consider
+
+an
+
+arbitrary
+
+(u, v) ∈ E. Since the mechanism Z is (ǫ˜, δ˜)-DP, we have
+
+Pr Z(DT ) ∈ S|1 ∈ T , T1 = u, Ti, i ∈ T \ {1} ≤ eǫ˜ Pr Z(DT ) ∈ S|1 ∈ T , T1 = v, Ti, i ∈ T \ {1} + δ˜. (40)
+
+Now we are ready to prove (38).
+
+A11 = Pr Z(DT ) ∈ S|1 ∈ T and 1 ∈ T1
+
+=
+
+Pr[T , Ti, i ∈ T |1 ∈ T and 1 ∈ T1] Pr[Z(DT ) ∈ S|T , T1, . . . , Tm]
+
+T ∈([mk ]):1∈T
+
+( ) T1∈
+
+[r] s
+
+:1∈T1
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+(=a)
+
+Pr[T , Ti, i ∈ T \ {1}|1 ∈ T ]
+
+Pr[T1|1 ∈ T1] Pr[Z(DT ) ∈ S|T , T1, . . . , Tm]
+
+T ∈([m k ]):1∈T
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+( ) T1∈
+
+[r] s
+
+:1∈T1
+
+=
+
+T ∈([mk ]):1∈T
+
+Pr[T , Ti, i
+
+∈T
+
+\ {1}|1 ∈ T ]
+
+1
+
+(r − s)
+
+r−1 s−1
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+(r − s) Pr[Z(DT ) ∈ S|T , T1, . . . , Tm]
+
+( ) T1∈
+
+[r] s
+
+:1∈T1
+
+=
+
+T ∈([mk ]):1∈T
+
+Pr[T , Ti, i
+
+∈T
+
+\ {1}|1 ∈ T ] s
+
+1
+r−1 s
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+(r − s) Pr[Z(DT ) ∈ S|T , T1, . . . , Tm]
+
+( ) T1∈
+
+[r] s
+
+:1∈T1
+
+(b)
+≤
+
+T ∈([mk ]):1∈T
+
+Pr[T , Ti, i ∈ T
+
+\ {1}|1 ∈ T ] s
+
+1
+r−1 s
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+s
+
+( ) T1∈
+
+[r] s
+
+:1∈/ T1
+
+eǫ˜ Pr[Z(DT ) ∈ S|T , T1, . . . , Tm] + δ˜
+
+=
+
+Pr[T , Ti, i ∈ T \ {1}|1 ∈ T ]
+
+Pr[T1|1 ∈/ T1]
+
+T ∈([mk ]):1∈T
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+( ) T1∈
+
+[r] s
+
+:1∈/T1
+
+eǫ˜ Pr[Z(DT ) ∈ S|T , T1, . . . , Tm] + δ˜
+
+(=c)
+
+Pr[T , Ti, i ∈ T |1 ∈ T and 1 ∈/ T1]
+
+T ∈([m k ]):1∈T
+
+( ) T1∈
+
+[r] s
+
+:1∈/ T1
+
+( ) Ti∈
+
+[r] s
+
+for
+
+i∈T
+
+\{1}
+
+eǫ˜ Pr[Z(DT ) ∈ S|T , T1, . . . , Tm] + δ˜
+
+≤ eǫ˜ Pr Z(DT ) ∈ S|1 ∈ T and 1 ∈/ T1 + δ˜
+
+= eǫ˜A10 + δ˜.
+
+29
+
+Here, (a) and (c) follow from the fact that clients sample the data points independent of each other, and (b)
+
+follows
+
+from
+
+(40)
+
+together
+
+with
+
+the
+
+fact
+
+that
+
+there
+
+are
+
+(r
+
+−
+
+s)
+
+r−1 s−1
+
+=
+
+s
+
+r−1 s
+
+edges in the bipartite graph
+
+G = (V1 ∪ V2, E), where degree of vertices in V1 is (r − s) and degree of vertices in V2 is s.
+
+Proof of (39).
+
+First note that the number of subsets T ∈ [m] such that |T | = k, 1 ∈ T is equal to
+
+m−1 k−1
+
+and the number of subsets T ⊂ [m] such that |T | = k, 1 ∈/ T
+
+is equal to
+
+m−1 k
+
+.
+
+It is easy to verify that
+
+(m − k)
+
+m−1 k−1
+
+=k
+
+m−1 k
+
+.
+
+Consider the following bipartite graph G = (V1 ∪ V2, E), where the left vertex set V1 has
+
+m−1 k−1
+
+rk−1
+
+vertices, one for each conﬁguration of (T , Ti : i ∈ T ) such that T ⊂ [m], |T | = k, 1 ∈ T and T1 = 1,
+
+the right vertex set V2 has
+
+m−1 k
+
+rk
+
+vertices, one for each conﬁguration of (T , Ti
+
+:i∈T)
+
+such that T
+
+⊂ [m],
+
+|T | = k, 1 ∈/ T , and the edge set E contains all the edges between neighboring vertices, i.e., if (u, v) ∈ V1 × V2
+
+is such that u and v diﬀer in only one element, then (u, v) ∈ E. Observe that each vertex of V1 has r(m − k)
+
+neighbors in V2. Similarly, each vertex of V2 has k neighbors in V1.
+
+Consider an arbitrary edge (u, v) ∈ E.
+
+By construction, there exists T ∈
+
+[m] k
+
+with 1 ∈ T and
+
+Ti ∈ [r], i ∈ T such that u = (T , Ti : i ∈ T ) and T ′ ∈
+
+that v = common.
+
+(T ′, Ti′ : i ∈ T ′). Note that, Now, since the mechanism Z
+
+since is (ǫ˜,
+
+(u, v) ∈ E, (Ti δ˜)-DP, we have
+
+:
+
+[m] k
+i∈
+
+with 1 T ) and
+
+∈/ T (Ti′ :
+
+′
+i
+
+and ∈T
+
+Ti′ ∈ [r], i ′) have k −
+
+∈ 1
+
+T ′ such elements
+
+Pr Z(DT ) ∈ S|T , Ti, i ∈ T ≤ eǫ˜ Pr Z(DT ′) ∈ S|T ′, Ti′, i ∈ T ′ + δ˜.
+
+(41)
+
+Now we are ready to prove (39).
+
+A11 = Pr Z(DT ) ∈ S|1 ∈ T and T1 = 1
+
+=
+
+Pr[T , Ti, i ∈ T |1 ∈ T and T1 = 1] Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ]
+
+T ∈([m k ]):1∈T
+Ti∈[r] for i∈T :T1=1
+
+=
+
+1
+
+m−1 k−1
+
+rk−1
+
+T ∈([m k ]):1∈T
+
+Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ]
+
+Ti∈[r] for i∈T :T1=1
+
+=
+
+1
+
+(m − k)
+
+m−1 k−1
+
+rk
+
+T ∈([m k ]):1∈T
+
+r(m − k) Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ]
+
+Ti∈[r] for i∈T :T1=1
+
+(=a)
+
+k
+
+1
+m−1 k
+
+rk
+
+T ∈([m k ]):1∈T
+
+r(m − k) Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ]
+
+Ti∈[r] for i∈T :T1=1
+
+(b)
+≤
+
+k
+
+1
+m−1 k
+
+rk
+
+T ∈([m k ]):1∈/T
+
+k
+
+Ti∈[r] for i∈T
+
+eǫ Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ] + δ˜
+
+=
+
+1
+
+m−1 k
+
+rk
+
+T ∈([m k ]):1∈/T
+
+eǫ Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ] + δ˜
+
+Ti∈[r] for i∈T
+
+=
+
+Pr[T , Ti, i ∈ T |1 ∈/ T ] eǫ Pr[Z(DT ) ∈ S|T , Ti, i ∈ T ] + δ˜
+
+T ∈([m k ]):1∈/T
+Ti∈[r] for i∈T
+
+= eǫ˜ Pr Z(DT ) ∈ S|1 ∈/ T + δ˜
+
+30
+
+= eǫ˜A0 + δ˜
+
+Here,
+
+(a)
+
+uses
+
+(m
+
+−
+
+k)
+
+m−1 k−1
+
+=
+
+k
+
+m−1 k
+
+,
+
+and
+
+(b)
+
+follows
+
+from
+
+(41)
+
+together
+
+with
+
+the
+
+fact
+
+that
+
+there
+
+are
+
+r(m − k)
+
+m−1 k−1
+
+rk−1
+
+=
+
+k
+
+m−1 k
+
+rk
+
+edges
+
+in
+
+the
+
+bipartite
+
+graph
+
+G
+
+=
+
+(V1
+
+∪ V2, E),
+
+where
+
+degree
+
+of
+
+vertices
+
+in
+
+V1 is r(m − k) and degree of vertices in V2 is k.
+
+This completes the proof of Lemma 10.
+
+B Minimax Risk Estimation
+
+Lemma 13. For the minimax problems (5) and (6), the optimal estimator x (yn) is a deterministic function. In other words, the randomized decoder does not help in reducing the minimax risk.
+
+Proof. Towards a contradiction, suppose that the optimal estimator x is a randomized decoder deﬁned as fol-
+
+lows. For given clients’ responses yn, let the probabilistic estimator generate an estimate x (yn) whose mean
+
+and trace of the covariance matrix are given by µx(yn) = E [x(yn)] and σx2(yn) = E
+
+x (yn) − µx(yn)
+
+2 2
+
+Yn
+
+,
+
+respectively, where expectation is taken with respect to the randomization of the decoder, conditioned of
+
+Y n.
+
+E
+
+x − x (yn)
+
+2 2
+
+yn
+
+=E
+
+2
+x − µx(yn) + µx(yn) − x (yn) 2 yn
+
+=E
+
+x − µx(yn)
+
+2 2
+
+yn
+
++E
+
+µx(yn) − x (yn)
+
+2 2
+
+yn
+
++ 2E x − µx(yn), µx(yn) − x (yn) yn
+
+(=a) E >E
+
+x − µx(yn)
+
+2 2
+
+yn
+
+2
+x − µx(yn) 2 yn
+
++ σx2 (yn)
+
+In (a), we used that µx(yn) = E [x(yn)] to eliminate the last term. Similarly, we can prove that E
+
+µq − x (yn)
+
+2 2
+
+yn
+
+>
+
+E
+
+µq − µyn
+
+2 2
+
+yn
+
+.
+
+Hence, the deterministic estimator x (yn) = µx(yn) has a lower minimax risk than the
+
+probabilistic estimator.
+
+C Compressed and Private Mean Estimation
+
+C.1 Achievability for ℓ1-norm Ball: Proof of Theorem 5
+Lemma (Restating Lemma 5). The mechanism R1 presented in Algorithm 2 satisﬁes the following properties:
+
+1. R1 is (ǫ0, log (d) + 1)-LDP and requires only 1-bit of communication using public-randomness.
+
+2. R1 is unbiased and has bounded variance, i.e., for every x ∈ B1d (a), we have
+
+E [R1 (x)] = x
+
+and
+
+E
+
+R1 (x) − x
+
+2 2
+
+≤d
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+Proof. We show these properties one-by-one below.
+
+31
+
+1. Observe that the output of the mechanism R1 can be represented using the index j ∈ [d] and one
+
+bit of the sign of {±aHd (j)
+
+eǫ0 +1 eǫ0 −1
+
+}.
+
+Hence, it requires only log (d) + 1 bits for communication.
+
+Furthermore, the randomness j ∼ Unif [d] is independent of the input x. Thus, if the client has access
+
+to a public randomness j, then the client needs only to send one bit to represent its sign. Now, we show
+
+that the mechanism R1 is ǫ0-LDP. Let Z =
+
+± aHd(j)
+
+eǫ0 +1 eǫ0 −1
+
+: j = 1, 2, . . . , d
+
+denote all possible 2d
+
+outputs of the mechanism R1. We get
+
+1
+
+sup sup
+x,x′∈B1d(a) z∈Z
+
+Pr[R1(x) = z] Pr[R1(x′) = z]
+
+≤
+
+sup
+x,x′ ∈B1d (a)
+
+d
+1 d
+
+d j=1
+d j=1
+
+√
+
++ 1
+
+d|yj | eǫ0 −1
+
+2
+
+2a eǫ0 +1
+
+√
+
+− 1
+
+d|yj′ | eǫ0 −1
+
+2
+
+2a eǫ0 +1
+
+1
+
+= sup d
+
+x,x′ ∈B1d (a)
+
+1 d
+
+d j=1
+
+√ a(eǫ0 + 1) + d|yj |(eǫ0 − 1)
+
+d j=1
+
+√ a(eǫ0 + 1) − d|yj′ |(eǫ0 − 1)
+
+(a)
+≤
+
+2aeǫ0
+
+= eǫ0 ,
+
+2a
+
+where (a) uses the fact that for every j ∈ [d], we have |yj| ≤ a/√d and |yj′ | ≤ a/√d.
+
+2. Fix an arbitrary x ∈ B1d (a).
+
+Unbiasedness:
+
+E [R1
+
+(x)]
+
+=
+
+1 d
+
+d
+
+aHd (j)
+
+eǫ0 + 1 eǫ0 − 1
+
+j=1
+
+√ dyj eǫ0 − 1 a eǫ0 + 1
+
+=
+
+1 d
+
+d
+
+√ Hd (j) dyj
+
+(=b)
+
+1 d
+
+d
+
+Hd (j) HTd (j)x
+
+(=c) x
+
+j=1
+
+j=1
+
+where
+
+(b)
+
+uses
+
+y
+
+=
+
+√1 d
+
+Hd
+
+x
+
+and
+
+(c)
+
+uses
+
+d j=1
+
+Hd(j)HTd
+
+(j)
+
+=
+
+HdHTd
+
+= dId.
+
+Bounded variance:
+
+E
+
+R1 (x) − x
+
+2 2
+
+≤E
+
+R1(x)
+
+2 = E[R1(x)T R1(x)]
+
+=
+
+1 d
+
+d
+
+a2Hd(j)T Hd(j)
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+
+j=1
+
+= a2d
+
+eǫ0 + 1 2 eǫ0 − 1
+
+(Since Hd(j)T Hd(j) = d, ∀j ∈ [d])
+
+This completes the proof of Lemma 5.
+
+C.2 Achievability for ℓ2-norm Ball: Proof of Theorem 6
+
+Lemma (Restating Lemma 8). The mechanism R2 presented in Algorithm 3 satisﬁes the following properties, where ǫ0 > 0:
+
+1. R2 is (ǫ0, d(log(e) + 1))-LDP.
+
+2. R2 is unbiased and has bounded variance, i.e., for every x ∈ B2d (a), we have
+
+E [R2 (x)] = x
+
+and
+
+E
+
+R2 (x) − x
+
+2 2
+
+≤
+
+6a2d
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+Proof. We prove these properties one-by-one below.
+
+32
+
+1. It was shown by Duchi et al. [DJW18, Section 4.2.3] that Priv is an ǫ0-LDP mechanism. Now, since R2 = Quan ◦ Priv is a post-processing of a diﬀerentially-private mechanism Priv and post-processing preserves diﬀerential privacy, we have that R2 is also ǫ0-LDP. The claim that R2 uses d(log(e) + 1) bits of communication follows because R2 outputs the result of Quan, which produces an output which can be represented using d(log(e) + 1) bits; see [MT20].
+
+2. Unbiasedness of R2 follows because R2 = Quan ◦ Priv and both Priv and Quan are unbiased. To prove that variance is bounded, ﬁx an x ∈ B2d (a).
+
+E
+
+R2(x) − x
+
+2 2
+
+=E
+
+Quan (Priv(x)) − x
+
+2 2
+
+=E
+
+Quan (Priv(x)) − Priv(x) + Priv(x) − x
+
+2 2
+
+(=a) E
+
+Quan (Priv(x)) − Priv(x)
+
+2 2
+
++
+
+E
+
+Priv(x) − x
+
+2 2
+
+(b)
+≤ 2 Priv(x) 2 + E Priv(x) 2
+
+(c)
+
+(d)
+
+≤ 3 Priv(x) 2 ≤ 6d
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+In (a) we used the fact that Quan and Priv are unbiased, which implies that the cross multiplication
+
+term
+
+is
+
+zero.
+
+In
+
+(b)
+
+we
+
+used
+
+Lemma
+
+7
+
+to
+
+write
+
+E
+
+Quan (Priv(x)) − Priv(x)
+
+2 2
+
+≤2
+
+Priv(x)
+
+2
+
+and
+
+used
+
+the unbiasedness of Priv together with the fact that variance is bounded by the second moment to
+
+write E
+
+Priv(x) − x
+
+2 2
+
+≤E
+
+Priv(x)
+
+2 2
+
+.
+
+In (c) we used that the length of
+
+Priv on any input remains
+
+ﬁxed, i.e., E Priv(x) 2 = Priv(x) 2 = M 2 (where M is from the line 4 of Algorithm 4) holds for any
+
+x ∈ B2d(a). In (d) we used the bound on
+
+Priv(x)
+
+2 2
+
+from
+
+Lemma
+
+6.
+
+This completes the proof of Lemma 8.
+
+C.3 Achievability for ℓ∞-norm Ball: Proof of Theorem 7
+Lemma (Restating Lemma 9). The mechanism R∞ presented in Algorithm 6 satisﬁes the following properties:
+
+1. R∞ is (ǫ0, log (d) + 1)-LDP and requires only 1-bit of communication using public-randomness.
+
+2. R∞ is unbiased and has bounded variance, i.e., for every x ∈ B∞ d (a), we have
+
+E [R∞ (x)] = x
+
+and
+
+E
+
+R∞ (x) − x
+
+2 2
+
+≤
+
+a2d2
+
+eǫ0 + 1 eǫ0 − 1
+
+2
+.
+
+Proof. We prove these properties one-by-one below.
+
+1. Observe that the output of the mechanism R∞ can be represented using the index j ∈ [d] and one
+
+bit for the sign of
+
+± ad
+
+eǫ0 +1 eǫ0 −1
+
+ej
+
+.
+
+Hence, it requires only log (d) + 1 bits for communication.
+
+Furthermore, the randomness j ∼ Unif [d] is independent of the input x. Thus, if the client has access
+
+to a public randomness j, then the client needs only to send one bit for its sign. Now, we show that the
+
+mechanism R∞ is ǫ0-LDP. Let Z =
+
+± ad
+
+eǫ0 +1 eǫ0 −1
+
+ej : j = 1, 2, . . . , d
+
+denote all possible 2d outputs
+
+of the mechanism R∞. We get
+
+1
+
+sup sup
+x,x′∈B∞ d (a) z∈Z
+
+Pr [R∞ (x) Pr [R∞ (x)
+
+= =
+
+z] z]
+
+≤
+
+sup
+x,x′∈B∞ d (a)
+
+d
+1 d
+
+d i=1
+
++ 1 |xj | eǫ0 −1
+
+2
+
+2a eǫ0 +1
+
+− d
+
+1
+
+i=1 2
+
+|x′j | eǫ0 −1 2a eǫ0 +1
+
+1
+
+= sup d
+
+x,x′ ∈B∞ d
+
+1 d
+
+d i=1
+
+(a(eǫ0
+
++
+
+1)
+
++
+
+|xj |(eǫ0
+
+−
+
+1))
+
+d i=1
+
+a(eǫ0 + 1) − |x′j |(eǫ0 − 1)
+
+(42) (43)
+
+33
+
+(a)
+≤
+
+2aeǫ0
+
+= eǫ0 ,
+
+2a
+
+(44)
+
+where in (a) we used the fact that for every j ∈ [d], we have |xj | ≤ a and |x′j | ≤ a.
+
+2. Fix an arbitrary x ∈ B∞ d .
+
+Unbiasedness:
+
+E [R∞
+
+(x)]
+
+=
+
+1 d
+
+d j=1
+
+ej ad
+
+d
+= ej xj
+j=1
+
+=x
+
+eǫ0 + 1 eǫ0 − 1
+
+xj eǫ0 − 1 a eǫ0 + 1
+
+Bounded variance:
+
+E
+
+R∞(x) − x
+
+2 2
+
+≤
+
+E
+
+R∞(x)
+
+2 = E[R∞(x)T R∞(x)]
+
+=
+
+1 d
+
+d
+
+a2d2
+
+j=1
+
+eǫ0 + 1 2 eǫ0 − 1
+
+= a2d2
+
+eǫ0 + 1 2 eǫ0 − 1
+
+This completes the proof of Lemma 9.
+
+34
+

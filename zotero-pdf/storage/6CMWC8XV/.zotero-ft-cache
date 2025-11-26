@@ -1,0 +1,1215 @@
+29
+
+3
+
+2020 3
+
+OPEＲATIONS ＲESEAＲCH AND MANAGEMENT SCIENCE
+
+Vol． 29 No． 3 Mar． 2020
+
+Pearson
+
+100044
+
+、
+
+。
+
+。
+Pearson U294
+
+2004 ～ 2016
+
+BP
+
+。
+
+A
+
+1007-3221 2020 03-0135-07 doi 10． 12005 / orms． 2020． 0072
+
+Ｒailway Freight Demand Forecast Based on Uncertainty Theory
+
+LIU Xiao-tong ＲEN Shuang School of Computer and Information Technology Beijing Jiaotong University Beijing 100044 China
+Abstract Ｒeasonable prediction of railway freight demand is the decision-making basis for railway management departments to build and operate． Ｒailway freight demand is uncertain． In order to cope with the complex changes of railway freight demand the seven key factors of railway freight demand are selected based on the Pearson correlation analysis and uncertain multivariate linear regression model is constructed by using the uncertainty theory． The corresponding railway freight value is changed from the traditional single value to the possible demand range which is more in line with the actual demand of railway freight transportation under the uncertain environment． According to the relevant data of the National Bureau of Statistics from 2004 to 2016 the empirical study is carried out and compared with the prediction results of regression model and BP model． The results show that the prediction results of uncertain multivariate linear regression can deal with the uncertainty well and the accuracy is higher． Key words freight demand pearson correlation analysis uncertainty theory multiple linear regression prediction
+
+0
+1
+。 、
+
+。
+
+。
+2 K． V． Ｒudakov 3 、 Yang Y 4
+
+5
+
+GM
+
+11
+
+2018-08-23
+
+2018YFB1201401
+
+2018JBM019
+
+1995-
+
+、
+
+1981-
+
+。
+
+136 GM 1 1
+
+Sun Y 6
+
+2020 29
+
+Li X 7
+Verhulst
+9 10
+。 。
+。
+
+NAＲX
+8
+Verhulst 。
+、
+。
+
+、
+
+、
+
+。
+
+14 。
+
+4 。
+、 5
+、
+
+、
+3 1 。
+
+、
+
+、
+
+、
+
+、
+
+、
+
+、
+
+、
+
+、
+
+4
+
+、
+
+13
+
+。
+
+。
+
+11
+
+12
+
+13
+
+GDP
+
+。
+
+。
+
+。
+
+Pearson
+
+15
+。
+Pearson 、
+1． 2 Pearson Pearson
+1 +1 。
+1
+
+。 －
+
+。
+1
+1． 1
+
+yj
+
+j
+
+max y
+1km
+
+k
+
+min y
+1km
+
+k
+
+j =1
+
+2
+
+…
+
+m
+
+xji
+
+j
+
+i
+
+1mkaxmxki
+
+1mkinmxki j = 1 2 … m i = 1 2 … n。
+
+j
+
+tj
+
+=
+
+yj
+
+－
+
+min y
+1km
+
+k
+
+1mkaxmyk
+
+－
+
+min y
+1km
+
+k
+
+j =1 2 … m
+
+3
+
+137
+
+i
+
+kji
+
+=
+
+xji
+
+－
+
+min x
+1km
+
+ki
+
+1mkaxmxki － 1mkinmxki
+
+2
+
+i
+
+j=1 2 … m Pearson
+
+槡∑∑ ∑ ri =
+
+m j =1
+
+tj － 珋t
+
+kji － k珋
+
+m j =1
+
+tj － 珋t 2
+
+m j =1
+
+kji － k珋2
+
+∑ ∑ 珋t =
+
+m
+t j = 1 j
+
+k珋=
+
+m
+K j = 1 ji 。
+
+Pearson
+
+i=12 …n 2004 ～ 2016
+
+。
+
+1。
+1
+
+0． 72 0． 71 0． 79 0． 72 0． 66 0． 86 0． 95
+
+0． 84 0． 78 0． 83 0． 69 0． 78 0． 56
+
+0． 6
+、 、
+
+16
+。 0． 75
+
+、
+
+、
+
+7
+
+。
+
+1
+、 、
+
+2
+
+Γ
+
+L
+
+Γ
+
+σ
+
+L
+
+Λ
+
+Λ MΛ
+
+Λ
+
+。
+
+MΛ
+
+22 23
+
+1
+
+ΓM
+
+Γ =1
+
+2 M Λ + M Λc = 1
+
+Λ∈L
+
+3
+
+∞
+
+∞
+
+Λi
+
+∑ M
+
+∪
+i =1
+
+Λi
+
+ M Λi
+i =1
+
+。
+
+、
+
+MΓ
+
+Γ
+
+LM
+
+。
+
+4 Liu
+
+Γi Li Mi i =1 2 … n
+
+M
+… × Ln Mi Λi 。
+1 Liu
+
+σ
+
+L = L1 × L2 ×
+
+n
+
+M
+
+∏
+i =1
+
+Λi
+
+= min 1in
+
+ξ
+
+Φ
+
+Φ x = M ξx
+
+x
+
+。
+
+2 Liu
+
+ξ
+
+0
+
+z
+
+=
+
+  
+
+z b
+
+－ －
+
+a a
+
+1
+
+L ab
+
+ab
+
+z＜a azb z＞b
+a ＜ b。
+
+2． 1
+
+2007
+
+、 18 19
+
+、
+
+20 、
+
+17 、 21 、
+
+。
+
+。
+
+1
+
+138
+
+2020 29
+
+1 Liu
+
+ξ1 ξ2
+
+L a1 b1
+
+L a2 b2
+
+ξ1 + ξ2
+
+L a1 + a2 b1 + b2
+
+L a1
+
+b1 + L a2 b2 = L a1 + a2 b1 + b2
+
+L a b k ＞0
+
+L ka kb kL a b = L ka kb 。
+
+2． 2
+
+yj
+
+yj = A1 xj1 + A2 xj2 + A3 xj3 + A4 xj4 +
+
+A5 xj5 + A6 xj6 + A7 xj7
+
+1
+
+xj1
+
+xj2
+
+xj3
+
+xj4
+
+xj5
+
+xj6
+
+xj7
+
+A1 ～ A7
+
+xj1 ～ xj7
+
+。
+
+1
+
+7。
+
+Ai 1i≤
+
+。
+
+1
+
+Ai
+
+1、2
+
+A槇i
+
+A槇 zi
+
+0
+
+
+
+=
+
+ zi
+
+ 
+
+b
+
+i
+
+－ －
+
+ai ai
+
+
+
+1
+
+L ai bi 1 、2
+
+ai ＜ bi。 3 yj
+j
+
+y珓j yj
+
+A槇i 。
+A槇 zi zi ＜ ai
+
+ai zi bi
+
+2
+
+zi ＞ bi
+
+y珓j 。 y珓j
+
+0 
+
+n
+∑ yj ＜ aixji i =1
+
+珓yj yj
+
+∑ 
+=
+
+yj －
+7
+
+7
+i =1aixji
+7
+
+∑ ∑ 
+
+
+i =1bixji －
+
+i =1aixji
+
+n
+
+n
+
+∑ ∑ aixji  yj  bixji
+
+i =1
+
+i =1
+
+3
+
+
+
+n
+
+1
+
+∑ yj ＞ bixji
+
+i =1
+
+∑ ∑ 7
+
+L
+
+i = 1 ai xji
+
+7
+i = 1 bi xji
+
+∑ ∑ 7
+i = 1 ai xji ＜
+
+7
+i = 1 bi xji 。
+
+2． 3
+
+a1 … a7
+
+b1
+
+… b7 。
+
+3
+
+f
+
+f=b－a
+
+ba
+
+。
+
+4
+
+F
+
+n
+
+f
+
+w
+
+∑ F = wifi 。
+
+i =1
+
+。
+
+f
+
+A槇i 1 i7
+
+7
+min F = ∑wifi i =1
+fi = bi － ai wi A槇i
+
+4
+
+fi
+
+。
+
+yj = A1 xj1 + A2 xj2 + A3 xj3 + A4 xj4 + A5 xj5 + A6 xj6 +
+
+A7 xj7
+
+wi =
+
+| Ai |
+7
+
+。
+
+∑ | Aj |
+i =1
+
+3
+
+1
+
+H 0H1
+
+yj
+
+xj1 xj2 … xj7
+
+珓yj yj 2
+
+y珓j yj H
+
+5 H。
+
+ai ＜ bi
+
+6
+
+n
+
+n
+
+∑ ∑ ai xji  yj  bi xji
+
+7
+
+i =1
+
+i =1
+
+3
+
+139
+
+。
+
+7
+
+∑ min F =
+
+
+wi
+i =1
+
+bi － ai
+
+
+
+7
+
+7
+
+∑ ∑ s． t． yj  H bixji + 1 － H
+
+ai xji j = 1 2 … m
+
+
+
+i =1
+
+i =1
+
+8
+
+ 
+
+ai ＜ bi
+
+i =12 …7
+
+
+
+ 
+
+7
+
+7
+
+∑ ∑ ai xji  yj  bi xji
+
+i =1
+
+i =1
+
+j =12 … m
+
+2004 ～ 2014
+
+3
+
+2015 、2016
+
+。2004 ～ 2016 3． 1
+2。
+
+2004 ～ 2016
+
+2 2004 ～ 2016
+
+2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016
+3． 2
+
+/ 249017 269296 288224 314237 330354 333348 364271 393263 390438 396697 381334 335801 333186
+
+/ 74286． 9 88084． 4 104361． 8 126633． 6 149956． 6 160171． 7 191629． 8 227038． 8 244643． 3 261956． 1 277571． 8 282040． 3 296236
+
+/ 25145． 14 25881． 15 26434． 39 26681． 43 27187． 1 26892． 67 29027． 6 28915． 09 29838． 46 30137． 84 30396． 74 30725． 46 28372
+
+2 2004 ～ 2014 7
+
+/ 158084． 63 177274． 42 189691． 23 205526． 25 213058． 11 219718． 83 237839． 06 264658． 1 267493． 05 270522． 96 266333． 38 260985． 67
+240816
+
+/ 87097． 8 107470． 31 130053． 4 153141． 3 158590． 46 181907． 09 203732． 91 221198． 76 234320． 45 260664． 31 266118． 53 261873． 4 264449． 01
+
+/ 46947 48402． 2 49804． 2 50160． 3 52870． 9 53082． 1 54647． 7 57120． 8 58958 60193． 8 60702． 6 62143． 9 61625． O
+
+/ 1244990 1341778 1466347 1639432 1916759 2127834 2448052 2820100 3188475 3076648 3113334 3150019 3341259
+
+/ 276． 7 306． 7 349． 4 401． 8 407． 6 445． 5
+563 557． 5
+545 561． 3 594． 1 629． 3
+668
+
+yj = － 0． 259xj1 － 5． 515xj2 + 1． 480xj3 － 0． 173xj4
+
++ 3． 014xj5 － 0． 002xj6 + 167． 497xj7
+
+9
+
+3。
+
+w1 0． 00145
+
+w2 0． 03099
+
+3
+w3 0． 00832
+
+w4 0． 00097
+
+w5 0． 01694
+
+w6 0． 00001
+
+w7 0． 94131
+
+140
+
+2020 29
+
+3． 3
+
+2004 ～ 2014
+
+9
+
+H = 0． 8
+
+gurobi
+
+A槇1 0 0． 01 A槇2 1． 67812 1． 68812 A槇3 0． 30515 0． 62376 A槇4 0 0． 06433 A槇5 2． 06602 2． 07602 A槇6 0 0． 0157 A槇7 0 0． 01
+yj = A槇1 xj1 + A槇2 xj2 + A槇3 xj3 + A槇4 xj4 + A槇5 xj5 + A槇6 xj6 + A槇7 xj7
+。
+
+。
+
+。 2004 ～ 2011 2011 ～ 2014
+
+7
+
+∑ yj －
+7
+
+i = 1 ai xji
+7
+
+= 0． 6
+
+∑ ∑ i = 1 bi xji －
+
+i = 1 ai xji
+
+j = 2015 2016
+
+1
+
+2
+
+3
+
+4
+
+槡 ∑ 1
+
+| yj － Yj | 2
+
+Ni
+
+yj
+
+。
+
+∑ φ
+
+=
+
+1 N
+
+| yj － Yj |
+
+i
+
+yj
+
+ε
+
+= max
+
+| yj
+
+－ Yj | yj
+
+β
+
+= min
+
+| yj
+
+－ Yj | yj
+
+γ=
+
+yj
+
+Yj
+
+、BP 2。
+
+7
+
+∑ yj －
+7
+
+i = 1 ai xji
+7
+
+= 0． 95
+
+∑ ∑ i = 1 bi xji －
+
+i = 1 ai xji
+
+2015 、2016
+
+0． 6
+
+0． 95
+
+1 。
+2004 ～ 2014
+
+j = 2004 … 2014
+
+4
+
+2
+、
+3。
+
+BP 4
+
+/%
+
+/%
+
+2． 59
+
+6． 01
+
+0． 02
+
+3． 03
+
+2． 78
+
+14． 93
+
+0． 18
+
+5． 22
+
+BP
+
+2． 88
+
+13． 41
+
+0． 36
+
+4． 84
+
+2
+
+2004 ～ 2014
+
+2004 ～ 2014
+
+2015、2016
+
+BP
+
+。4 3
+
+10%
+
+3
+
+。
+
+3
+
+141
+
+6． 01%
+
+4%
+3． 03% 2． 2% BP
+
+2015、2016 1． 7% 。
+
+。
+4
+
+Pearson 、
+、
+
+、 、
+
+、 、
+
+。
+
+24 。 。
+。
+
+1 Li Xiang Gao Ziyou． Cost-benefit analysis for regenera-
+
+tive energy storage in metro J ． Chinese Management
+
+Studies 2017 11 1 19-34．
+
+2
+
+．
+
+D．
+
+2012 32 17 212-215．
+
+3 Ｒudakov K V Strizhov V V et al． Selecting an optimal
+
+model for forecasting the volumes of railway goods trans-
+
+portation J ． Automation ＆ Ｒemote Control 2017 78
+
+1 75-87．
+
+4 Yang Yandong Yu Congzhou． Prediction models based
+
+on multivariate statistical methods and their applications
+
+for predicting railway freight volume J ． Neurocomput-
+
+ing 2015 158 C 210-215．
+
+5
+
+．
+
+GM 1 1
+
+J．
+
+2017
+
+11 2480-2486．
+
+6 Sun Yan Lang Maoxiang Wang Danzhu Liu Yunlin．
+
+Prediction models for railway freight volume based on
+
+artificial neural networks J ． Applied Mechanics ＆
+
+Materials 2014 543-547 2093-2098．
+
+7 Li Xuefei Lang Maoxiang． Combination prediction of
+
+railway freight volume based on support vector machine
+
+and NAＲX neural network J ． LISS 2015 865-870．
+
+8
+
+．
+
+—Verhulst
+
+J．
+
+2016
+
+60 10 27-30．
+
+9
+
+．
+
+J．
+
+2018 18 5 1-8．
+
+10
+
+．
+
+J．
+
+2016 13 1
+
+168-175．
+
+11
+
+．
+
+D．
+
+2017．
+
+12
+
+．
+
+J．
+
+2017 11 192-195．
+
+13
+
+．
+
+GDP J ．
+
+2014 44 11 140-146．
+
+14
+
+．
+
+J．
+
+2012 12 3
+
+80-85．
+
+15
+
+．
+
+D．
+
+2016．
+
+16
+
+．
+
+J．
+
+2017 26 1 121-131．
+
+17 Yang Lixing Zhou Xuesong． Optimizing on-time arrival
+
+probability and percentile travel time for elementary path
+
+finding in time-dependent transportati-on networks
+
+linear mixed integer programming reformulations J ．
+
+Transportation Ｒesearch Part B Methodological 2017
+
+96 68-91．
+
+18 Li Xiang Zhou Jiandong et al． Travel itinerary
+
+problem J ． Transportation Ｒesearch Part B Methodo-
+
+locical 2016 91 332-343．
+
+19 Ning Yufu Su Taoyong． A multilevel approach for mod-
+
+elling vehicle routing problem with uncertain travelling
+
+time J ． Journal of Intelligent Manufacturing 2017
+
+28 3 683-688．
+
+20 Qin Zhongfeng． Mean-variance model for portfolio
+
+optimization problem in the simultaneous presence of
+
+random and uncertain returns J ． European Jouranl of
+
+Operational Ｒesearch 2015 245 2 480-488．
+
+21 Chen Xiaowei Liu Yuhan Dan Ｒalescu A． Uncertain
+
+stock model with periodic dividends J ． Fuzzy Optimi-
+
+zation and Decision Making 2013 12 1 111-123．
+
+22 Liu Baoding． Uncertainty theory M ． 5th edition
+
+Springer-Verlag Uncertainty Theory Laboratory 2017．
+
+23 Liu Baoding． Uncertain set theory and uncertain i
+
+nference rule with application to uncertain control J ．
+
+Journal of Uncertain Systems 2010 4 2 83-98．
+
+24
+
+．
+
+J．
+
+2018
+
+15 5 1341-1346．
+

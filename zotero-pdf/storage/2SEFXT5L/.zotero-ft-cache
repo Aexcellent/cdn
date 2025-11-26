@@ -1,0 +1,251 @@
+ 
+Your Privacy 
+ 
+We use cookies to make sure that our website works properly, as well as some ‘optional’ cookies to personalise content and advertising, provide social media features and analyse how people use our site. By accepting some or all optional cookies you give consent to the processing of your personal data, including transfer to third parties, some in countries outside of the European Economic Area that do not offer the same data protection standards as the country where you live. You can decide which optional cookies to accept by clicking on ‘Manage Settings’, where you can also find more information about how your personal data is processed. Further information can be found in our privacy policy . 
+Accept All Cookies Manage Preferences 
+Skip to main content 
+ 
+Advertisement 
+SpringerLink 
+Search 
+Go to cart 
+ 
+    Log in 
+ 
+    Published: 07 July 2020 
+ 
+Enhanced attribute based access control with secure deduplication for big data storage in cloud 
+ 
+    Praveen Kumar Premkamal   , , 
+    Syam Kumar Pasupuleti , 
+    … 
+    Abhishek Kumar Singh , & 
+    P. J. A. Alphonse   
+ 
+Peer-to-Peer Networking and Applications volume  14 ,  pages 102–120 ( 2021 ) Cite this article 
+ 
+    458 Accesses 
+ 
+    3 Citations 
+ 
+    Metrics details 
+ 
+Abstract 
+ 
+The cloud storage is the best option to outsource big data, as the cloud has the capability of storing a huge volume of data. However, cloud storage brings new concerns for privacy, fine-grained access control and data duplication, which are crucial for big data storage in the cloud. Existing solutions of data duplication over encrypted data schemes do not provide fine-grained access control. Recently, Cui et al. proposed the data duplication over encrypted data along with attribute based access control in 2017. However, this scheme suffers from the following issues: 1) it does not verify the data ownership which is essentially required for data protection when multiple users outsource the same data 2) it does not provide the data ownership management, which creates a chance to upload the false data by the ownership revoked owner 3) it suffers from communication and computation overhead during deduplication and encryption process. To improve the Cui et al. scheme, in this paper, we propose an enhanced attribute based access control with secure deduplication for big data storage in cloud (EABAC-SD). Our EABAC-SD scheme achieves dynamic ownership management using the group key. Our scheme allows only authorized data owners to upload the data which enhances the security. Further, our EABAC-SD scheme cuts down the communication and computation overhead of the encryption and deduplication process. In addition, security analysis proves that our scheme protects the data privacy and consistency. Further, our scheme proves that ineligible data owners and ownership withdrawn data owners are not able to upload the data. Performance analysis shows that our EABAC-SD scheme is more efficient than Cui et al. scheme. 
+ 
+This is a preview of subscription content, access via your institution . 
+References 
+ 
+    Abadi M, Boneh D, Mironov I, Raghunathan A, Segev G (2013) Message-locked encryption for lock-dependent messages. In: Advances in Cryptology–CRYPTO 2013, Springer, pp 374–391, https://doi.org/10.1007/978-3-642-40041-4_21 
+ 
+    Akinyele JA, Garman C, Miers I, Pagano MW, Rushanan M, Green M, Rubin AD (2013) Charm: a framework for rapidly prototyping cryptosystems. Journal of Cryptographic Engineering 3(2):111–128. https://doi.org/10.1007/s13389-013-0057-3 
+ 
+    Bellare M, Keelveedhi S, Ristenpart T (2013a) Dupless: server-aided encryption for deduplicated storage. In: Proceedings of the 22nd USENIX conference on Security, USENIX Association, pp 179–194 
+ 
+    Bellare M, Keelveedhi S, Ristenpart T (2013b ) Message-locked encryption and secure deduplication. In: Annual International Conference on the Theory and Applications of Cryptographic Techniques, Springer, pp 296–312. https://doi.org/10.1007/978-3-642-38348-9_18 
+ 
+    Bethencourt J, Sahai A, Waters B (2007) Ciphertext-policy attribute-based encryption. In: Security and Privacy, 2007. SP’07. IEEE Symposium on, IEEE, pp 321–334. https://doi.org/10.1109/SP.2007.11 
+ 
+    Cheung L, Newport C (2007) Provably secure ciphertext policy abe. In: Proceedings of the 14th ACM conference on Computer and communications security, ACM, pp 456–465, https://doi.org/10.1145/1315245.1315302 
+ 
+    Cui H, Deng RH, Li Y, Wu G (2019) Attribute-based storage supporting secure deduplication of encrypted data in cloud. IEEE Transactions on Big Data 5(3):330–342. https://doi.org/10.1109/TBDATA.2017.2656120 
+ 
+    Article   Google Scholar   
+ 
+    Deng H, Wu Q, Qin B, Domingo-Ferrer J, Zhang L, Liu J, Shi W (2014) Ciphertext-policy hierarchical attribute-based encryption with short ciphertexts. Information Sciences 275:370–384. https://doi.org/10.1016/j.ins.2014.01.035 
+ 
+    MathSciNet   Article   Google Scholar   
+ 
+    Douceur JR, Adya A, Bolosky WJ, Simon P, Theimer M (2002) Reclaiming space from duplicate files in a serverless distributed file system. In: Distributed Computing Systems, 2002. Proceedings. 22nd International Conference on, IEEE, pp 617–624. https://doi.org/10.1109/ICDCS.2002.1022312 
+ 
+    Goldwasser S, Micali S, Rackoff C (1985) The knowledge complexity of interactive proof-systems. In: Proceedings of the seventeenth annual ACM symposium on Theory of computing, pp 291–304. https://doi.org/10.1145/22145.22178 
+ 
+    Goyal V, Pandey O, Sahai A, Waters B (2006) Attribute-based encryption for fine-grained access control of encrypted data. In: Proceedings of the 13th ACM conference on Computer and communications security, ACM, pp 89–98, https://doi.org/10.1145/1180405.1180418 
+ 
+    Hashem IAT, Yaqoob I, Anuar NB, Mokhtar S, Gani A, Khan SU (2015) The rise of “big data” on cloud computing: Review and open research issues. Information systems 47:98–115. https://doi.org/10.1016/j.is.2014.07.006 
+ 
+    Article   Google Scholar   
+ 
+    Jiang T, Chen X, Wu Q, Ma J, Susilo W, Lou W (2017) Secure and efficient cloud data deduplication with randomized tag. IEEE Transactions on Information Forensics and Security 12(3):532–543. https://doi.org/10.1109/TIFS.2016.2622013 
+ 
+    Article   Google Scholar   
+ 
+    Jiang Y, Susilo W, Mu Y, Guo F (20118) Flexible ciphertext-policy attribute-based encryption supporting and-gate and threshold with short ciphertexts. International Journal of Information Security 17:463–475. https://doi.org/10.1007/s10207-017-0376-y 
+ 
+    Khan N, Yaqoob I, Hashem IAT, Inayat Z, Ali M, Kamaleldin W, Alam M, Shiraz M, Gani A (2014) Big data: survey, technologies, opportunities, and challenges. The Scientific World Journal 2014. https://doi.org/10.1155/2014/712826 
+ 
+    Kumar PP, Kumar PS, Alphonse P (2017) An efficient ciphertext policy-attribute based encryption for big data access control in cloud computing. In: 2017 Ninth International Conference on Advanced Computing (ICoAC), IEEE, pp 114–120, https://doi.org/10.1109/ICoAC.2017.8441507 
+ 
+    Kumar PP, Kumar PS, Alphonse P (2018) Attribute based encryption in cloud computing: A survey, gap analysis, and future directions. Journal of Network and Computer Applications 108:37–52. https://doi.org/10.1016/j.jnca.2018.02.009 
+ 
+    Article   Google Scholar   
+ 
+    Li J, Chen X, Li M, Li J, Lee PP, Lou W (2014) Secure deduplication with efficient and reliable convergent key management. IEEE transactions on parallel and distributed systems 25(6):1615–1625. https://doi.org/10.1109/TPDS.2013.284 
+ 
+    Article   Google Scholar   
+ 
+    Li J, Chen X, Huang X, Tang S, Xiang Y, Hassan MM, Alelaiwi A (2015) Secure distributed deduplication systems with improved reliability. IEEE Transactions on Computers 64(12):3569–3579. https://doi.org/10.1109/TC.2015.2401017 
+ 
+    MathSciNet   Article   Google Scholar   
+ 
+    Li J, Li J, Xie D, Cai Z (2016) Secure auditing and deduplicating data in cloud. IEEE Transactions on Computers 65(8):2386–2396. https://doi.org/10.1109/TC.2015.2389960 
+ 
+    MathSciNet   Article   Google Scholar   
+ 
+    Li J, Li X, Wang L, He D, Ahmad H, Niu X (2018) Fuzzy encryption in cloud computation: efficient verifiable outsourced attribute-based encryption. Soft Computing 22(3):707–714. https://doi.org/10.1007/s00500-017-2482-1 
+ 
+    Article   Google Scholar   
+ 
+    Li L, Gu T, Chang L, Xu Z, Liu Y, Qian J (2017) A ciphertext-policy attribute-based encryption based on an ordered binary decision diagram. IEEE Access 5:1137–1145. https://doi.org/10.1109/ACCESS.2017.2651904 
+ 
+    Article   Google Scholar   
+ 
+    Liu J, Asokan N, Pinkas B (2015) Secure deduplication of encrypted data without additional independent servers. In: Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security, ACM, pp 874–885. https://doi.org/10.1145/2810103.2813623 
+ 
+    Premkamal PK, Pasupuleti SK, Alphonse P (2019) A new verifiable outsourced ciphertext-policy attribute based encryption for big data privacy and access control in cloud. Journal of Ambient Intelligence and Humanized Computing 10:2693–2707. https://doi.org/10.1007/s12652-018-0967-0 
+ 
+    Article   Google Scholar   
+ 
+    Sahai A, Waters B (2005) Fuzzy identity-based encryption. In: Annual International Conference on the Theory and Applications of Cryptographic Techniques, Springer, pp 457–473, https://doi.org/10.1007/11426639_27 
+ 
+    Shamir A (1979) How to share a secret. Communications of the ACM 22(11):612–613. https://doi.org/10.1145/359168.359176 
+ 
+    MathSciNet   Article   Google Scholar   
+ 
+    Stanek J, Kencl L (2018) Enhanced secure thresholded data deduplication scheme for cloud storage. IEEE Transactions on Dependable and Secure Computing 15(4):694–707. https://doi.org/10.1109/TDSC.2016.2603501 
+ 
+    Article   Google Scholar   
+ 
+    Stanek J, Sorniotti A, Androulaki E, Kencl L (2014) A secure data deduplication scheme for cloud storage. In: International Conference on Financial Cryptography and Data Security, Springer, pp 99–118. https://doi.org/10.1007/978-3-662-45472-5_8 
+ 
+    Takabi H, Joshi JB, Ahn GJ (2010) Security and privacy challenges in cloud computing environments. IEEE Security & Privacy 8(6):24–31. https://doi.org/10.1109/MSP.2010.186 
+ 
+    Wang K, Yu J, Liu X, Guo S (2017) A pre-authentication approach to proxy re-encryption in big data context. IEEE Transactions on Big Data https://doi.org/10.1109/TBDATA.2017.2702176 
+ 
+    Waters B (2011) Ciphertext-policy attribute-based encryption: An expressive, efficient, and provably secure realization. In: International Workshop on Public Key Cryptography, Springer, pp 53–70. https://doi.org/10.1007/978-3-642-19379-8_4 
+ 
+    Yan Z, Ding W, Yu X, Zhu H, Deng RH (2016) Deduplication on encrypted big data in cloud. IEEE transactions on big data 2(2):138–150. https://doi.org/10.1109/TBDATA.2016.2587659 
+ 
+    Yan Z, Zhang L, Ding W, Zheng Q (2019) Heterogeneous data storage management with deduplication in cloud computing. IEEE Transactions on Big Data 5(3):393–407. https://doi.org/10.1109/TBDATA.2017.2701352 
+ 
+    Yang X, Lu R, Choo KKR, Yin F, Tang X (2017) Achieving efficient and privacy-preserving cross-domain big data deduplication in cloud. IEEE Transactions on Big Data https://doi.org/10.1109/TBDATA.2017.2721444 
+ 
+    Youn TY, Chang KY, Rhee KH, Shin SU (2018) Efficient client-side deduplication of encrypted data with public auditing in cloud storage. IEEE Access 6:26578–26587. https://doi.org/10.1109/ACCESS.2018.2836328 
+ 
+    Article   Google Scholar   
+ 
+    Yuan H, Chen X, Jiang T, Zhang X, Yan Z, Xiang Y (2018) Dedupdum: Secure and scalable data deduplication with dynamic user management. Information Sciences 456:159–173. https://doi.org/10.1016/j.ins.2018.05.024 
+ 
+    Article   Google Scholar   
+ 
+    Zhang Y, Chen X, Li J, Wong DS, Li H, You I (2017) Ensuring attribute privacy protection and fast decryption for outsourced data security in mobile cloud computing. Information Sciences 379:42–61. https://doi.org/10.1016/j.ins.2016.04.015 
+ 
+    Article   Google Scholar   
+ 
+    Zhou Y, Feng D, Xia W, Fu M, Huang F, Zhang Y, Li C (2015) Secdep: A user-aware efficient fine-grained secure deduplication scheme with multi-level key management. In: Mass Storage Systems and Technologies (MSST), 2015 31st Symposium on, IEEE, pp 1–14. https://doi.org/10.1109/MSST.2015.7208297 
+ 
+Download references 
+Author information 
+Affiliations 
+ 
+    Department of Computer Applications, National Institute of Technology, Tiruchirappalli, India 
+ 
+    Praveen Kumar Premkamal & P. J. A. Alphonse 
+ 
+    Institute for Development and Research in Banking Technology, Hyderabad, India 
+ 
+    Praveen Kumar Premkamal, Syam Kumar Pasupuleti & Abhishek Kumar Singh 
+ 
+    University of Hyderabad, Hyderabad, India 
+ 
+    Abhishek Kumar Singh 
+ 
+Corresponding author 
+ 
+Correspondence to Praveen Kumar Premkamal . 
+Additional information 
+Publisher’s note 
+ 
+Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations. 
+Rights and permissions 
+ 
+Reprints and Permissions 
+About this article 
+Verify currency and authenticity via CrossMark 
+Cite this article 
+ 
+Premkamal, P.K., Pasupuleti, S.K., Singh, A.K. et al. Enhanced attribute based access control with secure deduplication for big data storage in cloud. Peer-to-Peer Netw. Appl. 14, 102–120 (2021). https://doi.org/10.1007/s12083-020-00940-3 
+ 
+Download citation 
+ 
+    Received : 29 May 2019 
+ 
+    Accepted : 26 May 2020 
+ 
+    Published : 07 July 2020 
+ 
+    Issue Date : January 2021 
+ 
+    DOI : https://doi.org/10.1007/s12083-020-00940-3 
+ 
+Keywords 
+ 
+    Privacy 
+    Data deduplication 
+    Access control 
+    Big data 
+    Cloud computing 
+    CP-ABE  
+ 
+Access options 
+Buy single article 
+ 
+Instant access to the full article PDF. 
+ 
+USD 39.95 
+ 
+Price includes VAT (USA) 
+Tax calculation will be finalised during checkout. 
+ 
+Rent this article via DeepDyve. 
+ 
+Learn more about Institutional subscriptions 
+ 
+    Sections 
+    Figures 
+    References  
+ 
+    Abstract 
+    References 
+    Author information 
+    Additional information 
+    Rights and permissions 
+    About this article  
+ 
+Advertisement 
+ 
+Over 10 million scientific documents at your fingertips 
+Switch Edition 
+ 
+    Academic Edition 
+    Corporate Edition 
+ 
+    Home 
+    Impressum 
+    Legal information 
+    Privacy statement 
+    California Privacy Statement 
+    How we use cookies 
+    Manage cookies/Do not sell my data 
+    Accessibility 
+    FAQ 
+    Contact us 
+    Affiliate program 
+ 
+Not logged in - 154.17.2.206 
+ 
+Not affiliated 
+Springer Nature 
+ 
+© 2022 Springer Nature Switzerland AG. Part of Springer Nature . 

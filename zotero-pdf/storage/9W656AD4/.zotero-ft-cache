@@ -1,0 +1,539 @@
+2012 15th International IEEE Conference on Intelligent Transportation Systems Anchorage, Alaska, USA, September 16-19, 2012
+
+Temporal association rule mining for the preventive diagnosis of onboard subsystems within ﬂoating train data framework
+W. Sammouri, E. Coˆme, L. Oukhellou, P. Aknin, Ch-E. Fonlladosa, and K. Prendergast
+
+Abstract— The increasing interest in preventive maintenance strategies for railway transportation systems and the emergence of telecommunication technologies have both led to the development of ﬂoating train data (FTD) systems. Commercial trains are being equipped with both positioning and communications systems as well as onboard intelligent sensors monitoring various subsystems all over the train. The sizable collected amounts of real-time spatio-temporal data can be used to leverage the development of innovative diagnosis methodologies based on temporal and sequential data mining. This paper presents a temporal association rule mining approach named T-patterns, applied on highly challenging ﬂoating train data. The aim is to discover temporal associations between pairs of timestamped alarms, called events, that can predict the occurrence of severe failures within a complex bursty environment. Experiments
+TM
+carried out on Alstom’s TrainTracer data show promising results.
+I. INTRODUCTION
+Due to the demographic explosion of cities and suburban regions, it is a necessity to meet the mounting social and economic demands on railway transportation. This can be assured by providing a longer availability and a better reliability of transportation systems. In this context, infrastructure and rolling stock maintenance is an important area of interest both for railway operators and manufacturers. Intelligent diagnosis procedures are carried out to provide maintenance teams with an accurate and efﬁcient analysis of recorded measurements which allows them to schedule preventive maintenance appropriately and efﬁciently.
+Floating car data systems which are widely used in road transport networks [13], [27] have also been developed in the railway domain [1]. The basic idea is to equip each commercial train with positioning (GPS) and communications systems as well as onboard sensors monitoring various intelligent subsystems on the train. In this way, each train can be seen as a mobile sensor that operates in a distributed network to collect a large amount of data that is transferred back to the ground automatically via wireless technology. The ﬂoating train data system provides a real-time ﬂow of information consisting of georeferenced alarms, called events, along with their spatial and temporal coordinates.
+Ph.D. student, Universite´ Paris-Est, IFSTTAR, GRETTIA, F93166 Noisy-le-Grand, France. Corresponding author, e-mail: wissam.sammouri@ifsttar.fr.
+Researcher, Universite´ Paris-Est, IFSTTAR, GRETTIA, F-93166 Noisyle-Grand, France
+Senior Researcher, Universite´ Paris-Est, IFSTTAR, GRETTIA, F-93166 Noisy-le-Grand, France
+Senior Researcher, Universite´ Paris-Est, IFSTTAR, GRETTIA, F-93166 Noisy-le-Grand, France
+Alstom Engineers, Alstom Transport, F-93482 St. Ouen, France.
+
+Once these events are ordered with respect to time, they can be considered as one long temporal sequence for each train unit.
+This paper presents a data mining approach for analyzing the temporal sequence of events collected by a ﬂoating train diagnosis system developed by Alstom Transport called TrainTracerTM [1]. The main problem of this work is to discover association rules between pairs of events alerting the imminent or increased probability of occurrence of unwanted events requiring immediate maintenance actions, also referred to as target events. Once such relationships between events are discovered, one can use them to perform an on-line analysis of the incoming event stream in order to predict target events, i.e, severe faults. To be effective, this prediction is subject to two important constraints. First, target events should be predicted within a time delay that should be sufﬁcient enough to allow logistic and maintenance measures to be taken, such as directing a train towards a stand-by maintenance team in a nearby depot, thus avoiding the costly consequences of a train breaking down in-between stations. Secondly, prediction accuracy should be high enough due to high intervention costs in the case of false predictions.
+This paper deals with a particular temporal data mining approach called T-patterns, which has been initially proposed by [17] and extended by [24] and [26]. Data mining approaches are very diversiﬁed to comply with different types of problems that can orient the search towards ﬁnding frequent or rare patterns of events that can be temporal or nontemporal [2], [18], [28], [29]. The available TrainTracerTM dataset consists of a series of timestamped events where each event is identiﬁed by a numerical code and timestamp. The choice of T-patterns framework was motivated by its capability to discover temporal association rules leading to rare events, as well as modelling inter-event times, which is vital in our application. The methodology involved in Tpatterns assumes each event to be a temporal point process and searches for couples of events whose inter-event times are statistically dependent. The discovered event couples are then assessed using a series of performance measures such as inter-event time, recall and precision. Couples abiding with the two constraints mentioned above are considered to be valid association rules that can be presented to railway maintenance experts for further analysis.
+This paper is structured as follows: In Section II, a survey of previous work in relevant literature is presented. The Tpatterns algorithm along with its extensions and interestingness measures are detailed in Section III. Experiments with Alstom TrainTracerTM data are presented in Section IV prior
+
+978-1-4673-3063-3/12/$31.00 ©2012 IEEE
+
+1351
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 06,2022 at 07:26:32 UTC from IEEE Xplore. Restrictions apply.
+
+to a conclusion in Section V.
+II. RELATED WORK
+Temporal sequence mining algorithms have been applied in a variety of domains, such as environmental monitoring [25], bioinformatics [10], recognition of human behavior [12], [19], [8], stock markets [5], telecommunication alarm log management and interaction [18] etc. Depending on the ﬁeld of application, temporal association rule mining approaches generally aim either to ﬁnd frequent or rare ordered series of patterns that may be used afterwards to predict future events. The application most closely related to ours is the analysis of alarms in telecommunication and sensor networks [24], [18]. Thousands of different alarm types are accumulated daily and the goal is to ﬁnd collections of events occurring frequently together or to predict telecommunication failures from logs of alarm messages.
+Classical machine learning approaches can be employed to perform this data analysis. For example, [22] proposes markov models using historic data to make sequential prediction. In [28], a genetic-based machine learning approach is proposed to identify predictive patterns in sequences of events. More dedicated sequential data mining algorithms have been proposed to identify repeated patterns in event sequences ﬁrst and to use afterwards these patterns to predict faults. In [18], a general framework for discovering frequent episodes in a long sequence is proposed through the WINEPI algorithm. A survey of temporal knowledge discovery paradigms and methods can be found in [23].
+Recent approaches were proposed where score values are calculated and assessed by various null models [11], [15], [14], [10]. Among these methods, a systemic approach called T-patterns was introduced in [17]. Statistical dependence of inter-arrival times of couples of events is investigated in order to elucidate possible relationships between pairs of events and then build trees of hierarchical temporal dependencies. This algorithm was extended in [24] and [26] towards a better precision.
+In the railway domain, machine learning and data mining techniques have been applied to solve different kinds of problems. Research for advanced condition monitoring systems was carried out in both infrastructure [21], [6], [3] and rolling stock [4]. Other related work on the use of data mining approaches to deal with railway applications can be mentioned. [7] and [9] used pattern mining techniques to discover train delays. Association rule data mining approaches are used in [20] to analyze the causes in accident data sets in railway network. In [16], the A priori algorithm is applied in railway tunnel lining condition monitoring data management system.
+The present paper introduces a temporal data mining algorithm which leverages the availability of spatio-temporal data to develop novel preventive diagnosis approaches in the railway domain. The T-patterns algorithm is applied on the Alstom TrainTracerTM data to extract temporal association rules between the collected events. In the following section, the T-patterns algorithm is presented.
+
+III. T-PATTERNS ALGORITHM
+
+A. Principle
+
+The T-patterns algorithm is based on the concept that
+
+events can be considered as temporal processes by modeling
+
+their timestamps in the sequence. The aim is then to scruti-
+
+nize the statistical independency between couples of events
+
+by means of a statistical hypothesis test. Two temporal point
+
+processes A and B are considered to be independent if the
+
+arrival of an A-event does not lead to an increase in the
+
+probability of occurrence of a B-event. The hypothesis test
+
+is of the form:
+
+• H0: A and B are independent processes • H1: A and B are dependent
+
+To solve this hypothesis test, Magnusson [17] assumes
+
+furthermore that the two processes A and B are independent
+
+random poisson processes distributed over the observation
+
+period [1, T ] with a constant intensity that is equal to the
+
+average number of occurrences of each of these events per
+
+unit time interval. Considering NA and NB as the number of
+
+occurrences of A and B in the total sequence, this intensity
+
+is equal to
+
+NA T
+
+and
+
+NB T
+
+respectively. Now
+
+that
+
+the expected
+
+number of B-events in an interval of time can be easily
+
+derived, Magnusson uses this information to assert that after
+
+an occurrence of A at a time instant t, there is an interval
+
+[t + d1, t + d2], where (d2 ≥ d1 ≥ 0), that tends to
+
+contain more occurrence of B than would be expected by
+
+chance [17]. This interval is called critical interval (CI) and
+
+presented for simplicty as [d1, d2]. To evaluate an AB couple
+
+within a CI, the standard p-value is computed, which is the
+
+probability, under the null hypothesis, of observing more
+
+than NAB (the observed number of occurrence of B in the
+
+CIs) occurrences of B in the CIs. If the calculated p-value is
+
+inferior to a predeﬁned signiﬁcance threshold (ex. 1%), the
+
+null hypothesis is rejected.
+
+This algorithm was enhanced by [24] and [26] upon the
+
+introduction of a different approach to solve the hypothesis
+
+test as well as simpler CI search methods (refer to III-B.1).
+
+Authors have proposed that if A and B temporal processes
+
+were to be independent, then whenever an A-event occurs
+
+between two successive B-events, it will be uniformly dis-
+
+tributed in that interval [24]. The non-uniformity of A within
+
+the B-intervals increases the odds of the dependency of the
+
+two temporal processes and makes it worthy to start looking
+
+for critical intervals. Denote by tA = (tA1 , tA2, ..., tAn , ...) the (ordered) sequence of times at which an A-event occurs.
+
+TA(n) = tAn − tAn−1 represents inter A-event time-intervals and TB(n) = tBn − tBn−1 inter B-event time-intervals. The
+combination of an A-event and the ﬁrst subsequent B-event
+
+is referred to as AB-event. The time-interval separating these
+
+two events is denoted by TAB
+
+TAB(k) = tBk∗ − tAk ,
+
+(1)
+
+where k∗ = arg min{j | tBj > tAk }. Considering TB as the set of TB intervals in which at least one A-event occurs, TAB
+should then be uniformly distributed between 0 and TB:
+
+TAB ∼ U (0, TB)
+
+(2)
+
+1352
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 06,2022 at 07:26:32 UTC from IEEE Xplore. Restrictions apply.
+
+To obtain a standard uniform distribution, the ratio vector U Due to the fact that our problem imposes having sufﬁcient
+
+of the time between each event Ak and the ﬁrst succeeding inter-event time to allow intervention, railway experts from
+
+B event to the B-interval length containing Ak is calculated: Alstom company have asked for an inter-event time of 30
+
+U (k)
+
+=
+
+TAB (k) TB (k)
+
+=
+
+tBk∗ − tAk tBk∗ − tBk∗−1
+
+minutes (d1) and a prediction period extending to 24 hours (3) (d2). Thus, the critical interval was ﬁxed to [30 minutes , 24
+hours]. The approach adopted in this work is the following:
+
+To validate the null hypothesis (independence), U should be uniformly distributed between 0 and 1. The test can be solved using a Kolmogorov-Smirnov test between the U and a standard uniform distribution.
+
+The TAB histogram for each AB couple is plotted, which is equivalent to the frequency distribution of the time distance between every A-event and the ﬁrst succeeding B-event. If the mode of this histogram is ≥ 30 minutes, the couple is considered to have a sufﬁciently good inter-event time and
+
+Algorithm 1: Pseudo code of the T-patterns algorithm
+Inputs: A − List: List of all non-target events occurring in data, B − List: List of target events occurring in data, Signiﬁcance level α of the Kolmogorov Smirnov test= 1%
+
+thus abides the inter-event time constraint. In addition to the fact that the critical interval is ﬁxed,
+the difference between this approach and that in [24], [26] is that couples are furthermore scuritinized using recall and precision interestingness measures.
+2) Recall and precision measures: Interestingness mea-
+
+1: for every combination of A and B events in the
+
+sures such as recall and precision are traditionnally computed
+
+A − List and B − List: do
+
+to assess the robustness of event couples. They are deﬁned
+
+2: Compute vector tA, the ordered sequence of times at by
+
+which the A-event occurred 3: Search for the ﬁrst B-event succeeding every
+
+Recall
+
+=
+
+#P redicted target events #T otal target events
+
+(4)
+
+A-event and Calculate TAB using equation (1) 4: Compute TB which is the time distance between the
+two B-events within which each A-event occurred
+
+P recision
+
+=
+
+#T rue #T otal
+
+predictions predictions
+
+(5)
+
+5: Calculate the ratio vector U using equation (3) 6: if U is not uniformly distributed using a
+Kolmogorov Smirnov statistical test with siginiﬁcance level α then 7: (A, B) is considered to be statistically signiﬁcant
+and added to a list of possibly dependent couples 8: end if 9: end for
+
+The recall represents the number of predicted target events over the total number of target events in the sequence. That is, the percentage of target events that were predicted. The precision represents the number of true predictions over the total number of predictions. A high recall (i.e. low rate of false negatives) means that no target events were missed while a high precision reﬂects a high predictive capability and indicates a low rate of false positives. A false positive
+
+Outputs: Dependent (A, B) couples
+
+case corresponds to wrong prediction and a false negative
+
+situation is when no prediction occurs prior to a target event.
+
+Since a high value of both interestingness measures is
+
+B. Performance measures
+
+required considering the high cost of useless maintenance intervention in case of false positive predictions or the high
+
+Depending on the application, the metrics used to evaluate cost of corrective maintenance in case of false negatives, a
+
+the performance of the mining algorithm can vary. In our ap- trade-off should be established to decide whether a rule is
+
+plication, two main constraints have to be taken into account signiﬁcant or not.
+
+to identify among the possibly dependent pairs of events discovered by the T-patterns algorithm those representing
+
+IV. EXPERIMENTS
+
+plausible association rules in railway network. Couples of This section presents experiments performed to validate
+
+events abiding a high global accuracy on one hand and a the main idea explored throughout this paper, i.e., the anal-
+
+sufﬁciently-large inter-event time on the other hand would ysis of alarms sent by ﬂoating train diagnosis systems in the
+
+be considered as relevant.
+
+aim of discovering valid relationships leading to association
+
+1) Inter-event time modeling: As mentioned before, target rules. These rules allow us to analyze the incoming event
+
+events should be predicted within a warning time sufﬁcient stream and to predict those corresponding to severe faults. TM
+enough to allow logistic and maintenance actions to be taken. The Alstom TrainTracer data will ﬁrst be detailed in
+
+It is for this reason that critical intervals between all A Section IV-A and the results obtained by T-patterns algorithm
+
+and B events in the list of possibly dependent AB couples will be presented and discussed in section IV-B.
+
+should be modeled. To perform this, Many approaches have
+
+TM
+
+been proposed in [17], [24], [26]. They are based either on A. TrainTracer Data
+
+shrinking or splitting critical intervals till ﬁnding an interval The database upon which the current work was performed
+
+with a signiﬁcant p-value or using Gaussian mixture models was provided by Alstom Transport. It consists of a 6-month
+
+to ﬁt the histogram of the TAB vector.
+
+data extract from the TrainTracerTM database. TrainTracerTM
+
+1353
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 06,2022 at 07:26:32 UTC from IEEE Xplore. Restrictions apply.
+
+is a state-of-the-art software conceived by Alstom to collect and process data sent by a ﬂeet of trains equipped with onboard sensors monitoring 31 subsystems. This data consists of series of timestamped events where each event is identiﬁed by a numerical code in addition to context variables concerning the physical, geographical and technical framework of the train at its exact time of occurrence. There are 1113 types of events existing in the data with varying frequencies and distributions. There are 9.15 million events that have occurred in the 6-month period with an event occuring every 1.5 minutes on average. Since events may vary between warnings, alarms and normative events, they have been divided into 5 intervention categories describing how critical they are. These categories in an increasing order of importance are: Status, Driver Information, Driver Action Low, Maintenance and Driver Action High. A target event is deﬁned as an event necessitating immediate corrective maintenance actions on a train. In this work, all Driver Action High events related to tilting and traction subsystems were considered as target events. In total, only 30902 target events occurred in the data, consisting 0.45% of all events.
+B. Results and discussion
+The direct application of the T-patterns algorithm on the TrainTracerTM data will lead to the discovery of many spurious couples. This is due to the fact that many events occured only in a very limited number of trains, thus affecting negatively T-patterns results as well as the recall and precision interestingness measures. To overcome this inconvenience, a ﬁlter was introduced prior to the evaluation of an event couple by the T-patterns algorithm. This ﬁlter identiﬁes trains where the frequency of an event is superior to x + 3σ, where x refers to the mean frequency of an event among all trains and σ its standard deviation. For each (A, B) event couple, trains with an A or B frequency superior to that threshold are neglected. This procedure renders results more robust as it decreases the number of statistically dependent couples discovered by T-patterns by 20%. Fixing the value of the signiﬁcance level α of the Kolmogorov-Smirnov test to 1%, the T-patterns algorithm has discovered 8281 statistically dependent couples of events. These couples were subject to several evaluation processes in order to determine those satisfying the two constraints introduced in section I and thus would be considered as reliable association rules. These evaluation processes consisted of modeling inter-event times in addition to the calculation of recall and precision measures. Since target events should be predicted early enough to allow maintenance or logistic actions to be taken, the interevent time of all couples must be evaluated. As mentioned in section III.B, railway experts from Alstom Tranport have asked for a critical interval of [30 min , 24 hours]. That is, an A-event should predict the high probability of occurrence of a B-event within 30 minutes and 24 hours, i.e., mining is focused on couples with inter-event times at least equal to 30 minutes. Figure 1 represents the histogram of the modes of the TAB vector of all couples discovered by the T-patterns algorithm. 4796 couples with a mode value superior to the
+
+30-minute threshold were accepted.
+
+Count
+
+1800 1600 1400 1200 1000 800 600 400 200
+0 0
+
+500
+
+1000
+
+1500
+
+2000
+
+2500
+
+3000
+
+3500
+
+TAB mode (hours)
+
+Fig. 1. Histogram of the modes of the inter-event time vector TAB of the 8281 statistically dependent couples discovered by the T-patterns algorithm in 6-month TrainTracerTM data extract
+
+The recall/precision scatterplot for the 4796 couples is calculated and the global results are presented in Figure 2. As shown in the scatterplot of Figure 2, four zones can
+
+Precision
+
+1
+
+1
+
+0.9
+
+0.9
+
+Zone 2
+
+Zone 1
+
+0.8
+
+0.8
+
+0.7
+
+0.7
+
+0.6
+
+0.6
+
+0.5
+
+0.5
+
+0.4
+
+0.4
+
+Zone 4
+
+Zone 3
+
+0.3
+
+0.3
+
+0.2
+
+0.2
+
+0.1
+
+0.1
+
+0 1
+
+0
+
+0
+
+0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+
+1
+
+1
+
+0
+
+0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+
+1
+
+Recall
+
+Fig. 2. Recall/precision scatterplot of 4796 couples with a TAB mode value ≥ 30 minutes. Recall threshold = 50%, precision threshold = 50% along
+with the boxplot of recall and precision reﬂecting the global dispersion of
+both interestingness measures
+
+be deﬁned according to 50% thresholds on both recall and precision. Couples of events belonging to zone 1, i.e., both their recall and precision values exceed the threshold, may be very relevant and hence can be considered to be association rules with high interestingness. Zone 2 contains all couples with high precision and low recall while zone 3 contains those with high recall and low precision. Couples of events of these two zones are considered to be possibly relevant enough to be association rules because the weakness of one of the two measures might be a result of the complexities
+
+1354
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 06,2022 at 07:26:32 UTC from IEEE Xplore. Restrictions apply.
+
+occurring in the data such as redundancy or bursts. Zone 4 contains all couples with low recall and precision values. These couples are considered to be insigniﬁcant. Table I displays the number of couples existing in each zone. An empty zone 1 indicates that no relevant couples were found. Zone 2 and 3 respectively contained 2 and 696 possibly relevant couples. The 4098 couples found in zone 4 are considered to be irrelevant and are neglected.
+
+TABLE I NUMBER OF COUPLES OF EVENTS PER ZONE FOR RECALL THRESHOLD
+= 50%, PRECISION THRESHOLD = 50%
+
+Z one 1 2 3 4
+
+N b. of couples 0 2
+696 4098
+
+Due to the lack of the ground truth on the real existence TM
+of couples of events in the TrainTracer database, all discovered association rules need to be analyzed with the help of railway maintenance experts. This analysis aims to identify among the discovered association rules those having a real physical meaning. This means that the analysis of the obtained rules needs to be both statistical and physical. Indeed, useful dependencies between elements undirectly connected in the subsystem can be found as well as spurious association rules which will be omitted by knowledgeable experts if they do not have any technical signiﬁcance. Consider the following association rule:
+
+Count Count of event B Count of event A
+
+1 0.5
+0 0
+1000 500 0 0 100 50 0 0 400 200 0 0 400 200 0 0 400 200 0 0
+
+10 10 10
+5 50 500
+
+20
+
+30
+
+40
+
+Train unit number
+
+20
+
+30
+
+40
+
+Train unit number
+
+20
+
+30
+
+40
+
+Train unit number
+
+10
+
+15
+
+TAB (Hours), xlim([0 24])
+
+100
+
+150
+
+TAB (Hours), xlim([0 240])
+
+1000
+
+1500
+
+2000
+
+TAB (Hours), xlim([0 max de TAB]
+
+Recall
+
+Precision
+
+50
+
+60
+
+50
+
+60
+
+50
+
+60
+
+20 200 2500
+
+Count
+
+Count
+
+Fig. 3. An example of the distribution of recall/precision values of an association rule A =⇒ B (TNA =⇒ TOS) per train as well as the distribution of events A and B per train and histograms of the distribution of all TAB values of the association rule visible within variable time scales
+
+application of other efﬁcient algorithms in mining association rules leading to rare events such as [10], [5], [28] in order to confront and compare their results. Also, increasing the length of rules to be discovered may reveal hidden valuable information. Indeed, association rules between couples of events that seem physically irrelevant may be explained more logically by extending to length-3 rules and more. These two events in the above rule for example might be the extremities of longer rules.
+
+Tilt Authorization and Speed Supervision Not Available =⇒ Train Speed Exceeds 113mph with Tilt Not Available
+Recall: 59% Precision: 41%
+The recall value indicates that 59% of the “Train Speed Exceeds 113mph with Tilt Not Available” (TOS) events have been predicted by “Tilt Authorization and Speed Supervision not available” (TNA) events. However, only 41% of the TNA events have led to a TOS event within a time window of [30 min , 24h]. Prior to presenting the rule to technical experts, it is meaningful to consider the recall and precision values of the association rule per train as well as the distribution of the two events of the couple amongst trains (Figure 3). The observation of unusual distributions may decrease the chances of a rule to be relevant.
+As it can be seen in Figure 3, both events are fairly distributed among all trains, with the exception of trains 34 (for event A) and 19 (for target event B), marked in red. Both trains have been excluded by the introduced ﬁlter prior to the evaluation of the couple by T-patterns and the calculation of recall and precision.
+Many association rules were discovered and analyzed. Improving the robustness of the discovered rules necessitates cleaning data from redundancy and bursts, as well as the
+
+V. CONCLUSION AND FUTURE WORK
+This paper proposes a new methodology for discovering association rules in very complex and challenging ﬂoating train data with multiple constraints. Finding such relationships between couples of events leading to rare target events that require immediate maintenance actions will allow railway operators to analyze the incoming event stream and to predict those corresponding to severe faults. The proposed methodology is based on an improved version of the Tpatterns algorithm. This choice was mainly motivated by the rareness of temporal rules to be discovered within a large database of events and also by the modeling of the interevent time authorized by this algorithm. Experiments were carried out on a real ﬂoating train data extract from Alstom’s
+TM
+TrainTracer software. The obtained rules were analyzed using classical indicators such as recall, precision, inter-event times as well as by railway maintenance experts in order to incorporate physical expertise to the analysis process. The preliminary results show the potential of such methodology to highlight relevant couples of events.
+This work can be extended in several directions. The application relies on the analysis of sequential ﬂoating train alarms within a data mining framework, an important problem that has not received much attention until now. The availability of such spatio-temporal data offers new perspectives to set
+
+1355
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 06,2022 at 07:26:32 UTC from IEEE Xplore. Restrictions apply.
+
+up intelligent maintenance policies in the railway domain, thus optimizing maintenance operations while considering ﬁnancial cost and reliability objectives. Railway transport operators of the future may not only be able to monitor the ﬂeet they manage, but also to control any serious failures on the rolling stock. More algorithms dedicated to discovering temporal association rules leading to rare events could also be considered [10], [5], [28]. Finally, further investigations such as increasing the length of rules to be discovered can be carried out to improve results.
+REFERENCES
+[1] Onboard diagnosis transforms maintenance: Alstom’s onboard diagnosis system trantracer is changing the way maintenance is planned and conducted. International Railway Journal, 49:37–40, 2009.
+[2] R. Agrawal and R. Srikant. Mining sequential patterns. In Proceedings of the 11th International Conference on Data Engineering, pages 3– 14, Taipei, Taiwan, March 1995.
+[3] C. Barkan and N. Ahuja. Condition monitoring of railway turnouts and other track components using machine vision trb 11-1442. Transportation Research Record, (217):1–17, 2010.
+[4] J. Brizuela, C. Fritsch, and A. Ibez. Railway wheel-ﬂat detection and measurement by ultrasound. Transportation Research, 19(1):975–984, 2011.
+[5] C.H. Chen, T.P. Hong, and V.S. Tseng. Fuzzy data mining for timeseries data. Appl. Soft Comput., 12(1):536–542, 2012.
+[6] J. Chen, C. Roberts, and P Weston. Fault detection and diagnosis for railway track circuits using neuro-fuzzy systems. Control Engineering Practice, 16:585–596, 2008.
+[7] B. Cule, B. Goethals, S. Tassenoy, and S. Verboven. Mining train delays. Proceedings of the 10th International Symposium on Intelligent Data Analysis, IDA 2011, 2011.
+[8] M. Ermes, J. Parkka, J. Mantyjarvi, and I. Korhonen. Detection of daily activities and sports with wearable sensors in controlled and uncontrolled conditions. Information Technology in Biomedicine, IEEE Transactions on, 12(1):20 –26, jan. 2008.
+[9] H. Flier, R. Gelashvili, T. Graffagnino, and M. Nunkesser. Mining railway delay dependencies in large-scale real-world delay data. Robust and Online Large-Scale Optimization, Lecture Notes in Computer Science, 5868:354–368, 2009.
+[10] N. Haiminen, H. Mannila, and E. Terzi. Determining signiﬁcance of pairwise co-occurrences of events in bursty sequences. BMC Bioinformatics, 9(1), August 2008.
+[11] S. Hannenhalli and S. Levy. Predicting transcription factor synergism. Nucleic Acids Res, 30(19), 2002.
+[12] S. Honda, K.I. Fukui, K. Moriyama, S. Kurihara, and M. Numao. Extracting human behaviors with infrared sensor network. Proceedings of the 4th International Conference on Networked Sensing Systems, INSS 2007, pages 122–125, 2007.
+
+[13] B.S. Kerner, C. Demir, R.G. Herrtwich, S.L. Klenov, H. Rehborn, M. Aleksi, and A. Haug. Trafﬁc state detection with ﬂoating car data in road networks. In Proceedings of the International IEEE Conference on Intelligent Transportation Systems 2005, pages 700–705, 2005.
+[14] H. Klein and M. Vingron. Using transcription factor binding site co-occurrence to predict regulatory regions. Genome informatics. International Conference on Genome Informatics, 18:109–118, 2007.
+[15] S. Levy, S. Hannenhalli, and C. Workman. Enrichment of regulatory signals in conserved non-coding genomic sequence. Bioinformatics, 17(10):871–877, October 2001.
+[16] Y. Liu, W. Xu, and H. Du. The method of test for state of railway tunnel lining based on association rules. pages 387–390, May 2011.
+[17] S. Magnusson. Discovering hidden time patterns in behavior: Tpatterns and their detection. Behavior Research Methods, Instruments, & Computers, 32s:93–110, 2000.
+[18] H. Mannila, H. Toivonen, and A.I. Verkamo. Discovery of frequent episodes in event sequences. Data mining and knowledge discovery, 1:259–289, 1997.
+[19] C. Micheloni, L. Snidaro, and G.L. Foresti. Exploiting temporal statistics for events analysis and understanding. Image and Vision Computing, 27(10):1459 – 1469, 2009.
+[20] A. Mirabadi and S. Shariﬁan. Application of association rules in iranian railways (rai) accident data analysis. Safety Science, 48(10):1427 – 1435, 2010.
+[21] L. Oukhellou, E. Coˆme, L. Bouillaut, and P. Aknin. Combined use of sensor data and structural knowledge processed by bayesian network: Application to a railway diagnosis aid scheme. Transportation Research Part C: Emerging Technologies, 16:755–767, 2008.
+[22] S.P. Rao and D. Cook. Predicting inhabitant action using action and task models with application to smart homes. International Journal on Artiﬁcial Intelligence Tools, 13:81–100, 2004.
+[23] J.F. Roddick and M. Spiliopoulou. A survey of temporal knowledge discovery paradigms and methods. Knowledge and Data Engineering, IEEE Transactions on, 14(4):750 –767, July-August 2002.
+[24] A.A. Salah, E. Pauwels, R. Tavenard, and T. Gevers. T-patterns revisited: Mining for temporal patterns in sensor data. Sensors, 10(8):7496–7513, 2010.
+[25] P. Tan, M. Steinbach, V. Kumar, C. Potter, S. Klooster, and A. Torregrosa. Finding spatio-temporal patterns in earth science data. Proceedings of the KDD Workshop on Temporal Data Mining, August 2001.
+[26] R. Tavenard, A.A. Salah, and E.J. Pauwels. Searching for temporal patterns in ami sensor data. Constructing Ambient Intelligence, pages 53–62, 2008.
+[27] H. Van Zuylen, Y. Chen, and F. Zheng. Using ﬂoating car data for trafﬁc state estimation in signalized urban networks. IWTDCS Barcelona 2008, 2008.
+[28] G.M. Weiss. Timeweaver: a genetic algorithm for identifying predictive patterns in sequences of events. pages 718–725, 1999.
+[29] M.J. Zaki. SPADE: An efﬁcient algorithm for mining frequent sequences. Machine Learning Journal, 42:31–60, 2001.
+[30] M.J. Zaki, N. Lesh, and M. Ogihara. Planmine: Predicting plan failures using sequence mining. Artiﬁcial Intelligence Revue, 14:421–446, 2000.
+
+1356 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 06,2022 at 07:26:32 UTC from IEEE Xplore. Restrictions apply.
+

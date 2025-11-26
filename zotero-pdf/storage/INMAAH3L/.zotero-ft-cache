@@ -1,0 +1,328 @@
+Applied Mechanics and Materials Vols 409-410 (2013) pp 1197-1203 © (2013) Trans Tech Publications, Switzerland doi:10.4028/www.scientific.net/AMM.409-410.1197
+
+Online: 2013-09-03
+
+Study on the Ship Arrival Pattern of Container Terminals DU Pengchenga, WANG Wenyuanb, TANG Guoleic, GUO Zijiand,
+Faculty of Infrastructure Engineering, Dalian University of Technology, Dalian, 116024, China adupengcheng_1989@hotmail.com, bbsklwwy@gmail.com, ctangguolei@dlut.edu.cn, dzjguo@dlut.edu.cn
+
+Keywords: Container ship; Arrival pattern; Liner routes; Distribution regularities.
+Abstract. Container ship arrival pattern had an important effect on throughput capacity of container terminals. There is an urgent need for recognition of the ship arrival pattern of modern container terminal, owing to the change of the composition of both operating routes and arrival ships, which was brought up by the rapid development of China’s coastal ports container service. This paper statistically analyzes the ship arrival data collected from some domestic container terminals from the view of the number of daily arrival vessels and the inter-arrival time between two ships by using Chi-Square Test. The results prove that the ship arrival pattern of container terminals vary with the constitute of container liner routes, and the number of daily arrival vessels follows either Poisson or normal distribution, and the inter-arrival time follows both negative-exponential and gamma distribution.
+
+Introduction
+Container transportation of China’s coastal ports develops rapidly which contributes to China’s first position in global throughput ranking for many years, as well as its concentration on construction of more specialized container terminals. Since the imbalance of ship arrival is an important factor that affects the harbor traffic capacity, grasping the ship arrival pattern of container terminal is beneficial for deciding the scale of construction reasonably, attracting liner routes and improving competitiveness.
+With the continued optimization of container berths, the development trend of large-scale ship is obvious and the constitution of container shipping routes and arrival vessels are changing. The current ship arrival pattern of container terminal should be updated urgently to meet the demand for development of modern container terminal. Therefore, this paper discussed the ship arrival pattern of container terminals derived by analyzing the ship arrival data of some domestic container terminals, so as to provide the basis to ascertain the throughput capacity and the scale of container terminals reasonably.
+
+Statistic-testing Method
+When the specific type of the overall distribution being studied is unknown, and only some certain assumptions can be put forward to represent the type or specific traits of the unknown distribution function, the analysis process can be called non-parametric assumptions, and the corresponding test methods are known as non-parametric hypothesis test. In this light, Pearson Chi-Square goodness of fit test can be used generally, and the test statistic can be calculated according to equation (1):
+
+k
+    2 
+
+Ni  npi 2
+
+i1
+
+npi
+
+.
+
+（1）
+
+All rights reserved. No part of contents of this paper may be reproduced or transmitted in any form or by any means without the written permission of Trans Tech Publications, www.ttp.net. (ID: 128.210.126.199, Purdue University Libraries, West Lafayette, USA-19/05/15,20:31:43)
+
+1198
+
+Sustainable Development and Environment II
+
+Where Ni is the measured frequency and npi is the theoretical frequency; n stands for the total number of samples and k the sample groups.
+ 2
+The test statistic follows the R-degree of freedom Chi-Square distribution approximately, and the degree of freedom can be calculated according to equation (2):
+
+R=k-r-1.
+
+（2）
+
+Where r is the number of unknown parameters in the theoretical distribution, such as r is 1 in
+
+Poisson or negative-exponential distribution and in normal or gamma distribution, r is 2.
+
+In accordance with the Pearson theorem, if the significant level  is given, the critical value
+
+  2R can be found out from Chi-Square distribution table and the rejection region 2R , can
+
+be determined on the basis of the degree of freedom. If the test statistic falls into the rejection region, the null hypothesis should be rejected, vice versa.
+
+Ship Arrival Pattern Analysis
+
+Ship arrival pattern is usually described by distribution function of the daily arrival vessels and the inter-arrival time between two ships. This paper collects the vessel arrival data of some domestic container terminals, such as Port NB, GZ, SZ, etc., then groups the sample data of the number of daily arrival vessels and the inter-arrival time respectively and draws frequency histogram. The sample data is supposed to follow Poisson, normal, negative-exponential and gamma distribution, and then tested by the Chi-Square test method at the 0.05 significance level, so as to determine the ship arrival pattern.
+Port NB. Port NB, known for its container mainline harbor, integrates the estuary and gulf harbors into an organic whole in the Yangtze River Delta region. It remains the 4th in container throughput in China and is open to navigation to more than 600 ports in over 100 countries and regions around the world. Meanwhile, it owns ocean routes like the Mediterranean Sea routes, Europe routes, West America routes, South Africa route, Middle East routes, etc. and near-sea shipping lines like West Asia routes, as well as domestic routes and feeder routes. Its main business is to provide ocean transportation services, supplemented with short-range ocean and domestic transportation. By the end of 2010, the proportion of its ocean shipping reached up to 53.5%.
+Take CMICT for example, this paper collects ship arrival data from May 2008 to May 2009, analyzes ship arrival pattern of container terminals in Port NB. The inspection results are shown in table 1.
+(1) Distribution law of the number of daily arrival vessels Seen from table 1, the number of daily arrival vessels in CMICT follows Poisson distribution. The histogram and fitting curve are shown in figure 1(a). When Poisson distribution is assumed,
+
+   2
+
+
+
+2 0.05
+
+7
+
+,
+
+the
+
+null
+
+hypothesis
+
+is
+
+accepted.
+
+And
+
+when
+
+normal
+
+distribution
+
+is
+
+assumed,
+
+2
+
+
+
+   2 0.05
+
+6
+
+,
+
+the
+
+null
+
+hypothesis
+
+is
+
+rejected.
+
+(2) Distribution law of the inter-arrival time between two ships Table 1 shows that the inter-arrival time of CMICT follows both negative-exponential and gamma distribution, meanwhile the fitting degree of gamma distribution is superior to that of negative-exponential distribution. The distribution histogram and fitting curve are shown in figure
+
+Applied Mechanics and Materials Vols. 409-410
+
+1199
+
+1(b). When negative- exponential distribution is assumed,
+
+2
+
+
+
+2 0.05
+
+15
+
+,
+
+the
+
+null
+
+hypothesis
+
+is
+
+accepted. And when gamma distribution is assumed,
+
+
+
+2
+
+
+
+   2 0.05
+
+14
+
+,
+
+the
+
+null
+
+hypothesis
+
+is
+
+accepted.
+
+The analysis procedure of the distribution regularity in the following examples is the same as above.
+
+Table 1 Ship arrivals pattern statistical information summary of some container terminals
+
+Probability distribution
+
+Harbor
+
+NB
+
+GZ JZ SZ
+
+YT
+
+Terminal CMICT GOCT JNCT YICT DPWYT
+
+Poisson
+
+Test statistics
+
+5.55
+
+4.05 3.71 17.75 27.11
+
+distribution Number of daily
+
+Critical value
+
+14.07 9.49 5.99 12.59 11.07
+
+arrival vessels
+
+Normal
+
+Test 41.57 56.99 50.86 4.18 6.21
+statistics
+
+distribution
+
+Critical value
+
+12.59 7.81 3.84 11.07
+
+9.49
+
+Inter-arrival
+
+Negative exponential distribution
+
+Test statistics Critical
+value
+
+14.06 5.23 7.66 11.88 25.00 15.51 12.59 12.59
+
+15.80 12.59
+
+time
+
+Gamma
+
+Test statistics
+
+13.05
+
+6.17
+
+2.60 5.93
+
+4.53
+
+distribution
+
+Critical value
+
+23.68 14.07 11.07 11.07 11.07
+
+Routes constitute
+
+Relatively complicated Relatively single
+
+(a) The number of daily arrival vessels
+
+(b) The inter-arrival time
+
+Fig.1 The arrival vessel statistics characteristic graph of CMICT
+
+Port GZ. Port GZ is a container mainline harbor in the Pearl River delta region, with ocean transportation given first place to, supplemented with short-range ocean transportation and domestic trade. As an important part of the global logistics chain, Port GZ is the largest comprehensive hub
+
+1200
+
+Sustainable Development and Environment II
+
+port in South China whose routes reach more than 300 ports in over 80 countries and regions around the world. There are ocean routes like Red Sea routes, Europe routes, America routes, and Mediterranean Sea routes, and near-sea shipping lines like Southeast Asia routes, as well as domestic routes, feeder routes and inland river lines linking Hong Kong, Macao, and so on.
+Take GOCT for example, this paper collects ship arrival data from April to December 2008, analyzes the ship arrival pattern of container terminals in Port GZ. The inspection results are shown in table 1.
+(1) Distribution law of the number of daily arrival vessels Seen from table 1, the number of daily arrival vessels in GOCT follows Poisson distribution. And the histogram and fitting curve are shown in figure 2(a). (2) Distribution law of the inter-arrival time between two ships Table 1 shows that the inter-arrival time of GOCT follows both negative-exponential and gamma distribution, meanwhile the fitting degree of negative-exponential distribution is superior to that of gamma distribution. Moreover, the distribution histogram and fitting curve are shown in figure 2(b).
+
+(a) The number of daily arrival vessels
+
+(b) The inter-arrival time
+
+Fig.2 The arrival vessel statistics characteristic graph of GOCT
+
+Port JZ. Port JZ is a container feeder harbor in Bohai Rim region, with significant uncertainty of ship arrival influenced by its home port. It has opened up some container shipping lines. It owns domestic routes mainly and a small amount of feeder routes, but no routes for foreign trade. According to the ship arrival data from April to November 2008 of JNCT, this paper analyzes the ship arrival pattern of container terminals in Port JZ. The inspection results are shown in table 1.
+(1) Distribution law of the number of daily arrival vessels Seen from table 1, the number of daily arrival vessels in JNCT follows Poisson distribution. The histogram and fitting curve are shown in figure 3(a). (2) Distribution law of the inter-arrival time between two ships Table 1 shows that the inter-arrival time of JNCT follows both negative-exponential and gamma distribution, meanwhile the fitting degree of gamma distribution is superior to negative-exponential. The distribution histogram and fitting curve are shown in figure 3(b).
+
+Applied Mechanics and Materials Vols. 409-410
+
+1201
+
+(a) The number of daily arrival vessels
+
+(b) The inter-arrival time
+
+Fig.3 The arrival vessel statistics characteristic graph of JNCT
+
+Port SZ. Port SZ is a container mainline harbor in Pearl River delta region, attracts hundreds of liner routes every week which are ocean shipping routes mainly. As one of the ports whose container throughput is the highest in single terminal, its container liner density ranks the first in China. The shipping services cover around the world, including ocean routes of America, Europe, Australia, Middle East, Africa and near-sea shipping lines of Southeast Asia. According to the ship arrival data of 2006 of YICT, this paper analyzes the ship arrival pattern of container terminals in Port SZ. The inspection results are shown in table 1.
+(1) Distribution law of the number of daily arrival vessels Seen from table 1, the number of daily arrival vessels in YICT follows Poisson distribution. And the distribution histogram and the fitting curve are shown in figure 4(a). (2) Distribution law of the inter-arrival time between two ships Table 1 shows that the inter-arrival time of YICT follows both negative-exponential and gamma distribution, meanwhile the fitting degree of gamma distribution is superior to that of negative-exponential. The distribution histogram and fitting curve are shown in figure 4(b).
+
+(a) The number of daily arrival vessels
+
+(b) The inter-arrival time
+
+Fig.4 The arrival vessel statistics characteristic graph of YICT
+
+1202
+
+Sustainable Development and Environment II
+
+Port YT. Port YT, as a container feeder harbor in Bohai Rim region, is in current contact for navigation and trading with more than 150 ports from over 100 countries and regions. It operates short-range ocean transportation and domestic trade, meanwhile feeds to the surrounding container mainline ports. It serves the near-sea shipping routes to Japan and Korea, as well as a few domestic routes to Qingdao, Yingkou and Shanghai.
+Take DPWYT for example, this paper collects ship arrival data of 2008, analyzes the ship arrival pattern of container terminals in Port YT. The inspection results are shown in table 1.
+(1) Distribution law of the number of daily arrival vessels Seen from table 1, the number of daily arrival vessels in DPWYT follows Poisson distribution. The distribution histogram and the fitting curve are shown in figure 5(a). (2) Distribution law of the inter-arrival time between two ships Table 1 shows that the inter-arrival time of DPWYT follows gamma distribution. The distribution histogram and fitting curve are shown in figure 5(b).
+
+(a) The number of daily arrival vessels
+
+(b) The inter-arrival time
+
+Fig.5 The arrival vessel statistics characteristic graph of DPWYT
+
+To sum up, we could draw the following conclusions after analyzing the vessels arrival data of 6 container terminals mentioned above:
+(1) The number of daily arrival vessels in majority of container terminals follows Poisson distribution. The imbalance of vessels arrival is great and the port operation assignment is difficult, because the foreign trade and domestic feeder both do coexist or the routes are affected by subjective berth designation in these ports. Most of our ports belong to this type, such as Port NB, GZ and JZ.
+(2) The number of daily arrival vessels in small part of container terminals follows normal distribution. It’s easy to arrange the operation based on the relatively definite ship arrival in these container terminals which have relatively fixed routes. For example, the liner routes are dominated by ocean routes in Port SZ, and near-sea shipping lines in Port YT.
+(3) The inter-arrival time between two container vessels is well fitted with negative- exponential and gamma distribution, besides the fitting degree of gamma distribution is superior to that of negative-exponential distribution.
+
+Applied Mechanics and Materials Vols. 409-410
+
+1203
+
+Conclusion
+This paper studies on the ship arrival pattern of container terminal to meet the development needs of the modern container terminal. According to the statistical analysis of the vessels arrival data of 6 container terminals, the ship arrival pattern of China’s container terminal is obtained as follows:
+(1) The number of daily arrival vessels varies with the container shipping routes. It is Poisson distributed when the routes of domestic, foreign and feeder trade are all taken into account. While it follows normal distribution when the routes relative to a single.
+(2) The inter-arrival time between two container vessels is well fitted with negative- exponential and gamma distribution, besides the fitting degree of gamma distribution is superior to that of negative-exponential distribution.
+Literature References
+Existing research have shown that it’s easy to arrange arrival vessels in specialized terminal or terminal mainly for liner routes since the ship and the owner of cargo are relatively concentrated. Therefore, it is generally believed that the inter-arrival time follows second order distribution of Ireland in consideration of the fact that ship arrival randomness is due to the natural factors [1]. Kozan established a container terminal queuing model based on the fact that the number of daily arrival vessels follows Poisson distribution and the inter-arrival time follows negative-exponential distribution [2]. Shabayek et al statistically analyzed the ship arrival data of Kwai Chung container terminals in Hong Kong from January 1999 to March 2000 and obtained the knowledge that the inter-arrival time follows negative-exponential distribution [3]. X.Y. Yang et al statistically analyzed the vessel arrival data of Yingkou container terminals from January to September in 2003 and Tianjin orient container terminals from August to December in 2003, and confirmed that the inter-arrival time follows negative-exponential distribution [4]. J.X. Liu et al statistically analyzed the ship arrival pattern of Tianjin port main channel from 2003 to 2005, including container ships, bulk cargo ships, ro-ro ships, etc., and received that the number of daily arrival vessels follows normal distribution [5].
+Acknowledgements
+This work was financially supported by the Natural Science Foundation of China (51079022 and 51109030).
+References
+[1] Zijian Guo, Port planning and layout (the third edition), Beijing: China Communication Press, 2011 (In Chinese).
+[2] E. Kozan, Comparison of analytical and simulation planning models of seaport container terminals, Journal of Transportation Planning and Technology, Vol.20, No.3, 1997, 235-248.
+[3] A.A. Shabayek, W.W. Yeung, A simulation model for the Kwai Chung container in Hong Kong, European Journal of Operational Research, Vol.140, 2002, 1-11.
+[4] Xingyan Yang, Hengzhou Wei, The analysis of reasonable berth utilization of coastal port container terminal, Journal of Port Engineering Technology, No.3, 2004, 5-7 (In Chinese).
+[5] Jingxian Liu, Yunbin Li, Distribution regularity analysis of ship arrival and department at the Tianjin port main channel, Journal of Wuhan University of Technology (Transportation Science & Engineering), Vol.32, No.2, 2008, 351-353 (In Chinese).
+
+Sustainable Development and Environment II 10.4028/www.scientific.net/AMM.409-410
+Study on the Ship Arrival Pattern of Container Terminals 10.4028/www.scientific.net/AMM.409-410.1197
+

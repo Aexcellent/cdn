@@ -1,0 +1,5236 @@
+Journal of Machine Learning Research 18 (2018) 1-51
+
+Submitted 12/15; Revised 4/17; Published 4/18
+
+Risk-Constrained Reinforcement Learning with Percentile Risk Criteria
+
+Yinlam Chow DeepMind Mountain View, CA 94043, USA
+Mohammad Ghavamzadeh DeepMind Mountain View, CA 94043, USA
+Lucas Janson Department of Statistics Stanford University Stanford, CA 94305, USA
+Marco Pavone Aeronautics and Astronautics Stanford University Stanford, CA 94305, USA
+
+YINLAMCHOW@GOOGLE.COM GHAVAMZA@GOOGLE.COM LJANSON@STANFORD.EDU PAVONE@STANFORD.EDU
+
+Editor: Jan Peters
+
+Abstract
+In many sequential decision-making problems one is interested in minimizing an expected cumulative cost while taking into account risk, i.e., increased awareness of events of small probability and high consequences. Accordingly, the objective of this paper is to present efﬁcient reinforcement learning algorithms for risk-constrained Markov decision processes (MDPs), where risk is represented via a chance constraint or a constraint on the conditional value-at-risk (CVaR) of the cumulative cost. We collectively refer to such problems as percentile risk-constrained MDPs. Speciﬁcally, we ﬁrst derive a formula for computing the gradient of the Lagrangian function for percentile riskconstrained MDPs. Then, we devise policy gradient and actor-critic algorithms that (1) estimate such gradient, (2) update the policy in the descent direction, and (3) update the Lagrange multiplier in the ascent direction. For these algorithms we prove convergence to locally optimal policies. Finally, we demonstrate the effectiveness of our algorithms in an optimal stopping problem and an online marketing application.
+Keywords: Markov Decision Process, Reinforcement Learning, Conditional Value-at-Risk, ChanceConstrained Optimization, Policy Gradient Algorithms, Actor-Critic Algorithms
+
+1. Introduction
+The most widely-adopted optimization criterion for Markov decision processes (MDPs) is represented by the risk-neutral expectation of a cumulative cost. However, in many applications one is interested in taking into account risk, i.e., increased awareness of events of small probability and high consequences. Accordingly, in risk-sensitive MDPs the objective is to minimize a risk-sensitive criterion such as the expected exponential utility, a variance-related measure, or percentile performance. There are several risk metrics available in the literature, and constructing a “good” risk
+c 2018 Y. Chow, M. Ghavamzadeh, L. Janson, and M. Pavone. License: CC-BY 4.0, see https://creativecommons.org/licenses/by/4.0/. Attribution requirements are provided at http://jmlr.org/papers/v18/15-636.html.
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+criterion in a manner that is both conceptually meaningful and computationally tractable remains a topic of current research.
+Risk-Sensitive MDPs: One of the earliest risk metrics used for risk-sensitive MDPs is the exponential risk metric (1/γ)E exp(γZ) , where Z represents the cumulative cost for a sequence of decisions (Howard and Matheson, 1972). In this setting, the degree of risk-aversion is controlled by the parameter γ, whose selection, however, is often challenging. This motivated the study of several different approaches. In Collins (1997), the authors considered the maximization of a strictly concave functional of the distribution of the terminal state. In Wu and Lin (1999); Boda et al. (2004); Filar et al. (1995), risk-sensitive MDPs are cast as the problem of maximizing percentile performance. Variance-related risk metrics are considered, e.g., in Sobel (1982); Filar et al. (1989). Other mean, variance, and probabilistic criteria for risk-sensitive MDPs are discussed in the survey (White, 1988).
+Numerous alternative risk metrics have recently been proposed in the literature, usually with the goal of providing an “intuitive” notion of risk and/or to ensure computational tractability. Value-atrisk (VaR) and conditional value-at-risk (CVaR) represent two promising such alternatives. They both aim at quantifying costs that might be encountered in the tail of a cost distribution, but in different ways. Speciﬁcally, for continuous cost distributions, VaRα measures risk as the maximum cost that might be incurred with respect to a given conﬁdence level α. This risk metric is particularly useful when there is a well-deﬁned failure state, e.g., a state that leads a robot to collide with an obstacle. A VaRα constraint is often referred to as a chance (probability) constraint, especially in the engineering literature, and we will use this terminology in the remainder of the paper. In contrast, CVaRα measures risk as the expected cost given that such cost is greater than or equal to VaRα, and provides a number of theoretical and computational advantages. CVaR optimization was ﬁrst developed by Rockafellar and Uryasev (Rockafellar and Uryasev, 2002, 2000) and its numerical effectiveness has been demonstrated in several portfolio optimization and option hedging problems. Risk-sensitive MDPs with a conditional value at risk metric were considered in Boda and Filar (2006); Ott (2010); Ba¨uerle and Ott (2011), and a mean-average-value-at-risk problem has been solved in Ba¨uerle and Mundt (2009) for minimizing risk in ﬁnancial markets.
+The aforementioned works focus on the derivation of exact solutions, and the ensuing algorithms are only applicable to relatively small problems. This has recently motivated the application of reinforcement learning (RL) methods to risk-sensitive MDPs. We will refer to such problems as risk-sensitive RL.
+Risk-Sensitive RL: To address large-scale problems, it is natural to apply reinforcement learning (RL) techniques to risk-sensitive MDPs. Reinforcement learning (Bertsekas and Tsitsiklis, 1996; Sutton and Barto, 1998) can be viewed as a class of sampling-based methods for solving MDPs. Popular reinforcement learning techniques include policy gradient (Williams, 1992; Marbach, 1998; Baxter and Bartlett, 2001) and actor-critic methods (Sutton et al., 2000; Konda and Tsitsiklis, 2000; Peters et al., 2005; Borkar, 2005; Bhatnagar et al., 2009; Bhatnagar and Lakshmanan, 2012), whereby policies are parameterized in terms of a parameter vector and policy search is performed via gradient ﬂow approaches. One effective way to estimate gradients in RL problems is by simultaneous perturbation stochastic approximation (SPSA) (Spall, 1992). Risk-sensitive RL with expected exponential utility has been considered in Borkar (2001, 2002). More recently, the works in Tamar et al. (2012); Prashanth and Ghavamzadeh (2013) present RL algorithms for several variance-related risk measures, the works in Morimura et al. (2010); Tamar et al. (2015); Petrik and Subramanian (2012) consider CVaR-based formulations, and the works in Tallec (2007); Shapiro et al. (2013) consider nested CVaR-based formulations.
+2
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+Risk-Constrained RL and Paper Contributions: Despite the rather large literature on risk-sensitive MDPs and RL, risk-constrained formulations have largely gone unaddressed, with only a few exceptions, e.g., Chow and Pavone (2013); Borkar and Jain (2014). Yet constrained formulations naturally arise in several domains, including engineering, ﬁnance, and logistics, and provide a principled approach to address multi-objective problems. The objective of this paper is to ﬁll this gap by devising policy gradient and actor-critic algorithms for risk-constrained MDPs, where risk is represented via a constraint on the conditional value-at-risk (CVaR) of the cumulative cost or as a chance constraint. Speciﬁcally, the contribution of this paper is fourfold.
+1. We formulate two risk-constrained MDP problems. The ﬁrst one involves a CVaR constraint and the second one involves a chance constraint. For the CVaR-constrained optimization problem, we consider both discrete and continuous cost distributions. By re-writing the problems using a Lagrangian formulation, we derive for both problems a Bellman optimality condition with respect to an augmented MDP whose state consists of two parts, with the ﬁrst part capturing the state of the original MDP and the second part keeping track of the cumulative constraint cost.
+2. We devise a trajectory-based policy gradient algorithm for both CVaR-constrained and chanceconstrained MDPs. The key novelty of this algorithm lies in an unbiased gradient estimation procedure under Monte Carlo sampling. Using an ordinary differential equation (ODE) approach, we establish convergence of the algorithm to locally optimal policies.
+3. Using the aforementioned Bellman optimality condition, we derive several actor-critic algorithms to optimize policy and value function approximation parameters in an online fashion. As for the trajectory-based policy gradient algorithm, we show that the proposed actor-critic algorithms converge to locally optimal solutions.
+4. We demonstrate the effectiveness of our algorithms in an optimal stopping problem as well as in a realistic personalized advertisement recommendation (ad recommendation) problem (see Derfer et al. (2007) for more details). For the latter problem, we empirically show that our CVaR-constrained RL algorithms successfully guarantee that the worst-case revenue is lower-bounded by the pre-speciﬁed company yearly target.
+The rest of the paper is structured as follows. In Section 2 we introduce our notation and rigorously state the problem we wish to address, namely risk-constrained RL. The next two sections provide various RL methods to approximately compute (locally) optimal policies for CVaR constrained MDPs. A trajectory-based policy gradient algorithm is presented in Section 3 and its convergence analysis is provided in Appendix A (Appendix A.1 provides the gradient estimates of the CVaR parameter, the policy parameter, and the Lagrange multiplier, and Appendix A.2 gives their convergence proofs). Actor-critic algorithms are presented in Section 4 and their convergence analysis is provided in Appendix B (Appendix B.1 derives the gradient of the Lagrange multiplier as a function of the state-action value function, Appendix B.2.1 analyzes the convergence of the critic, and Appendix B.2.2 provides the multi-timescale convergence results of the CVaR parameter, the policy parameter, and the Lagrange multiplier). Section 5 extends the above policy gradient and actor-critic methods to the chance-constrained case. Empirical evaluation of our algorithms is the subject of Section 6. Finally, we conclude the paper in Section 7, where we also provide directions for future work.
+This paper generalizes earlier results by the authors presented in Chow and Ghavamzadeh (2014).
+3
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+2. Preliminaries
+We begin by deﬁning some notation that is used throughout the paper, as well as deﬁning the problem addressed herein and stating some basic assumptions.
+
+2.1 Notation
+
+We consider decision-making problems modeled as a ﬁnite MDP (an MDP with ﬁnite state and
+
+action spaces). A ﬁnite MDP is a tuple (X , A, C, D, P, P0) where X = {1, . . . , n, xTar} and A =
+{1, . . . , m} are the state and action spaces, xTar is a recurrent target state, and for a state x and an
+action a, C(x, a) is a cost function with |C(x, a)| ≤ Cmax, D(x, a) is a constraint cost function with |D(x, a)| ≤ Dmax 1, P (·|x, a) is the transition probability distribution, and P0(·) is the initial state distribution. For simplicity, in this paper we assume P0 = 1{x = x0} for some given initial state x0 ∈ {1, . . . , n}. Generalizations to non-atomic initial state distributions are straightforward,
+
+for which the details are omitted for the sake of brevity. A stationary policy µ(·|x) for an MDP is
+
+a probability distribution over actions, conditioned on the current state. In policy gradient methods,
+
+such policies are parameterized by a κ-dimensional vector θ, so the space of policies can be written as µ(·|x; θ), x ∈ X , θ ∈ Θ ⊆ Rκ . Since in this setting a policy µ is uniquely deﬁned by its
+
+parameter vector θ, policy-dependent functions can be written as a function of µ or θ, and we use
+
+µ(·|x; θ) to denote the policy and θ to denote the dependency on the policy (parameter).
+
+Given a πγµ(x, a|x0)
+
+ﬁxed γ ∈ (0, 1), we denote by dµγ (x|x0) = (1 − γ) = dµγ (x|x0)µ(a|x), the γ-discounted occupation
+
+∞ k=0
+
+γk
+
+measure
+
+P(xk = of state
+
+x|x0 = x0; µ) and x and state-action
+
+pair (x, a) under policy µ, respectively. This occupation measure is a γ-discounted probability
+
+distribution for visiting each state and action pair, and it plays an important role in sampling states
+
+and actions from the real system in policy gradient and actor-critic algorithms, and in guaranteeing
+
+their convergence. Because the state and action spaces are ﬁnite, Theorem 3.1 in Altman (1999) shows that the occupation measure dµγ (x|x0) is a well-deﬁned probability distribution. On the other
+
+hand, when γ = 1 the occupation measure of state x and state-action pair (x, a) under policy µ are
+
+respectively deﬁned by dµ(x|x0) =
+
+∞ t=0
+
+P(xt
+
+=
+
+x|x0; µ)
+
+and
+
+πµ(x, a|x0)
+
+=
+
+dµ(x|x0)µ(a|x).
+
+In this case the occupation measures characterize the total sums of visiting probabilities (although
+
+they are not in general probability distributions themselves) of state x and state-action pair (x, a).
+
+To study the well-posedness of the occupation measure, we deﬁne the following notion of a transient
+
+MDP.
+
+Deﬁnition 1 Deﬁne X = X \ {xTar} = {1, . . . , n} as a state space of transient states. An MDP is said to be transient if,
+
+1.
+
+∞ k=0
+
+P(xk
+
+=
+
+x|x0,
+
+µ)
+
+<
+
+∞
+
+for
+
+every
+
+x
+
+∈
+
+X
+
+and every stationary policy µ,
+
+2. P (xTar|xTar, a) = 1 for every admissible control action a ∈ A.
+
+Furthermore let Tµ,x be the ﬁrst-hitting time of the target state xTar from an arbitrary initial state x ∈ X in the Markov chain induced by transition probability P (·|x, a) and policy µ. Although transience implies the ﬁrst-hitting time is square integrable and ﬁnite almost surely, we will make the stronger assumption (which implies transience) on the uniform boundedness of the ﬁrst-hitting time.
+1. Without loss of generality, we set the cost function C(x, a) and constraint cost function D(x, a) to zero when x = xTar.
+
+4
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Assumption 2 The ﬁrst-hitting time Tµ,x is bounded almost surely over all stationary policies µ and all initial states x ∈ X . We will refer to this upper bound as T , i.e., Tµ,x ≤ T almost surely.
+The above assumption can be justiﬁed by the fact that sample trajectories collected in most reinforcement learning algorithms (including policy gradient and actor-critic methods) consist of bounded ﬁnite stopping time (also known as a time-out). Note that although a bounded stopping time would seem to conﬂict with the time-stationarity of the transition probabilities, this can be resolved by augmenting the state space with a time-counter state, analogous to the arguments given in Section 4.7 in Bertsekas (1995).
+Finally, we deﬁne the constraint and cost functions. Let Z be a ﬁnite-mean (E[|Z|] < ∞) random variable representing cost, with the cumulative distribution function FZ(z) = P(Z ≤ z) (e.g., one may think of Z as the total cost of an investment strategy µ). We deﬁne the value-at-risk at conﬁdence level α ∈ (0, 1) as
+
+VaRα(Z) = min z | FZ(z) ≥ α .
+
+Here the minimum is attained because FZ is non-decreasing and right-continuous in z. When FZ is continuous and strictly increasing, VaRα(Z) is the unique z satisfying FZ(z) = α. As mentioned, we refer to a constraint on the VaR as a chance constraint.
+Although VaR is a popular risk measure, it is not a coherent risk measure (Artzner et al., 1999) and does not quantify the costs that might be suffered beyond its value in the α-tail of the distribution (Rockafellar and Uryasev, 2000), Rockafellar and Uryasev (2002). In many ﬁnancial applications such as portfolio optimization where the probability of undesirable events could be small but the cost incurred could still be signiﬁcant, besides describing risk as the probability of incurring costs, it will be more interesting to study the cost in the tail of the risk distribution. In this case, an alternative measure that addresses most of the VaR’s shortcomings is the conditional value-at-risk, deﬁned as (Rockafellar and Uryasev, 2000)
+
+CVaRα(Z) := min
+ν∈R
+
+ν
+
++
+
+1
+
+1 −
+
+αE
+
+(Z
+
+−
+
+ν)+
+
+,
+
+(1)
+
+where (x)+ = max(x, 0) represents the positive part of x. While it might not be an immediate observation, it has been shown in Theorem 1 of Rockafellar and Uryasev (2000) that the CVaR of the loss random variable Z is equal to the average of the worst-case α-fraction of losses.
+We deﬁne the parameter γ ∈ (0, 1] as the discounting factor for the cost and constraint cost functions. When γ < 1, we are aiming to solve the MDP problem with more focus on optimizing current costs over future costs. For a policy µ, we deﬁne the cost of a state x (state-action pair (x, a)) as the sum of (discounted) costs encountered by the decision-maker when it starts at state x (state-action pair (x, a)) and then follows policy µ, i.e.,
+
+T −1
+Gθ(x) = γkC(xk, ak) | x0 = x, µ(·|·, θ),
+k=0
+
+T −1
+J θ(x) = γkD(xk, ak) | x0 = x, µ(·|·, θ),
+k=0
+
+and
+
+T −1
+Gθ(x, a) = γkC(xk, ak) | x0 = x, a0 = a, µ(·|·, θ),
+k=0
+T −1
+J θ(x, a) = γkD(xk, ak) | x0 = x, a0 = a, µ(·|·, θ).
+k=0
+
+5
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+The expected values of the random variables Gθ(x) and Gθ(x, a) are known as the value and actionvalue functions of policy µ, and are denoted by
+
+V θ(x) = E Gθ(x) ,
+
+Qθ(x, a) = E Gθ(x, a) .
+
+2.2 Problem Statement
+
+The goal for standard discounted MDPs is to ﬁnd an optimal policy that solves
+
+θ∗ = argmin V θ(x0).
+θ
+
+For CVaR-constrained optimization in MDPs, we consider the discounted cost optimization problem with γ ∈ (0, 1), i.e., for a given conﬁdence level α ∈ (0, 1) and cost tolerance β ∈ R,
+
+min V θ(x0) subject to CVaRα J θ(x0) ≤ β.
+
+(2)
+
+θ
+
+Using the deﬁnition of Hα(Z, ν), one can reformulate (2) as:
+
+min V θ(x0) subject to Hα J θ(x0), ν ≤ β,
+
+(3)
+
+θ,ν
+
+where
+
+Hα(Z, ν) :=
+
+ν
+
++
+
+1 1 − αE
+
+(Z
+
+− ν)+
+
+.
+
+The equivalence between problem (2) and problem (3) can be shown as follows. Let θ2 ∈ Θ be
+
+any arbitrary feasible policy parameter of problem (2). With θ2, one can always construct ν2 = VaRα(J θ2(x0)), such that (θ2, ν2) is feasible to problem (3). This in turn implies that the solution
+
+of (3) is less than the solution of (2). On the other hand, the following chain of inequalities holds
+
+for any ν ∈ R: CVaRα J θ(x0) ≤ Hα J θ(x0), ν ≤ β. This implies that the feasible set of θ
+
+in problem (3) is a subset of the feasible set of θ in problem (2), which further indicates that the
+
+solution of problem (2) is less than the solution of problem (3). By combining both arguments, one
+
+concludes the equivalence relation of these two problems.
+
+It is shown in Rockafellar and Uryasev (2000) and Rockafellar and Uryasev (2002) that the
+
+optimal ν actually equals VaRα, so we refer to this parameter as the VaR parameter. Here we
+
+choose to analyze the discounted-cost CVaR-constrained optimization problem, i.e., with γ ∈
+
+(0, 1), as in many ﬁnancial and marketing applications where CVaR constraints are used, it is more
+
+intuitive to put more emphasis on current costs rather than on future costs. The analysis can be
+
+easily generalized for the case where γ = 1.
+
+For chance-constrained optimization in MDPs, we consider the stopping cost optimization prob-
+
+lem with γ = 1, i.e., for a given conﬁdence level β ∈ (0, 1) and cost tolerance α ∈ R,
+
+min V θ(x0) subject to P J θ(x0) ≥ α ≤ β.
+
+(4)
+
+θ
+
+Here we choose γ = 1 because in many engineering applications, where chance constraints are used to ensure overall safety, there is no notion of discounting since future threats are often as important as the current one. Similarly, the analysis can be easily extended to the case where γ ∈ (0, 1).
+There are a number of mild technical and notational assumptions which we will make throughout the paper, so we state them here:
+
+Assumption 3 (Differentiability) For any state-action pair (x, a), µ(a|x; θ) is continuously differentiable in θ and ∇θµ(a|x; θ) is a Lipschitz function in θ for every a ∈ A and x ∈ X .2
+2. In actor-critic algorithms, the assumption on continuous differentiability holds for the augmented state Markovian policies µ(a|x, s; θ).
+
+6
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Assumption 4 (Strict Feasibility) There exists a transient policy µ(·|x; θ) such that
+Hα J θ(x0), ν < β
+in the CVaR-constrained optimization problem, and P J θ(x0) ≥ α < β in the chance-constrained problem.
+
+In the remainder of the paper we ﬁrst focus on studying stochastic approximation algorithms for the CVaR-constrained optimization problem (Sections 3 and 4) and then adapt the results to the chance-constrained optimization problem in Section 5. Our solution approach relies on a Lagrangian relaxation procedure, which is discussed next.
+2.3 Lagrangian Approach and Reformulation
+To solve (3), we employ a Lagrangian relaxation procedure (Chapter 3 of Bertsekas (1999)), which leads to the unconstrained problem:
+
+max min L(ν, θ, λ) := V θ(x0) + λ Hα J θ(x0), ν − β ,
+
+(5)
+
+λ≥0 θ,ν
+
+where λ is the Lagrange multiplier. Notice that L(ν, θ, λ) is a linear function in λ and Hα J θ(x0), ν
+is a continuous function in ν. The saddle point theorem from Chapter 3 of Bertsekas (1999) states that a local saddle point (ν∗, θ∗, λ∗) for the maximin optimization problem maxλ≥0 minθ,ν L(ν, θ, λ) is indeed a locally optimal policy θ∗ for the CVaR-constrained optimization problem. To further ex-
+plore this connection, we ﬁrst have the following deﬁnition of a saddle point:
+
+Deﬁnition 5 A local saddle point of L(ν, θ, λ) is a point (ν∗, θ∗, λ∗) such that for some r > 0,
+
+∀(θ, ν) ∈ Θ ×
+
+−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+∩ B(θ∗,ν∗)(r) and ∀λ ≥ 0, we have
+
+L(ν, θ, λ∗) ≥ L(ν∗, θ∗, λ∗) ≥ L(ν∗, θ∗, λ),
+
+(6)
+
+where B(θ∗,ν∗)(r) is a hyper-dimensional ball centered at (θ∗, ν∗) with radius r > 0.
+
+In Chapter 7 of Ott (2010) and in Ba¨uerle and Ott (2011) it is shown that there exists a determin-
+
+istic history-dependent optimal policy for CVaR-constrained optimization. The important point is
+
+that this policy does not depend on the complete history, but only on the current time step k, current
+
+state of the system xk, and accumulated discounted constraint cost
+
+k i=0
+
+γ
+
+iD(xk
+
+,
+
+ak).
+
+In the following two sections, we present a policy gradient (PG) algorithm (Section 3) and
+
+several actor-critic (AC) algorithms (Section 4) to optimize (5) (and hence ﬁnd a locally optimal
+
+solution to problem (3)). While the PG algorithm updates its parameters after observing several
+
+trajectories, the AC algorithms are incremental and update their parameters at each time-step.
+
+3. A Trajectory-based Policy Gradient Algorithm
+In this section, we present a policy gradient algorithm to solve the optimization problem (5). The idea of the algorithm is to descend in (θ, ν) and ascend in λ using the gradients of L(ν, θ, λ) w.r.t. θ,
+
+7
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+ν, and λ, i.e.,3
+
+∇θ L(ν,
+
+θ,
+
+λ)
+
+=
+
+∇θ V
+
+θ (x0 )
+
++
+
+(1
+
+λ −
+
+α) ∇θE
+
+J θ(x0) − ν + ,
+
+(7)
+
+1 ∂νL(ν, θ, λ) = λ 1 + (1 − α) ∂νE
+
+J θ(x0) − ν +
+
+λ
+
+1−
+
+1 (1 − α) P
+
+J θ(x0)
+
+≥
+
+ν
+
+,
+
+(8)
+
+1 ∇λL(ν, θ, λ) = ν + (1 − α) E
+
+J θ(x0) − ν + − β.
+
+(9)
+
+The unit of observation in this algorithm is a trajectory generated by following the current policy.
+
+At each iteration, the algorithm generates N trajectories by following the current policy, uses them
+
+to estimate the gradients in (7)–(9), and then uses these estimates to update the parameters ν, θ, λ.
+
+Let ξ = {x0, a0, c0, x1, a1, c1, . . . , xT −1, aT −1, cT −1, xT } be a trajectory generated by follow-
+
+ing the policy θ, where xT = xTar is the target state of the system. The cost, constraint cost,
+
+and probability of ξ are deﬁned as G(ξ) =
+
+T −1 k=0
+
+γk
+
+C (xk
+
+,
+
+ak
+
+),
+
+J (ξ)
+
+=
+
+T −1 k=0
+
+γ k D(xk ,
+
+ak),
+
+and
+
+Pθ(ξ) = P0(x0)
+
+T −1 k=0
+
+µ(ak|xk;
+
+θ)P (xk+1|xk, ak),
+
+respectively.
+
+Based
+
+on
+
+the
+
+deﬁnition
+
+of
+
+Pθ (ξ ),
+
+one obtains ∇θ log Pθ(ξ) =
+
+T −1 k=0
+
+∇θ
+
+log
+
+µ(ak|xk;
+
+θ).
+
+Algorithm 1 contains the pseudo-code of our proposed policy gradient algorithm. What appears
+
+inside the parentheses on the right-hand-side of the update equations are the estimates of the gradi-
+
+ents of L(ν, θ, λ) w.r.t. θ, ν, λ (estimates of (7)–(9)). Gradient estimates of the Lagrangian function
+
+can be found in Appendix A.1. In the algorithm, ΓΘ is an operator that projects a vector θ ∈ Rκ to
+
+the closest point in a compact and convex set Θ ⊂ Rκ, i.e., ΓΘ(θ) = arg minθˆ∈Θ
+
+θ
+
+− θˆ
+
+2 2
+
+,
+
+ΓN
+
+is
+
+a
+
+projection
+
+operator
+
+to
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+],
+
+i.e.,
+
+ΓN (ν)
+
+=
+
+arg
+
+minνˆ∈[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+ν − νˆ 22, and ΓΛ
+
+is a projection operator to [0, λmax], i.e., ΓΛ(λ) = arg minλˆ∈[0,λmax]
+
+λ − λˆ
+
+2 2
+
+.
+
+These projection
+
+operators are necessary to ensure the convergence of the algorithm; see the end of Appendix A.2
+
+for details. Next we introduce the following assumptions for the step-sizes of the policy gradient
+
+method in Algorithm 1.
+
+Assumption 6 (Step Sizes for Policy Gradient) The step size schedules {ζ1(k)}, {ζ2(k)}, and {ζ3(k)} satisfy
+
+ζ1(k) = ζ2(k) = ζ3(k) = ∞,
+
+(10)
+
+k
+
+k
+
+k
+
+ζ1(k)2,
+
+ζ2(k)2,
+
+ζ3(k)2 < ∞,
+
+(11)
+
+k
+
+k
+
+k
+
+ζ1(k) = o ζ2(k) , ζ2(k) = o ζ3(k) .
+
+(12)
+
+These step-size schedules satisfy the standard conditions for stochastic approximation algorithms, and ensure that the ν update is on the fastest time-scale ζ3(k) , the policy θ update is on the intermediate time-scale ζ2(k) , and the Lagrange multiplier λ update is on the slowest time-scale ζ1(k) . This results in a three time-scale stochastic approximation algorithm.
+In the following theorem, we prove that our policy gradient algorithm converges to a locally optimal policy for the CVaR-constrained optimization problem.
+3. The notation in (8) means that the right-most term is a member of the sub-gradient set ∂ν L(ν, θ, λ).
+
+8
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Theorem 7 Under Assumptions 2–6, the sequence of policy updates in Algorithm 1 converges almost surely to a locally optimal policy θ∗ for the CVaR-constrained optimization problem as k goes
+to inﬁnity.
+
+While we refer the reader to Appendix A.2 for the technical details of this proof, a high level overview of the proof technique is given as follows.
+
+1. First we show that each update of the multi-time scale discrete stochastic approximation al-
+gorithm (νk, θk, λk) converges almost surely, but at different speeds, to the stationary point (ν∗, θ∗, λ∗) of the corresponding continuous time system.
+
+2. Then by using Lyapunov analysis, we show that the continuous time system is locally asymptotically stable at the stationary point (ν∗, θ∗, λ∗).
+
+3. Since the Lyapunov function used in the above analysis is the Lagrangian function L(ν, θ, λ), we ﬁnally conclude that the stationary point (ν∗, θ∗, λ∗) is also a local saddle point, which by the saddle point theorem (see e.g., Chapter 3 of Bertsekas (1999)), implies that θ∗ is a locally
+optimal solution of the CVaR-constrained MDP problem (the primal problem).
+
+This convergence proof procedure is standard for stochastic approximation algorithms, see (Bhatnagar et al., 2009; Bhatnagar and Lakshmanan, 2012; Prashanth and Ghavamzadeh, 2013) for more details, and represents the structural backbone for the convergence analysis of the other policy gradient and actor-critic methods provided in this paper.
+Notice that the difference in convergence speeds between θk, νk, and λk is due to the stepsize schedules. Here ν converges faster than θ and θ converges faster than λ. This multi-time scale convergence property allows us to simplify the convergence analysis by assuming that θ and λ are ﬁxed in ν’s convergence analysis, assuming that ν converges to ν∗(θ) and λ is ﬁxed in θ’s convergence analysis, and ﬁnally assuming that ν and θ have already converged to ν∗(λ) and θ∗(λ) in λ’s convergence analysis. To illustrate this idea, consider the following two-time scale stochastic approximation algorithm for updating (xk, yk) ∈ X × Y:
+
+xk+1 = xk + ζ1(k) f (xk, yk) + Mk+1 ,
+
+(13)
+
+yk+1 = yk + ζ2(k) g(xk, yk) + Nk+1 ,
+
+(14)
+
+where f (xk, yk) and g(xk, yk) are Lipschitz continuous functions, Mk+1, Nk+1 are square integrable Martingale differences w.r.t. the σ-ﬁelds σ(xi, yi, Mi, i ≤ k) and σ(xi, yi, Ni, i ≤ k), and ζ1(k) and ζ2(k) are non-summable, square summable step sizes. If ζ2(k) converges to zero faster than ζ1(k), then (13) is a faster recursion than (14) after some iteration k0 (i.e., for k ≥ k0), which means (13) has uniformly larger increments than (14). Since (14) can be written as
+
+yk+1 = yk + ζ1(k)
+
+ζ2(k) ζ1(k)
+
+g(xk, yk) + Nk+1
+
+,
+
+and by the fact that ζ2(k) converges to zero faster than ζ1(k), (13) and (14) can be viewed as noisy Euler discretizations of the ODEs x˙ = f (x, y) and y˙ = 0. Note that one can consider the ODE x˙ = f (x, y0) in place of x˙ = f (x, y), where y0 is constant, because y˙ = 0. One can then show (see e.g., Theorem 2 in Chapter 6 of Borkar (2008)) the main two-timescale convergence result, i.e., under the above assumptions associated with (14), the sequence (xk, yk) converges to µ(y ), y as i → ∞, with probability one, where µ(y0) is a locally asymptotically stable equilibrium of the ODE x˙ = f (x, y0), µ is a Lipschitz continuous function, and y is a locally asymptotically stable equilibrium of the ODE y˙ = g µ(y), y .
+
+9
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Algorithm 1 Trajectory-based Policy Gradient Algorithm for CVaR MDP
+Input: parameterized policy µ(·|·; θ), conﬁdence level α, and cost tolerance β Initialization: policy θ = θ0, VaR parameter ν = ν0, and the Lagrangian parameter λ = λ0 while TRUE do
+for k = 0, 1, 2, . . . do Generate N trajectories {ξj,k}Nj=1 by starting at x0 = x0 and following the current policy θk .
+
+ν Update: θ Update:
+λ Update:
+
+νk+1 = ΓN
+
+νk − ζ3(k)
+
+λk
+
+−
+
+(1
+
+λk − α)N
+
+N
+
+1 J (ξj,k) ≥ νk
+
+j=1
+
+1N
+
+θk+1 = ΓΘ θk − ζ2(k) N
+
+∇θ log Pθ(ξj,k)|θ=θk G(ξj,k)
+
+j=1
+
++ λk (1 − α)N
+
+N
+
+∇θ log Pθ(ξj,k)|θ=θk
+
+J (ξj,k) − νk 1
+
+J (ξj,k) ≥ νk
+
+j=1
+
+1
+
+N
+
+λk+1 = ΓΛ λk + ζ1(k) νk − β + (1 − α)N
+
+J (ξj,k) − νk 1 J (ξj,k) ≥ νk
+
+j=1
+
+end for if {λk} converges to λmax, i.e., |λi∗ − λmax| ≤
+Set λmax ← 2λmax. else
+return parameters ν, θ, λ and break end if end while
+
+for some tolerance parameter
+
+> 0 then
+
+4. Actor-Critic Algorithms
+As mentioned in Section 3, the unit of observation in our policy gradient algorithm (Algorithm 1) is a system trajectory. This may result in high variance for the gradient estimates, especially when the length of the trajectories is long. To address this issue, in this section we propose two actorcritic algorithms that approximate some quantities in the gradient estimates by linear combinations of basis functions and update the parameters (linear coefﬁcients) incrementally (after each stateaction transition). We present two actor-critic algorithms for optimizing (5). These algorithms are based on the gradient estimates of Sections 4.1-4.3. While the ﬁrst algorithm (SPSA-based) is fully incremental and updates all the parameters θ, ν, λ at each time-step, the second one updates θ at each time-step and updates ν and λ only at the end of each trajectory, thus is regarded as a semitrajectory-based method. Algorithm 2 contains the pseudo-code of these algorithms. The projection operators ΓΘ, ΓN , and ΓΛ are deﬁned as in Section 3 and are necessary to ensure the convergence of the algorithms. At each step of our actor critic algorithms (steps indexed by k in Algorithm 1 and in Algorithm 2) there are two parts:
+• Inner loop (critic update): For a ﬁxed policy (given as θ ∈ Θ), take action ak ∼ µ(·|xk, sk; θk), observe the cost c(xk, ak), the constraint cost d(xk, ak), and the next state (xk+1, sk+1). Us-
+10
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+ing the method of temporal differences (TD) from Chapter 6 of Sutton and Barto (1998), estimate the value function V θ(x, s).
+• Outer loop (actor update): Estimate the gradient of V θ(x, s) for policy parameter θ, and hence the gradient of the Lagrangian L(ν, θ, λ), using the unbiased sampling based point estimator for gradients with respect to θ and λ and either: (1) using the SPSA method (20) to obtain an incremental estimator for gradient with respect to ν or (2) only calculating the gradient estimator with respect to ν at the end of the trajectory (see (23) for more details). Update the policy parameter θ ∈ Θ in the descent direction, the VaR approximation ν ∈ N in the descent direction, and the Lagrange multiplier λ ∈ Λ in the ascent direction on speciﬁc timescales that ensure convergence to locally optimal solutions.
+
+Next, we introduce the following assumptions for the step-sizes of the actor-critic method in Algorithm 2.
+
+Assumption 8 (Step Sizes) The step size schedules {ζ1(k)}, {ζ2(k)}, {ζ3(k)}, and {ζ4(k)} satisfy
+
+ζ1(k) = ζ2(k) = ζ3(k) = ζ4(k) = ∞,
+
+(15)
+
+k
+
+k
+
+k
+
+k
+
+ζ1(k)2,
+
+ζ2(k)2,
+
+ζ3(k)2,
+
+ζ4(k)2 < ∞,
+
+(16)
+
+k
+
+k
+
+k
+
+k
+
+ζ1(k) = o ζ2(k) , ζ2(k) = o ζ3(k) , ζ3(k) = o ζ4(k) .
+
+(17)
+
+Furthermore, the SPSA step size {∆k} in the actor-critic algorithm satisﬁes ∆k → 0 as k → ∞ and k(ζ2(k)/∆k)2 < ∞.
+These step-size schedules satisfy the standard conditions for stochastic approximation algorithms, and ensure that the critic update is on the fastest time-scale ζ4(k) , the policy and VaR parameter updates are on the intermediate time-scale, with the ν-update ζ3(k) being faster than the θ-update ζ2(k) , and ﬁnally the Lagrange multiplier update is on the slowest time-scale ζ1(k) . This results in four time-scale stochastic approximation algorithms.
+
+4.1 Gradient w.r.t. the Policy Parameters θ The gradient of the objective function w.r.t. the policy θ in (7) may be rewritten as
+
+∇θL(ν, θ, λ) = ∇θ
+
+E Gθ(x0)
+
+λ + (1 − α) E
+
+J θ(x0) − ν +
+
+.
+
+(24)
+
+Given the original MDP M = (X , A, C, D, P, P0) and the parameter λ, we deﬁne the augmented MDP M¯ = (X¯, A¯, C¯λ, P¯, P¯0) as X¯ = X × S, A¯ = A, P¯0(x, s) = P0(x)1{s0 = s}, and
+
+C¯λ(x, s, a) = P¯(x , s |x, s, a) =
+
+λ(−s)+/(1 − α) if x = xTar,
+
+C(x, a)
+
+otherwise,
+
+P (x |x, a)1{s = s − D(x, a) /γ} if x ∈ X ,
+
+1{x = xTar, s = 0}
+
+if x = xTar,
+
+where xTar is the target state of the original MDP M, S and s0 are respectively the ﬁnite state space and the initial state of the s part of the state in the augmented MDP M¯ . Furthermore, we denote by
+
+11
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Algorithm 2 Actor-Critic Algorithms for CVaR MDP
+
+Input: Parameterized policy µ(·|·; θ) and value function feature vector φ(·) (both over the augmented MDP M¯ ), conﬁdence level α, and cost tolerance β
+
+Initialization: policy θ = θ0; VaR parameter ν = ν0; Lagrangian parameter λ = λ0; value function weight vector v = v0 ; initial condition (x0, s0) = (x0, ν)
+while TRUE do
+
+// (1) SPSA-based Algorithm:
+
+for k = 0, 1, 2, . . . do Draw action ak ∼ µ(·|xk, sk; θk); Observe next state (xk+1, sk+1) ∼ P¯(·|xk, sk, ak); // AC Algorithm:
+
+Observe cost C¯λk (xk, sk, ak); // note that sk+1 = (sk − D xk, ak) /γ
+
+TD Error: δk(vk) = C¯λk (xk, sk, ak) + γvk φ(xk+1, sk+1) − vk φ(xk, sk)
+
+(18)
+
+Critic Update: vk+1 = vk + ζ4(k)δk(vk)φ(xk, sk)
+
+(19)
+
+ν Update:
+
+νk+1 = ΓN
+
+νk −ζ3(k)
+
+λk + vk
+
+φ x0, νk + ∆k − φ(x0, νk − ∆k) 2∆k
+
+(20)
+
+θ Update:
+
+θk+1 = ΓΘ
+
+θk
+
+−
+
+ζ2(k) 1−γ
+
+∇θ
+
+log
+
+µ(ak |xk ,
+
+sk ;
+
+θ)
+
+·
+
+δk (vk )
+
+(21)
+
+λ Update:
+
+λk+1 = ΓΛ
+
+λk + ζ1(k)
+
+νk −β
+
++
+
+(1
+
+−
+
+1 α)(1
+
+−
+
+γ) 1{xk
+
+=
+
+xTar }(−sk )+
+
+(22) if xk = xTar (reach a target state), then set (xk+1, sk+1) = (x0, νk+1) end for
+
+// (2) Semi Trajectory-based Algorithm:
+
+Initialize t = 0
+
+for k = 0, 1, 2, . . . do
+
+Draw action ak P¯(·|xk, sk, ak);
+
+∼ µ(·|xk, sk; θk), observe cost C¯λk (xk, sk, ak), and next state Update (δk, vk, θk, λk) using Eqs. (18), (19), (21), and (22)
+
+(xk+1, sk+1)
+
+∼
+
+if xk = xTar then
+
+Update ν as
+
+ν Update:
+
+νk+1 = ΓN
+
+νk − ζ3(k)
+
+λk
+
+−
+
+λk 1 1−α
+
+xk = xTar, sk ≤ 0
+
+(23)
+
+Set (xk+1, sk+1) = (x0, νk+1) and t = 0 else
+t←t+1 end if end for if {λk} converges to λmax, i.e., |λi∗ − λmax| ≤ Set λmax ← 2λmax. else return parameters v, w, ν, θ, λ, and break end if end while
+
+for some tolerance parameter
+
+> 0 then
+
+12
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+sTar the s part of the state in M¯ when a policy θ reaches a target state xTar (which we assume occurs before an upper-bound T number of steps), i.e.,
+
+1 sTar = γT
+
+T −1
+ν − γkD(xk, ak) ,
+k=0
+
+such that the initial state is given by s0 = ν. We will now use n = |X¯| to indicate the size of the augmented state space X¯ instead of the size of the original state space X . It can be later seen that the augmented state s in the MDP M¯ keeps track of the cumulative CVaR constraint cost. Similar
+to the analysis in Ba¨uerle and Ott (2011), the major motivation of introducing the aforementioned augmented MDP M¯ is that, by utilizing the augmented state s ∈ S that monitors the running
+constraint cost and thus the feasibility region of the original CVaR constrained MDP, one is able to deﬁne a Bellman operator on M¯ (whose exact deﬁnition can be found in Theorem 10), whose
+ﬁxed point solution is equal to the solution of the original CVaR Lagrangian problem. Therefore
+by combining these properties, this reformulation allows one to transform the CVaR Lagrangian
+problem to a standard MDP problem. We deﬁne a class of parameterized stochastic policies µ(·|x, s; θ), (x, s) ∈ X¯, θ ∈ Θ ⊆ Rκ1
+for this augmented MDP. Recall that Gθ(x) is the discounted cumulative cost and J θ(x) is the
+discounted cumulative constraint cost. Therefore, the total (discounted) cost of a trajectory can be
+written as
+
+T
+
+γkC¯λ(xk, sk, ak) | x0 = x, s0 = s, µ
+
+=
+
+Gθ(x) + λ J θ(x) − s +. (1 − α)
+
+(25)
+
+k=0
+
+From (25), it is clear that the quantity in the parenthesis of (24) is the value function of the policy θ at state (x0, ν) in the augmented MDP M¯ , i.e., V θ(x0, ν). Thus, it is easy to show that4
+
+∇θL(ν, θ, λ)
+
+=
+
+∇θ V
+
+θ(x0, ν)
+
+=
+
+1
+
+1 −
+
+γ
+
+πγθ(x, s, a|x0, ν) ∇ log µ(a|x, s; θ) Qθ(x, s, a), 5
+
+x,s,a
+
+(26)
+
+where πγθ is the discounted occupation measure (deﬁned in Section 2) and Qθ is the action-value
+
+function
+
+of
+
+policy
+
+θ
+
+in
+
+the
+
+augmented
+
+MDP
+
+M¯ .
+
+We
+
+can
+
+show
+
+that
+
+1 1−γ
+
+∇
+
+log
+
+µ(ak|xk,
+
+sk ;
+
+θ)
+
+·
+
+δk
+
+is
+
+an unbiased estimate of ∇θL(ν, θ, λ), where
+
+δk = C¯λ(xk, sk, ak) + γV (xk+1, sk+1) − V (xk, sk)
+
+is the temporal-difference (TD) error in the MDP M¯ from (18), and V is an unbiased estimator of V θ (see e.g., Bhatnagar et al. (2009)). In our actor-critic algorithms, the critic uses linear approximation for the value function V θ(x, s) ≈ v φ(x, s) = V θ,v(x, s), where the feature vector φ(·) belongs to a low-dimensional space Rκ1 with dimension κ1. The linear approximation V θ,v belongs to a low-dimensional subspace SV = {Φv|v ∈ Rκ1}, where Φ is the n × κ1 matrix whose
+4. Note that the second equality in Equation (26) is the result of the policy gradient theorem (Sutton et al., 2000; Peters et al., 2005).
+5. Notice that the state and action spaces of the original MDP are ﬁnite, and there is only a ﬁnite number of outcomes in the transition of s (due to the assumption of a bounded ﬁrst hitting time). Therefore the augmented state s belongs to a ﬁnite state space as well.
+
+13
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+rows are the transposed feature vectors φ (·). To ensure that the set of feature vectors forms a well-posed linear approximation to the value function, we impose the following assumption on the basis functions.
+
+Assumption 9 (Independent Basis pendent. In particular, κ1 ≤ n and
+
+Functions) The Φ is full column
+
+basis rank.
+
+functions Moreover,
+
+φ(i)
+
+κ1 i=1
+
+for every
+
+are v∈
+
+linearly indeRκ1, Φv = e,
+
+where e is the n-dimensional vector with all entries equal to one.
+
+The following theorem shows that the critic update vk converges almost surely to v∗, the minimizer of the Bellman residual. Details of the proof can be found in Appendix B.2.
+
+Theorem 10 Deﬁne v∗ ∈ arg minv
+
+Bθ[Φv] − Φv
+
+2 dθγ
+
+as
+
+the
+
+minimizer
+
+to
+
+the
+
+Bellman
+
+residual,
+
+where the Bellman operator is given by
+
+
+
+
+
+
+
+
+
+Bθ[V ](x, s) = µ(a|x, s; θ) C¯λ(x, s, a) + γP¯(x , s |x, s, a)V (x , s )
+
+a
+
+
+
+x ,s
+
+
+
+and V˜ ∗(x, s) = (v∗) φ(x, s) is the projected Bellman ﬁxed point of V θ(x, s), i.e., V˜ ∗(x, s) = ΠBθ[V˜ ∗](x, s). Suppose the γ-occupation measure πγθ is used to generate samples of (xk, sk, ak) for any k ∈ {0, 1, . . . , }. Then under Assumptions 8–9, the v-update in the actor-critic algorithm
+converges to v∗ almost surely.
+
+4.2 Gradient w.r.t. the Lagrangian Parameter λ We may rewrite the gradient of the objective function w.r.t. the Lagrangian parameters λ in (9) as
+
+∇λL(ν, θ, λ) = ν −β +∇λ
+
+E Gθ(x0)
+
+λ + (1 − α) E
+
+J θ(x0) − ν +
+
+(=a) ν −β +∇λV θ(x0, ν).
+
+(27)
+
+Similar to Section 4.1, equality (a) comes from the fact that the quantity in parenthesis in (27) is V θ(x0, ν), the value function of the policy θ at state (x0, ν) in the augmented MDP M¯ . Note that the dependence of V θ(x0, ν) on λ comes from the deﬁnition of the cost function C¯λ in M¯ . We now derive an expression for ∇λV θ(x0, ν), which in turn will give us an expression for ∇λL(ν, θ, λ).
+
+Lemma 11 The gradient of V θ(x0, ν) w.r.t. the Lagrangian parameter λ may be written as
+
+∇λV
+
+θ (x0 ,
+
+ν)
+
+=
+
+1
+
+1 −
+
+γ
+
+πγθ (x,
+
+s,
+
+a|x0,
+
+ν)
+
+(1
+
+1 −
+
+α)
+
+1{x
+
+=
+
+xTar}(−s)+.
+
+(28)
+
+x,s,a
+
+Proof. See Appendix B.1.
+
+From
+
+Lemma
+
+11
+
+and
+
+(27),
+
+it
+
+is
+
+easy
+
+to
+
+see
+
+that
+
+ν
+
+−β
+
++
+
+1 (1−γ)(1−α)
+
+1{x
+
+=
+
+xTar}(−s)+
+
+is
+
+an unbiased estimate of ∇λL(ν, θ, λ). An issue with this estimator is that its value is ﬁxed to
+
+νk
+
+−β
+
+all
+
+along
+
+a
+
+trajectory,
+
+and
+
+only
+
+changes
+
+at
+
+the
+
+end
+
+to
+
+νk
+
+−β
+
++
+
+1 (1−γ)(1−α)
+
+(−sTar
+
+)+.
+
+This
+
+may affect the incremental nature of our actor-critic algorithm. To address this issue, Chow and
+
+Ghavamzadeh (2014) previously proposed a different approach to estimate the gradients w.r.t. θ and
+
+λ which involves another value function approximation to the constraint. However this approach is
+
+less desirable in many practical applications as it increases the approximation error and impedes the
+
+speed of convergence.
+
+14
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Another important issue is that the above estimator is unbiased only if the samples are gener-
+
+ated from the distribution πγθ(·|x0, ν). If we just follow the policy θ, then we may use νk − β +
+
+γk (1−α)
+
+1{xk
+
+=
+
+xTar }(−sk )+
+
+as an estimate for ∇λL(ν, θ, λ).
+
+Note that
+
+this
+
+is an issue for
+
+all dis-
+
+counted actor-critic algorithms: their (likelihood ratio based) estimate for the gradient is unbiased
+
+only if the samples are generated from πγθ, and not when we simply follow the policy. This might
+
+also be the reason why, to the best of our knowledge, no rigorous convergence analysis can be found
+
+in the literature for (likelihood ratio based) discounted actor-critic algorithms under the sampling
+
+distribution.6
+
+4.3 Sub-Gradient w.r.t. the VaR Parameter ν We may rewrite the sub-gradient of our objective function w.r.t. the VaR parameter ν in (8) as
+
+∂νL(ν, θ, λ)
+
+1 λ 1 − (1 − α) P
+
+∞
+γkD(xk, ak) ≥ ν | x0 = x0; θ
+
+.
+
+(29)
+
+k=0
+
+From the deﬁnition of the augmented MDP M¯ , the probability in (29) may be written as P(sTar ≤ 0 | x0 = x0, s0 = ν; θ), where sTar is the s part of the state in M¯ when we reach a target state, i.e., x = xTar (see Section 4.1). Thus, we may rewrite (29) as
+
+∂νL(ν, θ, λ)
+
+λ
+
+1 1 − (1 − α) P
+
+sTar ≤ 0 | x0 = x0, s0 = ν; θ
+
+.
+
+(30)
+
+From (30), it is easy to see that λ−λ1{sTar ≤ 0}/(1−α) is an unbiased estimate of the sub-gradient of L(ν, θ, λ) w.r.t. ν. An issue with this (unbiased) estimator is that it can only be applied at the end
+of a trajectory (i.e., when we reach the target state xTar), and thus, using it prevents us from having a fully incremental algorithm. In fact, this is the estimator that we use in our semi-trajectory-based
+actor-critic algorithm.
+One approach to estimate this sub-gradient incrementally is to use the simultaneous perturbation
+stochastic approximation (SPSA) method (Chapter 5 of Bhatnagar et al. (2013)). The idea of SPSA is to estimate the sub-gradient g(ν) ∈ ∂νL(ν, θ, λ) using two values of g at ν− = ν − ∆ and ν+ = ν + ∆, where ∆ > 0 is a positive perturbation (see Chapter 5 of Bhatnagar et al. (2013) or Prashanth and Ghavamzadeh (2013) for the detailed description of ∆).7 In order to see how SPSA
+can help us to estimate our sub-gradient incrementally, note that
+
+∂νL(ν, θ, λ) = λ + ∂ν
+
+E J θ(x0)
+
+λ + (1 − α) E
+
+J θ(x0) − ν +
+
+(=a) λ + ∂ν V θ(x0, ν). (31)
+
+Similar to Sections 4.1–4.3, equality (a) comes from the fact that the quantity in parenthesis in (31) is V θ(x0, ν), the value function of the policy θ at state (x0, ν) in the augmented MDP M¯ . Since the critic uses a linear approximation for the value function, i.e., V θ(x, s) ≈ v φ(x, s), in our actor-
+critic algorithms (see Section 4.1 and Algorithm 2), the SPSA estimate of the sub-gradient would be of the form g(ν) ≈ λ + v φ(x0, ν+) − φ(x0, ν−) /2∆.
+
+6. Note that the discounted actor-critic algorithm with convergence proof in (Bhatnagar, 2010) is based on SPSA. 7. SPSA-based gradient estimate was ﬁrst proposed in Spall (1992) and has been widely used in various settings, espe-
+cially those involving a high-dimensional parameter. The SPSA estimate described above is two-sided. It can also be implemented single-sided, where we use the values of the function at ν and ν+. We refer the readers to Chapter 5 of Bhatnagar et al. (2013) for more details on SPSA and to Prashanth and Ghavamzadeh (2013) for its application to learning in mean-variance risk-sensitive MDPs.
+
+15
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+4.4 Convergence of Actor-Critic Methods
+In this section, we will prove that the actor-critic algorithms converge to a locally optimal policy for the CVaR-constrained optimization problem. Deﬁne
+θ(vk) = Bθ[Φvk] − Φvk ∞
+as the residual of the value function approximation at step k, induced by policy µ(·|·, ·; θ). By the triangle inequality and ﬁxed point theorem Bθ[V ∗] = V ∗, it can be easily seen that V ∗ − Φvk ∞ ≤ θ(vk) + Bθ[Φvk] − Bθ[V ∗] ∞ ≤ θ(vk) + γ Φvk − V ∗ ∞. The last inequality follows from the contraction property of the Bellman operator. Thus, one concludes that V ∗ − Φvk ∞ ≤ θ(vk)/(1 − γ). Now, we state the main theorem for the convergence of actor-critic methods.
+Theorem 12 Suppose θk (vk) → 0 and the γ-occupation measure πγθ is used to generate samples of (xk, sk, ak) for any k ∈ {0, 1, . . .}. For the SPSA-based algorithms, suppose the feature vector satisﬁes the technical Assumption 21 (provided in Appendix B.2.2) and suppose the SPSA step-size satisﬁes the condition θk (vk) = o(∆k), i.e., θk (vk)/∆k → 0. Then under Assumptions 2–4 and 8–9, the sequence of policy updates in Algorithm 2 converges almost surely to a locally optimal policy for the CVaR-constrained optimization problem.
+Details of the proof can be found in Appendix B.2.
+
+5. Extension to Chance-Constrained Optimization of MDPs
+
+In many applications, in particular in engineering (see, for example, Ono et al. (2015)), chance constraints are imposed to ensure mission success with high probability. Accordingly, in this section we extend the analysis of CVaR-constrained MDPs to chance-constrained MDPs (i.e., (4)). As for CVaR-constrained MDPs, we employ a Lagrangian relaxation procedure (Chapter 3 of Bertsekas (1999)) to convert a chance-constrained optimization problem into the following unconstrained problem:
+
+max min L(θ, λ) := Gθ(x0) + λ P J θ(x0) ≥ α − β ,
+
+(32)
+
+λ θ,α
+
+where λ is the Lagrange multiplier. Recall Assumption 4 which assumed strict feasibility, i.e., there exists a transient policy µ(·|x; θ) such that P J θ(x0) ≥ α < β. This is needed to guarantee the
+existence of a local saddle point.
+
+5.1 Policy Gradient Method
+
+In this section we propose a policy gradient method for chance-constrained MDPs (similar to Algorithm 1). Since we do not need to estimate the ν-parameter in chance-constrained optimization, the corresponding policy gradient algorithm can be simpliﬁed and at each inner loop of Algorithm 1 we only perform the following updates at the end of each trajectory:
+
+θ Update: λ Update:
+
+θk+1 = ΓΘ
+
+θk
+
+−
+
+ζ2(k) N
+
+N
+∇θ log P(ξj,k)G(ξj,k) + λk∇θ log P(ξj,k)1 J (ξj,k) ≥ α
+
+j=1
+
+1N
+
+λk+1 = ΓΛ
+
+λk + ζ1(k)
+
+−β+ N
+
+1 J (ξj,k) ≥ α
+
+j=1
+
+16
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Considering the multi-time-scale step-size rules in Assumption 6, the θ update is on the fast timescale ζ2(k) and the Lagrange multiplier λ update is on the slow time-scale ζ1(k) . This results in a two time-scale stochastic approximation algorithm. In the following theorem, we prove that our policy gradient algorithm converges to a locally optimal policy for the chance-constrained problem.
+
+Theorem 13 Under Assumptions 2–6, the sequence of policy updates in Algorithm 1 converges to a locally optimal policy θ∗ for the chance-constrained optimization problem almost surely.
+
+Proof. [Sketch] By taking the gradient of L(θ, λ) w.r.t. θ, we have
+
+∇θL(θ, λ) = ∇θGθ(x0)+λ∇θP J θ(x0) ≥ α = ∇θPθ(ξ)G(ξ)+λ ∇θPθ(ξ)1 J (ξ) ≥ α .
+
+ξ
+
+ξ
+
+On the other hand, the gradient of L(θ, λ) w.r.t. λ is given by
+
+∇λL(θ, λ) = P J θ(x0) ≥ α − β.
+
+One can easily verify that the θ and λ updates are therefore unbiased estimates of ∇θL(θ, λ) and ∇λL(θ, λ), respectively. Then the rest of the proof follows analogously from the convergence proof of Algorithm 1 in steps 2 and 3 of Theorem 7.
+
+5.2 Actor-Critic Method
+
+In this section, we present an actor-critic algorithm for the chance-constrained optimization. Given the original MDP M = (X , A, C, D, P, P0) and parameter λ, we deﬁne the augmented MDP M¯ = (X¯, A¯, C¯λ, P¯, P¯0) as in the CVaR counterpart, except that P¯0(x, s) = P0(x)1{s = α} and
+
+C¯λ(x, s, a) =
+
+λ1{s ≤ 0} if x = xTar, C(x, a) otherwise.
+
+Thus, the total cost of a trajectory can be written as
+
+T
+
+C¯λ(xk, sk, ak) | x0 = x, s0 = β, µ = Gθ(x) + λP(J θ(x) ≥ β).
+
+(33)
+
+k=0
+
+Unlike the actor-critic algorithms for CVaR-constrained optimization, here the value function ap-
+proximation parameter v, policy θ, and Lagrange multiplier estimate λ are updated episodically, i.e., after each episode ends by time T when (xk, sk) = (xTar, sTar)8, as follows:
+
+T
+
+Critic Update: vk+1 = vk + ζ3(k) φ(xh, sh)δh(vk)
+
+(34)
+
+h=0
+
+T
+
+Actor Updates: θk+1 = ΓΘ θk − ζ2(k) ∇θ log µ(ah|xh, sh; θ)|θ=θk · δh(vk)
+
+(35)
+
+h=0
+
+λk+1 = ΓΛ λk + ζ1(k) − β + 1{sTar ≤ 0}
+
+(36)
+
+From analogous analysis as for the CVaR actor-critic method, the following theorem shows that the critic update vk converges almost surely to v∗.
+8. Note that sTar is the state of st when xt hits the (recurrent) target state xTar.
+
+17
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Theorem 14 Let v∗ ∈ arg minv
+
+Bθ[Φv] − Φv
+
+2 dθ
+
+be a minimizer of the Bellman residual, where
+
+the undiscounted Bellman operator at every (x, s) ∈ X¯ is given by
+
+Bθ[V ](x, s) = µ(a|x, s; θ) C¯λ(x, s, a) +
+
+P¯(x , s |x, s, a)V (x , s )
+
+a∈A
+
+(x ,s )∈X¯
+
+and V˜ ∗(x, s) = φ (x, s)v∗ is the projected Bellman ﬁxed point of V θ(x, s), i.e., V˜ ∗(x, s) =
+ΠBθ[V˜ ∗](x, s) for (x, s) ∈ X¯ . Then under Assumptions 8–9, the v-update in the actor-critic algorithm converges to v∗ almost surely.
+
+Proof. [Sketch] The proof of this theorem follows the same steps as those in the proof of The-
+
+orem 10, except replacing the γ-occupation measure dθγ with the occupation measure dθ (the total visiting probability). Similar analysis can also be found in the proof of Theorem 10 in Tamar and
+
+Mannor (2013). Under Assumption 2, the occupation measure of any transient states x ∈ X (start-
+
+ing at an arbitrary initial transient state x0 ∈ X ) can be written as dµ(x|x0) =
+
+Tµ,x t=0
+
+P(xt
+
+=
+
+x|x0; µ) when γ = 1. This further implies the total visiting probabilities are bounded as follows:
+
+dµ(x|x0) ≤ Tµ,x and πµ(x, a|x0) ≤ Tµ,x for any x, x0 ∈ X . Therefore, when the sequence of states {(xh, sh)}Th=0 is sampled by the h-step transition distribution P(xh, sh | x0, s0, θ), ∀h ≤ T ,
+the unbiased estimators of
+
+A :=
+
+πθ(y, s , a |x, s)φ(y, s ) φ (y, s ) −
+
+P¯(z, s |y, s , a)φ (z, s )
+
+(y,s )∈X¯ ,a ∈A
+
+(z,s )∈X¯
+
+and
+
+b :=
+
+πθ(y, s , a |x, s)φ(y, s )C¯λ(y, s , a )
+
+(y,s )∈X¯ ,a ∈A
+
+are given by
+
+T h=0
+
+φ(xh,
+
+sh)(φ
+
+(xh, sh) − φ
+
+(xh+1, sh+1)) and
+
+T h=0
+
+φ(xh,
+
+sh
+
+)C¯λ(xh,
+
+sh,
+
+ah),
+
+respectively. Note that in this theorem, we directly use the results from Theorem 7.1 in Bertsekas
+
+(1995) to show that every eigenvalue of matrix A has positive real part, instead of using the technical
+
+result in Lemma 20.
+Recall that θ(vk) = Bθ[Φvk] − Φvk ∞ is the residual of the value function approximation at step k induced by policy µ(·|·, ·; θ). By the triangle inequality and ﬁxed-point theorem of stochastic stopping problems, i.e., Bθ[V ∗] = V ∗ from Theorem 3.1 in Bertsekas (1995), it can be easily seen that V ∗ − Φvk ∞ ≤ θ(vk) + Bθ[Φvk] − Bθ[V ∗] ∞ ≤ θ(vk) + κ Φvk − V ∗ ∞ for some κ ∈ (0, 1). Similar to the actor-critic algorithm for CVaR-constrained optimization, the last
+inequality also follows from the contraction mapping property of Bθ from Theorem 3.2 in Bertsekas (1995). Now, we state the main theorem for the convergence of the actor-critic method.
+
+Theorem 15 Under Assumptions 2–9, if θk (vk) → 0, then the sequence of policy updates converges almost surely to a locally optimal policy θ∗ for the chance-constrained optimization problem.
+
+Proof. [Sketch ] From Theorem 14, the critic update converges to the minimizer of the Bellman
+residual. Since the critic update converges on the fastest scale, as in the proof of Theorem 12, one can replace vk by v∗(θk) in the convergence proof of the actor update. Furthermore, by sampling the sequence of states {(xh, sh)}Th=0 with the h-step transition distribution P(xh, sh | x0, s0, θ), ∀h ≤ T , the unbiased estimator of the gradient of the linear approximation to the Lagrangian
+function is given by
+
+∇θL˜v(θ, λ) :=
+
+πθ(x, s, a|x0 = x0, s0 = ν)∇θ log µ(a|x, s; θ)A˜θ,v(x, s, a),
+
+(x,s)∈X¯ ,a∈A
+
+18
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+where Q˜θ,v(x, s, a) − v φ(x, s) is given by
+
+T h=0
+
+∇θ
+
+log
+
+µ(ah|xh,
+
+sh;
+
+θ)|θ=θk
+
+·
+
+δh(v∗)
+
+and
+
+the
+
+unbiased estimator of ∇λL(θ, λ) = −β + P(sTar ≤ 0) is given by −β + 1{sTar ≤ 0}. Analogous
+
+to equation (77) in the proof of Theorem 24, by convexity of quadratic functions, we have for any
+
+value function approximation v,
+
+(y,s
+
+)∈X¯
+
+,a
+
+∈A
+
+π θ (y ,
+
+s
+
+,
+
+a
+
+|x,
+
+s)(Aθ(y,
+
+s
+
+,
+
+a
+
+)
+
+−
+
+A˜vθ (y,
+
+s
+
+,
+
+a
+
+))
+
+≤
+
+2T
+
+θ (v ) 1−κ
+
+,
+
+which further implies that ∇θL(θ, λ) − ∇θL˜v(θ, λ) → 0 when θ(v) → 0 at v = v∗(θk). The rest of the proof follows identical arguments as in steps 3 to 5 of the proof of Theorem 12.
+
+6. Examples
+In this section we illustrate the effectiveness of our risk-constrained policy gradient and actor-critic algorithms by testing them on an American option stopping problem and on a long-term personalized advertisement-recommendation (ad-recommendation) problem.
+
+6.1 The Optimal Stopping Problem
+
+We consider an optimal stopping problem of purchasing certain types of goods, in which the state at each time step k ≤ T consists of a purchase cost ck and time k, i.e., x = (ck, k), where T is the deterministic upper bound of the random stopping time. The purchase cost sequence {ck}Tk=0 is randomly generated by a Markov chain with two modes. Speciﬁcally, due to future market uncertainties, at time k the random purchase cost at the next time step ck+1 either grows by a factor fu > 1, i.e., ck+1 = fuck, with probability p, or drops by a factor fd < 1, i.e., ck+1 = fdck, with probability 1 − p. Here fu and fd are constants that represent the rates of appreciation (due to anticipated shortage of supplies from vendors) and depreciation (due to reduction of demands in the market) respectively. The agent (buyer) should decide either to accept the present cost (uk = 1) or wait (uk = 0). If he/she accepts the cost or when the system terminates at time k = T , the purchase cost is set at max(K, ck), where K is the maximum cost threshold. Otherwise, to account for a steady rate of inﬂation, at each time step the buyer receives an extra cost of ph that is independent to the purchase cost. Moreover, there is a discount factor γ ∈ (0, 1) to account for the increase in
+the buyer’s affordability. Note that if we change cost to reward and minimization to maximization,
+this is exactly the American option pricing problem, a standard testbed to evaluate risk-sensitive algorithms (e.g., see Tamar et al. (2012)). Since the state space size n is exponential in T , ﬁnding
+an exact solution via dynamic programming (DP) quickly becomes infeasible, and thus the problem
+requires approximation and sampling techniques.
+The optimal stopping problem can be reformulated as follows
+
+min E Gθ(x0)
+θ
+
+subject to
+
+CVaRα Gθ(x0) ≤ β or P Gθ(x0) ≥ β ≤ 1 − α9, (37)
+
+where the discounted cost function is given by
+
+T
+Gθ(x) = γk (1{uk = 1}max(K, ck) + 1{uk = 0}ph) | x0 = x, µ.
+k=0
+
+9. To ensure that the notation is consistent between the CVaR and chance constraints, in the chance constraint deﬁnition the conﬁdence level is denoted by α and the tolerance threshold of Gθ(x0) is denoted by β.
+
+19
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+We set the parameters of the MDP as follows: x0 = [1; 0], ph = 0.1, T = 20, K = 5, γ = 0.95,
+
+fu = 2, fd = 0.5, and p = 0.65. The conﬁdence level and constraint threshold are given by α =
+
+0.95 and β = 3. The number of sample trajectories N is set to 500, 000 and the parameter bounds
+
+are λmax = 5, 000 and Θ = [−20, 20]κ1, where the dimension of the basis functions is κ1 = 1024.
+
+We implement the standard Gaussian radial basis functions (RBFs) as feature functions and search
+
+over the class of Boltzmann policies θ : θ = {θx,a}x∈X ,a∈A, µθ(a|x) =
+
+exp(θx,ax) a∈A exp(θx,ax)
+
+.
+
+We consider the following trajectory-based algorithms:
+
+1. PG: This is a policy gradient algorithm that minimizes the expected discounted cost function without considering any risk criteria.
+
+2. PG-CVaR/PG-CC: These are the CVaR/chance-constrained simulated trajectory-based policy gradient algorithms given in Section 3.
+
+The experiments for each algorithm comprise the following two phases:
+1. Tuning phase: We run the algorithm and update the policy until (ν, θ, λ) converges.
+2. Converged run: Having obtained a converged policy θ∗ in the tuning phase, in the converged run phase, we perform a Monte Carlo simulation of 10, 000 trajectories and report the results as averages over these trials.
+We also consider the following incremental algorithms:
+1. AC: This is an actor-critic algorithm that minimizes the expected discounted cost function without considering any risk criteria. This is similar to Algorithm 1 in Bhatnagar (2010).
+2. AC-CVaR/AC-CC: These are the CVaR/chance-constrained semi-trajectory actor-critic algorithms given in Section 4.
+3. AC-CVaR-SPSA: This is the CVaR-constrained SPSA actor-critic algorithm given in Section 4.
+Similar to the trajectory-based algorithms, we use RBF features for [x; s] and consider the family of augmented state Boltzmann policies. Similarly, the experiments comprise two phases: 1) the tuning phase, where the set of parameters (v, ν, θ, λ) is obtained after the algorithm converges, and 2) the converged run, where the policy is simulated with 10, 000 trajectories.
+We compare the performance of PG-CVaR and PG-CC (given in Algorithm 1), and AC-CVaRSPSA, AC-CVaR, and AC-CC (given in Algorithm 2), with PG and AC, their risk-neutral counterparts. Figures 1 and 2 show the distribution of the discounted cumulative cost Gθ(x0) for the policy θ learned by each of these algorithms. The results indicate that the risk-constrained algorithms yield a higher expected cost, but less worst-case variability, compared to the risk-neutral methods. More precisely, the cost distributions of the risk-constrained algorithms have lower right-tail (worstcase) distribution than their risk-neutral counterparts. Table 1 summarizes the performance of these algorithms. The numbers reiterate what we concluded from Figures 1 and 2.
+Notice that while the risk averse policy satisﬁes the CVaR constraint, it is not tight (i.e., the constraint is not matched). In fact this is a problem of local optimality, and other experiments in the literature (for example see the numerical results in Prashanth and Ghavamzadeh (2013) and in
+20
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Bhatnagar and Lakshmanan (2012)) have the same problem of producing solutions which obey the constraints but not tightly. However, since both the expectation and the CVaR risk metric are sub-additive and convex, one can always construct a policy that is a linear combination of the risk neutral optimal policy and the risk averse policy such that it matches the constraint threshold and has a lower cost compared to the risk averse policy.
+
+10000 8000
+
+Expectation CVaR(0.95)
+
+10000 8000
+
+Expectation CVaR(0.95) CVaR(0.95) SPSA
+
+Frequency Frequency
+
+6000
+
+6000
+
+4000
+
+4000
+
+2000
+
+2000
+
+00
+
+2
+
+4
+
+6
+
+Cost
+
+00
+
+2
+
+4
+
+6
+
+Cost
+
+Figure 1: Cost distributions for the policies learned by the CVaR-constrained and risk-neutral policy gradient and actor-critic algorithms. The left ﬁgure corresponds to the PG methods and the right ﬁgure corresponds to the AC algorithms.
+
+Frequency Frequency
+
+10000 8000 6000 4000 2000
+
+Expectation VaR(0.95)
+
+8000 6000 4000 2000
+
+Expectation VaR(0.95)
+
+00
+
+2
+
+4
+
+6
+
+8
+
+Cost
+
+00
+
+2
+
+4
+
+6
+
+8
+
+Cost
+
+Figure 2: Cost distributions for the policies learned by the chance-constrained and risk-neutral policy gradient and actor-critic algorithms. The left ﬁgure corresponds to the PG methods and the right ﬁgure corresponds to the AC algorithms.
+
+21
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+PG PG-CVaR
+PG-CC AC
+AC-CVaR-SPSA AC-CVaR AC-CC
+
+E Gθ(x0) 1.177 1.997 1.994 1.113 1.326 1.343 1.817
+
+σ Gθ(x0) 1.065 0.060 0.121 0.607 0.322 0.346 0.753
+
+CVaR Gθ(x0) 4.464 2.000 2.058 3.331 2.145 2.208 4.006
+
+VaR Gθ(x0) 4.005 2.000 2.000 3.220 1.283 1.290 2.300
+
+Table 1: Performance comparison of the policies learned by the risk-constrained and risk-neutral algorithms. In this table σ Gθ(x0) stands for the standard deviation of the total cost.
+
+6.2 A Personalized Ad-Recommendation System
+Many companies such as banks and retailers use user-speciﬁc targeting of advertisements to attract more customers and increase their revenue. When a user requests a webpage that contains a box for an advertisement, the system should decide which advertisement (among those in the current campaign) to show to this particular user based on a vector containing all her features, often collected by a cookie. Our goal here is to generate a strategy that for each user of the website selects an ad that when it is presented to her has the highest probability to be clicked on. These days, almost all the industrial personalized ad recommendation systems use supervised learning or contextual bandits algorithms. These methods are based on the i.i.d. assumption of the visits (to the website) and do not discriminate between a visit and a visitor, i.e., each visit is considered as a new visitor that has been sampled i.i.d. from the population of the visitors. As a result, these algorithms are myopic and do not try to optimize for the long-term performance. Despite their success, these methods seem to be insufﬁcient as users establish longer-term relationship with the websites they visit, i.e., the ad recommendation systems should deal with more and more returning visitors. The increase in returning visitors violates (more) the main assumption underlying the supervised learning and bandit algorithms, i.e., there is no difference between a visit and a visitor, and thus, shows the need for a new class of solutions.
+The reinforcement learning (RL) algorithms that have been designed to optimize the long-term performance of the system (expected sum of rewards/costs) seem to be suitable candidates for ad recommendation systems (Shani et al., 2002). The nature of these algorithms allows them to take into account all the available knowledge about the user at the current visit, and then selects an offer to maximize the total number of times she will click over multiple visits, also known as the user’s life-time value (LTV). Unlike myopic approaches, RL algorithms differentiate between a visit and a visitor, and consider all the visits of a user (in chronological order) as a trajectory generated by her. In this approach, while the visitors are i.i.d. samples from the population of the users, their visits are not. This long-term approach to the ad recommendation problem allows us to make decisions that are not usually possible with myopic techniques, such as to propose an offer to a user that might be a loss to the company in the short term, but has the effect that makes the user engaged with the website/company and brings her back to spend more money in the future.
+For our second case study, we use an Adobe personalized ad-recommendation (Theocharous and Hallak, 2013) simulator that has been trained based on real data captured with permission from the website of a Fortune 50 company that receives hundreds of visitors per day. The simulator produces a vector of 31 real-valued features that provide a compressed representation of all of the
+22
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+available information about a user. The advertisements are clustered into four high-level classes that the agent must select between. After the agent selects an advertisement, the user either clicks (reward of +1) or does not click (reward of 0) and the feature vector describing the user is updated. In this case, we test our algorithm by maximizing the customers’ life-time value in 15 time steps subject to a bounded tail risk.
+Instead of using the cost-minimization framework from the problem statement in Section 2.2, by deﬁning the return random variable (under a ﬁxed policy θ) Rθ(x0) as the (discounted) total number of clicks along a user’s trajectory, here we formulate the personalized ad-recommendation problem as a return maximization problem where the tail risk corresponds to the worst case return distribution:
+
+max E Rθ(x0)
+
+subject to CVaR1−α − Rθ(x0) ≤ β.
+
+(38)
+
+θ
+
+We set the parameters of the MDP as T = 15 and γ = 0.98, the conﬁdence level and constraint threshold as α = 0.05 and β = −0.12, the number of sample trajectories N to 1, 000, 000, and the parameter bounds as λmax = 5, 000 and Θ = [−60, 60]κ1, where the dimension of the basis functions is κ1 = 4096. Similar to the optimal stopping problem, we implement both the trajectory based algorithm (PG, PG-CVaR) and the actor-critic algorithms (AC, AC-CVaR) for risk-neutral and risk sensitive optimal control. Here we used the 3rd order Fourier basis with cross-products
+in Konidaris et al. (2011) as features and search over the family of Boltzmann policies. We compared
+the performance of PG-CVaR and AC-CVaR, our risk-constrained policy gradient (Algorithm 1) and
+actor-critic (Algorithms 2) algorithms, with their risk-neutral counterparts (PG and AC). Figure 3 shows the distribution of the discounted cumulative return Rθ(x0) for the policy θ learned by each
+of these algorithms. The results indicate that the risk-constrained algorithms yield a lower expected
+reward, but have higher left tail (worst-case) reward distributions. Table 2 summarizes the ﬁndings
+of this experiment.
+
+10000 8000
+
+Expectation CVaR(0.05)
+
+10000 8000
+
+Expectation CVaR(0.05)
+
+Frequency Frequency
+
+6000
+
+6000
+
+4000
+
+4000
+
+2000
+
+2000
+
+00
+
+5
+
+10
+
+15
+
+Reward
+
+00
+
+5
+
+10
+
+15
+
+Reward
+
+Figure 3: Reward distributions for the policies learned by the CVaR-constrained and risk-neutral policy gradient and actor-critic algorithms. The left ﬁgure corresponds to the PG methods and the right ﬁgure corresponds to the AC algorithms.
+
+23
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+PG PG-CVaR
+AC AC-CVaR
+
+E Rθ(x0) 0.396 0.287 0.581 0.253
+
+σ Rθ(x0) 1.898 0.914 2.778 0.634
+
+CVaR Rθ(x0) 0.037 0.126 0 0.137
+
+VaR Rθ(x0) 1.000 1.795 0 1.890
+
+Table 2: Performance comparison of the policies learned by the CVaR-constrained and risk-neutral algorithms. In this table σ Rθ(x0) stands for the standard deviation of the total reward.
+
+7. Conclusions and Future Work
+We proposed novel policy gradient and actor-critic algorithms for CVaR-constrained and chanceconstrained optimization in MDPs, and proved their convergence. Using an optimal stopping problem and a personalized ad-recommendation problem, we showed that our algorithms resulted in policies whose cost distributions have lower right-tail compared to their risk-neutral counterparts. This is important for a risk-averse decision-maker, especially if the right-tail contains catastrophic costs. Future work includes: 1) Providing convergence proofs for our AC algorithms when the samples are generated by following the policy and not from its discounted occupation measure , 2) Using importance sampling methods (Bardou et al., 2009; Tamar et al., 2015) to improve gradient estimates in the right-tail of the cost distribution (worst-case events that are observed with low probability), and 3) Applying the algorithms presented in this paper to a variety of applications ranging from operations research to robotics and ﬁnance.
+Acknowledgments
+
+We would like to thank Csaba Szepesvari for his comments that helped us with the derivation of the algorithms, Georgios Theocharous for sharing his ad-recommendation simulator with us, and Philip Thomas for helping us with the experiments with the simulator. We would also like to thank the reviewers for their very helpful comments and suggestions, which helped us to signiﬁcantly improve the paper. Y-L. Chow is partially supported by The Croucher Foundation doctoral scholarship. L. Janson was partially supported by NIH training grant T32GM096982. M. Pavone was partially supported by the Ofﬁce of Naval Research, Science of Autonomy Program, under Contract N0001415-1-2673.
+
+Appendix A. Convergence of Policy Gradient Methods
+
+A.1 Computing the Gradients
+
+i) ∇θL(ν, θ, λ): Gradient of L(ν, θ, λ) w.r.t. θ By expanding the expectations in the deﬁnition of the objective function L(ν, θ, λ) in (5), we obtain
+
+L(ν, θ, λ) =
+
+λ Pθ(ξ)G(ξ) + λν + 1 − α
+
+Pθ(ξ) J (ξ) − ν + − λβ.
+
+ξ
+
+ξ
+
+By taking the gradient with respect to θ, we have
+
+∇θL(ν, θ, λ) =
+
+λ ∇θPθ(ξ)G(ξ) + 1 − α
+
+∇θPθ(ξ) J (ξ) − ν +.
+
+ξ
+
+ξ
+
+24
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+This gradient can be rewritten as
+
+λ
+
+∇θL(ν, θ, λ) =
+
+Pθ(ξ) · ∇θ log Pθ(ξ)
+
+G(ξ) +
+
+J (ξ) − ν 1 J (ξ) ≥ ν
+
+1−α
+
+ξ:Pθ (ξ)=0
+
+, (39)
+
+where in the case of Pθ(ξ) = 0, the term ∇θ log Pθ(ξ) is given by:
+
+T −1
+
+∇θ log Pθ(ξ) =∇θ
+
+log P (xk+1|xk, ak) + log µ(ak|xk; θ) + log 1{x0 = x0}
+
+k=0
+
+T −1
+
+= ∇θ log µ(ak|xk; θ)
+
+k=0
+
+T −1
+
+1
+
+= k=0 µ(ak|xk; θ) ∇θµ(ak|xk; θ).
+
+ii) ∂νL(ν, θ, λ): Sub-differential of L(ν, θ, λ) w.r.t. ν From the deﬁnition of L(ν, θ, λ), we can
+
+easily see that L(ν, θ, λ) is a convex function in ν for any ﬁxed θ ∈ Θ. Note that for every ﬁxed ν
+
+and any ν , we have
+
+J (ξ) − ν + − J (ξ) − ν + ≥ g · (ν − ν),
+
+where g is any element in the set of sub-derivatives:
+
+
+
+−1
+
+g ∈ ∂ν
+
+J (ξ) − ν
+
++
+
+:=
+
+ −q
+
+:
+
+q
+
+∈
+
+[0,
+
+1]
+
+0
+
+if ν < J (ξ), if ν = J (ξ), otherwise.
+
+Since L(ν, θ, λ) is ﬁnite-valued for any ν ∈ R, by the additive rule of sub-derivatives, we have
+
+
+
+λ
+
+λq
+
+∂ν
+
+L(ν,
+
+θ,
+
+λ)
+
+=
+
+− 
+
+1
+
+−
+
+α
+
+ξ
+
+Pθ(ξ)1 J (ξ) > ν
+
+− 1−α
+
+ξ
+
+Pθ(ξ)1 J (ξ) = ν
+
+In particular for q = 1, we may write the sub-gradient of L(ν, θ, λ) w.r.t. ν as
+
+  + λ | q ∈ [0, 1] . 
+(40)
+
+λ ∂νL(ν, θ, λ)|q=0 = λ − 1 − α Pθ(ξ) · 1 J (ξ) ≥ ν
+ξ
+
+or
+
+λ
+
+λ− 1−α
+
+Pθ(ξ) · 1 J (ξ) ≥ ν ∈ ∂νL(ν, θ, λ).
+
+ξ
+
+iii) ∇λL(ν, θ, λ): Gradient of L(ν, θ, λ) w.r.t. λ Since L(ν, θ, λ) is a linear function in λ, one can express the gradient of L(ν, θ, λ) w.r.t. λ as follows:
+
+1
+
+∇λL(ν, θ, λ) = ν − β + 1 − α Pθ(ξ) · J (ξ) − ν 1 J (ξ) ≥ ν .
+
+(41)
+
+ξ
+
+25
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+A.2 Proof of Convergence of the Policy Gradient Algorithm
+In this section, we prove the convergence of the policy gradient algorithm (Algorithm 1). Before going through the details of the convergence proof, a high level overview of the proof technique is given as follows.
+
+1. First, by convergence properties of multi-time scale discrete stochastic approximation algorithms, we show that each update (νk, θk, λk) converges almost surely to a stationary point (ν∗, θ∗, λ∗) of the corresponding continuous time system. In particular, by adopting the stepsize rules deﬁned in Assumption 6, we show that the convergence rate of ν is fastest, followed by the convergence rate of θ, while the convergence rate of λ is the slowest among the set of
+parameters.
+
+2. By using Lyapunov analysis, we show that the continuous time system is locally asymptotically stable at the stationary point (ν∗, θ∗, λ∗).
+
+3. Since the Lyapunov function used in the above analysis is the Lagrangian function L(ν, θ, λ), we conclude that the stationary point (ν∗, θ∗, λ∗) is a local saddle point. Finally by the local saddle point theorem, we deduce that θ∗ is a locally optimal solution for the CVaR-constrained
+MDP problem.
+
+This convergence proof procedure is standard for stochastic approximation algorithms, see (Bhatnagar et al., 2009; Bhatnagar and Lakshmanan, 2012) for further references.
+Since ν converges on the faster timescale than θ and λ, the ν-update can be rewritten by assuming (θ, λ) as invariant quantities, i.e.,
+
+λ
+
+N
+
+νk+1 = ΓN
+
+νk − ζ3(k)
+
+λ− (1 − α)N
+
+1 J (ξj,k) ≥ νk
+
+.
+
+(42)
+
+j=1
+
+Consider the continuous time dynamics of ν deﬁned using differential inclusion
+
+ν˙ ∈ Υν [−g(ν)] , ∀g(ν) ∈ ∂νL(ν, θ, λ),
+
+(43)
+
+where
+
+Υν
+
+[K (ν )]
+
+:=
+
+lim
+0<η→0
+
+ΓN
+
+(ν
+
++
+
+η K (ν )) η
+
+−
+
+ΓN
+
+(ν)
+
+.
+
+Here Υν[K(ν)] is the left directional derivative of the function ΓN (ν) in the direction of K(ν). By using the left directional derivative Υν [−g(ν)] in the sub-gradient descent algorithm for ν, the gradient will point in the descent direction along the boundary of ν whenever the ν-update hits its
+boundary. Furthermore, since ν converges on a faster timescale than θ, and λ is on the slowest time-scale,
+the θ-update can be rewritten using the converged ν∗(θ), assuming λ as an invariant quantity, i.e.,
+
+1N
+
+θk+1 =ΓΘ θk − ζ2(k) N
+
+∇θ log Pθ(ξj,k)|θ=θk G(ξj,k)
+
+j=1
+
+λ +
+(1 − α)N
+
+N
+
+∇θ log Pθ(ξj,k)|θ=θk
+
+J (ξj,k) − ν 1
+
+J (ξj,k) ≥ ν∗(θk)
+
+.
+
+j=1
+
+26
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Consider the continuous time dynamics of θ ∈ Θ:
+
+θ˙ = Υθ [−∇θL(ν, θ, λ)] |ν=ν∗(θ),
+
+(44)
+
+where
+
+Υθ [K (θ)]
+
+:=
+
+lim
+0<η→0
+
+ΓΘ(θ
+
++
+
+η K (θ)) η
+
+−
+
+ΓΘ(θ)
+
+.
+
+Similar to the analysis of ν, Υθ[K(θ)] is the left directional derivative of the function ΓΘ(θ) in the direction of K(θ). By using the left directional derivative Υθ [−∇θL(ν, θ, λ)] in the gradient descent algorithm for θ, the gradient will point in the descent direction along the boundary of Θ
+whenever the θ-update hits its boundary.
+Finally, since the λ-update converges in the slowest time-scale, the λ-update can be rewritten using the converged θ∗(λ) and ν∗(λ), i.e.,
+
+
+
+
+
+λk+1 = ΓΛ λk + ζ1(k)
+
+ν ∗ (λk )
+
++
+
+1
+
+1 −
+
+α
+
+1 N
+
+N
+
+J (ξj,k) − ν∗(λk) + − β  .
+
+(45)
+
+j=1
+
+Consider the continuous time system
+
+λ˙ (t) = Υλ ∇λL(ν, θ, λ)
+
+, λ(t) ≥ 0,
+
+(46)
+
+θ=θ∗(λ),ν=ν∗(λ)
+
+where
+
+Υλ[K(λ)] := lim ΓΛ
+0<η→0
+
+λ + ηK(λ) η
+
+− ΓΛ(λ) .
+
+Again, similar to the analysis of (ν, θ), Υλ[K(λ)] is the left directional derivative of the function ΓΛ(λ) in the direction of K(λ). By using the left directional derivative Υλ [∇λL(ν, θ, λ)] in the gradient ascent algorithm for λ, the gradient will point in the ascent direction along the boundary of
+[0, λmax] whenever the λ-update hits its boundary. Deﬁne L∗(λ) = L(ν∗(λ), θ∗(λ), λ),
+
+for
+
+λ
+
+≥
+
+0
+
+where
+
+(θ∗(λ), ν∗(λ))
+
+∈
+
+Θ
+
+×
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+is
+
+a
+
+local
+
+minimum
+
+of
+
+L(ν, θ, λ)
+
+for
+
+ﬁxed
+
+λ
+
+≥
+
+0,
+
+i.e.,
+
+L(ν,
+
+θ,
+
+λ)
+
+≥
+
+L(ν∗(λ),
+
+θ∗(λ),
+
+λ)
+
+for
+
+any
+
+(θ,
+
+ν)
+
+∈
+
+Θ
+
+×
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+∩
+
+B(θ∗(λ),ν∗(λ))(r)
+
+for some r > 0.
+
+Next, we want to show that the ODE (46) is actually a gradient ascent of the Lagrangian function
+
+using the envelope theorem from mathematical economics (Milgrom and Segal, 2002). The envelope theorem describes sufﬁcient conditions for the derivative of L∗ with respect to λ to equal the
+
+partial derivative of the objective function L with respect to λ, holding (θ, ν) at its local optimum (θ, ν) = (θ∗(λ), ν∗(λ)). We will show that ∇λL∗(λ) coincides with ∇λL(ν, θ, λ)|θ=θ∗(λ),ν=ν∗(λ) as follows.
+
+Theorem 16 The value function L∗ is absolutely continuous. Furthermore,
+
+λ
+
+L∗(λ) = L∗(0) +
+
+0
+
+∇λ L(ν, θ, λ )
+
+ds,
+θ=θ∗(s),ν=ν∗(s),λ =s
+
+λ ≥ 0.
+
+(47)
+
+27
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Proof. The proof follows from analogous arguments to Lemma 4.3 in Borkar (2005). From the deﬁnition of L∗, observe that for any λ , λ ≥ 0 with λ < λ ,
+
+|L∗(λ ) − L∗(λ )| ≤
+
+sup
+
+|L(ν, θ, λ ) − L(ν, θ, λ )|
+
+θ∈Θ,ν
+
+∈[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+=
+
+sup
+
+θ∈Θ,ν
+
+∈[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+λ
+∇λL(ν, θ, s)ds
+λ
+
+≤
+
+λ λ
+
+sup
+
+|∇λL(ν, θ, s)| ds
+
+θ∈Θ,ν
+
+∈[
+
+−Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+≤
+
+(1
+
+3Dmax − α)(1 −
+
+(λ γ)
+
+− λ ).
+
+This implies that L∗ is absolutely continuous. Therefore, L∗ is continuous everywhere and differ-
+entiable almost everywhere.
+By the Milgrom–Segal envelope theorem in mathematical economics (Theorem 1 of Milgrom and Segal (2002)), one concludes that the derivative of L∗(λ) coincides with the derivative of L(ν, θ, λ) at the point of differentiability λ and θ = θ∗(λ), ν = ν∗(λ). Also since L∗ is absolutely continuous, the limit of (L∗(λ) − L∗(λ ))/(λ − λ ) at λ ↑ λ (or λ ↓ λ ) coincides with
+the lower/upper directional derivatives if λ is a point of non-differentiability. Thus, there is only a countable number of non-differentiable points in L∗ and the set of non-differentiable points of L∗ has measure zero. Therefore, expression (47) holds and one concludes that ∇λL∗(λ) coincides with ∇λL(ν, θ, λ)|θ=θ∗(λ),ν=ν∗(λ).
+Before getting into the main result, we have the following technical proposition whose proof
+directly follows from the deﬁnition of log Pθ(ξ) and Assumption 3 that ∇θµ(ak|xk; θ) is Lipschitz in θ.
+
+Proposition 17 ∇θL(ν, θ, λ) is Lipschitz in θ. Proof. Recall that
+
+λ
+
+∇θL(ν, θ, λ) =
+
+Pθ(ξ) · ∇θ log Pθ(ξ)
+
+G(ξ) +
+
+J (ξ) − ν 1 J (ξ) ≥ ν
+
+1−α
+
+ξ
+
+and ∇θ log Pθ(ξ) =
+
+T −1 k=0
+
+∇θ µ(ak |xk ;
+
+θ)/µ(ak|xk;
+
+θ)
+
+whenever
+
+µ(ak|xk;
+
+θ)
+
+∈
+
+(0, 1].
+
+Now As-
+
+sumption (A1) implies that ∇θµ(ak|xk; θ) is a Lipschitz function in θ for any a ∈ A and k ∈
+
+{0, . . . , T − 1} and µ(ak|xk; θ) is differentiable in θ. Therefore, by recalling that
+
+T −1
+Pθ(ξ) = P (xk+1|xk, ak)µ(ak|xk; θ)1{x0 = x0}
+k=0
+and by combining these arguments and noting that the sum of products of Lipschitz functions is Lipschitz, one concludes that ∇θL(ν, θ, λ) is Lipschitz in θ.
+
+Remark 18 The fact that ∇θL(ν, θ, λ) is Lipschitz in θ implies that ∇θL(ν, θ, λ) 2 ≤ 2( ∇θL(ν, θ0, λ) + θ0 )2 + 2 θ 2
+
+which further implies that
+
+∇θL(ν, θ, λ) 2 ≤ K1(1 + θ 2).
+
+28
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+for K1 = 2 max(1, ( ∇θL(ν, θ0, λ) + θ0 )2) > 0. Similarly, the fact that ∇θ log Pθ(ξ) is Lipschitz implies that
+∇θ log Pθ(ξ) 2 ≤ K2(ξ)(1 + θ 2)
+for a positive random variable K2(ξ). Furthermore, since T < ∞ w.p. 1, µ(ak|xk; θ) ∈ (0, 1] and ∇θµ(ak|xk; θ) is Lipschitz for any k < T , K2(ξ) < ∞ w.p. 1.
+
+Remark 19 For any given θ ∈ Θ, λ ≥ 0, and g(ν) ∈ ∂νL(ν, θ, λ), we have
+
+|g(ν)| ≤ 3λ(1 + |ν|)/(1 − α).
+
+(48)
+
+To see this, recall that the set of g(ν) ∈ ∂νL(ν, θ, λ) can be parameterized by q ∈ [0, 1] as
+
+λ
+
+λq
+
+g(ν; q) = − (1 − α)
+
+Pθ(ξ)1 {J (ξ) > ν} − 1 − α
+
+Pθ(ξ)1 {J (ξ) = ν} + λ.
+
+ξ
+
+ξ
+
+It is obvious that |1 {J (ξ) = ν}| , |1 {J (ξ) > ν}| ≤ 1 + |ν|. Thus, ξ Pθ(ξ)1 {J (ξ) > ν} ≤
+supξ |1 {J (ξ) > ν}| ≤ 1 + |ν|, and ξ Pθ(ξ)1 {J (ξ) = ν} ≤ 1 + |ν|. Recalling that 0 < (1 − q), (1 − α) < 1, these arguments imply the claim of (48).
+
+We are now in a position to prove the convergence analysis of Theorem 7.
+
+Proof. [Proof of Theorem 7] We split the proof into the following four steps:
+
+Step 1 (Convergence of ν-update) Since ν converges on a faster time scale than θ and λ, according to Lemma 1 in Chapter 6 of Borkar (2008), one can analyze the convergence properties of ν in the following update rule for arbitrary quantities of θ and λ (i.e., here we have θ = θk and λ = λk):
+
+
+
+
+
+
+
+λ
+
+N
+
+νk+1
+
+=
+
+ΓN
+
+νk
+
++
+
+ζ3(k)
+
+ (1
+
+−
+
+α)N
+
+1 J (ξj,k) ≥ νk − λ + δνk+1 ,
+
+(49)
+
+j=1
+
+and the Martingale difference term with respect to ν is given by
+
+
+
+
+
+λ
+
+1N
+
+δνk+1 = 1 − α − N 1 J (ξj,k) ≥ νk + Pθ(ξ)1{J (ξ) ≥ νk} .
+
+(50)
+
+j=1
+
+ξ
+
+First, one can show that δνk+1 is square integrable, i.e.,
+
+E[ δνk+1 2 | Fν,k] ≤ 4
+
+λmax 2 1−α
+
+where Fν,k = σ νm, δνm, m ≤ k is the ﬁltration of νk generated by different independent trajectories.
+Second, since the history trajectories are generated based on the sampling probability mass function Pθ(ξ), expression (40) implies that E [δνk+1 | Fν,k] = 0. Therefore, the ν-update is a stochastic approximation of the ODE (43) with a Martingale difference error term, i.e.,
+λ 1 − α Pθ(ξ)1{J (ξ) ≥ νk} − λ ∈ −∂νL(ν, θ, λ)|ν=νk .
+ξ
+
+29
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Then one can invoke Corollary 4 in Chapter 5 of Borkar (2008) (stochastic approximation theory
+
+for non-differentiable systems) to show that the sequence {νk},
+
+νk
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+converges
+
+almost
+
+surely
+
+to
+
+a
+
+ﬁxed
+
+point
+
+ν∗
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+of
+
+the
+
+differential
+
+inclusion
+
+(43),
+
+where
+
+ν∗ ∈ Nc :=
+
+ν ∈ − Dmax , Dmax 1−γ 1−γ
+
+: Υν[−g(ν)] = 0, g(ν) ∈ ∂νL(ν, θ, λ)
+
+.
+
+To justify the assumptions of this corollary, 1) from Remark 19, the Lipschitz property is satisﬁed,
+
+i.e.,
+
+supg(ν)∈∂ν L(ν,θ,λ)
+
+|g(ν)|
+
+≤
+
+3λ(1
+
++
+
+|ν|)/(1
+
+−
+
+α),
+
+2)
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+and
+
+∂ν
+
+L(ν,
+
+θ,
+
+λ)
+
+are
+
+convex
+
+compact sets by deﬁnition, which implies {(ν, g(ν)) | g(ν) ∈ ∂νL(ν, θ, λ)} is a closed set, and
+
+further implies ∂νL(ν, θ, λ) is an upper semi-continuous set valued mapping, 3) the step-size rule
+
+follows from Assumption 6, 4) the Martingale difference assumption follows from (50), and 5)
+
+νk
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+],
+
+∀i
+
+implies
+
+that
+
+supk
+
+νk
+
+< ∞ almost surely.
+
+Consider the ODE for ν ∈ R in (43), we deﬁne the set-valued derivative of L as follows:
+
+DtL(ν, θ, λ) = g(ν)Υν − g(ν) | ∀g(ν) ∈ ∂νL(ν, θ, λ) .
+
+One can conclude that
+
+max DtL(ν, θ, λ) = max g(ν)Υν − g(ν) | g(ν) ∈ ∂νL(ν, θ, λ) .
+g(ν)
+
+We now show that maxg(ν) DtL(ν, θ, λ) ≤ 0 and this quantity is non-zero if Υν − g(ν) = 0 for every g(ν) ∈ ∂νL(ν, θ, λ) by considering three cases. To distinguish the latter two cases, we need to deﬁne,
+
+J (ν) :=
+
+g(ν) ∈ ∂Lν(ν, θ, λ) ∀η0 > 0, ∃η ∈ (0, η0] such that θ − ηg(ν) ∈
+
+− Dmax , Dmax 1−γ 1−γ
+
+.
+
+Case
+
+1:
+
+ν
+
+∈
+
+(−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+).
+
+For every g(ν) ∈ ∂νL(ν, θ, λ), there exists a sufﬁciently small η0 > 0 such that ν − η0g(ν) ∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+and
+
+ΓN θ − η0g(ν) − θ = −η0g(ν).
+
+Therefore, the deﬁnition of Υθ[−g(ν)] implies
+
+max DtL(ν, θ, λ) = max − g2(ν) | g(ν) ∈ ∂νL(ν, θ, λ) ≤ 0.
+
+(51)
+
+g(ν)
+
+The maximum is attained because ∂νL(ν, θ, λ) is a convex compact set and g(ν)Υν − g(ν)
+
+is a continuous function. At the same time, we have maxg(ν) DtL(ν, θ, λ) < 0 whenever 0 ∈
+
+∂νL(ν, θ, λ).
+
+Case
+
+2:
+
+ν
+
+∈
+
+{−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+}
+
+and
+
+J
+
+(ν)
+
+is
+
+empty.
+
+The
+
+condition
+
+ν
+
+−
+
+ηg(ν)
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+implies
+
+that
+
+Υν − g(ν) = −g(ν).
+
+Then we obtain
+
+max DtL(ν, θ, λ) = max − g2(ν) | g(ν) ∈ ∂νL(ν, θ, λ) ≤ 0.
+
+(52)
+
+g(ν)
+
+30
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Furthermore, we have maxg(ν) DtL(ν, θ, λ) < 0 whenever 0 ∈ ∂νL(ν, θ, λ).
+
+Case
+
+3:
+
+ν
+
+∈
+
+{−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+}
+
+and
+
+J
+
+(ν)
+
+is
+
+nonempty.
+
+First, consider any g(ν) ∈ J (ν). For any η > 0, deﬁne νη := ν − ηg(ν). The above condition
+
+implies that when 0 < η → 0, ΓN
+
+νη
+
+is
+
+the
+
+projection
+
+of
+
+νη
+
+to
+
+the
+
+tangent
+
+space
+
+of
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+].
+
+For
+
+any
+
+element
+
+νˆ
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+],
+
+since
+
+the
+
+set
+
+{ν
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+:
+
+ν − νη 2 ≤
+
+νˆ − νη 2}
+
+is
+
+compact,
+
+the
+
+projection
+
+of
+
+νη
+
+on
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+exists.
+
+Furthermore,
+
+since
+
+f (ν)
+
+:=
+
+1 2
+
+(ν
+
+−
+
+νη
+
+)2
+
+is
+
+a strongly convex function and ∇f (ν) = ν − νη, by the ﬁrst order optimality condition, one obtains
+
+∇f (νη∗)(ν − νη∗) = (νη∗ − νη)(ν − νη∗) ≥ 0,
+
+∀ν ∈ − Dmax , Dmax 1−γ 1−γ
+
+where νη∗ is the unique projection of νη (the projection is unique because f (ν) is strongly convex
+
+and
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+is
+
+a
+
+convex
+
+compact
+
+set).
+
+Since
+
+the
+
+projection
+
+(minimizer)
+
+is
+
+unique,
+
+the
+
+above
+
+equality holds if and only if ν = νη∗.
+
+Therefore,
+
+for
+
+any
+
+ν
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+and
+
+η
+
+>
+
+0,
+
+g(ν)Υν
+
+− g(ν) = g(ν)
+
+lim νη∗ − ν 0<η→0 η
+
+= lim ν − νη 0<η→0 η
+
+lim νη∗ − ν 0<η→0 η
+
+− = lim
+0<η→0
+
+νη∗ − ν η2
+
+2
++ lim
+0<η→0
+
+νη∗ − νη
+
+νη∗ − ν η2
+
+≤ 0.
+
+Second,
+
+for
+
+any
+
+g(ν)
+
+∈
+
+∂νL(ν, θ, λ)
+
+∩
+
+J (ν)c,
+
+one
+
+obtains
+
+ν
+
+−
+
+ηg(ν)
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+],
+
+for
+
+any
+
+η ∈ (0, η0] and some η0 > 0. In this case, the arguments follow from case 2 and the following
+
+expression holds: Υν − g(ν) = −g(ν).
+
+Combining these arguments, one concludes that
+
+max DtL(ν, θ, λ)
+g(ν)
+≤ max max g(ν) Υν − g(ν) | g(ν) ∈ J (ν) , max − g2(ν) | g(ν) ∈ ∂νL(ν, θ, λ) ∩ J (ν)c
+
+≤ 0. (53)
+
+This quantity is non-zero whenever 0 ∈ {g(ν) Υν −g(ν) | ∀g(ν) ∈ ∂νL(ν, θ, λ)} (this is because, for any g(ν) ∈ ∂νL(ν, θ, λ) ∩ J (ν)c, one obtains g(ν) Υν − g(ν) = −g(ν)2). Thus, by similar arguments one may conclude that maxg(ν) DtL(ν, θ, λ) ≤ 0 and it is non-zero if Υν − g(ν) = 0 for every g(ν) ∈ ∂νL(ν, θ, λ).
+Now for any given θ and λ, deﬁne the following Lyapunov function
+Lθ,λ(ν) = L(ν, θ, λ) − L(ν∗, θ, λ)
+where ν∗ is a minimum point (for any given (θ, λ), L is a convex function in ν). Then Lθ,λ(ν) is a positive deﬁnite function, i.e., Lθ,λ(ν) ≥ 0. On the other hand, by the deﬁnition of a minimum point, one easily obtains 0 ∈ {g(ν∗) Υν − g(ν∗) |ν=ν∗ | ∀g(ν∗) ∈ ∂νL(ν, θ, λ)|ν=ν∗} which means that ν∗ is also a stationary point, i.e., ν∗ ∈ Nc.
+Note that maxg(ν) DtLθ,λ(ν) = maxg(ν) DtL(ν, θ, λ) ≤ 0 and this quantity is non-zero if Υν − g(ν) = 0 for every g(ν) ∈ ∂νL(ν, θ, λ). Therefore, by the Lyapunov theory for asymptotically stable differential inclusions (see Theorem 3.10 and Corollary 3.11 in Benaim et al. (2006), where the Lyapunov function Lθ,λ(ν) satisﬁes Hypothesis 3.1 and the property in (53) is equivalent
+
+31
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+to Hypothesis 3.9 in the reference), the above arguments imply that with any initial condition ν(0),
+
+the state trajectory ν(t) of (43) converges to ν∗, i.e., L(ν∗, θ, λ) ≤ L(ν(t), θ, λ) ≤ L(ν(0), θ, λ)
+
+for any t ≥ 0.
+
+As stated earlier, the sequence {νk},
+
+νk
+
+∈
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+constitutes
+
+a
+
+stochastic
+
+approxima-
+
+tion to the differential inclusion (43), and thus converges almost surely its solution (Borkar, 2008),
+
+which further converges almost surely to ν∗ ∈ Nc. Also, it can be easily seen that Nc is a closed
+
+subset
+
+of
+
+the
+
+compact
+
+set
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+],
+
+and
+
+therefore
+
+a
+
+compact
+
+set
+
+itself.
+
+Step 2 (Convergence of θ-update) Since θ converges on a faster time scale than λ and ν con-
+verges faster than θ, according to Lemma 1 in Chapter 6 of Borkar (2008) one can prove conver-
+gence of the θ update for any arbitrary λ (i.e., λ = λk). Furthermore, in the θ-update, we have that νk − ν∗(θk) → 0 almost surely. By the continuity condition of ∇θL(ν, θ, λ), this also implies ∇θL(ν, θ, λ)|θ=θk,ν=νk − ∇θL(ν, θ, λ)|θ=θk,ν=ν∗(θk) → 0. Therefore, the θ-update can be rewritten as a stochastic approximation, i.e.,
+
+θk+1 = ΓΘ θk + ζ2(k) − ∇θL(ν, θ, λ)|θ=θk,ν=ν∗(θk) + δθk+1 ,
+
+(54)
+
+where
+
+1N
+
+δθk+1 =∇θL(ν, θ, λ)|θ=θk,ν=ν∗(θk) − N
+
+∇θ log Pθ(ξj,k) |θ=θk G(ξj,k)
+
+j=1
+
+λ −
+(1 − α)N
+
+N
+
+∇θ log Pθ(ξj,k)|θ=θk J (ξj,k) − ν∗(θk) 1
+
+J (ξj,k) ≥ ν∗(θk)
+
+j=1
+
+λ +
+(1 − α)N
+
+N
+
+∇θ log Pθ(ξj,k)|θ=θk
+
+ν∗(θk) − νk 1
+
+J (ξj,k) ≥ ν∗(θk)
+
+j=1
+
+λ
+
+N
+
++ (1 − α)N
+
+∇θ log Pθ(ξj,k)|θ=θk J (ξj,k) − νk
+
+1 J (ξj,k) ≥ νk − 1 J (ξj,k) ≥ ν∗(θk)
+
+.
+
+j=1
+
+(55)
+
+First, we consider the last two components in (61). Recall that νk − ν∗(θk) → 0 almost
+surely. Furthermore by noticing that ∇θ log Pθ(ξj,k) is Lipschitz in θ, θ lies in a compact set Θ, both J (ξj,k) and νk are bounded, and ν, ν∗(θk) lie in a compact set N , one immediately concludes
+that as i → ∞,
+
+ν∗(θk) − νk 1 J (ξj,k) ≥ ν∗(θk) → 0, almost surely
+
+J (ξj,k) − νk 1 J (ξj,k) ≥ νk − 1 J (ξj,k) ≥ ν∗(θk) → 0, almost surely
+
+(56)
+
+Second, one can show that δθk+1 is square integrable, i.e., E[ δθk+1 2 | Fθ,k] ≤ Kk(1 + θk 2) for some Kk > 0, where Fθ,k = σ θm, δθm, m ≤ k is the ﬁltration of θk generated by different
+
+32
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+independent trajectories. To see this, notice that
+
+δθk+1 2
+
+≤2
+
+∇θL(ν, θ, λ)|θ=θk,ν=ν∗(θk)
+
+2
+
++
+
+2 N2
+
+
+
+2
+
+Cmax + 2λDmax 1 − γ (1 − α)(1 − γ)
+
+2N
+ ∇θ log Pθ(ξj,k) |θ=θk 
+
+j=1
+
+≤2K1,k(1 +
+
+θk
+
+2)
+
++
+
+2N N2
+
+
+
+
+
+Cmax + 2λmaxDmax 1 − γ (1 − α)(1 − γ)
+
+2N
+
+
+∇θ log Pθ(ξj,k) |θ=θk
+
+2
+
+
+j=1
+
+≤2K1,k(1 +
+
+θk
+
+2)
+
++
+
+2N N2
+
+
+
+
+
+Cmax + 2λmaxDmax 1 − γ (1 − α)(1 − γ)
+
+2N
+ K2(ξj,k)(1 +
+
+θk 2)
+
+j=1
+
+2N −1 ≤2 K1,k + N
+
+Cmax + 2λmaxDmax 1 − γ (1 − α)(1 − γ)
+
+2
+max K2(ξj,k)
+1≤j≤N
+
+(1+ θk 2).
+
+The Lipschitz upper bounds are due to the results in Remark 18. Since K2(ξj,k) < ∞ w.p. 1, there
+exists K2,k < ∞ such that max1≤j≤N K2(ξj,k) ≤ K2,k. By combining these results, one concludes that E[ δθk+1 2 | Fθ,k] ≤ Kk(1+ θk 2) where
+
+Kk = 2
+
+K1,k
+
++
+
+2N
+
+−1K2,k N
+
+Cmax + 2λmaxDmax 2 1 − γ (1 − α)(1 − γ)
+
+< ∞.
+
+Third, since the history trajectories are generated based on the sampling probability mass func-
+tion Pθk (ξ), expression (39) implies that E [δθk+1 | Fθ,k] = 0. Therefore, the θ-update is a stochastic approximation of the ODE (44) with a Martingale difference error term. In addition, from the convergence analysis of the ν-update, ν∗(θ) is an asymptotically stable equilibrium point for the
+sequence {νk}. From (40), ∂νL(ν, θ, λ) is a Lipschitz set-valued mapping in θ (since Pθ(ξ) is Lipschitz in θ), and thus it can be easily seen that ν∗(θ) is a Lipschitz continuous mapping of θ.
+Now consider the continuous time dynamics for θ ∈ Θ, given in (44). We may write
+
+dL(ν, θ, λ)
+
+dt
+
+= ∇θL(ν, θ, λ)|ν=ν∗(θ) Υθ − ∇θL(ν, θ, λ)|ν=ν∗(θ) .
+ν=ν∗(θ)
+
+(57)
+
+By considering the following cases, we now show that dL(ν, θ, λ)/dt|ν=ν∗(θ) ≤ 0 and this quantity is non-zero whenever Υθ −∇θL(ν, θ, λ)|ν=ν∗(θ) = 0.
+
+Case 1: When θ ∈ Θ◦ = Θ \ ∂Θ. Since Θ◦ is the interior of the set Θ and Θ is a convex compact set, there exists a sufﬁciently small
+η0 > 0 such that θ − η0∇θL(ν, θ, λ)|ν=ν∗(θ) ∈ Θ and
+
+ΓΘ θ − η0∇θL(ν, θ, λ)|ν=ν∗(θ) − θ = −η0∇θL(ν, θ, λ)|ν=ν∗(θ).
+
+Therefore, the deﬁnition of Υθ − ∇θL(ν, θ, λ)|ν=ν∗(θ) implies
+
+dL(ν, θ, λ)
+
+=−
+
+dt
+
+ν=ν∗(θ)
+
+∇θL(ν, θ, λ)|ν=ν∗(θ)
+
+2 ≤ 0.
+
+(58)
+
+33
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+At the same time, we have dL(ν, θ, λ)/dt|ν=ν∗(θ) < 0 whenever ∇θL(ν, θ, λ)|ν=ν∗(θ) = 0.
+
+Case 2: When θ ∈ ∂Θ and θ − η∇θL(ν, θ, λ)|ν=ν∗(θ) ∈ Θ for any η ∈ (0, η0] and some η0 > 0. The condition θ − η∇θL(ν, θ, λ)|ν=ν∗(θ) ∈ Θ implies that
+
+Υθ − ∇θL(ν, θ, λ)|ν=ν∗(θ) = −∇θL(ν, θ, λ)|ν=ν∗(θ).
+
+Then we obtain
+
+dL(ν, θ, λ)
+
+=−
+
+dt
+
+ν=ν∗(θ)
+
+∇θL(ν, θ, λ)|ν=ν∗(θ)
+
+2 ≤ 0.
+
+(59)
+
+Furthermore, dL(ν, θ, λ)/dt|ν=ν∗(θ) < 0 when ∇θL(ν, θ, λ)|ν=ν∗(θ) = 0.
+
+Case 3: When θ ∈ ∂Θ and θ − η∇θL(ν, θ, λ)|ν=ν∗(θ) ∈ Θ for some η ∈ (0, η0] and any η0 > 0.
+
+For any η > 0, deﬁne θη := θ − η∇θL(ν, θ, λ)|ν=ν∗(θ). The above condition implies that when
+
+0 < η → 0, ΓΘ θη is the projection of θη to the tangent space of Θ. For any element θˆ ∈ Θ, since
+
+the set {θ ∈ Θ : θ − θη 2 ≤ θˆ− θη 2} is compact, the projection of θη on Θ exists. Furthermore,
+
+since f (θ) :=
+
+1 2
+
+θ − θη
+
+2 2
+
+is
+
+a
+
+strongly
+
+convex
+
+function
+
+and
+
+∇f (θ)
+
+=
+
+θ
+
+−
+
+θη ,
+
+by
+
+the
+
+ﬁrst
+
+order
+
+optimality condition, one obtains
+
+∇f (θη∗) (θ − θη∗) = (θη∗ − θη) (θ − θη∗) ≥ 0, ∀θ ∈ Θ,
+
+where θη∗ is the unique projection of θη (the projection is unique because f (θ) is strongly convex and Θ is a convex compact set). Since the projection (minimizer) is unique, the above equality holds if and only if θ = θη∗.
+Therefore, for any θ ∈ Θ and η > 0,
+
+∇θL(ν, θ, λ)|ν=ν∗(θ) Υθ − ∇θL(ν, θ, λ)|ν=ν∗(θ) = ∇θL(ν, θ, λ)|ν=ν∗(θ)
+
+= lim θ − θη 0<η→0 η
+
+lim θη∗ − θ 0<η→0 η
+
+− = lim
+0<η→0
+
+θη∗ − θ η2
+
+2
++ lim
+0<η→0
+
+θη∗ − θη
+
+lim θη∗ − θ 0<η→0 η
+
+θη∗ − θ η2
+
+≤ 0.
+
+By combining these arguments, one concludes that dL(ν, θ, λ)/dt|ν=ν∗(θ) ≤ 0 and this quantity is non-zero whenever Υθ −∇θL(ν, θ, λ)|ν=ν∗(θ) = 0.
+Now, for any given λ, deﬁne the Lyapunov function
+Lλ(θ) = L(ν∗(θ), θ, λ) − L(ν∗(θ∗), θ∗, λ),
+where θ∗ is a local minimum point. Then there exists a ball centered at θ∗ with radius r such that for any θ ∈ Bθ∗(r), Lλ(θ) is a locally positive deﬁnite function, i.e., Lλ(θ) ≥ 0. On the other hand, by the deﬁnition of a local minimum point, one obtains Υθ[−∇θL(θ∗, ν, λ)|ν=ν∗(θ∗)]|θ=θ∗ = 0 which means that θ∗ is a stationary point, i.e., θ∗ ∈ Θc.
+Note that dLλ(θ(t))/dt = dL(θ(t), ν∗(θ(t)), λ)/dt ≤ 0 and the time-derivative is non-zero whenever Υθ −∇θL(ν, θ, λ)|ν=ν∗(θ) = 0. Therefore, by the Lyapunov theory for asymptotically stable systems from Chapter 4 of Khalil and Grizzle (2002), the above arguments imply that with any initial condition θ(0) ∈ Bθ∗(r), the state trajectory θ(t) of (44) converges to θ∗, i.e., L(θ∗, ν∗(θ∗), λ) ≤ L(θ(t), ν∗(θ(t)), λ) ≤ L(θ(0), ν∗(θ(0)), λ) for any t ≥ 0.
+
+34
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Based on the above properties and noting that 1) from Proposition 17, ∇θL(ν, θ, λ) is a Lipschitz function in θ, 2) the step-size rule follows from Assumption 6, 3) expression (61) implies that
+δθk+1 is a square integrable Martingale difference, and 4) θk ∈ Θ, ∀i implies that supk θk < ∞ almost surely, one can invoke Theorem 2 in Chapter 6 of Borkar (2008) (multi-time scale stochastic
+approximation theory) to show that the sequence {θk}, θk ∈ Θ converges almost surely to the solution of the ODE (44), which further converges almost surely to θ∗ ∈ Θ.
+
+Step 3 (Local Minimum) Now, we want to show that the sequence {θk, νk} converges to a local minimum of L(ν, θ, λ) for any ﬁxed λ. Recall that {θk, νk} converges to (θ∗, ν∗) := (θ∗, ν∗(θ∗)).
+
+Previous arguments on the (ν, θ)-convergence imply that with any initial condition (θ(0), ν(0)), the
+
+state trajectories θ(t) and ν(t) of (43) and (44) converge to the set of stationary points (θ∗, ν∗) in the
+
+positive invariant set Θc × Nc and L(θ∗, ν∗, λ) ≤ L(θ(t), ν∗(θ(t)), λ) ≤ L(θ(0), ν∗(θ(0)), λ) ≤
+
+L(θ(0), ν(t), λ) ≤ L(θ(0), ν(0), λ) for any t ≥ 0.
+
+By contradiction, suppose (θ∗, ν∗) is not a local minimum. Then there exists (θ¯, ν¯) ∈ Θ ×
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]
+
+∩
+
+B(θ∗,ν∗)(r)
+
+such
+
+that
+
+L(θ¯, ν¯, λ) =
+
+min
+
+L(ν, θ, λ).
+
+(θ,ν
+
+)∈Θ×[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]∩B(θ∗
+
+,ν∗
+
+)
+
+(r)
+
+The minimum is attained by the Weierstrass extreme value theorem. By putting θ(0) = θ¯, the above arguments imply that
+
+L(θ¯, ν¯, λ) =
+
+min
+
+L(ν, θ, λ) < L(θ∗, ν∗, λ) ≤ L(θ¯, ν¯, λ)
+
+(θ,ν
+
+)∈Θ×[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+]∩B(θ∗
+
+,ν∗
+
+)(r)
+
+which is a contradiction. Therefore, the stationary point (θ∗, ν∗) is a local minimum of L(ν, θ, λ) as well.
+
+Step 4 (Convergence of λ-update) Since the λ-update converges in the slowest time scale, according to previous analysis, we have that θk − θ∗(ν∗(λk), λk) → 0, νk − ν∗(λk) → 0 almost
+surely. By continuity of ∇λL(ν, θ, λ), we also have the following:
+
+∇λL(ν, θ, λ)
+
+− ∇λL(ν, θ, λ)
+
+→ 0, almost surely.
+
+θ=θ∗ (λk ),ν =ν ∗ (λk ),λ=λk
+
+θ=θk ,ν =νk ,λ=λk
+
+Therefore, the λ-update rule can be re-written as follows:
+
+λk+1 = ΓΛ λk + ζ1(k) ∇λL(ν, θ, λ)
+
++ δλk+1
+
+θ=θ∗ (λk ),ν =ν ∗ (λk ),λ=λk
+
+(60)
+
+where
+
+δλk+1 = − ∇λL(ν, θ, λ)
+
++
+
+θ=θ∗(λ),ν=ν∗(λ),λ=λk
+
+ν ∗ (λk )
+
++
+
+1
+
+1 −
+
+α
+
+1 N
+
+N
+
+J (ξj,k) − ν∗(λk) + − β
+
+j=1
+
++(νk
+
+−
+
+ν ∗ (λk ))
+
++
+
+1
+
+1 −
+
+α
+
+1 N
+
+N
+
+j=1
+
+J (ξj,k) − νk + − J (ξj,k) − ν∗(λk) + .
+
+(61)
+
+35
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+From the fact that θk − θ∗(ν∗(λk), λk) → 0 almost surely as i → ∞, one can conclude that the last component of the above expression vanishes, i.e., both νk − ν∗(λk) → 0 and J (ξj,k) −
+
+νk + − J (ξj,k) − ν∗(λk) + → 0 almost surely. Moreover, from (41), we see that ∇λL(ν, θ, λ)
+
+is a constant function of λ. Similar to the θ-update, one can easily show that δλk+1 is square
+
+integrable, i.e.,
+
+E[ δλk+1 2 | Fλ,k] ≤ 2
+
+β+
+
+3Dmax
+
+(1 − γ)(1 − α)
+
+2
+,
+
+where Fλ,k = σ λm, δλm, m ≤ k is the ﬁltration of λ generated by different independent trajectories. Furthermore, expression (41) implies that E [δλk+1 | Fλ,k] = 0. Therefore, the λ-update is a stochastic approximation of the ODE (46) with a Martingale difference error term. In addition, from the convergence analysis of the (θ, ν)-update, (θ∗(λ), ν∗(λ)) is an asymptotically stable
+equilibrium point for the sequence {θk, νk}. From (39), ∇θL(ν, θ, λ) is a linear mapping in λ, and (θ∗(λ), ν∗(λ)) is a Lipschitz continuous mapping of λ.
+Consider the ODE for λ ∈ [0, λmax] in (46). Analogous to the arguments for the θ-update, we can write
+
+d(−L(ν, θ, λ))
+
+dt
+
+= −∇λL(ν, θ, λ)
+
+Υλ ∇λL(ν, θ, λ)
+
+,
+
+θ=θ∗(λ),ν=ν∗(λ)
+
+θ=θ∗(λ),ν=ν∗(λ)
+
+θ=θ∗(λ),ν=ν∗(λ)
+
+and show that −dL(ν, θ, λ)/dt|θ=θ∗(λ),ν=ν∗(λ) ≤ 0. This quantity is non-zero whenever
+
+Υλ dL(ν, θ, λ)/dλ|θ=θ∗(λ),ν=ν∗(λ) = 0.
+
+Consider the Lyapunov function L(λ) = −L(θ∗(λ), ν∗(λ), λ) + L(θ∗(λ∗), ν∗(λ∗), λ∗)
+
+where λ∗ is a local maximum point. Then there exists a ball centered at λ∗ with radius r such that for any λ ∈ Bλ∗(r), L(λ) is a locally positive deﬁnite function, i.e., L(λ) ≥ 0. On the other hand, by the deﬁnition of a local maximum point, one obtains
+
+Υλ dL(ν, θ, λ)/dλ|θ=θ∗(λ),ν=ν∗(λ),λ=λ∗ |λ=λ∗ = 0
+
+which means that λ∗ is also a stationary point, i.e., λ∗ ∈ Λc. Since
+
+dL(λ(t)) dL(θ∗(λ(t)), ν∗(λ(t)), λ(t))
+
+=−
+
+≤0
+
+dt
+
+dt
+
+and the time-derivative is non-zero whenever Υλ[∇λL(ν, θ, λ) |ν=ν∗(λ),θ=θ∗(λ)] = 0, the Lyapunov theory for asymptotically stable systems implies that λ(t) converges to λ∗.
+Given the above results and noting that the step size rule is selected according to Assump-
+tion 6, one can apply the multi-time scale stochastic approximation theory (Theorem 2 in Chapter
+6 of Borkar (2008)) to show that the sequence {λk} converges almost surely to the solution of the ODE (46), which further converges almost surely to λ∗ ∈ [0, λmax]. Since [0, λmax] is a compact set, following the same lines of arguments and recalling the envelope theorem (Theorem 16) for local optima, one further concludes that λ∗ is a local maximum of L(θ∗(λ), ν∗(λ), λ) = L∗(λ).
+
+36
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Step 5 (Local Saddle Point) By letting θ∗ = θ∗ ν∗(λ∗), λ∗ and ν∗ = ν∗(λ∗), we will show
+
+that (θ∗, ν∗, λ∗) is a local saddle point of the Lagrangian function L(ν, θ, λ) if λ∗ ∈ [0, λmax), and thus by the local saddle point theorem, θ∗ is a locally optimal solution for the CVaR-constrained
+
+optimization.
+
+Suppose the sequence {λk} generated from (60) converges to a stationary point λ∗ ∈ [0, λmax).
+
+Since step 3 implies that (θ∗, ν∗) is a local minimum of L(ν, θ, λ∗) over the feasible set (θ, ν) ∈
+
+Θ
+
+×
+
+[−
+
+Dmax 1−γ
+
+,
+
+Dmax 1−γ
+
+],
+
+there
+
+exists
+
+a
+
+r
+
+>
+
+0
+
+such
+
+that
+
+L(θ∗, ν∗, λ∗) ≤ L(ν, θ, λ∗),
+
+∀(θ, ν) ∈ Θ ×
+
+− Dmax , Dmax 1−γ 1−γ
+
+∩ B(θ∗,ν∗)(r).
+
+In order to complete the proof, we must show
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ + ≤ β,
+
+(62)
+
+and
+
+λ∗
+
+ν∗
+
++
+
+1
+
+1 −
+
+α
+
+E
+
+J θ∗ (x0) − ν∗ + − β
+
+= 0.
+
+(63)
+
+These two equations imply
+
+L(θ∗, ν∗, λ∗) =V θ∗ (x0)+λ∗ =V θ∗ (x0)
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ + − β
+
+≥V θ∗ (x0)+λ
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ + − β
+
+= L(θ∗, ν∗, λ),
+
+which further implies that (θ∗, ν∗, λ∗) is a saddle point of L(ν, θ, λ). We now show that (62) and (63) hold.
+Recall that Υλ ∇λL(ν, θ, λ)|θ=θ∗(λ),ν=ν∗(λ),λ=λ∗ |λ=λ∗ = 0.
+We show (62) by contradiction. Suppose
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ + > β.
+
+This implies that for λ∗ ∈ [0, λmax), we have
+
+ΓΛ
+
+λ∗ − η β −
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ +
+
+= λ∗−η
+
+β−
+
+ν
+
+∗
+
++
+
+1
+
+1 −
+
+α
+
+E
+
+J θ∗ (x0)−ν∗ +
+
+for any η ∈ (0, ηmax], for some sufﬁciently small ηmax > 0. Therefore,
+
+Υλ ∇λL(ν, θ, λ)
+θ=θ∗(λ),ν=ν∗(λ),λ=λ∗
+
+=
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+λ=λ∗
+
+J θ∗ (x0) − ν∗ + − β > 0.
+
+This is in contradiction with the fact that Υλ ∇λL(ν, θ, λ)|θ=θ∗(λ),ν=ν∗(λ),λ=λ∗ |λ=λ∗ = 0. Therefore, (62) holds.
+
+37
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+To show that (63) holds, we only need to show that λ∗ = 0 if
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ + < β.
+
+Suppose λ∗ ∈ (0, λmax), then there exists a sufﬁciently small η0 > 0 such that
+
+1 η0
+
+ΓΛ
+
+λ∗ − η0
+
+β−
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ +
+
+=
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ + − β < 0.
+
+− ΓΛ(λ∗)
+
+This again contradicts the assumption Υλ ∇λL(ν, θ, λ)|θ=θ∗(λ),ν=ν∗(λ),λ=λ∗ |λ=λ∗ = 0. Therefore (63) holds.
+
+When
+
+λ∗
+
+=
+
+λmax
+
+and
+
+ν∗
+
++
+
+1 1−α
+
+E
+
+J θ∗ (x0) − ν∗ + > β,
+
+ΓΛ
+
+λ∗ − η
+
+β−
+
+ν∗
+
++
+
+1
+
+1 −
+
+αE
+
+J θ∗ (x0) − ν∗ +
+
+= λmax
+
+for any η > 0 and
+
+Υλ ∇λL(ν, θ, λ)|θ=θ∗(λ),ν=ν∗(λ),λ=λ∗ |λ=λ∗ = 0.
+
+In this case one cannot guarantee feasibility using the above analysis, and (θ∗, ν∗, λ∗) is not a local saddle point. Such a λ∗ is referred to as a spurious ﬁxed point (see e.g., Chapter 8 of Kushner and Yin (1997)). Notice that λ∗ is bounded (otherwise we can conclude that the problem is infeasible), so that by incrementally increasing λmax in Algorithm 1, we can always prevent ourselves from obtaining a spurious ﬁxed point solution.
+Combining the above arguments, we ﬁnally conclude that (θ∗, ν∗, λ∗) is a local saddle point of L(ν, θ, λ). Then by the saddle point theorem, θ∗ is a locally optimal policy for the CVaR-constrained optimization problem.
+
+Appendix B. Convergence of Actor-Critic Algorithms
+Recall from Assumption 6 that the SPSA step size {∆k} satisﬁes ∆k → 0 as k → ∞ and k(ζ2(k)/∆k)2 < ∞.
+38
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+B.1 Gradient with Respect to λ (Proof of Lemma 11)
+By taking the gradient of V θ(x0, ν) w.r.t. λ (recall that both V and Q depend on λ through the cost function C¯ of the augmented MDP M¯ ), we obtain
+
+∇λV θ(x0, ν) = µ(a|x0, ν; θ)∇λQθ(x0, ν, a)
+a∈A¯
+
+= µ(a|x0, ν; θ)∇λ C¯(x0, ν, a) +
+
+γP¯(x , s |x0, ν, a)V θ(x , s )
+
+a∈A¯
+
+(x ,s )∈X¯
+
+= µ(a|x0, ν; θ)∇λC¯(x0, ν, a) +γ
+
+µ(a|x0, ν; θ)P¯(x , s |x0, ν, a)∇λV θ(x , s )
+
+a
+
+a,x ,s
+
+h(x0,ν)
+
+= h(x0, ν) + γ
+
+µ(a|x0, ν; θ)P¯(x , s |x0, ν, a)∇λV θ(x , s )
+
+(64)
+
+a,x ,s
+
+= h(x0, ν) + γ
+
+µ(a|x0, ν; θ)P¯(x , s |x0, ν, a) h(x , s )
+
+a,x ,s
+
++γ
+
+µ(a |x , s ; θ)P¯(x , s |x , s , a )∇λV θ(x , s ) .
+
+a ,x ,s
+
+By unrolling the last equation using the deﬁnition of ∇λV θ(x, s) from (64), we obtain
+
+∞
+∇λV θ(x0, ν) = γk
+
+P(xk = x, sk = s | x0 = x0, s0 = ν; θ)h(x, s)
+
+k=0 x,s
+
+1 =
+1−γ
+
+dθγ (x,
+
+s|x0, ν)h(x, s)
+
+=
+
+1
+
+1 −
+
+γ
+
+dθγ(x, s|x0, ν)µ(a|x, s)∇λC¯(x, s, a)
+
+x,s
+
+x,s,a
+
+1 =
+1−γ
+
+πγθ(x, s, a|x0, ν)∇λC¯(x, s, a)
+
+x,s,a
+
+1 =
+1−γ
+
+πγθ (x,
+
+s,
+
+a|x0,
+
+ν)
+
+1
+
+1 −
+
+α
+
+1{x
+
+=
+
+xTar}(−s)+.
+
+x,s,a
+
+This completes the proof.
+
+B.2 Proof of Convergence of the Actor-Critic Algorithms
+Before going through the details of the convergence proof, a high level overview of the proof technique is given as follows.
+1. By utilizing temporal difference techniques, we show the critic update converges (in the fastest time scale) almost surely to a ﬁxed point solution v∗ of the projected form of Bellman’s equation, which is deﬁned on the augmented MDP M¯ .
+2. Similar to the analysis of the policy gradient algorithm, by convergence properties of multitime scale discrete stochastic approximation algorithms, we show that each update (νk, θk, λk) converges almost surely to a stationary point (ν∗, θ∗, λ∗) of the corresponding continuous
+
+39
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+time system. In particular, by adopting the step-size rules deﬁned in Assumption 8, we show that the convergence rate of v is fastest, followed by the convergence rate of ν and the convergence rate of θ, while the convergence rate of λ is the slowest among the set of parameters. Different from the policy gradient algorithm, the parameters of the actor-critic algorithm are updated incrementally. To adjust for this difference in the convergence analysis, modiﬁcations to the gradient estimate of ν are introduced, either via the SPSA method or the semi-trajectory method, to ensure the gradient estimates are unbiased. Following from the arguments of Lyapunov analysis, we prove that the continuous time system is locally asymptotically stable at the stationary point (ν∗, θ∗, λ∗).
+3. Following the same line of arguments from the proof of the policy gradient algorithm, we conclude that the stationary point (v∗, ν∗, θ∗, λ∗) is a local saddle point. Finally, by the the local saddle point theorem, we deduce that θ∗ is a locally optimal solution for the CVaRconstrained MDP problem.
+This convergence proof procedure is rather standard for stochastic approximation algorithms, see (Bhatnagar et al., 2009; Bhatnagar and Lakshmanan, 2012) for further references.
+
+B.2.1 PROOF OF THEOREM 10: CRITIC UPDATE (v-UPDATE)
+By the step size conditions, one notices that {vk} converges on a faster time scale than {νk}, {θk}, and {λk}. According to Lemma 1 in Chapter 6 of Borkar (2008), one can take (ν, θ, λ) in the vupdate as arbitrarily ﬁxed quantities (in this case we have (ν, θ, λ) = (νk, θk, λk)). Thus the critic update can be re-written as follows:
+
+vk+1 = vk + ζ4(k)φ(xk, sk)δk(vk),
+
+(65)
+
+where the scalar
+
+δk (vk) = −vk φ(xk, sk) + γvk φ (xk+1, sk+1) + C¯λ(xk, sk, ak)
+
+is the temporal difference (TD) from (18). Deﬁne
+
+
+
+
+
+A :=
+
+πγθ(y, s , a |x, s)φ(y, s ) φ (y, s ) − γ P¯(z, s |y, s , a)φ z, s  , (66)
+
+y,a ,s
+
+z,s
+
+and
+
+b :=
+
+πγθ(y, s , a |x, s)φ(y, s )C¯λ(y, s , a ).
+
+(67)
+
+y,a ,s
+
+It is easy to see that the critic update vk in (65) can be re-written as the following stochastic approx-
+
+imation scheme:
+
+vk+1 = vk + ζ4(k)(b − Avk + δAk+1),
+
+(68)
+
+where the noise term δAk+1 is a square integrable Martingale difference, i.e., E[δAk+1 | Fk] = 0 if the γ-occupation measure πγθ is used to generate samples of (xk, sk, ak)with Fk being the ﬁltration
+generated by different independent trajectories. By writing
+
+δAk+1 = −(b − Avk) + φ(xk, sk)δk(vk)
+
+40
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+and noting Eπγθ [φ(xk, sk)δk(vk) | Fk] = −Avk + b, one can easily verify that the stochastic approximation scheme in (68) is equivalent to the critic iterates in (65) and δAk+1 is a Martingale difference, i.e., Eπγθ [δAk+1 | Fk] = 0. Let
+h (v) := −Av + b.
+
+Before getting into the convergence analysis, we present a technical lemma whose proof can be found in Lemma 6.10 of Bertsekas and Tsitsiklis (1996).
+Lemma 20 Every eigenvalue of the matrix A has positive real part.
+We now turn to the analysis of the critic iteration. Note that the following properties hold for the critic update scheme in (65): 1) h (v) is Lipschitz, 2) the step size satisﬁes the properties in Assumption 8, 3) the noise term δAk+1 is a square integrable Martingale difference, 4) the function hc (v) := h (cv) /c, c ≥ 1 converges uniformly to a continuous function h∞ (v) for any v in a compact set, i.e., hc (v) → h∞ (v) as c → ∞, and 5) the ordinary differential equation (ODE) v˙ = h∞ (v) has the origin as its unique locally asymptotically stable equilibrium. The fourth property can be easily veriﬁed from the fact that the magnitude of b is ﬁnite and h∞ (v) = −Av. The ﬁfth property follows directly from the facts that h∞ (v) = −Av and all eigenvalues of A have positive real parts.
+By Theorem 3.1 in Borkar (2008), these ﬁve properties imply:
+
+The critic iterates {vk} are bounded almost surely, i.e., sup vk < ∞ almost surely.
+k
+The convergence of the critic iterates in (65) can be related to the asymptotic behavior of the ODE
+
+v˙ = h (v) = b − Av.
+
+(69)
+
+Speciﬁcally, Theorem 2 in Chapter 2 of Borkar (2008) and the above conditions imply vk → v∗ with probability 1, where the limit v∗ depends on (ν, θ, λ) and is the unique solution satisfying h (v∗) = 0, i.e., Av∗ = b. Therefore, the critic iterates converge to the unique ﬁxed point v∗ almost
+surely, as k → ∞.
+
+B.2.2 PROOF OF THEOREM 12
+
+Step 1 (Convergence of v-update) The proof of convergence for the critic parameter follows directly from Theorem 10.
+
+Step 2 (Convergence of SPSA Based ν-update) In this section, we analyze the ν-update for the
+
+incremental actor-critic method. This update is based on the SPSA perturbation method. The idea of
+
+this method is to estimate the sub-gradient g(ν) ∈ ∂νL(ν, θ, λ) using two simulated value functions corresponding to ν− = ν − ∆ and ν+ = ν + ∆. Here ∆ ≥ 0 is a positive random perturbation that
+
+vanishes asymptotically. The SPSA-based estimate for a sub-gradient g(ν) ∈ ∂νL(ν, θ, λ) is given
+
+by
+
+1 g(ν) ≈ λ +
+
+φ
+
+x0, ν + ∆ − φ
+
+x0, ν − ∆
+
+v.
+
+2∆
+
+First, we consider the following assumption on the feature functions in order to prove that the SPSA approximation is asymptotically unbiased.
+
+41
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Assumption 21 For any v ∈ Rκ1, the feature functions satisfy the following conditions
+|φ x0, ν + ∆ v − φ x0, ν − ∆ v| ≤ K1(v)(1 + ∆).
+Furthermore, the Lipschitz constants are uniformly bounded, i.e., supv∈Rκ1 K12(v) < ∞.
+This assumption is mild as the expected utility objective function implies that L(ν, θ, λ) is Lipschitz in ν, and φV x0, ν v is just a linear function approximation of V θ(x0, ν).
+Next, we turn to the convergence analysis of the sub-gradient estimation and ν-update. Since ν converges faster than θ and λ. Consider the ν-update in (20):
+
+1
+
+νk+1 = ΓN
+
+νk − ζ3(k)
+
+λ+ 2∆k
+
+φ
+
+x0, νk + ∆k − φ
+
+x0, νk − ∆k
+
+vk
+
+,
+
+(70)
+
+where according to Lemma 1 in Chapter 6 of Borkar (2008), (θk, λk) in this expression are viewed as constant quantities. Since v converges faster than ν, Lemma 1 in Chapter 6 of Borkar (2008) also implies vk − v∗(νk) → 0 almost surely, where v∗(ν) is the converged critic parameter. Together with the above assumption that the feature function is bounded, one can rewrite the ν-update in (20)
+as follows:
+
+1
+
+νk+1 = ΓN
+
+νk − ζ3(k)
+
+λ+ 2∆k
+
+φ
+
+x0, νk + ∆k − φ
+
+x0, νk − ∆k
+
+where 1
+k = 2∆k φ
+
+x0, νk + ∆k − φ
+
+x0, νk − ∆k
+
+(vk − v∗(νk)) → 0,
+
+v∗(νk) + k , (71)
+almost surely.
+
+Equipped with this intermediate result, we establish the bias and convergence of the stochastic sub-gradient estimate. Let
+
+g(νk) ∈ arg max {g : g ∈ ∂νL(ν, θ, λ)|ν=νk } ,
+
+and
+
+Λ1,k+1 =
+
+φ x0, νk + ∆k − φ x0, νk − ∆k 2∆k
+
+Λ2,k =λk + EML (k) − g(νk), Λ3,k =EM (k) − EML (k),
+
+v∗(νk) − EM (k) ,
+
+where
+
+1 EM (k) :=E 2∆k φ
+
+x0, νk + ∆k − φ
+
+x0, νk − ∆k
+
+EML (k) :=E
+
+1 2∆k
+
+V θ x0, νk + ∆k − V θ x0, νk − ∆k
+
+v∗(νk) | ∆k , | ∆k .
+
+Note that (71) is equivalent to
+
+νk+1 = ΓN (νk − ζ3(k) (g(νk) + Λ1,k+1 + Λ2,k + Λ3,k)) .
+
+(72)
+
+42
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+First, it is clear that Λ1,k+1 is a Martingale difference as E[Λ1,k+1 | Fk] = 0, which implies that
+
+k
+Mk+1 = ζ3(j)Λ1,j+1
+j=0
+
+is a Martingale w.r.t. the ﬁltration Fk. By the Martingale convergence theorem, we can show that if supk≥0 E[Mk2] < ∞, when k → ∞, Mk converges almost surely and ζ3(k)Λ1,k+1 → 0 almost surely. To show that supk≥0 E[Mk2] < ∞, for any t ≥ 0 one observes that
+
+k
+E[Mk2+1] = (ζ3(j))2 E[E[Λ21,j+1 | ∆j]]
+j=0
+
+k
+≤2 E
+j=0
+
+ζ3(j) 2
+
+2∆j
+
+E
+
+φ
+
+x0, νj + ∆j − φ
+
+x0, νj − ∆j
+
+v∗ (νj )
+
+2
+| ∆j
+
++E φ x0, νj + ∆j − φ x0, νj − ∆j v∗(νj) | ∆j 2 .
+
+Now based on Assumption 21, the above expression implies
+
+k
+E[Mk2+1] ≤2 E
+j=0
+
+ζ3(j) 2∆j
+
+2
+2K12(1 + ∆j)2
+
+.
+
+Combining the above results with the step size conditions, there exists K = 4K12 > 0 such that
+
+∞
+
+sup E[Mk2+1] ≤ K E
+
+k≥0
+
+j=0
+
+ζ3(j) 2∆j
+
+2
+
++ (ζ3(j))2 < ∞.
+
+Second, by the Min Common/Max Crossing theorem in Chapter 5 of Bertsekas (2009), one
+can show that ∂νL(ν, θ, λ)|ν=νk is a non-empty, convex, and compact set. Therefore, by duality of directional directives and sub-differentials, i.e.,
+
+max
+
+{g
+
+:
+
+g
+
+∈
+
+∂ν L(ν,
+
+θ,
+
+λ)|ν=νk }
+
+=
+
+lim
+ξ↓0
+
+L(νk
+
++
+
+ξ,
+
+θ,
+
+λ) − 2ξ
+
+L(νk
+
+−
+
+ξ,
+
+θ,
+
+λ) ,
+
+one concludes that for λk = λ (we can treat λk as a constant because it converges on a slower time
+
+scale than νk),
+
+λ + EML (k) = g(νk) + O(∆k),
+
+almost surely. This further implies that
+
+Λ2,k = O(∆k), i.e., Λ2,k → 0 as k → ∞,
+
+almost surely. Third, since dθγ(x0, ν|x0, ν) = 1, from the deﬁnition of θ(v∗(νk)),
+|Λ3,k| ≤ 2 θ(v∗(νk))/∆k.
+
+43
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+As t goes to inﬁnity, θ(v∗(νk))/∆k → 0 by assumption and Λ3,k → 0. Finally, since ζ3(k)Λ1,k+1 → 0, Λ2,k → 0, and Λ3,k → 0 almost surely, the ν-update in (72) is
+a noisy sub-gradient descent update with vanishing disturbance bias. Thus, the ν-update in (20) can
+be viewed as an Euler discretization of an element of the following differential inclusion,
+
+ν˙ ∈ Υν [−g(ν)] , ∀g(ν) ∈ ∂νL(ν, θ, λ),
+
+(73)
+
+and the ν-convergence analysis is analogous to Step 1 of the proof of Theorem 7.
+
+Step 2 (Convergence of Semi-trajectory ν-update) Since ν converges on a faster timescale than θ and λ, according to Lemma 1 in Chapter 6 of Borkar (2008), the convergence property of ν in (23) can be shown for any arbitrarily ﬁxed pair of (θ, λ) (in this case we have (θ, λ) = (θk, λk)), i.e.,
+
+νk+1 = ΓN
+
+νk − ζ3(k)
+
+λ λ−
+1−α
+
+P sTar ≤ 0 | x0 = x0, s0 = νk, θ
+
++ δνM,k+1
+
+, (74)
+
+where
+
+δνM,k+1 = −P sTar ≤ 0 | x0 = x0, s0 = νk, µ + 1 {xk = xTar, sk ≤ 0}
+
+(75)
+
+is a square integrable stochastic term, speciﬁcally,
+
+E[(δνM,k+1)2 | Fν,k] ≤ 2,
+
+where Fν,k = σ(νm, δνm, m ≤ k) is the ﬁltration generated by ν. Since E [δνM,k+1 | Fν,k] = 0, δνM,k+1 is a Martingale difference and the ν-update in (74) is a stochastic approximation of an element of the differential inclusion
+
+λ 1 − αP
+
+sTar ≤ 0 | x0 = x0, s0 = νk, θ
+
+− λ ∈ −∂ν L(ν, θ, λ)|ν=νk .
+
+Thus, the ν-update in (23) can be viewed as an Euler discretization of the differential inclusion in (73), and the ν-convergence analysis is analogous to Step 1 of the proof of Theorem 7.
+
+Step 3 (Convergence of θ-update) We ﬁrst analyze the actor update (θ-update). Since θ con-
+verges on a faster time scale than λ, according to Lemma 1 in Chapter 6 of Borkar (2008), one can
+take λ in the θ-update as a ﬁxed quantity (i.e., here we have that λ = λk). Furthermore, since v and ν converge on a faster scale than θ, one also have vk − v∗(θk) → 0, νk − ν∗(θk) → 0 almost surely, and since convergence almost surely of the ν sequence implies convergence in distribution, we have πγθk (x , s , a |x0 = x0, s0 = νk) − πγθk (x , s , a |x0 = x0, s0 = ν∗(θk)) → 0. In the following analysis, we assume that the initial state x0 ∈ X is given. Consider the θ-update in (21)
+
+θk+1 = ΓΘ
+
+θk − ζ2(k)
+
+∇θ
+
+log
+
+µ(ak
+
+|xk
+
+,
+
+sk ;
+
+θ)|θ=θk
+
+δk (vk ) 1−γ
+
+.
+
+(76)
+
+Utilizing the above convergence properties, (76) can be rewritten as follows:
+
+θk+1 = ΓΘ
+
+θk − ζ2(k) ∇θ log µ(ak|xk, sk; θ)|θ=θk
+
+δk(v∗(θk)) + 1−γ
+
+k
+
+,
+
+where we showed in the convergence analysis of the ν sequence that
+
+k
+
+=
+
+δk (vk ) 1−γ
+
+−
+
+δk (v ∗ (θk )) 1−γ
+
+→
+
+0,
+
+almost surely.
+
+44
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+Consider the case in which the value function for a ﬁxed policy θ (i.e., θ = θk) is approximated by a learned function approximation, φ (x, s)v∗(θk). If the approximation is sufﬁciently good, we might hope to use it in place of V θ(x, s) and still point roughly in the direction of the true gradient. Recall the temporal difference error (random variable) for a given pair (xk, sk) ∈ X × R:
+δk (v) = −v φ(xk, sk) + γv φ (xk+1, sk+1) + C¯λ(xk, sk, ak).
+Deﬁne the v-dependent approximated advantage function
+A˜θ,v(x, s, a) := Q˜θ,v(x, s, a) − v φ(x, s),
+
+where
+
+Q˜θ,v(x, s, a) = γ P¯(x , s |x, s, a)v φ(x , s ) + C¯λ(x, s, a).
+x ,s
+
+The following lemma, whose proof follows from the proof of Lemma 3 in Bhatnagar et al. (2009), shows that δk(v) is an unbiased estimator of A˜θ,v.
+
+Lemma 22 For any given policy µ and v ∈ Rκ1, we have
+
+A˜θ,v(x, s, a) = E[δk(v) | xk = x, sk = s, ak = a].
+
+Deﬁne
+
+∇θ L˜ v (ν,
+
+θ,
+
+λ)
+
+:=
+
+1
+
+1 −
+
+γ
+
+πγθ(x, s, a|x0 = x0, s0 = ν)∇θ log µ(a|x, s; θ)A˜θ,v(x, s, a)
+
+x,a,s
+
+as the linear function approximation of ∇θL˜(ν, θ, λ). Similar to Proposition 17, we present the following technical lemma on the Lipschitz property of ∇θL˜v(ν, θ, λ).
+
+Proposition 23 ∇θL˜v(ν, θ, λ) is a Lipschitz function in θ.
+
+Proof. Consider the feature vector v. Recall that the feature vector satisﬁes the linear equation Av = b, where A and b are given by (66) and (67), respectively. From Lemma 1 in Bhatnagar and Lakshmanan (2012), by exploiting the inverse of A using Cramer’s rule, one may show that v is continuously differentiable in θ. Now consider the γ-occupation measure πγθ. By applying Theorem 2 in Altman et al. (2004) (or Theorem 3.1 in Shardlow and Stuart (2000)), it can be seen that the occupation measure πγθ of the process (xk, sk) is continuously differentiable in θ. Recall from Assumption 3 in Section 2.2 that ∇θµ(ak|xk, sk; θ) is a Lipschitz function in θ for any a ∈ A and k ∈ {0, . . . , T − 1}, and µ(ak|xk, sk; θ) is differentiable in θ. By combining these arguments and noting that the sum of products of Lipschitz functions is Lipschitz, one concludes that ∇θL˜v(ν, θ, λ) is Lipschitz in θ.
+We turn to the convergence proof of θ.
+Theorem 24 The sequence of θ-updates in (21) converges almost surely to an equilibrium point θ∗ that satisﬁes Υθ −∇θL˜v∗(θ)(ν∗(θ), θ, λ) = 0, for a given λ ∈ [0, λmax]. Furthermore, if the function approximation error θ(vk) vanishes as the feature vector vk converges to v∗, then the sequence of θ-updates converges to θ∗ almost surely, where θ∗ is a local minimum point of L(ν∗(θ), θ, λ) for a given λ ∈ [0, λmax].
+
+45
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Proof. We will mainly focus on proving the convergence of θk → θ∗ (second part of the theorem). Since we just showed in Proposition 23 that ∇θL˜v∗(θ)(ν∗(θ), θ, λ) is Lipschitz in θ, the convergence proof of θk → θ∗ (ﬁrst part of the theorem) follows from identical arguments.
+Note that the θ-update in (76) can be rewritten as:
+
+θk+1 = ΓΘ θk + ζ2(k) −∇θL(ν, θ, λ)|ν=ν∗(θ),θ=θk + δθk+1 + δθ ,
+
+where
+
+δθk+1 =
+
+πγθk (x
+
+,
+
+s
+
+,
+
+a
+
+|x0
+
+=
+
+x0,
+
+s0
+
+=
+
+ν ∗ (θk ))∇θ
+
+log
+
+µ(a
+
+|x
+
+,
+
+s
+
+;
+
+θ)|θ=θk
+
+A˜θk,v∗(θk)(x , 1−γ
+
+s
+
+,
+
+a
+
+)
+
+x ,a ,s
+
+−
+
+∇θ
+
+log
+
+µ(ak
+
+|xk,
+
+sk ;
+
+θ)|θ=θk
+
+δk
+
+(v∗(θk)) 1−γ
+
+.
+
+and
+
+δθ =
+
+πγθk (x , s , a |x0 = x0, s0 = ν∗(θk))·
+
+x ,a ,s
+
+∇θ log µ(a |x , s ; θ)|θ=θk (Aθk (x , s , a ) − A˜θk,v∗(θk)(x , s , a )) 1−γ
+
+First, one can show that δθk+1 is square integrable, speciﬁcally,
+
+E[ δθk+1 2 | Fθ,k]
+
+2 ≤
+1−γ
+
+∇θ log µ(u|x, s; θ)|θ=θk 1 {µ(u|x, s; θk) > 0}
+
+2 ∞
+
+A˜θk,v∗(θk)(x, s, a)
+
+2 ∞
+
++
+
+|δk (v ∗ (θk ))|2
+
+≤
+
+1
+
+2 −
+
+γ
+
+·
+
+∇θµ(u|x, s; θ)|θ=θk
+
+2 ∞
+
+min{µ(u|x, s; θk) | µ(u|x, s; θk)
+
+>
+
+0}2
+
+A˜θk,v∗(θk)(x, s, a)
+
+2 ∞
+
++
+
+|δk (v ∗ (θk ))|2
+
+K2 ≤ 64
+
+θk
+
+2
+
+1−γ
+
+max
+x,s,a
+
+|C¯λ(x,
+
+s,
+
+a)|2
+
++
+
+2
+
+max
+x,s
+
+φ(x, s)
+
+2 sup
+k
+
+vk
+
+2
+
+K2 ≤ 64
+
+θk
+
+2
+
+1−γ
+
+max
+
+Cmax,
+
+γ
+
+T
+
+2λDmax (1 − α)(1
+
+−
+
+γ
+
+)
+
+2
+
++ 2 max
+x,s
+
+φ(x, s)
+
+2 sup
+k
+
+vk
+
+2
+
+,
+
+for some Lipschitz constant K, where the indicator function in the second line can be explained by the fact that πγθk (x, s, u) = 0 whenever µ(u | x, s; θk) = 0 and because the expectation is taken with respect to πγθk . The third inequality uses Assumption 3 and the fact that µ takes on ﬁnitely-many values (and thus its nonzero values are bounded away from zero). Finally, supk vk < ∞ follows from the Lyapunov analysis in the critic update.
+Second, note that
+
+δθ
+
+≤
+
+(1
+
++ γ) (1 −
+
+ψθk γ)2
+
+∞
+
+θk (v∗(θk)),
+
+(77)
+
+46
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+
+where ψθ(x, s, a) = ∇θ log µ(a|x, s; θ) is the “compatible feature.” The last inequality is due to the fact that since πγθ is a probability measure, convexity of quadratic functions implies
+
+πγθ(x , s , a |x0 = x0, s0 = ν∗(θ))(Aθ(x , s , a ) − A˜θ,v(x , s , a ))
+x ,a ,s
+
+≤
+
+πγθ(x , s , a |x0 = x0, s0 = ν∗(θ))(Qθ(x , s , a ) − Q˜θ,v(x , s , a ))
+
+x ,a ,s
+
++ dθγ(x , s |x0 = x0, s0 = ν∗(θ))(V θ(x , s ) − V θ,v(x , s ))
+x ,s
+
+=γ
+
+πγθ(x , s , a |x0 = x0, s0 = ν∗(θ)) P¯(x , s |x , s , a )(V θ(x , s ) − φ (x , s )v)
+
+x ,a ,s
+
+x ,s
+
++
+
+dθγ(x , s |x0 = x0, s0 = ν∗(θ))(V θ(x , s ) − V θ,v(x , s ))2
+
+x ,s
+
+≤γ
+
+πγθ(x , s , a |x0 = x0, s0 = ν∗(θ)) P¯(x , s |x , s , a )(V θ(x , s ) − φ (x , s )v)2
+
+x ,a ,s
+
+x ,s
+
++ θ(v) 1−γ
+
+≤
+
+dθγ (x
+
+,s
+
+|x0, ν∗(θ)) − (1 − γ)1{x0 = x
+
+,ν = s
+
+}
+
+(V θ(x
+
+,s
+
+)−φ
+
+(x
+
+,s
+
+)v)2 + θ(v) 1−γ
+
+x ,s
+
+1+γ
+
+≤ 1−γ
+
+θ (v ).
+
+Then by Lemma 22, if the γ-occupation measure πγθ is used to generate samples (xk, sk, ak),
+one obtains E [δθk+1 | Fθ,k] = 0, where Fθ,k = σ(θm, δθm, m ≤ k) is the ﬁltration generated by different independent trajectories. On the other hand, |δθ | → 0 as θk (v∗(θk)) → 0. Therefore, the
+θ-update in (76) is a stochastic approximation of the continuous system θ(t), described by the ODE
+
+θ˙ = Υθ −∇θL(ν, θ, λ)|ν=ν∗(θ) ,
+
+with an error term that is a sum of a vanishing bias and a Martingale difference. Thus, the conver-
+
+gence analysis of θ follows analogously from Step 2 in the proof of Theorem 7, i.e., the sequence of
+
+θ-updates in (21) converges to θ∗ almost surely, where θ∗ is the equilibrium point of the continuous
+
+system θ satisfying
+
+Υθ −∇θL(ν, θ, λ)|ν=ν∗(θ) = 0.
+
+(78)
+
+Step 4 (Local Minimum) The proof that (θ∗, ν∗) is a local minimum follows directly from the arguments in Step 3 in the proof of Theorem 7.
+Step 5 (λ-update and Convergence to Local Saddle Point) Note that the λ-update converges on the slowest time scale, according to previous analysis, we have that θk − θ∗(λk) → 0, νk − ν∗(λk) → 0 almost surely. By continuity of ∇λL(ν, θ, λ), we also have the following:
+
+∇λL(ν, θ, λ)
+
+− ∇λL(ν, θ, λ)
+
+→ 0.
+
+θ=θ∗ (λk ),ν =ν ∗ (λk ),λ=λk
+
+θ=θk ,ν =νk ,λ=λk
+
+47
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+
+Thus, (20) may be rewritten as
+
+λk+1 = ΓΛ λk + ζ1(k) ∇λL(ν, θ, λ)
+
++ δλk+1 ,
+
+(79)
+
+θ=θ∗(λ),ν=ν∗(λ),λ=λk
+
+where
+
+δλk+1 = −∇λL(ν, θ, λ)
+
++
+
+θ=θ∗(λ),ν=ν∗(λ),λ=λk
+
+
+
+
+
+(νk
+
+−
+
+ν ∗ (λk ))
+
++
+
+ν ∗ (λk )
+
++
+
+(1
+
+(−sk )+ − α)(1 −
+
+γ) 1{xk
+
+=
+
+xTar}
+
+−
+
+β 
+
+.
+
+(80)
+
+νk−ν∗(λk) →0
+
+From (41), ∇λL(ν, θ, λ) does not depend on λ. Similar to the θ-update, one can easily show that δλk+1 is square integrable, speciﬁcally,
+
+E[ δλk+1 2 | Fλ,k] ≤ 8
+
+β2 +
+
+Dmax 1−γ
+
+2
++
+
+2Dmax
+
+2
+
+(1 − γ)2(1 − α)
+
+,
+
+where Fλ,k = σ λm, δλm, m ≤ k is the ﬁltration of λ generated by different independent trajectories. Similar to the θ-update, using the γ-occupation measure πγθ, one obtains E [δλk+1 | Fλ,k] = 0. As above, the λ-update is a stochastic approximation for the continuous system λ(t) described
+by the ODE
+
+λ˙ = Υλ ∇λL(ν, θ, λ)
+
+,
+
+θ=θ∗(λ),ν=ν∗(λ)
+
+with an error term that is a Martingale difference. Then the λ-convergence and the analysis of local optima follow from analogous arguments in Steps 4 and 5 in the proof of Theorem 7.
+
+References
+E. Altman. Constrained Markov decision processes, volume 7. CRC Press, 1999.
+E. Altman, K. Avrachenkov, and R. Nu´n˜ez-Queija. Perturbation analysis for denumerable Markov chains with application to queueing models. Advances in Applied Probability, pages 839–853, 2004.
+P. Artzner, F. Delbaen, J. Eber, and D. Heath. Coherent measures of risk. Journal of Mathematical Finance, 9(3):203–228, 1999.
+O. Bardou, N. Frikha, and G. Page`s. Computing VaR and CVaR using stochastic approximation and adaptive unconstrained importance sampling. Monte Carlo Methods and Applications, 15(3):173–210, 2009.
+N. Ba¨uerle and A. Mundt. Dynamic mean-risk optimization in a binomial model. Mathematical Methods of Operations Research, 70(2):219–239, 2009.
+N. Ba¨uerle and J. Ott. Markov decision processes with average-value-at-risk criteria. Mathematical Methods of Operations Research, 74(3):361–379, 2011.
+J. Baxter and P. Bartlett. Inﬁnite-horizon policy-gradient estimation. Journal of Artiﬁcial Intelligence Research, 15:319–350, 2001.
+
+48
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+M. Benaim, J. Hofbauer, and S. Sorin. Stochastic approximations and differential inclusions, Part II: Applications. Mathematics of Operations Research, 31(4):673–695, 2006.
+D. Bertsekas. Dynamic programming and optimal control. Athena Scientiﬁc, 1995.
+D. Bertsekas. Nonlinear programming. Athena Scientiﬁc, 1999.
+D. Bertsekas. Min common/max crossing duality: A geometric view of conjugacy in convex optimization. Lab. for Information and Decision Systems, MIT, Tech. Rep. Report LIDS-P-2796, 2009.
+D. Bertsekas and J. Tsitsiklis. Neuro-dynamic programming. Athena Scientiﬁc, 1996.
+S. Bhatnagar. An actor-critic algorithm with function approximation for discounted cost constrained Markov decision processes. Systems & Control Letters, 59(12):760–766, 2010.
+S. Bhatnagar and K. Lakshmanan. An online actor-critic algorithm with function approximation for constrained Markov decision processes. Journal of Optimization Theory and Applications, 153(3):688–708, 2012.
+S. Bhatnagar, R. Sutton, M. Ghavamzadeh, and M. Lee. Natural actor-critic algorithms. Automatica, 45(11): 2471–2482, 2009.
+S. Bhatnagar, H. Prasad, and L. Prashanth. Stochastic recursive algorithms for optimization, volume 434. Springer, 2013.
+K. Boda and J. Filar. Time consistent dynamic risk measures. Mathematical Methods of Operations Research, 63(1):169–186, 2006.
+K. Boda, J. Filar, Y. Lin, and L. Spanjers. Stochastic target hitting time and the problem of early retirement. Automatic Control, IEEE Transactions on, 49(3):409–419, 2004.
+V. Borkar. A sensitivity formula for the risk-sensitive cost and the actor-critic algorithm. Systems & Control Letters, 44:339–346, 2001.
+V. Borkar. Q-learning for risk-sensitive control. Mathematics of Operations Research, 27:294–311, 2002.
+V. Borkar. An actor-critic algorithm for constrained Markov decision processes. Systems & Control Letters, 54(3):207–213, 2005.
+V. Borkar. Stochastic approximation: a dynamical systems viewpoint. Cambridge University Press, 2008.
+V. Borkar and R. Jain. Risk-constrained Markov decision processes. IEEE Transaction on Automatic Control, 2014.
+Y. Chow and M. Ghavamzadeh. Algorithms for CVaR optimization in MDPs. In Advances in Neural Information Processing Systems, pages 3509–3517, 2014.
+Y. Chow and M. Pavone. Stochastic Optimal Control with Dynamic, Time-Consistent Risk Constraints. In American Control Conference, pages 390–395, Washington, DC, June 2013. doi: 10.1109/ACC.2013.6579868. URL http://ieeexplore.ieee.org/xpls/abs_all.jsp? arnumber=6579868.
+E. Collins. Using Markov decision processes to optimize a nonlinear functional of the ﬁnal distribution, with manufacturing applications. In Stochastic Modelling in Innovative Manufacturing, pages 30–45. Springer, 1997.
+B. Derfer, N. Goodyear, K. Hung, C. Matthews, G. Paoni, K. Rollins, R. Rose, M. Seaman, and J. Wiles. Online marketing platform, August 17 2007. US Patent App. 11/893,765.
+49
+
+CHOW, GHAVAMZADEH, JANSON AND PAVONE
+J. Filar, L. Kallenberg, and H. Lee. Variance-penalized Markov decision processes. Mathematics of Operations Research, 14(1):147–161, 1989.
+J. Filar, D. Krass, and K. Ross. Percentile performance criteria for limiting average Markov decision processes. IEEE Transaction of Automatic Control, 40(1):2–10, 1995.
+R. Howard and J. Matheson. Risk sensitive Markov decision processes. Management Science, 18(7):356– 369, 1972.
+H. Khalil and J. Grizzle. Nonlinear systems, volume 3. Prentice hall Upper Saddle River, 2002.
+V. Konda and J. Tsitsiklis. Actor-Critic algorithms. In Proceedings of Advances in Neural Information Processing Systems 12, pages 1008–1014, 2000.
+G. Konidaris, S. Osentoski, and P. Thomas. Value function approximation in reinforcement learning using the Fourier basis. In AAAI, 2011.
+H. Kushner and G. Yin. Stochastic approximation algorithms and applications. Springer, 1997.
+P. Marbach. Simulated-Based Methods for Markov Decision Processes. PhD thesis, Massachusetts Institute of Technology, 1998.
+P. Milgrom and I. Segal. Envelope theorems for arbitrary choice sets. Econometrica, 70(2):583–601, 2002.
+T. Morimura, M. Sugiyama, M. Kashima, H. Hachiya, and T. Tanaka. Nonparametric return distribution approximation for reinforcement learning. In Proceedings of the 27th International Conference on Machine Learning, pages 799–806, 2010.
+M. Ono, M. Pavone, Y. Kuwata, and J. Balaram. Chance-constrained dynamic programming with application to risk-aware robotic space exploration. Autonomous Robots, 39(4):555–571, 2015.
+J. Ott. A Markov decision model for a surveillance application and risk-sensitive Markov decision processes. PhD thesis, Karlsruhe Institute of Technology, 2010.
+J. Peters, S. Vijayakumar, and S. Schaal. Natural actor-critic. In Proceedings of the Sixteenth European Conference on Machine Learning, pages 280–291, 2005.
+M. Petrik and D. Subramanian. An approximate solution method for large risk-averse Markov decision processes. In Proceedings of the 28th International Conference on Uncertainty in Artiﬁcial Intelligence, 2012.
+L. Prashanth and M. Ghavamzadeh. Actor-critic algorithms for risk-sensitive MDPs. In Proceedings of Advances in Neural Information Processing Systems 26, pages 252–260, 2013.
+R. Rockafellar and S. Uryasev. Optimization of conditional value-at-risk. Journal of Risk, 2:21–42, 2000.
+R. Rockafellar and S. Uryasev. Conditional value-at-risk for general loss distributions. Journal of Banking and Finance, 26(7):1443 – 1471, 2002.
+G. Shani, R. Brafman, and D. Heckerman. An MDP-based recommender system. In Proceedings of the Eighteenth conference on Uncertainty in artiﬁcial intelligence, pages 453–460. Morgan Kaufmann Publishers Inc., 2002.
+A. Shapiro, W. Tekaya, J. da Costa, and M. Soares. Risk neutral and risk averse stochastic dual dynamic programming method. European journal of operational research, 224(2):375–391, 2013.
+T. Shardlow and A. Stuart. A perturbation theory for ergodic Markov chains and application to numerical approximations. SIAM journal on numerical analysis, 37(4):1120–1137, 2000.
+50
+
+RISK-CONSTRAINED REINFORCEMENT LEARNING WITH PERCENTILE RISK CRITERIA
+M. Sobel. The variance of discounted Markov decision processes. Applied Probability, pages 794–802, 1982. J. Spall. Multivariate stochastic approximation using a simultaneous perturbation gradient approximation.
+IEEE Transactions on Automatic Control, 37(3):332–341, 1992. R. Sutton and A. Barto. Introduction to reinforcement learning. MIT Press, 1998. R. Sutton, D. McAllester, S. Singh, and Y. Mansour. Policy gradient methods for reinforcement learning with
+function approximation. In Proceedings of Advances in Neural Information Processing Systems 12, pages 1057–1063, 2000. Y. Le Tallec. Robust, risk-sensitive, and data-driven control of Markov decision processes. PhD thesis, Massachusetts Institute of Technology, 2007. A. Tamar and S. Mannor. Variance adjusted actor critic algorithms. arXiv preprint arXiv:1310.3697, 2013. A. Tamar, D. Di Castro, and S. Mannor. Policy gradients with variance related risk criteria. In Proceedings of the Twenty-Ninth International Conference on Machine Learning, pages 387–396, 2012. A. Tamar, Y. Glassner, and S. Mannor. Policy gradients beyond expectations: Conditional value-at-risk. In AAAI, 2015. G. Theocharous and A. Hallak. Lifetime value marketing using reinforcement learning. RLDM 2013, page 19, 2013. D. White. Mean, variance, and probabilistic criteria in ﬁnite Markov decision processes: A review. Journal of Optimization Theory and Applications, 56(1):1–29, 1988. R. Williams. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning, 8(3-4):229–256, 1992. C. Wu and Y. Lin. Minimizing risk models in Markov decision processes with policies depending on target values. Journal of Mathematical Analysis and Applications, 231(1):47–67, 1999.
+51
+

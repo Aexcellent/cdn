@@ -1,0 +1,1652 @@
+Information Sciences 553 (2021) 110–128
+Contents lists available at ScienceDirect
+Information Sciences
+journal homepage: www.elsevier.com/locate/ins
+
+Providing reliability in recommender systems through Bernoulli Matrix Factorization
+Fernando Ortega a,⇑, Raúl Lara-Cabrera a, Ángel González-Prieto a, Jesús Bobadilla a
+a Dpto. Sistemas Informáticos, ETSI Sistemas Informáticos, Universidad Politécnica de Madrid, Madrid, Spain
+
+article info
+Article history: Received 26 May 2020 Received in revised form 26 November 2020 Accepted 2 December 2020 Available online 15 December 2020
+Keywords: Recommender systems Collaborative ﬁltering Matrix factorization Reliability Classiﬁcation model Bernoulli distribution
+
+abstract
+Beyond accuracy, quality measures are gaining importance in modern recommender systems, with reliability being one of the most important indicators in the context of collaborative ﬁltering. This paper proposes Bernoulli Matrix Factorization (BeMF), which is a matrix factorization model, to provide both prediction values and reliability values. BeMF is a very innovative approach from several perspectives: a) it acts on model-based collaborative ﬁltering rather than on memory-based ﬁltering, b) it does not use external methods or extended architectures, such as existing solutions, to provide reliability, c) it is based on a classiﬁcation-based model instead of traditional regression-based models, and d) matrix factorization formalism is supported by the Bernoulli distribution to exploit the binary nature of the designed classiﬁcation model. The experimental results show that the more reliable a prediction is, the less liable it is to be wrong: recommendation quality improves after the most reliable predictions are selected. State-of-the-art quality measures for reliability have been tested, which shows that BeMF outperforms previous baseline methods and models.
+Ó 2020 Elsevier Inc. All rights reserved.
+
+1. Introduction
+Recommender System (RSs) [42] are services that most people use. Relevant commercial examples are Netﬂix, Spotify, Amazon and TripAdvisor. Improving recommendation accuracy has focused existing research [7], and prediction models, such as the K Nearest Neighbours (KNN) algorithm [7] to the Matrix Factorization (MF) methods [24] and the latest Neural Network (NN) models [4,5] have been reﬁned over time. In recent years, increasing importance has been given to ‘‘beyond accuracy” RS measures [19]. Diversity, coverage and serendipity are current goals in RSs, where diverse and innovative recommendations are highly desirable. It is also important that recommendations have a novelty degree [12]: to recommend Star Wars VI (Return of the Jedi) to a Star Wars fan can be very accurate but it is not surprising or ‘‘novel” to him or her. Remarkable current research in RS points to ‘‘reliable” recommendations [6]: when an RS recommends a restaurant by giving it ﬁve stars, a person is probably not entirely convinced about the rating. Some RS services provide additional information that allows us to infer a ‘‘reliability” for the rating; this information usually consists of the number of people who have voted for the restaurant. Almost everyone prefers a restaurant with an average vote of 4 stars and 1200 ratings than a restaurant with an average vote of 5 stars and only 5 ratings. RS methods and models for reliability automatically provide a reliability value that is associated with each recommendation.
+Providing accurate reliability values that are associated with predictions is an important goal in the RS ﬁeld for the following reasons:
+⇑ Corresponding author.
+E-mail addresses: fernando.ortega@upm.es (F. Ortega), raul.lara@upm.es (R. Lara-Cabrera), angel.gonzalez.prieto@upm.es (Á. González-Prieto), jesus. bobadilla@upm.es (J. Bobadilla).
+https://doi.org/10.1016/j.ins.2020.12.001 0020-0255/Ó 2020 Elsevier Inc. All rights reserved.
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+a) This approach resembles human semantics: ‘‘I recommend this ﬁlm because it is truly good, but I am not sure if you like war movies” (high prediction, low reliability); ‘‘I know you very well, and I am sure you will love these shoes” (high prediction, high reliability); ‘‘I deﬁnitely do not recommend this restaurant” (low prediction, high reliability); ‘‘I do not think that you are going to like this song” (low prediction, low reliability).
+b) The extra ‘‘reliability” information enables new ways of showing recommendations to the users: from bidimensional plots (prediction, accuracy) to natural language, as demonstrated in the previous examples.
+c) People feel more comfortable when they use fuzzy concepts (you will like it ‘‘a lot”; you ‘‘probably” will not like it) rather than absolute concepts (you will like it or will not like it).
+d) Reliability values can be used to improve the accuracy of the results instead of improving explanations. As we will show later, some related works address this problem. Accuracy improvements are mainly achieved by ﬁltering low reliability recommendations.
+e) Reliability information is a powerful tool to improve users’ trust in a RS: categorical mistakes (such as erroneous ﬁvestar recommendations) generate distrust on the part of the users who receive the recommendations. Conversely, people tolerate errors from noncategorical information. Reliability values are adequate information to modulate the probability of recommendations (it is ‘‘very likely” that you like. . .).
+f) Reliability of predictions can be employed to properly handle a cold start problem. If all the predictions for a user or item have associated low reliability values, it can be considered a cold start problem, and recommendation methods that are designed ad hoc for cold start situations could be applied.
+
+The kernel of an RS is its ﬁltering approach; mainly, recommendations can be made based on demographic [2], content [48], social [40], context [44] and collaborative information. Due to their accurate results, a Collaborative Filtering (CF) based RS [42] is the most extended RS. Commercial RS architectures usually implement hybrid approaches [18] that include CF and other ﬁltering sources. Research on reliability has been focused on the CF context, and methods and models have been published to provide reliability values that are mainly based on both the KNN approach and the MF approach. A KNN-based framework for providing reliability information was proposed in [17], where a speciﬁc implementation of the framework is explained. The key idea is that positive and negative factors are analyzed to obtain reliabilities: the greater are the positive factors, the higher are the reliability values; and the greater are the negative factors, the lower are the reliability values. A completely different KNN approach to obtaining reliabilities is proposed in [1], where low-quality rating proﬁles of users are enhanced by adding reliable votes. To estimate the conﬁdence level of each prediction, [22] provides a full probability distribution of the item ratings rather than only a single score.
+Trust information is a relevant concept that is related to reliability since both are usually correlated. In [11], the authors propose a conﬁdence-based RS approach where trust and certainty are combined. The paper addresses the uncertainty that is derived from different rating behaviors of users on the same scale (e.g., 1 to 5 stars), and trust is applied to the opinions of the users. The use of ontologies and fuzzy linguistic models to represent users’ trust in RSs is addressed in [29], where users’ trust is employed in RS ﬁltering rather than traditional similarity based on ratings. A Boltzmann machine learning model that is fed with trust information and users’ preferences is proposed in [46], and the model merges both inputs to obtain improved recommendations. Trust-aware information was utilized in [3] to enrich the prediction process and obtain a ‘‘conﬁdence” value for a recommendation. Trust-aware information [37] has been employed in other works to obtain reliability values for predictions and recommendations. Based on a reliability-based method, [33] improves the RS accuracy by providing a dynamic mechanism to construct trust networks of the users. It is particularly important to be aware that reliability values can be applied to improve the accuracy results by selecting the recommendations with the highest reliability values [17]. Some trust-aware conﬁdence measures for rating predictions were proposed in [34]. Moreover, beyond accuracy, the entropy concept [45] can be applied to an RS to create a reliability measure. The initialization of MF is improved in [9] by using social trust information and a deep learning model.
+The concept of reliability or conﬁdence has also been recently addressed by [31,27]. In the ﬁrst paper, the authors focus on several methods to embed awareness in an RS to determine whether each item should be suggested. Similar to our proposed method, the authors claim that conﬁdence values can be used to ﬁlter the most reliable suggestions, which leads to an accuracy increase and a coverage decrease. The second paper [27] introduces the reliability concept in the review-to-rating conversion ﬁeld, that is, the reliability in the conversion of textual reviews to implicit ratings. An aggregation of reliability measures was proposed in [1], where user-based reliability, rating proﬁle reliability and item-based reliability were combined. By using this information, the authors obtain improved recommendations. Nevertheless, this solution is a memory-based solution, and thus, it has important drawbacks compared to our proposed model-based approach. Analogously, a conﬁdence measure and a similarity conﬁdence coefﬁcient for link predictions are proposed in [43] in the context of the KNN memory-based method. Another memory-based approach [10] utilizes the reliability concept to improve traditional Pearson and cosine similarity measures. Previously, authors created the ‘‘credibility of a rating between users” based on the users’ ratings on common items. RSs can also be improved by using context-aware preﬁltering. Contextual recommendations were made in [39] using traditional CF and fuzzy rules to select items that are suitable for the speciﬁc situations of the users. In the same way, CF contextual postﬁltering is performed in [38] to cast recommendations of restaurants with the aim of disseminating information about products and services. Moreover, an increase in effectiveness in advertising campaigns has been reached by combining evolutionary computation and fuzzy logic [26]. Additionally, online advertising recommendations have been improved using conﬁdence information [35], which outperforms some current reinforcement learning schemes. Both [25,47] are research papers
+111
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+that use an upper bound of conﬁdence to improve recommendations. The former work, [25], has been tested in event-based social networks and synthetic datasets. On the other hand, in [47], a user’s conﬁdence and time context algorithm are proposed, where the user’s behavior temporal information is exploited to improve the recommendation accuracy.
+Despite its success, the previously mentioned research has two main drawbacks in the current RS reliability issue. First, the KNN approach is not applied due to its lack of accuracy and scalability. Conversely, our proposed method is not based on KNN but is based on the MF model, which is now a CF standard [49]. Second, social information is only available in a small subset of existing RSs, so social-based trust-aware approaches that are oriented to obtain reliability values cannot be considered universal solutions. Conversely, our proposed approach only uses the ratings matrix that contains the preferences of a set of users over a set of items, which is basic information for CF-based RSs. Since the proposed method does not rely on the KNN method, where identifying strategies for designing reliability measures are more obvious, it utilizes MF techniques and provides a brand-new MF-based approach to address RS reliabilities.
+We will employ remarkable research in the MF ﬁeld that has been applied to an RS in this paper as baselines. Probabilistic Matrix Factorization (PMF) [32] and Biased MF [21] are classic MF implementations. non-Negative Matrix Factorization (NMF) [23] avoids negative latent factor values and facilitates the assignment of semantic meanings to them. Bayesian non-Negative Matrix Factorization (BNMF) [16] provides an understandable probabilistic meaning to the latent factors, which lie within the range ½0; 1, and group users that share the same tastes. An improved CF Singular Value Decomposition (SVD++) is presented in [20]. The User Ratings Proﬁle Model (URP) model [28] produces complete user rating proﬁles; each item rating is assigned by selecting a user attitude for the item. A two-level MF semantic architecture is designed in [50], which allows us to add reliabilities for any MF-based CF system as an add-on. We will use this method to obtain reliability values from the previously described MF implementations; it serves as a base for this paper’s baselines.
+One of the reasons that explains why the problem of reliability in RS has not been completely addressed is the lack of quality measures of reliability. Accuracy quality can be measured using a complete set of prediction and recommendation quality measures (Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), precision, recall, F1, etc.); reliability does not have analogous quality values. The underlying idea is that ‘‘the more suitable reliability is, the better accuracy results will provide when applied: predictions with higher reliabilities should provide more accurate (less error) results, whereas we expect higher prediction errors on low reliability recommended items” [50]. This is a recurrent concept that is addressed in several papers: ‘‘The most common measurement of conﬁdence is the probability that the predicted value is indeed true” [41], ‘‘This reliability measure is based on the usual notion that the more reliable a prediction, the less liable to be wrong” [17], and ‘‘Evaluations of recommenders for this task must evaluate the success of high-conﬁdence recommendations, and perhaps consider the opportunity costs of excessively low conﬁdence” [15]. Using these concepts, the reliability framework proposed in [17] provides plots that show the prediction errors versus reliability inverse correlation. Based on conﬁdence curve analysis, [30] proposed a method to estimate the reliability quality of reliability measures. The method tests the conﬁdence curve by checking that its ﬁrst value is higher than the last value (error decreases when reliability increases). The weak point of [17] is that it does not test all the conﬁdence curve trends. In [6], the Reliability Prediction Index (RPI), which is a quality measure of reliability that tests the quality of reliabilities for predictions, is proposed. This quality measure returns a simple value, similar to customary accuracy quality measures, and scores the quality of a reliability measure for an RS.
+The proposed model in this paper obtains the reliability value of each prediction and recommendation using three concepts: the machine learning classiﬁcation concept, Bernoulli distribution and MF model. Instead of designing a regression model, we have chosen a classiﬁcation approach, so the classes to classify correspond to the ﬁnite set of possible scores that can be assigned as rates to the items of the RS, e.g., f1; 2; 3; 4; 5g stars in the MovieLens dataset [14]. In this way, our model returns the probabilities that a user will assign each of the possible scores to an item. In our MovieLens example, the model may return ½0:05; 0:05; 0:1; 0:6; 0:2, which means that the score 4 (probability 0:6) is the best prediction choice (for a given huser; itemi pair). The classiﬁcation model in the RS MF context is an innovative approach that is proposed in this paper: current MF implementations return a regression value for each prediction, e.g., 4:3. To design the explained classiﬁcationbased MF approach, we set D individual classiﬁcation tasks independent from each other, where D is the number of possible scores in the dataset (D ¼ 5 in MovieLens). In this way, we have D separated classiﬁcation processes. Each classiﬁcation task for a given score focuses on the dichotomy that this score may or may not correspond to the score evaluated for each huser; itemi pair. This behavior can be modeled using the Bernoulli distribution, that is, the discrete probability distribution of a random variable that takes the value 1 with probability p and the value 0 with probability 1 À p. The formalization of the classiﬁcation-based MF approach by using the Bernoulli distribution is detailed in Section 2. We have named this proposed method Bernoulli Matrix Factorization (BeMF) in allusion to the Bernoulli distribution and the MF model.
+Fig. 1 shows the main ideas of the proposed BeMF model using a graphical example: the dataset displayed as a rating matrix is split into D ¼ 5 matrices, which correspond to the possible scores (score 1, score 2, . . ., score 5). Each matrix contains the basic information that is related to each corresponding score: if the rating corresponds to the actual score, we assign the code ‘‘1”; if the rating does not correspond to the score, we assign the code ‘‘0”; otherwise, the nonrated mark ‘‘–” is assigned. This set of D ¼ 5 separated matrices feeds D ¼ 5 independent Bernoulli factorizations, and as usual, each factorization generates its user’s latent factors matrix and its item’s latent factor matrix (gray row named ‘‘Factors”). From each pair of latent matrices, we can obtain predictions that utilize the inner product of the chosen user and item factors. Note that each prediction result does not correspond to the regression value of the rating, as is customary, but corresponds to the probability that the score will be classiﬁed as the correct score (gray row named ‘‘Probabilities”). The summation of these probabilities is equal
+
+112
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+Fig. 1. Architecture of the proposed BeMF model.
+to 1 since the BeMF model returns the probability distribution of the rating of user u to item i. The last step is to aggregate the D ¼ 5 resulting probabilities to establish a classiﬁcation ‘‘winner”. Usually, the aggregation approach selects the score that is associated with the maximum probability. Note that we refer to Bernoulli factorization for the D MF parallel processes that are based on Bernoulli distribution, whereas we refer to the BeMF model for the complete architecture.
+The proposed model provides an innovative approach to obtain reliability values in a CF RS. The main advantages of the model are listed as follows:
+a) BeMF can be considered universal since it can be applied to a CF RS, which is are just based on ratings. Particularly, BeMF does not use social information, which is important since social information is only available in a reduced set of CF RSs. A variety of papers rely on social information and the trust and distrust of the associated information [3,33,34,37], but they cannot be applied to the most popular RS datasets.
+b) BeMF is a model-based approach, and therefore, it is not limited to small- or medium-sized RSs, as discussed in papers on memory-based KNN [1,17,22]. In this way, the proposed approach is scalable, whereas the memory-based methods are not scalable.
+c) The BeMF model is based on classiﬁcation [4,5] rather than the usual regression approaches [16,20,21,23,28,32]. The machine learning classiﬁcation approach provides more information than the regression approach; speciﬁcally, it returns a set of D probabilities. The D probabilities can be aggregated to obtain the expected reliability result. This context is richer than the isolated resultant value that is provided by the regression models.
+d) The BeMF machine learning model is based on the Bernoulli distribution because it adequately adapts to the binary expected result for each of the D possible scores. The key concept is the simpliﬁcation that we make by performing D simpler and more precise processes instead of the traditional complex regression task. To the best of our knowledge, a Bernoulli classiﬁcation-based model has never been published in the reliability RS ﬁeld. Additionally, the Bernoulli distribution directly provides, in a natural way, the expected probability that the prediction is true, that is, reliability.
+e) Despite its simplicity, the use of the Bernoulli distribution endows BeMF with considerable ﬂexibility. Eventually, the output of the BeMF model for user u and item i can be understood as a vector ðp1u;i; . . . ; pDu;iÞ of probabilities, where psu;i is the probability that u assigns the s-th score (for example, s stars) to item i. This distribution is a discrete probability distribution on the set of possible ratings. By using the underlying Bernoulli distribution, BeMF can actually model any discrete probability on the set of ratings or it ﬁts the hyperparameters of a categorical distribution. Thus, it is completely general from a probabilistic point of view. The difference between BeMF and a model that is based on a cat-
+113
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+egorical distribution is the training method: using the Bernoulli distribution for each score, we assume that the ratings
+are independent. For this reason, each probability ps is computed only based on the appearances of the ratings s on the dataset. This process accelerates the training process and prevents overﬁtting.
+
+This paper’s hypothesis claims that an MF model can be designed to provide the reliability of each RS recommendation by using a classiﬁcation-based approach and setting its learning stage in the Bernoulli distribution. Our contribution is the proposal and validation of an RS model that is capable of providing not only recommendations using a classiﬁcation-based approach but also the reliability of these recommendations. Regarding the originality of our contribution, this is an innovative approach that provides explicit reliability values to RS users or improves the accuracy by selecting recommendations with the highest reliability values. Although reliability has been employed to improve accuracy, it has not become a common practice. Additionally, the reliability measures that are provided by this machine learning model are intrinsically linked to the model and do not depend on external methods or extended architectures as existing solutions.
+The remainder of the paper has been structured as follows: In Section 2, the mathematical foundations of the proposed method are explained, and the resulting BeMF algorithm is provided. Section 3 shows the designed experiments and their results and discussions. Section 4 contains the main conclusions of the paper and outlines some future works.
+
+2. Proposed model
+
+Following the standard framework of CFs, we assume that we have N users that are evaluating M different items with a
+
+discrete set of possible scores S ¼ fs1; . . . ; sDg (typically S ¼ f1; . . . ; 5g as in the MovieLens dataset [14]). These ratings are collected in the rating matrix R ¼ ðRu;iÞ, where Ru;i ¼ sa if user u 2 ½1; N has assigned item i 2 ½1; M the score sa 2 S and
+
+Ru;i ¼  if user u has not rated item i. From this rating matrix, we generate D distinct matrices Rs1 ; . . . ; RsD , which correspond to the possible scores that can be
+
+assigned to the items. In this way, ﬁxed s 2 S; the matrix Rs ¼ ðRsu;iÞ is a (sparse) matrix such that Rsu;i ¼ 1 if user u voted item i with exactly score s; Rsu;i ¼ 0 if user u voted item i but with a different score from s and Rsu;i ¼  if u did not rate item i.
+Our model will attempt to ﬁt the matrices Rs1 ; . . . ; RsD by performing D parallel matrix factorizations. The factors of each of
+
+the values will be independent, so the BeMF model is the juxtaposition of D different individual Bernoulli factorizations that
+
+ﬁt binary matrices. Fig. 2 shows the plate diagram of the model, which is composed of D different factorizations (one factor-
+
+ization for each possible score), each of which is composed of N variables Uu (latent factors of each user) and M variables Vi
+(latent factors of each item). The hyperparameters of the model are two positive real values rU; rV > 0: an integer k > 0
+(number of hidden factors) and a smooth logistic-like function w.
+
+The problem of predicting the missing values of the matrix Rs is not a regression problem, as is customary in RS literature. The
+
+matrix Rs is a binary matrix, and each known value Rsu;i has a very speciﬁc meaning, namely, whether user u considered that item
+
+i deserves rate s. This problem is intrinsically a classiﬁcation problem; in the simplest case it is a binary classiﬁcation problem.
+
+For this reason, the proposed system models the decision Rsu;i, as a random variable of Bernoulli type with the probability of success 0 6 psu;i 6 1. This approach is compatible with the known fact that deciding to rate an item is not deterministic and depends on some stochastic psychological process that may vary from day to day. Hence, psu;i only measures the afﬁnity of u for item i (more precisely, the reliability in the prediction, c.f., Section 2.2). In this way, the higher is the value psu;i, the more
+
+likely u rates i with score s, independent of imponderable factors.
+
+Regarding how the value psu;i is estimated, which is consistent with the usual assumptions in RS models, we will assume
+
+that
+
+the
+
+probability
+
+psu;i
+
+is
+
+given
+
+as
+
+the
+
+inner
+
+product
+
+Usu
+
+Á
+
+V
+
+s i
+
+of
+
+some
+
+k-dimensional
+
+hidden
+
+user
+
+factors
+
+vector
+
+Usu
+
+¼
+
+ðU
+
+s u;1
+
+;
+
+...;
+
+U
+
+s u;k
+
+Þ
+
+and
+
+hidden
+
+item
+
+factors
+
+vector
+
+V
+
+s i
+
+¼
+
+ðV
+
+s i;1
+
+;
+
+.
+
+.
+
+.
+
+;
+
+V
+
+s i;k
+
+Þ.
+
+However,
+
+the
+
+inner
+
+product
+
+Usu
+
+Á
+
+V
+
+s i
+
+may
+
+attain
+
+any
+
+real
+
+Fig. 2. Plate diagram of BeMF model. 114
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+value,
+
+so
+
+it
+
+is
+
+not
+
+a
+
+suitable
+
+quantity
+
+for
+
+psu;i .
+
+To
+
+normalize
+
+the
+
+product
+
+Usu
+
+Á
+
+V
+
+s i
+
+,
+
+we
+
+use
+
+a
+
+logistic-like
+
+smooth
+
+function
+
+w
+
+:
+
+R
+
+!
+
+½0; 1
+
+in
+
+such
+
+a
+
+way
+
+that
+
+0
+
+6
+
+wðU
+
+s u
+
+Á
+
+V
+
+s i
+
+Þ
+
+6
+
+1,
+
+and
+
+thus,
+
+we
+
+may
+
+consider
+
+psu;v
+
+¼
+
+wðUsu
+
+Á
+
+V
+
+s i
+
+Þ.
+
+In
+
+contrast
+
+with
+
+other
+
+MF
+
+models, for each user and item, there is not a single instance of user and item factors but D different vectors of factors,
+
+one vector of factor for each possible rating.
+
+2.1. Bernoulli factorization
+
+In this section, we describe the mathematical formulation of the factorization model for each score. Hence, throughout
+
+this section, we ﬁx s 2 S as a possible score. To shorten the notation, we denote R ¼ Rs as the vote matrix, which corresponds
+
+to the score s. This matrix is a sparse binary matrix.
+
+First, we ﬁx the logistic-like function w : R ! ½0; 1, i.e., a smooth increasing function with wðxÞ ! 0 when x ! À1 and
+
+wðxÞ ! 1 when x ! 1. This hyperparameter will have the role of an activation function that will translate the inner product
+
+of the factors into a probability.
+
+Fix user u and item i. The underlying probabilistic assumption of the Bernoulli factorization is that, given the latent vec-
+
+tors of user Uu and item Vi of dimension k > 0 (number of hidden factors), the rate Ru;i is a Bernoulli distribution with the
+
+success probability wðUu Á V iÞ. Hence, the mass function of this random variable, pðRu;ijUu; ViÞ, is given by
+
+pðRu;i jU u ;
+
+V
+
+iÞ
+
+¼
+
+&
+
+wðUuV iÞ 1 À wðUuViÞ
+
+if Ru;i ¼ 1; if Ru;i ¼ 0:
+
+From this formula, given sample R ¼ ðRu;iÞ, we obtain that the associated likelihood, LðRjU; VÞ, is
+
+0
+
+10
+
+1
+
+Y
+
+Y
+
+Y
+
+LðRjU; VÞ ¼ pðRu;ijUu; V iÞ ¼ @ wðUuV iÞA@ 1 À wðUuViÞA:
+
+Ru;i –
+
+Ru;i ¼1
+
+Ru;i ¼0
+
+In this way, the log-likelihood function, ‘‘ðRjU; VÞ ¼ log LðRjU; VÞ, is given by
+
+X
+
+X
+
+‘ðRjU; VÞ ¼ logðwðUuViÞÞ þ logð1 À wðUuViÞÞ:
+
+Ru;i ¼1
+
+Ru;i ¼0
+
+Now, as in PMF [32], let us assume spherical normal priors with a zero mean and standard deviation given by hyperpa-
+
+rameters rU; rV > 0. In this case, we have the probability density functions
+
+!
+
+!
+
+pðUuÞ ¼ rUp1ﬃ2ﬃﬃpﬃﬃﬃ exp
+
+À
+
+jjUujj2
+2r2
+
+;
+
+pðViÞ ¼ rV p1ﬃ2ﬃﬃpﬃﬃﬃ exp
+
+À
+
+jjV ijj2
+2r2
+
+:
+
+Hence, their prior likelihoods, LðUÞ and LðVÞ for users and items, respectively, are
+
+LðUÞ
+
+¼
+
+YN pðUuÞ
+u¼1
+
+¼
+
+1
+rNU ð2pÞN=2
+
+YN
+u¼1
+
+exp
+
+!
+
+À
+
+jjUujj2
+2r2U
+
+¼
+
+1
+rNU ð2pÞN=2
+
+exp
+
+À
+
+PN
+u¼1
+
+jjUu
+
+2r2U
+
+jj2
+
+! ;
+
+LðV Þ
+
+¼
+
+YM pðV i Þ
+i¼1
+
+¼
+
+1
+rMV ð2pÞM=2
+
+YM
+i¼1
+
+exp
+
+!
+
+À
+
+jjV ijj2
+2r2V
+
+¼
+
+1
+rMV ð2pÞM=2
+
+exp
+
+À
+
+PMi¼1jjV
+2r2V
+
+i
+
+! jj2 :
+
+Analogously, their prior log-likelihoods are
+
+‘ðUÞ
+
+¼
+
+À
+
+1
+2r2U
+
+XN jjUujj2
+u¼1
+
+þ
+
+CU;
+
+‘ðV Þ
+
+¼
+
+À
+
+1
+2r2V
+
+X M jjV i jj2
+i¼1
+
+þ
+
+CV
+
+:
+
+for some constants CU ¼ ÀN logðrUpﬃ2ﬃﬃpﬃﬃﬃÞ and CV ¼ ÀM logðrV pﬃ2ﬃﬃpﬃﬃﬃÞ.
+
+Moreover, the posterior likelihood, LðRÞ, is
+
+LðRÞ ¼ LðRjU; VÞLðUÞLðVÞ:
+
+Therefore, the posterior log-likelihood is given by
+
+‘ðRÞ
+
+¼
+
+‘ðRjU;
+
+V
+
+Þ
+
+þ
+
+‘ðUÞ
+
+þ
+
+‘ðV
+
+Þ
+
+¼
+
+X
+Ru;i ¼1
+
+logðwðUuV
+
+iÞÞ
+
+þ
+
+X
+Ru;i ¼0
+
+logð1
+
+À
+
+wðUuV
+
+iÞÞ
+
+À
+
+1
+2r2U
+
+XN jjUujj2
+u¼1
+
+À
+
+1
+2r2V
+
+X M jjV
+i¼1
+
+ijj2
+
+þ
+
+C;
+
+where C ¼ CU þ CV is a constant.
+
+The maximum likelihood estimator is obtained by maximizing the posterior log-likelihood ‘ðRÞ. For this purpose, the con-
+
+stant
+
+C
+
+is
+
+irrelevant,
+
+so
+
+it
+
+can
+
+be
+
+dismantled.
+
+Setting
+
+gU
+
+¼
+
+1
+r2U
+
+and
+
+gV
+
+¼
+
+1
+r2V
+
+,
+
+the
+
+maximization
+
+problem
+
+can
+
+be
+
+converted
+
+to
+
+the
+
+minimization of the cost function
+
+115
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+FðU;
+
+VÞ
+
+¼
+
+X À
+Ru;i ¼1
+
+logðwðUuV iÞÞ
+
+À
+
+X
+Ru;i ¼0
+
+logð1
+
+À
+
+wðUu V i ÞÞ
+
+þ
+
+gU
+2
+
+XN jjUujj2
+u¼1
+
+þ
+
+gV
+2
+
+X M jjV i jj2 :
+i¼1
+
+To optimize this cost function, we will use a standard gradient descent algorithm. Fixing user u0 and an item i0, denote the
+
+components of the latent vectors as Uu0 ¼ ðUu0;1; . . . ; Uu0;kÞ and V i0 ¼ ðVi0;1; . . . ; Vi0;kÞ. The directional derivatives of F in the directions Uu0;a and Uu0;b are then given by
+
+g @F
+@ U u0 ;a
+
+¼
+
+À fi
+
+j
+
+X g Ru0 ;i ¼1
+
+w0ðUu0 V iÞ wðUu0 V iÞ
+
+V i;a
+
+þ
+
+X f g i j Ru0;i¼0
+
+1
+
+wðUu0 V iÞ À wðUu0 V
+
+i
+
+Þ
+
+V
+
+i;a
+
+þ
+
+U Uu0;a;
+
+g @F
+@V i0;b
+
+¼
+
+À fu
+
+j
+
+X g Ru;i0 ¼1
+
+w0ðUuV i0 Þ wðUuV i0 Þ
+
+U
+
+u;b
+
+þ
+
+X 1
+f g u j Ru;i0 ¼0
+
+w0ðUuV i0 Þ À wðUuV i0
+
+Þ
+
+Uu;b
+
+þ
+
+V V i0;b:
+
+For simplicity, let us set gU ¼ gV ¼ g. The associated gradient descent algorithm with step c > 0 then updates the approx-
+
+imations
+
+at
+
+time
+
+T,
+
+which
+
+are
+
+denoted
+
+U
+
+T u
+
+and
+
+V
+
+T i
+
+,
+
+to
+
+the
+
+approximations
+
+at
+
+time
+
+T
+
+þ
+
+1
+
+by
+
+the
+
+rule
+
+0
+
+1
+
+UTuþ1
+
+¼
+
+UTu
+
+þ
+
+cB@ X
+fi j Ru;i¼1g
+
+w0ðUuV iÞ wðUuV iÞ
+
+Vi
+
+À
+
+X fi j Ru;i¼0g
+
+1
+
+w0ðUuV iÞ À wðUuV iÞ
+
+Vi
+
+À
+
+gUuCA;
+
+0
+
+1
+
+V
+
+Tþ1 i
+
+¼
+
+V
+
+T i
+
+þ
+
+cB@
+fu
+
+X g j Ru;i¼1
+
+w0ðUuV iÞ wðUuV iÞ
+
+Uu
+
+À
+
+X 1
+fu j Ru;i¼0g
+
+w0ðUuV iÞ À wðUuV iÞ
+
+Uu
+
+À
+
+gV i CA:
+
+Example
+
+2.1. If
+
+we
+
+consider
+
+w ¼ logit
+
+to
+
+be
+
+the
+
+logistic
+
+function,
+
+logitðxÞ
+
+¼
+
+1 1þeÀx
+
+,
+
+then
+
+we
+
+have
+
+that
+
+logit0ðxÞ ¼ logitðxÞð1 À logitðxÞÞ. Hence, the update rule reads
+
+0
+
+1
+
+UTuþ1
+
+¼
+
+UTu
+
+þ
+
+cB@ X
+fi j Ru;i¼1g
+
+logitðUuViÞð1 À logitðUuV iÞÞ logitðUu V i Þ
+
+Vi
+
+À
+
+X fi j Ru;i¼0g
+
+logitðUuViÞð1 À logitðUuViÞÞ 1 À logitðUuViÞ
+
+Vi
+
+À
+
+gUuCA;
+
+0
+
+1
+
+V
+
+Tþ1 i
+
+¼
+
+V
+
+T i
+
+þ
+
+cB@ X
+fu j Ru;i¼1g
+
+logitðUuV iÞð1 À logitðUuViÞÞ logitðUuV iÞ
+
+Uu
+
+À
+
+X fu j Ru;i¼0g
+
+logitðUuViÞð1 À logitðUuViÞÞ 1 À logitðUuViÞ
+
+Uu
+
+À
+
+gV i CA:
+
+These update rules can be simpliﬁed as
+
+0
+
+1
+
+UTuþ1 ¼ UTu þ cB@ X ð1 À logitðUuV iÞÞVi À X logitðUuViÞV i À gUuCA;
+
+fi j Ru;i¼1g
+
+fi j Ru;i¼0g
+
+0
+
+1
+
+V
+
+Tþ1 i
+
+¼
+
+V
+
+T i
+
+þ
+
+cB@
+
+X
+
+ð1 À logitðUuV iÞÞUu À
+
+X logitðUuViÞUu À gViCA:
+
+fu j Ru;i¼1g
+
+fu j Ru;i¼0g
+
+2.2. BeMF model
+
+By performing Bernoulli factorization on each possible score, we obtain a collection of user and item factor pairs ðUs1 ; Vs1 Þ; . . . ; ðUsD ; V sD Þ for the scores S ¼ fs1; . . . ; sDg. We can gather all this information to obtain the ﬁnal output U. For each user u and item i, the output is the D-dimensional vector
+
+Uðu;
+
+iÞ
+
+¼
+
+1
+
+Ps
+a¼1
+
+wðU
+
+sa u
+
+V
+
+sa i
+
+Þ
+
+À wðU
+
+s1 u
+
+V
+
+s1 i
+
+Þ;
+
+.
+
+.
+
+.
+
+;
+
+wðUsuD
+
+V
+
+sD i
+
+Á Þ:
+
+This
+
+vector
+
+is
+
+vector
+
+Uðu; iÞ
+
+¼
+
+ðp1u;i; . .
+
+.
+
+; pDu;iÞ
+
+with
+
+0
+
+6
+
+pau;i
+
+6
+
+1
+
+and
+
+P
+a
+
+pau;i
+
+¼
+
+1.
+
+The
+
+value
+
+pau;i
+
+may
+
+be
+
+interpreted
+
+as
+
+the
+
+prob-
+
+ability that user u assigns score sa to item i. In this way, pau;i is the reliability that we have in predicting sa. From this vector, if
+
+a0 ¼ argmaxa pau;i is the mode of this probability distribution, we obtain.
+
+116
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+ The prediction is given by R^u;i ¼ sa0 .
+ The reliability of the prediction is given by qu;i ¼ pau;0i.
+
+Moreover, we can ﬁx the threshold # > 0 (required prediction reliability), and we set R^u;i ¼  (i.e., the prediction is unre-
+liable if qu;i < #). In this way, we ﬁlter unreliable predictions.
+
+2.3. BeMF algorithm
+
+Algorithm 1 contains the pseudocode for the training process of the BeMF model using the logistic function (w ¼ logit) as the activation function, as shown in Example 2.1. The algorithm receives as inputs the sparse rating matrix (R), number of
+latent factors (k) and hyperparameters that are required by gradient descent optimization: learning rate (c), regularization (g) and number of iterations (m). The algorithm returns as output two matrices that contain the learned latent factors: U
+contains the latent factors for each score s, user u and factor f , and V contains the latent factors for each score s, item i
+and factor f . These matrices can be used to compute both predictions and reliability, as described in Section 2.2. Note that to reduce the algorithm’s processing time, the user update loop (lines 5–16) and item update loop (lines 19–30) can be executed in parallel for each user and item, respectively.
+
+Algorithm 1: BeMF model ﬁtting algorithm
+
+117
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+2.4. Running example
+
+This section presents a running example of the BeMF model using the dataset with 4 users and 6 items shown in Table 1. To reduce the extension of the running example and make it more readable, we set the possible scores to ‘like’ ( ) and ‘dislike’ ( ). Note that despite the simplicity of this set of possible scores, it is a real set of possible scores that is employed in commercial services such as YouTube, Tinder or Steam.
+The ﬁrst step is to split the rating matrix into as many matrices as the number of possible scores. In this case, we have two possible scores, so we split the rating matrix of Table 1 into a matrix that encodes the ‘like’ ratings (Table 2 and a matrix that encodes the ‘dislike’ ratings (Table 2b). Recall that the absence of a rating must not be encoded into these matrices.
+During the ﬁtting process, the BeMF model must learn its parameters following Algorithm 1. These parameters are stored in four matrices that contain the latent factors of the users for the ‘like’ rating (), latent factors of the users for the ‘dislike’ rating (), latent factors of the items for the ‘like’ rating () and latent factors of the items for the ‘dislike’ rating (). For this example, we have ﬁxed the number of latent factors to k ¼ 3. Table 3 contains a random initialization of these parameters for the running example.
+To learn the parameters, a gradient descent approach is employed, so we must perform m iterations following the update rules for the latent factors. For example, the update of the ﬁrst factor f 1 of user u1 for the like rating, which is denoted , is computed as
+
+From this value, we can improve the hidden factor by updating
+
+Note that only the items rated by user u1 (i.e., i1, i2 and i4) update his/her latent factors.
+Table 4 contains the latent factors after one iteration (m ¼ 1) using the learning rate c ¼ 0:1 and regularization g ¼ 0:01.
+Once the BeMF model has been trained, predictions can be computed by obtaining the score that maximizes the probability in the classiﬁcation task. For example, to predict the rating of user u1 to the item i3, R^u1;i3 , we must compute the probability distribution of this rating, Uðu1; i3Þ, as
+ð1Þ
+
+¼
+
+0:71
+
+1 þ
+
+0:62
+
+ð0:71;
+
+0:62Þ
+
+¼
+
+ð0:53;
+
+0:47Þ:ð2Þ
+
+Henceforth, the BeMF model will return with the reliability qu1;i3 ¼ 0:53.
+
+Table 1 Rating matrix used in the running example. Possible scores are set to like ( ) and dislike ( ).
+
+Table 2 Resulting matrix after splitting the running example’s rating matrix.
+118
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+Table 3 Initial random BeMF model parameters in the running example. The number of latent factors has been ﬁxed to k ¼ 3.
+
+Table 4 BeMF model parameters after one iteration in the running example.
+3. Proposed model evaluation This section contains a detailed explanation of the experiments that are carried out to evaluate the proposed model. Sec-
+tion 3.1 describes the experimental setup that deﬁnes the datasets, baselines and quality measures that are employed during the evaluation. Section 3.2 includes the experimental results and a comparison of the performance of the proposed method regarding the selected baselines. All experiments have been conducted using Collaborative Filtering for Java (CF4J) [36]; their source code is available athttps://github.com/ferortega/bernoulli-matrix-factorization. 3.1. Experimental setup
+Experimental evaluation was conducted using the MovieLens [14], FilmTrust [13] and MyAnimeList datasets. These datasets have been selected to assess the impact of splitting the rating matrix into binary rating matrices using different discrete
+119
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+sets of possible scores. In this way, the MovieLens dataset contains ratings from 1 star to 5 stars FilmTrust ratings range from 0.5 to 4.0 with half increments; and the MyAnimeList dataset restricts its possible scores to the range 1 to 10. Moreover, to ensure the reproducibility of these experiments, all of them were carried out using the benchmark version of these datasets, which are included in CF4J [36]. The main features of these datasets are shown in Table 5.
+According to Section 1, all the MF models that are presented in the literature are capable of estimating a user’s rating prediction for an item, but only a few MF models provide the reliability of their predictions and recommendations. Baselines have been selected to supply a heterogeneous representation of all the existing MF models. Table 6 contains the selected baselines and their generated outputs. Note that the proposed model, BeMF, can estimate the user’s rating predictions and compute the reliability of the predictions and recommendations, as described in Section 2.2.
+The chosen baselines contain several hyperparameters that must be tuned. We analyzed the prediction error of the baseline models with different values of these hyperparameters by performing a grid search optimization that minimizes the mean absolute prediction error. Table 7 contains the hyperparameters that are generated from this optimization process for each baseline and dataset.
+In the same way, the BeMF model has some hyperparameters that must be tuned: k, which denotes the number of latent
+factors of the model; c, which represents the learning rate of the gradient descent optimization algorithm; g, which controls
+the regularization to avoid overﬁtting; and m, the number of iterations of the ﬁtting process. According to Algorithm 1, we have ﬁxed the activation function to the logistic function. As with the baselines, a grid search optimization was carried out to compare the prediction error of the proposed model using thousands of combinations of the required hyperparameters. We evaluated the following intervals of values for each hyperparameter:
+
+ k: from 2 to 8 latent factors with increments of 2.
+ c: from 0.002 to 0.02 with increments of 0.002.  g: from 0.01 to 0.2 with increments of 0.01.
+ m: from 50 to 100 with increments of 25.
+
+Table 5 Main parameters of the datasets used in the experiments.
+
+Dataset
+MovieLens FilmTrust MyAnimeList
+
+Number of users
+6,040 1,508 69,600
+
+Number of items
+3,706 2,071 9,927
+
+Number of ratings
+911,031 32,675 5,788,207
+
+Number of test ratings
+89,178 2,819 549,027
+
+Possible scores
+1 to 5 stars 0.5 to 4.0 with half increments 1 to 10
+
+Table 6 Output generated by MF models selected as baselines.
+
+Table 7 Baseline hyperparameters generated from grid search optimization.
+
+Method
+PMF BiasedMF NMF BNMF URP SVD++
+
+MovieLens
+factors ¼ 8, c ¼ 0:01, k ¼ 0:045 factors ¼ 6, c ¼ 0:01, k ¼ 0:055
+factors ¼ 2
+factors ¼ 10, a ¼ 0:6, b ¼ 5
+factors ¼ 10
+factors ¼ 4, c ¼ 0:0014, k ¼ 0:05
+
+FilmTrust
+factors ¼ 4, c ¼ 0:015, k ¼ 0:1 factors ¼ 2, c ¼ 0:015, k ¼ 0:15
+factors ¼ 2
+factors ¼ 10, a ¼ 0:4, b ¼ 25
+factors ¼ 4
+factors ¼ 2, c ¼ 0:0014, k ¼ 0:02
+120
+
+MyAnimeList
+factors ¼ 10, c ¼ 0:005, k ¼ 0:085 factors ¼ 10, c ¼ 0:01, k ¼ 0:085
+factors ¼ 2
+factors ¼ 4, a ¼ 0:5, b ¼ 5
+factors ¼ 8
+factors ¼ 4, c ¼ 0:0015, k ¼ 0:1
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+The total number of all the possible combinations of these parameter values is 2400. In the MovieLens dataset, the min-
+imum prediction error was obtained using k ¼ 2, c ¼ 0:006, k ¼ 0:16 and m ¼ 100 iterations. In the same way, in the FilmTrust dataset, the hyperparameter values that minimize the prediction error are k ¼ 2, c ¼ 0:02, k ¼ 0:06 and m ¼ 75 iterations. In MyAnimeList, the best predictions are estimated using k ¼ 4, c ¼ 0:004, k ¼ 0:1 and m ¼ 100 iterations.
+The quality of the predictions and recommendations provided by a CF-based RS must be evaluated using standard quality
+measures. To measure the quality of the predictions, we deﬁne MAE (Eq. (3)) as the mean absolute difference between the test ratings (Ru;i) and their predictions (R^u;i) and deﬁne coverage (Eq. (4)) as the proportion of test ratings that a CF can predict (R^u;i – ) concerning the total number of test ratings. Here, Rtest is the collection of pairs hu; ii of user u and item i in the test split of the dataset, and #Rtest denotes its cardinality.
+
+MAE
+
+¼
+
+1 #Rtest
+
+X kRu;i
+hu;ii2Rtest
+
+À
+
+R^u;ij:
+
+ð3Þ
+
+Coverage
+
+¼
+
+#fhu;
+
+ii
+
+2 RtextjR^u;i #Rtest
+
+–
+
+g
+
+:
+
+ð4Þ
+
+On the other hand, ﬁxing n > 0 to measure the quality of the top n recommendations, we can consider two adapted qual-
+
+ity measures. The ﬁrst quality measure is precision, which is given by the averaged proportion of successful recommenda-
+
+tions
+
+that
+
+are
+
+included
+
+in
+
+the
+
+recommendation
+
+list
+
+of
+
+user
+
+u
+
+of
+
+maximum
+
+length
+
+n,
+
+which
+
+is
+
+denoted
+
+T
+
+n u
+
+,
+
+with
+
+respect
+
+to
+
+the
+
+size of the recommendation list (Eq. (5)). The second quality measure is recall, which is the averaged proportion of successful
+
+recommendations included in the recommendation list of user u, Tnu, with respect to the total number of test items that user u likes (Eq. (6)).
+
+precision
+
+¼
+
+1 N
+
+XN
+u¼1
+
+fi
+
+2
+
+T
+
+n u
+
+jRu;i
+
+#T
+
+n u
+
+P
+
+hg
+
+:
+
+ð5Þ
+
+recall
+
+¼
+
+1 N
+
+XN
+u¼1
+
+fi
+
+2
+
+T
+
+n u
+
+jRu;i
+
+P
+
+hg
+
+fi 2 RtuestjRu;i P hg
+
+:
+
+ð6Þ
+
+In the previous formulae, u runs over the users of the dataset, N is the total number of users, Rtuest is the collection of items rated by user u in the test split and h is a threshold to discern if a user likes an item (Ru;i P h) or not (Ru;i < h).
+
+3.2. Experimental results
+
+The most popular MF based CF methods are constructed as regressors because they assume that rating values are continuous, and consequently, their predictions are real values. Conversely, the BeMF model has been designed to work with discrete rating values so that it solves the classiﬁcation problem in which the classes are the possible scores with which items are rated. A confusion matrix is a graphical representation tool that is used to evaluate the output of a classiﬁer. Columns contain the predicted labels, rows contain the real labels and cells denote the proportion of samples of a label that have been predicted with another label. Fig. 3 contains the confusion matrix of the BeMF model’s predictions for the MovieLens (a),
+
+Fig. 3. Confusion matrix of the classiﬁcation performed by BeMF. 121
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+Fig. 4. Histogram of the reliability values of BeMF’s test predictions.
+
+Fig. 5. Quality of the predictions measured by MAE and coverage. Predictions with lower reliability than those indicated on the x-axis are ﬁltered out.
+FilmTrust (b) and MyAnimeList (c) datasets. We observe that most of the predictions are correct. However, the model tends to return predictions for high scores due to the bias of the datasets employed in CF, where users tend to rate only items that they like.
+The BeMF model is capable of providing not only rating prediction but also the reliability of this prediction. The reliability values indicate the model’s conﬁdence in the predictions. Fig. 4 shows the histograms with the distribution of the reliability values of the test predictions in the MovieLens (a), FilmTrust (b) and MyAnimeList (c) datasets. These histograms show that the reliability distribution shape is the same for the three tested datasets: most of the reliability values belong to the interval
+122
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+Fig. 6. Quality of the predictions measured by MAE and coverage. Predictions with lower reliability than those indicated on the x-axis are ﬁltered out. Models with the sufﬁx * obtain their reliability values using [50].
+
+Table 8 RPI values for the native reliability values provided by BeMF and the reliability values enforced by [50].
+
+Dataset
+MovieLens FilmTrust MyAnimeList
+
+BeMF (native)
+0.09344191 0.17187947 0.17087788
+
+BeMF (enforced)
+0.03607168 0.03277490 0.03386983
+
+½0:3; 0:5, which means a conﬁdence interval between 30% to 50% in the predicted rating, and there are few reliabilities with values greater than 0:75.
+The reliability value allows us to calibrate the output of the BeMF model. By ﬁltering out less reliable predictions, we decrease the coverage of the model (i.e., some predictions cannot be issued because the model does not have enough conﬁdence to make them) but increase the prediction accuracy. It is reasonable to think that predictions with high reliability are more obvious than predictions with low reliability. For example, if a user has positively rated Star Wars Episode IV (A New Hope) and Star Wars Episode V (The Empire Strikes Back), the model will have high conﬁdence in the positive interest of the user to Star Wars Episode VI (Return of the Jedi) and will assign a high reliability value to this prediction. Conversely, the same model will have less conﬁdence in the interest of the user in other sci-ﬁ movies, such as Interstellar or Gravity, and will assign lower reliability values to these predictions.
+Fig. 5 analyzes the impact of the reliability measure on the quality of the predictions. We have contrasted the prediction error against the predictability of the model using the MAE and coverage quality measures that are deﬁned in Eqs. (3), (4), respectively. The plots were generated by ﬁltering all the predictions with lower reliability than the reliability denoted on the x-axis. Note that only the models that return prediction reliabilities (refer to Table 6) can ﬁlter their predictions; the remaining predictions are shown as a horizontal line in the plot. All the plots exhibit the same trend: The prediction error is reduced when unreliable predictions are ﬁltered out. Consequently, the coverage of the model also decreases. In any case,
+123
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+Fig. 7. Comparison of the quality of the predictions returned by CF based on KNN with respect to BeMF. BeMF is shown by ﬁltering out predictions with a reliability lower than 0.3 (BeMF 0.3), 0.5 (BeMF 0.5) or 0.7 (BeMF 0.7).
+the prediction accuracy improvement of the BeMF model with respect to the evaluated baselines is signiﬁcant when the coverage is between 50% and 75%.
+Despite the satisfactory results reported by the BeMF model in the previous experiment, we consider it unfair because not some recommendation models do not beneﬁt from ﬁltering out unreliable predictions. Several methods exist to extend CF-based RSs, which add reliability to their predictions. One of the most popular methods is presented in [50]. In this paper, the authors propose computing an auxiliary MF model that factorizes a matrix that contains the prediction errors. The authors claim that high reliability values are produced by low prediction errors, and vice versa.
+Fig. 6 contains the results of repeating the experiment shown in Fig. 5 but adding a reliability value to the predictions performed by BiasedMF, BNMF, NMF, PMF and SVD++ using [50]. The trend observed in the previous experiment is again observed: When unreliable predictions are ﬁltered out, the error decreases and the coverage decreases. However, the reliability values enforced by [50] do not achieve results that are as satisfactory as those achieved by the native reliability implemented by BeMF.
+At this point, it is reasonable to consider that the tuple hprediction; reliabilityi that is returned by the BeMF model substantially improves the quality of predictions thanks to the accuracy of the reliability values. To conﬁrm the accuracy of the native reliability values returned by the BeMF model, we have compared them against the reliability values enforced by [50] when applied to the BeMF model’s predictions. To compare both quality measures, we will use RPI [6]. Table 8 contains the results of this experiment. We can observe that the native BeMF reliability values signiﬁcantly improve those enforced by [50].
+Previous experiments demonstrate that the satisfactory results are a consequence of including the reliability of the predictions in the model output. As we previously stated, BeMF can be calibrated to return few but very reliable predictions or many but less reliable predictions. This property is very innovative in MF but not in CF. KNN-based CF systems contain a hyperparameter that tunes the number of neighbors that are considered to issue the prediction. If a low number of neighbors is selected, few predictions are returned, but they are more accurate. Conversely, if a high number of neighbors is selected, many predictions are returned, but they are less accurate. BeMF should signiﬁcantly improve the quality of the predictions
+124
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+Fig. 8. Quality of the recommendations measured by precision and recall. Recommendations with a lower probability than those denoted on the x-axis are ﬁltered out.
+returned by KNN. To evaluate this hypothesis, BeMF has been compared with user-based KNN and item-based KNN using JMSD [8] as a similarity metric. The results of this comparison are shown in Fig. 7. We observe that the predictions returned by BeMF have less error than the predictions returned by KNN-based methods, independent of whether the predictions returned by BeMF have been ﬁltered with a reliability lower than 0.3 (BeMF 0.3), 0.5 (BeMF 0.5) or 0.7 (BeMF 0.7).
+To analyze the quality of the recommendations, we measured the precision (Eq. (5)) and recall (Eq. (6)) of the top 10 recommendations (n ¼ 10). To discern whether a recommendation is right or wrong, we have ﬁxed the threshold that determines the items that interest a user based on his/her test ratings to h ¼ 4 in MovieLens, h ¼ 3:5 in FilmTrust and h ¼ 7 in MyAnimeList.
+Recommendation lists, including the top 10 test items, were built in two ways. If the recommendation method provides the reliability of the recommendations (refer to Table 6), we have selected the top 10 test items with the highest probability
+of being liked by the user (reliability qu;i P #). On the other hand, if the recommendation method does not provide the reli-
+ability of the recommendations, we have selected the top 10 test items with the highest prediction (R^u;i), excluding those who have a prediction lower than h. Note that # and h have different roles: the former is a threshold in the desired reliability, while the latter is a threshold in the predicted score. The results of this comparison are shown in Fig. 8.
+This plot shows that when recommendations with a lower probability than those denoted on the x-axis are ﬁltered out, the precision value increases and the recall value declines. BeMF is the recommendation method that provides the best precision when the item’s minimum probability of being liked is between 0:5 and 0:75. BNMF achieves the best precision with probabilities higher than 0:75. However, the recall value is so low in these cases that the recommendation ability of the method is seriously impaired. Therefore, BeMF provides a better balance between the quality of the recommendations (precision) and the capability of the recommendation items (recall).
+4. Conclusions
+In this paper, we have presented the BeMF model, which is an MF-based CF algorithm that returns not only predictions for items that are not rated by users but also the reliability of these predictions. This outcome is achieved by addressing the recommendation process as a classiﬁcation problem rather than a regression problem. The pair hprediction; reliabilityi that is
+125
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+returned by the BeMF model allows us to calibrate its output to obtain the proper balance between the quality of the predictions and the quantity of the predictions (i.e., to decrease the prediction error by reducing the model’s coverage). Likewise, the BeMF model allows us to estimate the reliability of a recommendation by obtaining the probability that a user has interest in an item. This approach is innovative approach that improves accuracy by selecting recommendations with the highest reliability values and providing explicit reliability values to the users.
+The experimental results carried out on the MovieLens, FilmTrust and MyAnimeList datasets show the distinct superiority of the BeMF model against not only other MF models but also alternative approaches such as KNN when ﬁltering out unreliable predictions and recommendations. BeMF has also proven to achieve a better balance between the quality of the recommendations (precision) and the capability of recommending items (recall). The authors of this work are committed to reproducible science, so the source code of all the experiments conducted in this article is publicly accessible and was tested against benchmark datasets that are included in the open source project CF4J.
+One of the most important reasons for this outperformance is that reliability is a native concept in BeMF and does not depend on external methods or extended architectures as existing solutions. Using the Bernoulli distribution, BeMF can model the rating action as a stochastic process, in which the decision of assigning a particular score is not deterministic but depends on some psychologically and environmentally imponderable factors of the users (e.g., its frame of mind) and the items (e.g., hype around a long-awaited movie). In this way, reliability is intrinsically linked to BeMF, and in some sense, is the main focus of the algorithm: prediction is just a byproduct that is obtained by choosing the most reliable score. This focus is in sharp contrast with reliability measures that can be artiﬁcially added to other methods, which are based on either a secondary MF to predict the expected error [50] or a similarity measure that is computed on the selected neighbors [8].
+On the other hand, the URP returns a native reliability measure, which is provided via a probabilistic model of the behaviors of the users (essentially a multinomial distribution). However, in this case, the proposed distribution imposes strong topological restrictions on the obtained reliability measures. If the URP returns that the most likely score for an item from a given user is s 2 S, then the shape of the multinomial distribution forces that s À 1 and s þ 1 are also very likely ratings. In particular, the obtained distributions are unimodal, so reliability is essentially a measure of closeness to the mode. Conversely, BeMF supports any discrete distribution, including multimodal distributions, as output. This ﬁnding implies that BeMF’s reliability is much richer, and it may reach a valley between two modes, e.g., if an item is very controversial and is usually rated very well or very bad.
+In future work, we propose conducting a more in-depth analysis of the impact of the proposed model beyond the quality of the predictions and recommendations. We propose studying the quality of BeMF beyond accuracy quality measures, such as novelty, diversity or discovery. Similarly, we propose to study the stability of the model against shilling attacks that are performed to nuke or promote particular items.
+Another interesting research area is the use of other probability distributions as underlying assumptions for the MF method. In this paper, we modeled the ratings as a D-dimensional vector of independent Bernoulli random variables, which enables efﬁcient parallel training for each possible rating and reduces the number of hyperparameters of the model. Nevertheless, some dependency among random scores can be imposed. This dependency, such as modeling votes as a normal distribution in PMF [32] or as a binomial distribution in BNMF [16], has been previously reported in the literature. A prospective work would be to explore other types of distributions that allow us to improve the performance in speciﬁc tasks. For instance, modeling the ratings as an exponential distribution allows the model to capture and exploit rare events, such as recommending underrated movies to speciﬁc users or providing accurate predictions to cold users.
+On the other hand, this new model can be extended. Therefore, we propose incorporating social and content information to improve the quality of the predictions. We also propose adapting BeMF to make recommendations to user groups. An interesting research area would be to add time information to the model to reﬂect the changes in the opinions of the users over time.
+
+CRediT authorship contribution statement
+Fernando Ortega: Conceptualization, Software, Investigation, Writing - original draft, Writing - review & editing, Supervision, Project administration. Raúl Lara-Cabrera: Software, Resources, Data curation, Writing - original draft, Writing review & editing, Visualization. Ángel González-Prieto: Conceptualization, Formal analysis, Writing - original draft, Writing - review & editing. Jesús Bobadilla: Validation, Writing - original draft, Writing - review & editing, Funding acquisition.
+Declaration of Competing Interest
+The authors declare that they have no known competing ﬁnancial interests or personal relationships that could have appeared to inﬂuence the work reported in this paper.
+Acknowledgments
+This work has been supported by the Agencia Estatal de Investigación of Spain under grant PID2019-106493RB-I00 / AEI / 10.13039/501100011033 (DL-CEMG) and by the Ministerio de Ciencia e Innovación of Spain and European Regional Develop-
+126
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+ment Fund (FEDER) under grant TIN2017-85727-C4-3-P (DeepBio). The authors thank Dolores Abernathy for very useful conversations regarding the application of logistic functions to the model.
+
+References
+[1] S. Ahmadian, M. Afsharchi, M. Meghdadi, A novel approach based on multi-view reliability measures to alleviate data sparsity in recommender systems, Multimedia Tools and Applications 78(13) (2019) 17763–17798. ISSN 1573-7721..
+[2] M.Y.H. Al-Shamri. User proﬁling approaches for demographic recommender systems, Knowledge-Based Systems 100 (2016) 175–187. ISSN 09507051..
+[3] M.M. Azadjalal, P. Moradi, A. Abdollahpouri, M. Jalili, A trust-aware recommendation method based on Pareto dominance and conﬁdence concepts, Knowledge-Based Systems 116 (2017) 130–143. ISSN 0950-7051..
+[4] Z. Batmaz, A. Yurekli, A. Bilge, C. Kaleli. A review on deep learning for recommender systems: challenges and remedies, Artiﬁcial Intelligence Review 52 (1) (2019) 1–37. ISSN 1573-7462..
+[5] J. Bobadilla, S. Alonso, A. Hernando, Deep learning architecture for collaborative ﬁltering recommender systems, Applied Sciences 10(7) (2020) 2441. ISSN 2076-3417..
+[6] J. Bobadilla, A. Gutiérrez, F. Ortega, B. Zhu, Reliability quality measures for recommender systems, Information Sciences 442 (2018) 145–157. [7] J. Bobadilla, F. Ortega, A. Hernando, A. Gutiérrez, Recommender systems survey, Knowledge-Based Systems 46 (2013) 109–132. ISSN 0950-7051.. [8] J. Bobadilla, F. Serradilla, J. Bernal, A new collaborative ﬁltering metric that improves the behavior of recommender systems, Knowledge-Based Systems
+23 (6) (2010) 520–528. [9] S. Deng, L. Huang, G. Xu, X. Wu, Z. Wu, On deep learning for trust-aware recommendations in social networks, IEEE Transactions on Neural Networks
+and Learning Systems 28(5) (2016) 1164–1177. ISSN 2162-2388.. [10] S. Fan, H. Yu, H. Huang, An improved collaborative ﬁltering recommendation algorithm based on reliability, in: 2018 IEEE 3rd International Conference
+on Cloud Computing and Big Data Analysis (ICCCBDA), 2018, pp. 45–51. [11] F.S. Gohari, F.S. Aliee, H. Haghighi, A new conﬁdence-based recommendation approach: Combining trust and certainty, Information Sciences 422
+(2018) 21–50. ISSN 0020-0255.. [12] P. Gravino, B. Monechi, V. Loreto, Towards novelty-driven recommender systems, Comptes Rendus Physique 20(4) (2019) 371–379. ISSN 1631-0705.. [13] G. Guo, J. Zhang, N. Yorke-Smith, A novel bayesian similarity measure for recommender systems, in: Proceedings of the 23rd International Joint
+Conference on Artiﬁcial Intelligence (IJCAI), 2013, pp. 2619–2625. [14] F.M. Harper, J.A. Konstan, The movielens datasets: History and context, ACM Transactions on Interactive Intelligent Systems 5 (4) (2015) 1–19. [15] J.L. Herlocker, J.A. Konstan, L.G. Terveen, J.T. Riedl, Evaluating collaborative ﬁltering recommender systems, ACM Transactions on Information Systems
+22(1) (2004) 5–53. ISSN 1046-8188.. [16] A. Hernando, J. Bobadilla, F. Ortega, A non negative matrix factorization for collaborative ﬁltering recommender systems based on a Bayesian
+probabilistic model, Knowledge-Based Systems 97 (2016) 188–202. ISSN 0950-7051.. [17] A. Hernando, J. Bobadilla, F. Ortega, J. Tejedor, Incorporating reliability measurements into the predictions of a recommender system, Information
+Sciences 218 (2013) 1–16. ISSN 0020-0255.. [18] V. Yu. Ignat’ev, D.V. Lemtyuzhnikova, D.I. Rul’, I.L. Ryabov, Constructing a hybrid recommender system, Journal of Computer and Systems Sciences
+International 57(6) (2018) 921–926. ISSN 1555-6530.. [19] M. Kaminskas, D. Bridge, Diversity, serendipity, novelty, and coverage: a survey and empirical analysis of beyond-accuracy objectives in recommender
+systems, ACM Transactions on Interactive Intelligent Systems 7(1) (2016) 1–42. ISSN 2160-6455.. [20] Y. Koren, Factorization meets the neighborhood: a multifaceted collaborative ﬁltering model, Proceedings of the 14th ACM SIGKDD International
+Conference on Knowledge Discovery and Data Mining, KDD’08, Association for Computing Machinery, New York, NY, USA, 2008, pp. 426–434. [21] Y. Koren, R. Bell, C. Volinsky, Matrix factorization techniques for recommender systems, Computer 42(8) (2009) 30–37. ISSN 1558-0814.. [22] Y. Koren, J. Sill, OrdRec: An ordinal model for predicting personalized item rating distributions, Proceedings of the Fifth ACM Conference on
+Recommender Systems, RecSys’11, Association for Computing Machinery, New York, NY, USA, 2011, pp. 117–124. [23] D.D. Lee, H.S. Seung, Algorithms for non-negative matrix factorization, in: T.K. Leen, T.G. Dietterich, V. Tresp, (Eds.), Advances in Neural Information
+Processing Systems, vol. 13, MIT Press, 2001, pp. 556–562.. [24] H. Li, Y. Liu, Y. Qian, N. Mamoulis, W. Tu, D.W. Cheung. HHMF: hidden hierarchical matrix factorization for recommender systems, Data Mining and
+Knowledge Discovery 33(6) (2019) 1548–1582. ISSN 1573-756X.. [25] Y. Liang, C. Huang, X. Bao, K. Xu, Sequential dynamic event recommendation in event-based social networks: An upper conﬁdence bound approach,
+Information Sciences 542 (2021) 1–23. ISSN 0020-0255.. [26] Q. Madera, O. Castillo, M. García-Valdez, A. Mancilla, A method based on interactive evolutionary computation and fuzzy logic for increasing the
+effectiveness of advertising campaigns, Information Sciences 414 (2017) 175–186. ISSN 0020–0255.. [27] D. Margaris, C. Vassilakis, D. Spiliotopoulos, What makes a review a reliable rating in recommender systems? Information Processing & Management
+57(6) (2020) 102304. ISSN 0306-4573.. [28] B. Marlin, Modeling user rating proﬁles for collaborative ﬁltering, Proceedings of the 16th International Conference on Neural Information Processing
+Systems, NIPS’03, MIT Press, Cambridge, MA, USA, 2003, pp. 627–634. [29] C. Martinez-Cruz, C. Porcel, J. Bernabé-Moreno, E. Herrera-Viedma, A model to represent users trust in recommender systems using ontologies and
+fuzzy linguistic modeling, Information Sciences 311 (2015) 102–118. ISSN 0020-0255.. [30] M.A. Mazurowski. Estimating conﬁdence of individual rating predictions in collaborative ﬁltering recommender systems, Expert Systems with
+Applications 40(10) (2013) 3847–3857. ISSN 0957-4174.. [31] R.M. Mesas, A. Bellogín, Exploiting recommendation conﬁdence in decision-aware recommender systems, Journal of Intelligent Information Systems
+54(1) (2020) 45–78. ISSN 1573-7675.. [32] A. Mnih R.R. Salakhutdinov, Probabilistic matrix factorization, in: Advances in Neural Information Processing Systems (2008) pp. 1257–1264.. [33] P. Moradi, S. Ahmadian, A reliability-based recommendation method to improve trust-aware recommender systems, Expert Systems with Applications
+42(21) (2015) 7386–7398. ISSN 0957-4174.. [34] P. Moradi, S. Ahmadian, F. Akhlaghian, An effective trust-based recommendation method using a novel graph clustering algorithm, Physica A:
+Statistical Mechanics and its Applications 436 (2015) 462–481. ISSN 0378-4371.. [35] N. Nguyen-Thanh, D. Marinca, K. Khawam, D. Rohde, F. Vasile, E.S. Lohan, S. Martin, D. Quadri, Recommendation System-based Upper Conﬁdence
+Bound for Online Advertising. ArXiv e-prints, 2019.. [36] F. Ortega, B. Zhu, J. Bobadilla, A. Hernando, CF4J: Collaborative ﬁltering for Java, Knowledge-Based Systems 152 (2018) 94–99. [37] M.G. Ozsoy, F. Polat, Trust based recommendation systems, Proceedings of the 2013 IEEE/ACM International Conference on Advances in Social
+Networks Analysis and Mining, ASONAM’13, Association for Computing Machinery, New York, NY, USA, 2013, pp. 1267–1274. [38] X. Ramirez-Garcia, M. García-Valdez, Post-Filtering for a Restaurant Context-Aware Recommender System, Springer, Cham, 2014, pp. 695–707. [39] X. Ramirez-Garcia, M. Garcia-Valdez, A Pre-ﬁltering based context-aware recommender system using fuzzy rules, Springer, Cham, 2015, pp. 497–505.
+ISBN 978-3-319-17746-5.. [40] A. Rezvanian, B. Moradabadi, M. Ghavipour, M.M. Daliri Khomami, M.R. Meybodi, Social Recommender Systems, Springer International Publishing,
+Cham, 2019, pp. 281–313. [41] G. Shani, A. Gunawardana, Evaluating Recommendation Systems, Springer, US, Boston, MA, 2011, pp. 257–297.
+127
+
+F. Ortega, Raúl Lara-Cabrera, Á. González-Prieto et al.
+
+Information Sciences 553 (2021) 110–128
+
+[42] S.S. Sohail, J. Siddiqui, R. Ali, Classiﬁcations of recommender systems: a review, Journal of Engineering Science and Technology Review 10(4) (2017) 132–153. ISSN 1791-2377..
+[43] Z. Su, X. Zheng, J. Ai, L. Shang, Y. Shen, Link prediction in recommender systems with conﬁdence measures, Chaos: An Interdisciplinary Journal of Nonlinear Science 29(8) (2019) 083133. ISSN 1054-1500..
+[44] N.M. Villegas, C. Sánchez, J. Díaz-Cely, G. Tamura, Characterizing context-aware recommender systems: A systematic literature review, KnowledgeBased Systems 140 (2018) 173–200. ISSN 0950-7051..
+[45] W. Wang, G. Zhang, J. Lu, Collaborative ﬁltering with entropy-driven user similarity in recommender systems, International Journal of Intelligent Systems 30(8) (2015) 854–870. ISSN 0884-8173..
+[46] X. Wu, X. Yuan, C. Duan, J. Wu, A novel collaborative ﬁltering algorithm of machine learning by integrating restricted Boltzmann machine and trust information, Neural Computing and Applications 31(9) (2019) 4685–4692. ISSN 1433-3058..
+[47] G. Xu, Z. Tang, C. Ma, Y. Liu, M. Daneshmand, A collaborative ﬁltering recommendation algorithm based on user conﬁdence and time context, Journal of Electrical and Computer Engineering 2019 (2019). ISSN 2090-0147..
+[48] H. Zamani A. Shakery, A language model-based framework for multi-publisher content-based recommender systems, Information Retrieval Journal 21 (5) (2018) 369–409. ISSN 1573-7659..
+[49] S. Zhang, L. Liu, Z. Chen, H. Zhong, Probabilistic matrix factorization with personalized differential privacy, Knowledge-Based Systems 183 (2019) 104864. ISSN 0950-7051..
+[50] B. Zhu, F. Ortega, J. Bobadilla, A. Gutiérrez, Assigning reliability values to recommendations using matrix factorization, Journal of Computational Science 26 (2018) 165–177.
+
+128
+

@@ -1,0 +1,123 @@
+ 
+Processing math: 100% 
+Your Privacy 
+ 
+We use cookies to make sure that our website works properly, as well as some ‘optional’ cookies to personalise content and advertising, provide social media features and analyse how people use our site. By accepting some or all optional cookies you give consent to the processing of your personal data, including transfer to third parties, some in countries outside of the European Economic Area that do not offer the same data protection standards as the country where you live. You can decide which optional cookies to accept by clicking on ‘Manage Settings’, where you can also find more information about how your personal data is processed. Further information can be found in our privacy policy . 
+Accept All Cookies Manage Preferences 
+Skip to main content Skip to sections 
+ 
+This service is more advanced with JavaScript available 
+ 
+Advertisement 
+Hide 
+SpringerLink 
+Search 
+Go to cart 
+ 
+Menu 
+Annual Cryptology Conference 
+ 
+CRYPTO 2012 : Advances in Cryptology – CRYPTO 2012 pp 643-662 | Cite as 
+Multiparty Computation from Somewhat Homomorphic Encryption 
+ 
+    Authors 
+    Authors and affiliations  
+ 
+    Ivan Damgård 
+    Valerio Pastro 
+    Nigel Smart 
+    Sarah Zakarias  
+ 
+Conference paper 
+ 
+    412 Citations 
+    6 Mentions 
+    8.4k Downloads 
+ 
+Part of the Lecture Notes in Computer Science book series (LNCS, volume 7417) 
+Abstract 
+ 
+We propose a general multiparty computation protocol secure against an active adversary corrupting up to n-1 of the n players. The protocol may be used to compute securely arithmetic circuits over any finite field \mathbb {F}_{p^k} . Our protocol consists of a preprocessing phase that is both independent of the function to be computed and of the inputs, and a much more efficient online phase where the actual computation takes place. The online phase is unconditionally secure and has total computational (and communication) complexity linear in n , the number of players, where earlier work was quadratic in n . Moreover, the work done by each player is only a small constant factor larger than what one would need to compute the circuit in the clear. We show this is optimal for computation in large fields. In practice, for 3 players, a secure 64-bit multiplication can be done in 0.05 ms. Our preprocessing is based on a somewhat homomorphic cryptosystem. We extend a scheme by Brakerski et al., so that we can perform distributed decryption and handle many values in parallel in one ciphertext. The computational complexity of our preprocessing phase is dominated by the public-key operations, we need O(n^2/s) operations per secure multiplication where s is a parameter that increases with the security parameter of the cryptosystem. Earlier work in this model needed \varOmega (n^2) operations. In practice, the preprocessing prepares a secure 64-bit multiplication for 3 players in about 13 ms. 
+Keywords 
+Secret Share Scheme  Message Authentication Code  Homomorphic Encryption  Oblivious Transfer  Arithmetic Circuit  
+These keywords were added by machine and not by the authors. This process is experimental and the keywords may be updated as the learning algorithm improves. 
+Download to read the full conference paper text 
+References 
+ 
+    1. 
+    Asharov, G., Jain, A., López-Alt, A., Tromer, E., Vaikuntanathan, V., Wichs, D.: Multiparty Computation with Low Communication, Computation and Interaction via Threshold FHE. In: Pointcheval, D., Johansson, T. (eds.) EUROCRYPT 2012. LNCS, vol. 7237, pp. 483–501. Springer, Heidelberg (2012) CrossRef Google Scholar 
+    2. 
+    Beaver, D.: Efficient Multiparty Protocols Using Circuit Randomization. In: Feigenbaum, J. (ed.) CRYPTO 1991. LNCS, vol. 576, pp. 420–432. Springer, Heidelberg (1992) Google Scholar 
+    3. 
+    Bendlin, R., Damgård, I., Orlandi, C., Zakarias, S.: Semi-homomorphic Encryption and Multiparty Computation. In: Paterson, K.G. (ed.) EUROCRYPT 2011. LNCS, vol. 6632, pp. 169–188. Springer, Heidelberg (2011) CrossRef Google Scholar 
+    4. 
+    Brakerski, Z., Gentry, C., Vaikuntanathan, V.: Fully homomorphic encryption without bootstrapping. Electronic Colloquium on Computational Complexity (ECCC) 18, 111 (2011) Google Scholar 
+    5. 
+    Brakerski, Z., Vaikuntanathan, V.: Fully Homomorphic Encryption from Ring-LWE and Security for Key Dependent Messages. In: Rogaway, P. (ed.) CRYPTO 2011. LNCS, vol. 6841, pp. 505–524. Springer, Heidelberg (2011) CrossRef Google Scholar 
+    6. 
+    Canetti, R., Lindell, Y., Ostrovsky, R., Sahai, A.: Universally composable two-party and multi-party secure computation. In: STOC, pp. 494–503 (2002) Google Scholar 
+    7. 
+    Damgård, I., Keller, M., Larraia, E., Miles, C., Smart, N.P.: Implementing AES via an actively/covertly secure dishonest-majority MPC protocol. IACR Cryptology ePrint Archive, 2012:262 (2012) Google Scholar 
+    8. 
+    Damgård, I.B., Nielsen, J.B.: Perfect Hiding and Perfect Binding Universally Composable Commitment Schemes with Constant Expansion Factor. In: Yung, M. (ed.) CRYPTO 2002. LNCS, vol. 2442, pp. 581–596. Springer, Heidelberg (2002) CrossRef Google Scholar 
+    9. 
+    Damgård, I., Orlandi, C.: Multiparty Computation for Dishonest Majority: From Passive to Active Security at Low Cost. In: Rabin, T. (ed.) CRYPTO 2010. LNCS, vol. 6223, pp. 558–576. Springer, Heidelberg (2010) CrossRef Google Scholar 
+    10. 
+    Gentry, C.: Fully homomorphic encryption using ideal lattices. In: Mitzenmacher, M. (ed.) STOC, pp. 169–178. ACM (2009) Google Scholar 
+    11. 
+    Gentry, C., Halevi, S., Smart, N.P.: Fully Homomorphic Encryption with Polylog Overhead. In: Pointcheval, D., Johansson, T. (eds.) EUROCRYPT 2012. LNCS, vol. 7237, pp. 465–482. Springer, Heidelberg (2012) CrossRef Google Scholar 
+    12. 
+    Ishai, Y., Kushilevitz, E., Ostrovsky, R., Sahai, A.: Zero-knowledge from secure multiparty computation. In: Johnson, D.S., Feige, U. (eds.) STOC, pp. 21–30. ACM (2007) Google Scholar 
+    13. 
+    Ishai, Y., Prabhakaran, M., Sahai, A.: Founding Cryptography on Oblivious Transfer – Efficiently. In: Wagner, D. (ed.) CRYPTO 2008. LNCS, vol. 5157, pp. 572–591. Springer, Heidelberg (2008) CrossRef Google Scholar 
+    14. 
+    Lindell, Y.: Highly-Efficient Universally-Composable Commitments Based on the DDH Assumption. In: Paterson, K.G. (ed.) EUROCRYPT 2011. LNCS, vol. 6632, pp. 446–466. Springer, Heidelberg (2011) CrossRef Google Scholar 
+    15. 
+    Myers, S., Sergi, M., Shelat, A.: Threshold fully homomorphic encryption and secure computation. IACR Cryptology ePrint Archive, 2011:454 (2011) Google Scholar 
+    16. 
+    Nielsen, J.B., Nordholt, P.S., Orlandi, C., Burra, S.S.: A new approach to practical active-secure two-party computation. IACR Cryptology ePrint Archive, 2011:91 (2011) Google Scholar 
+    17. 
+    Smart, N.P., Vercauteren, F.: Fully homomorphic SIMD operations. IACR Cryptology ePrint Archive, 2011:133 (2011) Google Scholar 
+    18. 
+    Winkler, S., Wullschleger, J.: On the Efficiency of Classical and Quantum Oblivious Transfer Reductions. In: Rabin, T. (ed.) CRYPTO 2010. LNCS, vol. 6223, pp. 707–723. Springer, Heidelberg (2010) CrossRef Google Scholar 
+ 
+Copyright information 
+© International Association for Cryptologic Research 2012 2012 
+About this paper 
+ 
+Cite this paper as: 
+    Damgård I., Pastro V., Smart N., Zakarias S. (2012) Multiparty Computation from Somewhat Homomorphic Encryption. In: Safavi-Naini R., Canetti R. (eds) Advances in Cryptology – CRYPTO 2012. CRYPTO 2012. Lecture Notes in Computer Science, vol 7417. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-32009-5_38 
+ 
+    DOI https://doi.org/10.1007/978-3-642-32009-5_38 
+    Publisher Name Springer, Berlin, Heidelberg 
+    Print ISBN 978-3-642-32008-8 
+    Online ISBN 978-3-642-32009-5 
+    eBook Packages Computer Science Computer Science (R0) 
+ 
+    Reprints and Permissions 
+ 
+Multiparty Computation from Somewhat Homomorphic Encryption 
+Cite paper 
+Share paper 
+Actions 
+ 
+Over 10 million scientific documents at your fingertips 
+Academic Edition 
+ 
+    Home 
+    Impressum 
+    Legal information 
+    Privacy statement 
+    California privacy statement 
+    How we use cookies 
+    Manage cookies/Do not sell my data 
+    Accessibility 
+    FAQ 
+    Contact us 
+    Affiliate program 
+ 
+Springer Nature 
+ 
+© 2020 Springer Nature Switzerland AG. Part of Springer Nature . 
+ 
+Not logged in Not affiliated 122.118.163.95 

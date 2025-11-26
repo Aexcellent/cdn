@@ -1,0 +1,838 @@
+J. Cryptology (1994) 7:1-32
+
+Journal of
+CRYPTOLOGY
+9 1994 International Association for Cryptologic Research
+
+Definitions and Properties of Zero-Knowledge Proof Systems*
+Oded Goldreich and Yair Oren
+Department of Computer Science, Technion, Haifa, Israel
+Communicated by Shaft Goldwasser
+Received 26 February 1990 and revised 22 September 1992
+Abstract. In this paper we investigate some properties of zero-knowledge proofs, a notion introduced by Goldwasser, Micali, and Rackoff. We introduce and classify two definitions of zero-knowledge: auxiliary-input zero-knowledge and blackboxsimulation zero-knowledge. We explain why auxiliary-input zero-knowledge is a definitionmore suitable for cryptographic applications than the original [GMR 1] definition. In particular, we show that any protocol solely composed of subprotocols which are auxiliary-input zero-knowledge is itself auxiliary-input zeroknowledge. We show that blackbox-simulationzero-knowledge implies auxiliaryinput zero-knowledge (which in turn implies the [GMR1] definition). We argue that all known zero-knowledge proofs are in fact blackbox-simulation zeroknowledge (i.e.,we proved zero-knowledge using blackbox-simulationof the verifier).As a result, all known zero-knowledge proof systems are shown to be auxiliaryinput zero-knowledge and can be used for cryptographic applications such as those in [GMW2].
+We demonstrate the trivialityof certain classes of zero-knowledge proof systems, in the sense that only languages in BPP have zero-knowledge proofs of these classes. In particular, we show that any language having a Las Vegas zeroknowledge proof system necessarily belongs to RP. We show that randomness of both the verifier and the prover, and nontriviality of the interaction are essential properties of (nontrivial)auxiliary-inputzero-knowledge proofs.
+Key words. Zero-knowledge, Computational complexity, Computational indistinguishability,Cryptographic composition of protocols.
+1. Introduction
+The fundamental notion of zero-knowledge was introduced by Goldwasser et al. in [GMR1]. They considered a setting where a powerful prover is proving a theorem
+* This research was partially supported by the Fund for Basic Research Administered by the Israeli Academy of Sciencesand Humanities.Preliminaryversions ofthis work have appeared in [O1] and [02].
+
+2
+
+o. Goldreichand Y.Oren
+
+to a probabilistic polynomial-time verifier. Intuitively, a proof system is considered zero-knowledge if whatever the verifier can compute while interacting with the prover it can compute by itself without going through the protocol. The intriguing nature of this notion has raised considerable interest and many questions to be answered. Zero-knowledge proofs are of wide applicability in the field of cryptographic protocols, as demonstrated by Goldreich et al. in [ G M W l ] and [GMW2]. In this paper we investigate some aspects of these proof systems. We present new definitions of zero-knowledge, discuss their importance, and investigate their relative power. In the second part of the paper we demonstrate that certain properties are essential to zero-knowledge interactive proofs.
+
+1.1. Definitional Issues
+The original definition of zero-knowledge was presented in [GMR1]. This definition does not seem to capture fully the intuitive meaning of the concept of zeroknowledge. For one thing, it would be expected that the sequential application ("composition") of protocols, each of which is zero-knowledge, would yield a protocol which is itsdfzero-knowledge (in the same manner that summing any finite number of zeros would leave the total at zero). However, as claimed by Feige and Shamir [FS] and recently shown in [-GK], such a "composition theorem" cannot be proved for the [GMR1] definition.
+Another problem with this definition concerns its applicability to cryptographic protocols. Typically, zero-knowledge proof systems are used as subprotocols within larger cryptographic protocols. In such a scenario it is natural that a dishonest part (a "cheating" verifier in the zero-knowledge terminology) will compute its messages based on information acquired before the proof protocol began, possibly from earlier stages of the protocol in which the zero-knowledge proof is a subprotocol. We would like to require that even this additional information will not enable the verifier to obtain any knowledge from its interaction with the prover. (This is not guaranteed by the original definition.)
+In an effort to overcome these problems, we formulate the definition referred to as auxiliary-input zero-knowledge. Intuitively, the definition requires that whatever a verifier that has access to any information can compute when interacting with the prover, it can also compute by itself when having access to the same information.
+Apart from dealing with verifiers that "cheat" by means of using outside information, the proposed definition also enables us to prove a composition theorem. The fact that auxiliary-input zero-knowledge is closed under composition is crucial for the use of zero-knowledge proofs in the modular design of cryptographic protocols. In [GMW2] a compiler is presented that transforms any protocol correct in a weak adversarial model to a protocol correct in the strongest adversarial model. The existence of such a compiler relies heavily on the existence of auxiliary-input zeroknowledge proofs for every language in NP. On the other hand, the ability to derive such a strong result indicates that the auxiliary-input zero-knowledge definition is suitable for cryptographic purposes.
+The requirements of the auxiliary-input definition may seem very restrictive. However, all known zero-knowledge proof systems (e.g., [GMR1] and I-GMWl]) satisfy even a seemingly much stricter definition. All these protocols were proved
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+3
+
+zero-knowledge by presenting one algorithm that uses any verifier as a blackbox to simulate the interaction of that verifier with the prover. In fact it is hard to conceive an alternative way to prove a protocol zero-knowledge. We therefore present the definition of blackbox-simulation zero-knowledge, which formalizes this requirement. We show that blackbox-simulation zero-knowledge implies auxiliaryinput zero-knowledge. As a result, all known zero-knowledge proofs are auxiliaryinput zero-knowledge and can be used for cryptographic purposes such as those in [GMW2].
+Remark 1.1. The fact that the [GMR1] definition is not closed under composition, and that "nonuniform" verifiers could be used to overcome this problem, was observed independently by Goldwasser et al. [GMR2], Tompa and Woll [TW], and Feige and Shamir [FS].
+
+1.2. Essential Properties of Zero-Knowledoe
+Other results in this paper concern the triviality of certain classes of zero-knowledge proof systems. We consider a class of proof systems trivial in this context if only languages in BPP can have zero-knowledge proof systems of this type. The reason being that any BPP language has a trivial zero-knowledge proof: one in which the verifier checks by himself whether x ~ L or not. Proving the triviality of some class of proof systems can be thought of as demonstrating that some property (which this class lacks) is essential to zero-knowledge.
+In particular, we show that any language L possessing a Las Vegas zero-knowledge proof system (i.e., a proof system that never causes the verifier to accept on x r L) is in random polynomial time. It follows that the error probability on "no" instances, existing in all known zero-knowledge proofs, is inevitable and essential to the nontriviality of these proof systems. It is interesting to note that Les Vegas interactive proofs can exist only for languages in NP (see [GMS]).
+It is easy to see that the class of languages for which membership can be proved by a deterministic prover equals that for which membership can be proved by a probabilistic prover. (We can consider an optimal prover, i.e., one which always maximizes the acceptance probability. This prover computes in each case the "best possible" messages and can clearly be deterministic.) Thus, randomness of the prover is not essential to the power of interactive proof systems as far as language recognition is concerned. On the other hand, in all proof systems shown to be zero-knowledge the prover is probabilistic, and this property seems essential to the "zero-knowledgeness" of these proof systems. We show that this is no coincidence: only languages in BPP can have auxiliary-input zero-knowledge interactive proofs in which the prover is deterministic, and therefore randomness of the prover is essential to the nontriviality of the zero-knowledge proof system. We thus demonstrate a meaningful difference between general interactive proofs and zeroknowledge interactive proofs.
+Just as an error probability on "no" instances and randomness both of the prover and the verifier are essential to zero-knowledge proof systems, so is the nontriviality of the interaction. It can be easily shown that only languages in BPP can have one-step interactive proofs which are zero-knowledge. We show that the same holds
+
+4
+
+O. Goldreichand Y.Oren
+
+for two-step zero-knowledge proof systems under the auxiliary-input definition. In contrast, Aiello and Hastad [AH2] proved that, relative to some oracle A, two-step zero-knowledoe a c/z B p p A. Their proof holds for the original [GMR1] definition (actually for a stronger definition, see I-AH2]). The proof presents a two-step protocol which is a zero-knowledge interactive proof system for some language LA, but such that LA r BPP A.Since the prover in the protocol is deterministic, the result can also be interpreted as deterministic-prover zero-knowledoe A r BPP A. Our proofs for the two-step and determinstic prover cases, both holding for auxiliary-input zero-knowledge, relativize, and we can therefore conclude that neither will extend to the [GMR1] definition.
+Note that two-step protocols and determinstic-prover protocols can be zeroknowledge with respect to the prespecified verifier V (e.g., the two-step protocols for quadratic nonresiduosity [GMR1] and graph nonisomorphism [GMWl]). Therefore, unlike Fortnow IF] and Aiello and Hastad [AH1], who actually rely only on the fact that the prespecified verifier V has a simulator, we must in this case make use of the full power of the definition of zero-knowledge: specifically, the requirement that simulators for all verifiers, including the "cheaters," exist. Our results extend to zero-knowledge arguments, introduced in [BCC]. Zero-knowledge arguments differ from zero-knowledge interactive proofs, which are the main topic of our investigations, in that the former have a relaxed soundness condition (rather than requiring that it be impossible to fool the verifier into believing false statements, it is only required that cheating the verifier be computationally infeasible).
+Remark 1.2. We stress that if one-way functions exist, then every language in IP = PSPACE has a zero-knowledge proof system [GMWl], [IY], IS]. These proof systems have all the essential properties discussed above. Hence there seems to be a big difference between proof systems possessing these properties and those lacking them.
+Oroanization of the Paper. Section 2 contains some basic definitions and also an extension of the notion of polynomial indistinouishability which is required for the definitions presented in Section 3. In Section 3 we present our new definitions of zero-knowledge and investigate their relative power. We also prove the composition property of auxiliary-input zero-knowledge in that section. Section 4 contains our triviality results.
+
+2. Notation and Basic Definitions
+Let S be a set. By e ~ RS we mean that an element e is chosen at random from the set S with uniform probability distribution.
+When describing a protocol between two parties, A and B, we write A: action to mean party A performs some internal action (computation), and A~B:m to mean that A sends message m to B.
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+5
+
+We recall the definition of interactive proof systems [GMR1] (an alternative
+definition due to Babai [B] was shown to be equivalent by Goldwasser and Sipser IGS]): An interactive proof system for a language L is a protocol (i.e., a pair of local
+programs) for two probabilistic interactive machines called the prover and the verifier. Initially both machines have access to a common input tape. The two
+machines send messages to one another through two communication tapes. Each machine only sees its own tapes, the common input tape and the communication tapes. The verifier is bounded to a number of steps which is polynomial in the length
+of the common input, after which it stops in an accept state or in a reject state. We
+impose no restrictions on the local computation conducted by the prover, We require that, whenever the verifier is following its predetermined program, V, the following two conditions hold:
+(1) Completeness of the interactive proof system. If the prover runs its predeter-
+mined program, P, then, for every constant c > 0 and large enough x ~ L, the verifier accepts the common input x with probability at least 1 - I x V c. In other words, the prover can convince the verifier of x ~ L.
+(2) Soundness of the interactive proof system. For every program P*, run by the
+prover, for every constant c > 0 and large enough x r L, the verifier rejects x with probability at least 1 - txl -c. In other words, the prover cannot fool the verifier.
+An interactive proof system having P, V as programs is denoted by (P, V>.
+
+Definition. A t-step interactive proof system is one in which a total of t messages is
+sent by the two parties.
+
+Without loss of generality, we assume that the last message sent during an interactive proof is sent by the prover. (A last message sent by the verifier can have no role in convincing the verifier and therefore has absolutely no effect.) Thus, the prover sends the last (and only) message in a one-step interactive proof while in a two-step protocol the verifier sends a message first, followed by a response from the prover.
+The notion of polynomial indistinguishability of probability distributions is used
+in the definitions of zero-knowledge discussed in the next section. We extend the original [GM], l-Y] definition for the case of probability distributions indexed by two parameters, which are treated differently. This extension is required for the
+formal definition of auxiliary-input zero-knowledge presented in a later section. In
+that case, x is the common input to the protocol while y is the auxiliary-input to the verifier.
+
+Definition (Polynomial Indistinguishability). For every algorithm A, let pa~
+denote the probability that A outputs 1 on input (x, y) and an element chosen
+according to the probability distribution D(x, y). Denote by Dom the domain from which the pairs x, y are chosen. The distribution ensembles {D(x, Y)}x~y~Oomand {D'(x, Y)}x;y~oomare polynomially indistinguishable if, for every probabilistic algo-
+rithm A which runs time polynomial in the length of its first input (i.e., x), for every
+constant c > 0 there exists No such that for every x, Ixl > No, and for every y such
+
+6
+
+O. Goldreich and Y. Oren
+
+that (x, y) ~ Dom,
+Ipff~x." - pff'r I < Ixl -c.
+Note that we do not put any restrictions on the length of y, and in particular we do not require [Yl > No. The original definition is obtained from the above definition by omitting all mention of y. We occasionally avoid specifying the domain,
+and write {D(x, y)}x;y instead of {D(x,y)}~;y~aom. Two distribution ensembles {D(x, Y)}x;y~oomand {D'(x, Y)}x;y~oomare N O T polynomially indistinguishable if
+there exist a probabilistic polynomial-time algorithm A, a constant c > 0, and an
+infinite sequence Seq ofx's such that, for every x ~ Seq, there exist some y such that (x, y) ~ Dora and
+pAoli." _ pAO'l~." > Ixl -c.
+
+Definition. Let c > 0 be a constant and let D(x, y) and D'(x, y) be probability distributions over strings of length n > 1. We say that an algorithm A c-distinguishes between D(x, y) and D'(x, y) if
+1
+pAO~x., _ p~'~x., > ~n "
+
+Remark 2.1. Throughout this paper we use the phrases "with very high probabil-
+ity," "with (non-)negligible probability," and so on, to describe the behavior of
+algorithms. The formal interpretation of the statement "the algorithm behaves this way with very high probability" should be taken to be "the probability that the
+algorithm behaves this way on input of length n is greater than 1 - 1/Q(n) for any
+(positive) polynomial Q and sufficiently large n." Accordingly "negligible probabil-
+ity" is "less than l/Q(n) for any (positive) polynomial Q and sufficiently large n," and "nonnegligible probability" means "greater than 1/Q(n) for some polynomial Q and sufficiently large n." For convenience, we say that a function p(n) is c-nonngeligible, where c > 0, if p(n) > 1/nc for infinitely many n's.
+
+3. A Taxonomy of Zero-Knowledge Definitions
+In this section we present two alternative definitions of the notion of zero-knowl-
+edge, and investigate the relationship between them. We start by defining history descriptions and recalling the original zero-knowledge definition of [GMRI-I.
+Definition. A history description of a conversation between a machine V* and the
+prover P consists of the contents of all of V*'s read-only tapes (common input, random input, and, in the case of auxiliary-input zero-knowledge, also the auxiliary input) and of the sequence of messages sent by the prover during the interaction. We use [x, r, m] fix, y, r, m]) to denote history descriptions, where x is the common input (y the auxiliary input), r the random input to the verifier, and m the seqence
+of messages sent by the prover. We denote by (P(x), V*(x)) ((P(x), V*(x, y))) the
+probability distribution of history descriptions generated by the interaction of V* with P on x e L.
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+7
+
+Definition [GMR1]. An interactive proof system for a language L is zero-knowledge if, for all probabilistic polynomial-time machines V*, there exists a probabilistic polynomial-time algorithm My. that on input x produces a probability distribution Mv.(x) such that {Mv,(X)}x,L and {(e(x), V*(x))}x~. are polynomially
+indistinguishable.
+Remark 3.1. If we require that the above two probability distributions be equal, we obtain the definition referred to as perfect zero-knowledge. If we require them to be statistically close, we obtain almost-perfect zero-knowledge. (The definitions
+originate from [GMR1], and were named as above in IF].)
+Remark 3.2. In the definition above we required My, to simulate the history of V*'s interaction with P. An alternative definition is to require Mv. to generate the output of V* when interacting with P. Clearly, the output of V* is determined given the history, and therefore simulating the history is at least as hard as simulating the
+output. The converse may not be true for a specific verifier (in particular for V, the "honest" verifier). However, since, for every verifier V* there exists a verifier V'
+whose output is the history of the interaction of V* with P, it follows that, when
+quantifying over all verifiers, the two formalizations are equivalent. We use the history-based notion of zero-knowledge throughout this paper.
+3.1. New Definitions
+The first definition to be considered is motivated by cryptographic applications and
+is referred to as the auxiliary-input zero-knowledge definition. Let us elaborate on
+this motivation. Zero-knowledge interactive proofs are a powerful tool in the design of cryptographic protocols. Typically, they are used by a party to prove that it is computing its messages according to the protocol. It is crucial that these proofs are carried out without yielding the prover's secrets. In such a scenario it seems natural to assume that an adversarial party playing the role of the "verifier" will try to gain knowledge of interest to it. In order to do so the adversary may deviate from the specified program and compute its messages in a manner suited to its goals. Most probably it will want to base the computation of its messages on previously acquired information, possibly from earlier stages of the protocol in which the zero-knowledge proof is a subprotocol. Intuitively, we require that the proof system be such that even having this additional information cannot enable any V* to extract from its conversations with P anything that it could not compute by itself having that same information. To allow this possibility the interactive proof and zero-knowledge definitions introduced in I-GMRI] should be modified so that the verifier can have an auxiliary-input tape, through which the information that enables the "verifier" to compute the desired messages will be entered.
+
+Definition (Auxiliary-Input Zero-Knowledge). An interactive proof system for a
+language L is auxiliary-input zero-knowledge if, for every probabilistic polynomialtime machine V*, there exists a probabilistic polynomial-time machine My, such that the distribution ensembles {<P(x), V*(x, Y))}x;y~o, and {Mr,(X, Y)}x;y~o, are polynomially indistinguishable, where D1 --- {(x, y)lx ~ L, y ~ {0, 1}*}.
+
+8
+
+o. Goldreichand Y.Oren
+
+Note that by saying that V* is polynomial time we mean that its running time is bounded by a polynomial in the length of the common input. Machine V* has an additional input tape containing the auxiliary input y. During an interaction of V* on common input x, machine V* reads at most a poly(x).long prefix of its auxiliary input9 A similar convention holds for the simulator Mv, (i.e., its running time is polynomial in the length of its first input, and consequently it may only read a prefix of the second input).
+The second definition we consider is referred to as blackbox-simulation zeroknowledge. This definition requires the existence of a single polynomial-time machine Mu which simulates the interaction of any polynomial-time machine V* with the prover P on any x e L, using V* as a blackbox.
+What do we mean by "use V* as a blackbox"? A probabilistic algorithm in general can be viewed either as an algorithm which internally tosses coins or as a deterministic algorithm that has two inputs: a regular input and a random input. Two corresponding interpretations of "using a probabilistic algorithm as a blackbox" follow9 In the first case it means choosing an input and running the algorithm, while the algorithm internally flips its coins. In the second case it means choosing both inputs, and running the algorithm (the second input serves as the outcome of random coin tosses). Both these approaches extend naturally to probabilistic algorithms which also interact with other machines, as in our ease. We choose to adopt the second approach, that is, when using V* as a blackbox, the simulator Mu chooses both inputs to V*. All known zero-knowledge protocols were proved zero-knowledge using this approach. It is not clear if they could also be proved zero-knowledge when adopting the first approach.
+
+Definition (Blackbox-Simulation Zero-Knowledge). Denote by Ti,merI,'* (x) the running time of machine V* when interacting with P on input x. An interactive proof system for a language L is blackbox-simulation zero-knowledge if there exists a probabilistic polynomial-time machine Mu such that, for every polynomial Q, the distribution ensembles {(P(x), V*(x)) }x~v* ~o, and {Muv*(x)}x~v*~o2 are polynomially indistinguishable even when the distinguishers are allowed blackbox access to V*, where D2 = {(x, V*)lx e L and Ti9merV* (x) < Q(x)}.
+
+All known zero-knowledge protocols are in fact blackbox-simulation zeroknowledge. It seems likely that in order to prove an interactive proof system zero-knowledge with respect to any "verifier" V*, such a universal simulator would have to be presented. Thus this definition is reasonable and not too restrictive.
+
+Remark 3.3. In Remark 3.2 of this section we claimed that the "history-based" and the "output-based" versions of the [GMR1] zero-knowledge definitions are equivalent. This claim was established by pointing out that the distinguisher, given a history description, can generate V*'s output by using a built-in version of V*. The same reasoning holds for the auxiliary-input definition. However, the distinguishers in the case of blackbox-simulation cannot have a built-in version of what may be an infinte number of I/*'s. Therefore distinguishers running on a history description of an interaction by some machine V* must be allowed blackbox access to V*. This
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+9
+
+will clearly allow the distinguisher to reconstruct V*'s output given the history of the interaction.
+
+Remark 3.4. We stress that saying that (P, V) is an auxiliary-input zero-knowledge proof system does not mean that the honest verifier V may use the auxiliary input as a legitimate stage in its operation: it is not. Rather, we mean that the prover does not reveal knowledge even to cheating verifiers which do use an auxiliary input.
+
+3.2. Relationship Between the Definitions
+Let Cl(def) denote the class of all interactive proof systems satisfying the (zeroknowledge) requirements of definition def. The following relationships seem rather obvious:
+
+Theorem 3.1.
+(1) Cl(auxiliary-input) ~ CI([GMR1]). (2) Cl(blackbox-simulation)~_CI([GMR1]).
+
+Proof. In both cases (1) and (2) the [GMR1] definition is less restrictive than the
+
+other definitions in terms of its requirements from the simulation. In case (1) the
+
+simulation is required by the [GMR 1-Idefinition to be valid only when the auxiliary
+
+input is empty. In case (2) the blackbox definition requires that all verifiers be
+
+simulated by one machine M~ whereas the [GMR1] definition allows each such
+
+verifier to have its own specially tailored simulator.
+
+[]
+
+Next, we establish the relationship between the new definitions:
+
+Theorem 3.2.
+Cl(blackbox-simulation) ~_ Cl(auxiliary-input).
+
+Proof. Let (P, V) be an interactive proof system and assume (P, V) Cl(blackbox-simulation). That is, there exists a polynomial machine Mu such that,
+for every x ~ L and V', machine Mu simulates the interaction of V' with P on input x. We show (P, V) ~ Cl(auxiliary-input) by demonstrating how to construct a simulator My, for every probabilistic polynomial-time V* having auxiliary input.
+For every V* we construct My, as follows: Let Q be a polynomial such that, Yx, TimeV*(x) <_Q(x). The simulator My, will be a multiple-tape Turing machine. It will have the code of V* built-in. My, will also have access to Mu, the universal simulator guaranteed by the blackbox definition. Given x and auxiliary input y, machine My, "incorporates" a prefix o f y of length < Q(x) into the code of V*, forming a machine
+Vy*.On input x, machine Vy*behaves as follows: it copies y to its input tape and runs V*(x, y). Also, upon receiving a message "SEND AUXILIARY INPUT," Vy* sends a message contained y (this feature is not required by the simulation, but is used later by the distinguishers).
+Having constructed Vy*,machine My, now simulates the computation of M~ while having the "blackbox" Vy*.It then outputs the output of M~. Observe that the output
+
+10
+
+O. Goldreich and Y. Oren
+
+of M~ will be of the form [x, r, m] while the output of Mv. must be of the form l-x, y, r, m]. Therefore M e. adds y to the output of M u.
+
+Claim 3.2.1. Mv.(X, y) runs time polynomial in [xl, as required by the definition of auxiliary-input zero-knowledge.
+
+Proof. The time required to simulate one step of Vy*(x,y) is 0(I V*I + lY[). The
+
+value of IV*I is constant as far as Mr. is concerned, and therefore one step requires
+
+O(lYl). Since y was truncated to length Q(Ixl), it follows that lYl ~ O(Q(Ixl)). We
+
+know that ~*(x), which is essentially the same as V*(x, y), runs at most Q(Ix[) steps.
+
+All in all, simulating the computation of Vy*(x)can be achieved in time bounded by
+
+some polynomial Qv(Ixl).
+
+My. simulates the computation of Mu having a blackbox V7. The number of steps
+
+required by M~ is guaranteed to be polynomial in Ixl, when counting the activations
+
+of the blackbox Vy*at unit cost. Let QM(Ixl) be the running time of Mu.
+
+The running time of My. is bounded by QM(Ixl)' Qv(Ixl) and is clearly polynomial
+
+in Ixl.
+
+[]
+
+Claim 3.2.2. The distribution ensemble {(P(x), V*(x, Y))}x;y~o, is polynomially indistinguishable from {Mr,(X, Y)}x;y~o,, where D1 = {(x, y)lx ~ L}.
+
+Proof. Assume there exist a constant c, an algorithm A, and an infinite sequence S of pairs (x, y) ~ D1 such that,
+1
+V(X, y) E S, p(AI"(xLV*(x'y)) -- p~"t~'" > ixl--~--.
+
+We show that in such a case there exist a polynomial Q, an algorithm A', and an infinite sequence S' of pairs (x, Vy*)such that
+S' ___{(x, Vy*)lxe L, Time~,,(x) < Q(Ixl)} and,
+
+V(x, v7) ~ s', p<~,v;~, _ pf..,9~ > 1
+Ixl c'
+
+contrary to the assumption that M~ is a valid blackbox simulator. Let S' = {(x, Vy*)l(x,y) ~ S}, where Vy*is as described above. Clearly,
+
+V(x, Vy*)~ S', TimeV;(x) = Q(lx[).
+
+We construct A', the "blackbox-simulation" distinguisher, as follows: On input
+
+Ix, r, m] and a blackbox Vy* (recall that blackbox distinguishers have blackbox
+
+access to the verifiers), A' first sends a message "SEND AUXILIARY INPUT" to
+
+Vy*, to obtain y. It then runs A([x, y, r, m]) and outputs the outcome of this
+
+compuation. It is easy to see that A' will distinguish, for any pair (x, Vy*)for which
+
+A distinguishes, the corresponding pair (x, y). The claim follows.
+
+[]
+
+This completes the proof of Theorem 3.2.
+
+[]
+
+This is the most important result of this section, due to its effect: all known zero-knowledge protocols, having been proved zero-knowledge under the blackbox-
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+11
+
+simulation definition, are shown to be auxiliary-input zero-knowledge, and as such can be used for all cryptographic applications such as those given in [GMW2].
+Remark 3.5. The relationships derived in the above theorems also hold for perfect zero-knowledge and almost-perfectzero-knowledge.
+Remark 3.6. It follows from Theorem 4.1 of [GK] that Cl(auxiliary-input)c CI([GMR1]). We do not know whether Cl(auxiliary-input) equals Cl(blackboxsimulation). The following states clearly what is known:
+Cl(blackbox-simulation) ~_Ci(auxiliary-input) c CI([GMRI]).
+3.3. Proof of the Sequential Composition Theorem for Auxiliary-Input Zero-Knowledge
+We first define the notion of a sequential composition of interactive proof systems:
+Definition. Let (P1, Vl ) .... , (Pk, Vk) be interactive proof systems for languages L1, L2..... Lk, respectively. A sequential composition of the k protocols, denoted (P, V), is defined as follows: The common input to (P, V), x, will be a string of the form XI%X2%"'%Xk%, where "%" is a delimiter. The execution of (P, V) consists, at stage i, of P and V activating P~and V, respectively, as subroutines on x~. V accepts if all V~'shave accepted.
+In a similar manner we can define concurrent compositions:
+Definition. Let (PI, V~),..., (Pk, Vk) be interactive proof systems for languages L1, L2..... Lk, respectively. Without loss of generality, assume that all protocols are m-step protocols. A concurrentcompositionof the k protocols, (P, V), is defined as follows: (P, V) will also be an m-step protocol. The common input to {P, V), x, will be a string of the form Xl%X2%'"%Xk%, where "%" is a delimiter. The ith message in (P, V) will consist of the ith message of (P1, V1) .... , {Pk, Vk). V accepts if all V~'shave accepted.
+A
+Remark 3.7. Clearly, the case in which a single protocol (P, V) is iterated k times, possibly on the same input ~ i s merely a restricted version of the above definitions, in which, Vi, (Pi, V~) = (P, V) and, Vi, x~ = ~.
+It is easy to see that both compositions (sequential and concurrent) constitute iteractive proofs for L. We now prove that a sequential composition of auxiliaryinput zero-knowledge protocols yields an auxiliary-input zero-knowledge protocol. Recently it was shown in [GK] that the same is not true for concurrent compositions.
+Remark 3.8. In the following proofs k, the number of protocols, is assumed to be constant. We demonstrate later how a slightly altered version of the proof can be applied in the meaningful cases for which k is not a constant.
+Theorem 3.3 (Sequential Composition Theorem). Let (P1, V1), (t>2, V2) . . . . . ( Pk, Vk) be auxiliary-input zero-knowledge proof systems for languagesL 1, L2 . . . . .
+
+12
+
+O. Goidreichand Y. Oren
+
+L k, respectively. Let L = {xl~
+
+~ Li)}. Define (P, V) to be the
+
+composition of (P1, V1), (P2, V2). . . . . (Pk, Vk). Then (P, V) is an auxiliary-input
+
+zero-knowledoe proof system for L.
+
+Proof. It is easy to see that (P, V) is an iteractive proof system for L. We therefore concentrate on showing that (P, V) is auxiliary-input zero-knowledge. Recall that we are using the history-based notion of zero-knowledge. A history description in the case of an auxiliary input is of the form Ix, y, r, m], where x is the common input, y is the verifier's auxiliary input, r is the verifier's random string, and m is the sequence of prover messages.
+The objective of the indented small-print paragraphs throughout the proof is to provide insight and intuition to the otherwise rather formal proof.
+In order to prove that (P, V) is auxiliary-input zero-knowledge we must show how to construct a simulator Mr. for each polynomial-time probabilistic V*. We assume, without loss of generality, that V* initially copies the contents of all its input tapes (common input, random input, auxiliary input) to its work tape and never attempts to access these tapes again.
+V*'s interaction with P can be conceptually divided into V*'s interaction with/'1, V*'s interaction with P2, and so on. Since the k individual protocols are auxiliary-input zero-knowledge, machines Mv~.,M2...... Nkv,, which simulate the interaction of V* with PI, P2..... Pk,respectively, must exist. Basically, Me. will activate these simulators in sequence. However, in order for the overall simulation to be valid, the initial state of V* when being simulated by My+1. should be its final state in the simulation by M[,.. This can be achieved by giving V*, as its auxiliary input to the (i + 1)th stage, information which will enable it to reconstruct the final state of the ith stage. Obviously, we cannot guarantee that any V* will in fact behave as described above (i.e., reconstruct its state when having past history as its auxiliary input). Therefore, and instead of making any technical assumptions on V*,we consider, for every V*, a modified verifier V' which will exhibit the required behavior.
+As a first step we consider a verifier V' that has a built-in version of V* and the following additional property: on auxiliary input h, where h = Ix, y, r, m] is a history description of V*'s interaction with the prover, V' brings its built-in version of V* to the configuration (stage, work-tape contents, and head position) corresponding to this description, and proceeds from that point. In particular, if m = e (the empty string) and y is not itself a history description, then V' only copies x, y, r to the work tape of its built-in version of V* and then "behaves" like V*. Machine V' actually always ignores its "real" random string. In all other senses V' is exactly like V*. In particular, for every x, y, the probability distribution of prover messages generated by running (P(x), V*(x, y)) is exactly that generated by randomly choosing a string r and running (P(x), V'(x, Ix, y, r, el)).
+
+Construction of the Simulator for V*. Since the individual protocols are assumed to be auxiliary-input zero-knowledge, machines MvL, M2,, .... Mkv,,which simulate the history of V"s interaction with P1, P2. . . . . Pk, respectively, exist. The output produced by M~. on input pair (x, h) will be of the form [x, h, r, m], where r is V"s
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+13
+
+random string (which is actually ignored) in this simulation and m is the sequence of messages sent "on behalf" of the prover. Let sis 2 denote the concatenation of strings sl and s2. We now describe My.. On input x = x ~ % x 2 % ' " x k % and y, machine My. runs
+choose random strino r
+ho '-- [x, y, r, ~]
+hi *-"M~,(xl, ho) hz ~ M~,,(x2, hi)
+...
+hk *-- Mkv'(Xk, hk-t) m ~ m 1m 2 999m s OUTPUT([x, y, r, m]).
+(The m,'s are obtained from the h,'s.)
+We now show that My. is indeed a "good" simulator for (P, V*).
+Lemma 3.3.1. The distribution ensembles {Mr.(X, Y)}x,y,where My. is as described above, and { ( P(x), V*(x, y) ) }x.y are polynomially indistin#uishable.
+Proof. Suppose they are not. That is, there exists a constant c > 0 and a test A that, for infinitely many pairs (x, y), will c-distinguish between Mr.(X, y) and
+( P(x), V*(x, y) ).
+We show that in such a case another constant c' and another test A~~exists that, for some i and for infinitely many pairs (xi, y~),d-distinguishes between M~,,(xi, Yi) and (P~(xi), V'(xi, yi)), contrary to the assumption that Miv9correctly simulates the history of V"s intersection with P~.
+We consider the following hybrids of the probability distributions Mr.(x, y) and (P(x), V*(x, y)). The ith hybrid, denoted H~(x, y), is defined by the following process:
+choose a random string r ho ~ [x, y, r, e] h1~ (Pt(xl), V'(xl, ho)) h 2 .... (P2(x2), V'(x2, hi))
+
+h i ~.- (Pi(xi), V'(x i, h~-l)) hi+l '- M[,t' (x~+l, h,)
+.,.
+hh *-- Mkv,(Xk, hk-l) m ~ mira 2 999ms O U T P U T ( [ x , y, r, m-I).
+As before, each hi is of the form Ix, hH , ri, mr]. The extreme hybrids, H o and Hk, correspond to Mv.(X, y) and (P(x), V*(x, y)), respectively. Clearly, if we can cdistinguish between the extreme hybrids, then a constant c' and two adjacent hybrids which can be c'-distinguished, say Hi-1 and Hi, must exist. It is not hard to see that, for sufficienty large n, c' is approximately equal to c.
+
+14
+
+O. Goldreich and Y. Oren
+
+Let pref~(x, y) be the probability distribution defined by the process
+choose a random string r ho~-[x,y,r,e] h 1 ,.- ( P l ( x l ) , V'(x 1, ho))
+h2 ,.- (P2(xz) , V'(x2, hi))
+o,.
+hi-1 '- (Pi-l(xi-1), V'(xH, hi-~)) OUTPUT(h~-I).
+Let h be a string which may occur with nonzero probability in either of the
+distributions M~,,(xi, hi-l) and (Pi(xi), V'(xi, hi-l)), where hi-1 is a string assigned nonzero probability by pref~(x, y). Any such string h will contain ml, m2 ..... mi and x, y, and r. For strings h of this type we define suffi(h) to be the probability
+distribution generated by running
+hi+1 ~- M~+,l(Xi+l, h) hi+ 2 ~-- M~+2(xi+2, h i + l )
+
+h~ ,- M~,(x~, hR-1)
+m 4- m l m 2 . . . mR
+OUTPUT(Ix, y, r, m]).
+The distribution pref~(x, y) is actually a distribution on all the possible auxiliary
+inputs to the ith stage, given that the initial input is x and the initial auxiliary input is
+the string y. The distribution su~ can be regarded as an operator which on input a stage i history applies the remaining k - i simulation stages. If the input to suffi comes from M~,(x~, hH), then the effect of su~ will correspond to a string coming from HH(x, y). If the input comes from (P~(x~), V'(x~, h~_l)), then the effect of suff~ will correspond to a string coming from H~(x, y). Our aim is to show that if (x, y) are such that A c-distinguishes between Ho(x, y) and H~(x, y), then some i and some h* exist such that the A~~we construct while c'-distinguish between M~,(x~, h*) and (P~(x~), V'(x~, h*)). A "~ will actually activate the su~ operator on its input text, h, to
+obtain a text in a format suitable for A, and then "let A do the distinguishing."
+We use the following notational shorthands:
+PRi[h] = Prob{prefi(x, y) = h}. Suffi(M[h]) = suffi(Miv,(x,, h)). suffi(P[h]) = suffi( ( ei(xi) , V'(xi, h) ) ).
+Recall that pa~ denotes the probability that algorithm A outputs 1 on input of an element chosen according to the probability distribution D. The following relationship holds:
+pH,-,t=.y) = ~, PRi[h- I . pAUffi(Mtlq).
+h
+The probability pnA'-~t~'Y)is written above as a weighted average over all the possible
+h's, of the probability that A outputs 1 on input an element chosen according to
+suff~(M[h]). The weight is assigned by the probability ofh to be an i - 1 stage history.
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+15
+
+Similarly:
+
+pna'tx'~ = ~ PR,[h]" p~.ff, tethl).
+h
+
+It was assumed that the values pff,_~tx.y)and p~,tx,y)differ c'-nonnegligibly. Since both
+are weighted averages over the same probability space, there must be some element h*
+for which there willbe a c'-nonnegligible differencebetween p~u$Iauth*l)and p~sJ',teth'l).
+
+Since p],_,tx, y) _ p~,t~,y) > 1/ixlC', some h* exists for which
+
+p~ff, tuth'l) _ p~,ff, O'th*l) > ~Ix"1l
+
+We conclude that, for every (x, y) for which Ho(x, y) and Hk(x, y) can be cdistinguished, (xi, Yi) exists such that (Pi(xi), V'(xi, Yi)) and M[,,(xi, Yi) can be
+c'-distinguished. The auxiliary input Yiwill be the string h* corresponding to x and
+y. On input a text T = [xi, Yi, ri, mi] chosen either according to (Pi(xi), V'(xi, Yi) ) or to M~.,(xi, y~), the test A") extracts m~, m2, ..., m H , x, y, r (which are contained
+in T since they were contained in Yi = h*) and mi from T. It then runs
+
+hi+l ~._ ~A,.AtVi,+l~t-.X.i+l, T) hi+2 '-- M[,+,2(xi+~, hi+l)
+...
+hk "-- M~,,(Xk, hk-1) m ,-- mira 2 9 9 9 m k OUTPUT([x, y, r, m])
+
+to obtain a text T' = Ix, y, r, m]. The test A~ then runs A on T' and outputs the
+
+output of A.
+
+By our construction it is clear that A~ will c'-distinguish between
+
+(Pi(xi), V'(xi, Yi)) and M~,(xi, Yi). This contradicts the fact the M~,, is a "good"
+
+simulator for (Pi, V').
+
+[]
+
+We conclude that {Mv.(x,y)}x;y is polynomially indistinguishable from
+
+{ (P(x), V*(x, y))}x;y and the theorem follows.
+
+[]
+
+Remark 3.9. The assumption that k, the number of protocols, is constant was required in order to argue that if rio and Ilk can be distinguished for infinitely many
+pairs (x, y), then some i exists such that H H and Hi can also be distinguished infinitely many times, thus contradicting the assumption that M~v,is a good simulator. Observe, however, that in the case where a single protocol (P, V) is iterated, it is no longer essential to assume that k is a constant. Clearly, we could no longer claim that, for some i, the distributions H H and Hi can be distinguished infinitely many times. However, distinguishing any two adjacent hybrids Hi-1 and Hi means in every case distinguishing My. from (P, V'), contrary to the assumption that Me, is a good simulator for (P, V'). Therefore the Sequential Composition Theorem also holds in this case. More generally, the Sequential Composition Theorem holds for nonconstant k whenever, in each of the k stages, one of a finite set of protocols is run.
+
+16
+
+o. Goldreichand Y. Oren
+
+Remark 3.10. An analogous Sequential Composition Theorem can be proved for the blackbox-simulation zero-knowledge definition.
+
+4. Essential Properties of Zero-Knowledge Proofs
+In this section we show that certain properties are essential to zero-knowledge proof systems. We do so by demonstrating the triviality of zero-knowledge proof systems lacking these properties. By a class of interactive proof systems we mean, for example, all proof systems in which the verifier is deterministic, all proof systems in which only one message is sent, and so on. Let us first discuss the meaning of triviality in the context.
+The complexity class BPP encompasses our notion of efficient computation. Recall that a language L is in BPP if a probabilistic polynomial-time machine M exists such that, for every constant c > 0 and large enough x,
+if x e L Prob(M(x) = ACC) > 1 - Ixl -c (Completeness condition),
+if x • L Prob(M(x) = RE J) > 1 - Ixl -c (Soundness condition).
+Since V can recognize by itself any language in BPP, it follows that any language in BPP has a trivial zero-knowledge proof system: one in which the verifier checks by itself if x ~ L or not. Accordingly, we consider any class of zero-knowledge interactive proofs trivial if proof systems of this class can be zero-knowledge only for languages in BPP.
+4.1. General Framework of Trivality Proofs
+Basically, our proof method is the following: to prove the trivially of some class C, we assume that some language L has a zero-knowledge proof system of class C. By the definition of zero-knowledge, a simulator M v, which generates history descriptions of the interaction of V with the proper P (in some cases we consider the simulator with respect to some cheating verifier V*, that is My.), exists. We build a BPP machine for L, that uses My (My.).
+Let H = l-x, r, m] be a history description (H = Ix, y, r, m] in the case of auxiliary input), where x is the common input (y is the auxiliary input), r is the random input, and m is the sequence of messages sent in the protocol. String m is of the form (~o, fll . . . . . ~k) where the ~'s are the prover messages and the fl's are the verifier messages (m will be of the form (ill, ~q. . . . . ~k) if, in the protocol, V "speaks" first). We denote by V*(x, r, ~o. . . . . ~i-~) the deterministic polynomial-time computation that a verifier V* uses to determine fli (in the case of auxiliary input, fli = V*(x, y, r, 0to. . . . . ~-1)). Similarly, P(x, fll . . . . . fir) denotes the probabilistic computation used by P to determine ~t. The computation used by the honest verifier, V, to determine whether to accept or to reject is denoted by p(x, r, ~ . . . . . ~k)"
+Def'mition. A history description (or "conversation") H = Ix, r, m] (H = Ix, y, r, m] in the case of auxiliary input) is legal with respect to a verifier V* if the messages contained in m satisfy the following requirement:
+Vi, 1 < i < k, fl: = V*(x, r, ~o. . . . . ct~-t)-
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+17
+
+(In the case of auxiliary input, fli = V*(x, y, r, ~o,..., ~-1)). For convenience, we simply say "H is legal" when the identity of V* is clear from the context. H is accepting if it is legal with respect to V and if
+p(x, r, ~o, ..., ~) = ACC.
+Accepting conversations are only defined with respect to II".
+
+Recall that the texts produced by My on input x e L must be polynomially indistinguishable from the texts of real interaction between V and P. Therefore, and since a real conversation between P and V on x ~ L will be with very high probability legal and accepting, it follows that My must also produce legal and accepting conversations with very high probability for x ~ L, and do so within polynomial time. Otherwise a distinguisher which simply outputs 1 if the given conversation is accepting will clearly distinguish between real iteractions and simulation texts. The definition(s) of zero-knowledge require nothing of My in the case x r L. The result of running Mr. on x r L may be one of the following:
+(1) Mr may run for too long. (2) Mr may produce a nonaccepting (though perhaps legal) conversation. (3) My may produce an accepting conversation.
+The third case is indeed possible: in all protocols demonstrated to be zeroknowledge (e.g., [GMR1] and [GMWl]) the simulator presented in the proof generates accepting conversations regardless of whether x is in the language or not. In fact, if this case were not possible, then, for any language which has a zeroknowledge proof system, we could easily build a BPP machine: the machine would run Mr on x and accept if and only if My produces an accepting conservation.
+We conclude that a BPP machine which runs Mr can "safely" reject if either case 1 or case 2 occurs, because they are guaranteed to occur with negligible probability for x e L. The hard case to handle is the third case. In the proofs throughout this section, for each instance we use the special structure of the specific class of interactive proofs under consideration to handle this case.
+While using Mr (Mr.) in the proofs that follow we usually claim that some property, existing in the texts of real interaction on x e L, must also exist with very high probability in the texts produced by the simulator on input x e L. (For example, a property such as "the text constitutes an accepting conversation.") If the protocol is perfect or almost-perfect zero-knowledge, this claim follows immediately. However, if the two probability distributions are "only" polynomiaUy indistinguishable (following [AH1], we refer to this case as computational zero-knowledge), the proof may become more involved. In each case we first present a proof for perfect zero-knowledge, and then adapt it to computational zero-knowledge. Each formal proof is preceded by an intuitive discussion of the main ideas underlying it.
+
+Remark 4.1. In the proofs that follow, the BPP machines built arc actually shown to satisfy the requirements of BPP for all but perhaps a finite set of x's. Clearly, any such machine can be transformed into a "true" BPP machine.
+
+18
+
+O. Goldreichand Y.Oren
+
+4.2. Zero-Knowledge Proofs Which Never Err and Zero-Knowledoe Proofs with Deterministic Verifiers
+M. Blum proposed the concept of"Las Vegas" interactive proofs. Informally, these are interactive proof systems that never err, that is, never cause V to accept when x ~ L. In I-GMS] these protocols are referred to as "interactive proofs with perfect soundness." In this section we show that no protocol of this type can be zeroknowledge, even with respect to the [GMR1] definition, unless the language is in RP. A formal definition of"Las Vegas Interactive Proofs" can be obtained from the definition of general interactive proofs simply by replacing the soundness condition with: "whenever x r L, and for every program P* run by the prover, either V rejects or the protocol does not terminate."
+
+Theorem 4.1. Let L be a lanffuage for which a zero-knowledffe Las Ve#as interactive proof system exists. Then L E RP.
+
+Proof. The idea is to show that in this case accepting conversations simply do not exist for x r L, while (as always), for x e L, the simulator My will produce accepting conversations with very high probability. Let us first recall the definition of random polynomial time: a language L is in R P if a probabilistic polynomial-time algorithm M exists such that
+on input x e L machine M accepts with probability > 1/2 (completeness), on input x $ L machine M always rejects (soundness).
+
+Construction of the RP Machine. Since L has a Las Vegas zero-knowledge proof system, a probabilistic polynomial-time machine My that simulates the membership proofs of P and V exists. Let Q([xl) denote an upper bound for the running time of My on input x ~ L (where Q is some polynomial). The random polynomial-time machine we build, M, uses My.
+On input x, machine M runs My on x, maintaining a step count. If My runs more than Q(Ixl) steps, or does not produce an accepting conversation, M rejects. Otherwise (if the conversation produced by My is accepting) M accepts.
+
+Soundness of M.
+
+Claim 4.1.1. On input x ~ L, machine M v cannot possibly generate an accepting conversation.
+
+Proof. Assume it could, that is, there exists a random string r and a set of prover
+
+messages such that V running with random string r and receiving the appropriate
+
+messages accepts on x. Then the conversation could occur in a real interaction with
+
+nonzero probability, violating the conditions of Las Vegas protocols.
+
+[]
+
+Note that this claim follows only from the fact that accepting conversations cannot exist for x $ L, and not from the fact that the conversation was generated by My. Therefore it is valid regardless of the "quality" of the texts produced by M v.
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+19
+
+It is clear that M will never accept on x ~ L, and therefore the soundness condition is established.
+
+Completeness of M. The completeness property of interactive proofs requires that
+
+conversations on x E L be accepting with very high probability. The same is clearly
+
+true of the conversations produced by My in the case of perfect zero-knowledge.
+
+Adapting the argument to computational zero-knowledge is simple in this case:
+
+note that p, the predicate used by V to decide whether to accept or reject, must be
+
+computable in polynomial time. Consequently, if My does not produce accepting
+
+conversations on x e L with very high probability, then p will distinguish the texts
+
+of the simulator from those of real interaction.
+
+[]
+
+We conclude that the error probability on x 8 L instances, existing in all known zero-knowledge proofs, is inevitable and essential to the nontriviality of these proof systems. Another essential property of nontrivial zero-knowledge proofs is the randomness of the verifier. We prove this by demonstrating that any language which has a zero-knowledge interactive proof in which the verifier is deterministic, has a zero-knowledge Las Vegas interactive proof.
+
+Lemma 4.1.1. Let (P, V> be a (zero-knowledge) interactive proof system for a language L, in which the verifier is deterministic. Then L has a (zero-knowledge) Las Vegas interactive proof.
+
+Proof. We show that if <P, V) is not itself Las Vegas, then either it can be slightly modified to become Las Vegas, or it cannot constitute an interactive proof system for L. Suppose the protocol is not Las Vegas. Then there exists a prover P* and a set ofx # L such that V,when interacting with P* on such an x accepts with nonzero probability. If this set is finite, then the protocol can be modified in the following way to become Las Vegas: on input x, the verifier first checks if x belongs to the "problematic" set, and if it does, V rejects immediately. Otherwise the original protocol is carried out. Clearly, the modified protocol is Las Vegas. If the original protocol was zero-knowledge, then the modified protocol will also be, since with respect to x ~ L both protocols are the same (recall that the definitions of zeroknowledge require nothing if x r L). We now show that the "problematic" set must be finite: assun~e it is not, and an infinite sequence Seq of x r L exists such that V, when interacting with P* on x e Seq accepts with nonzero probability. Since V is determinstic, it follows that, for every x ~ Seq, a sequence of prover messages exists that cause V to accept (that is, V will accept with probability 1 when receiving this sequence of messages). Clearly, some/~ exists that, for every x ~ Seq, can find this sequence and always cause V to accept. One such /~ is a machine that given x simply tries out every possible set of messages to see on which of them, if any, V accepts./~ can check this easily as the computation of V is completely determined by x and by the prover messages, and does not depend on some hidden random string. Therefore the protocol cannot be an interactive proof system for L. []
+
+The following theorem is an immediate corollary of Theorem 4.1 and Lcmma 4.1.1:
+
+20
+
+O. Goldreichand Y.Oren
+
+Theorem 4.2. Let L be any language and assume that L has a zero-knowledge interactive proof in which the verifier is determinstic. Then L e RP.
+
+4.3. One-Step Zero-Knowledge Proofs
+One-step interactive proof systems do exist and contain NP proof systems as a special case. However, NP-like proof systems give out a large amount of knowledge, much of which is not essential for the proof. It was pointed out in [GMW1] that a one-step protocol cannot be zero-knowledge if it constitutes an interactive proof system for a language not in BPP. Here we present a formal proof of this statement. The proof holds even under the original [GMR1] definition of zero-knowledge.
+
+Theorem 4.3. Let L be a language for which there exists a one-step zero-knowledge interactive proof system. Then L e BPP.
+
+ProoL As before, we use My, the simulator for the honest verifier E The idea is to simulate the process of the interactive proof by ensuring that the message generated by the simulator "on behalf" of the prover is not based on prior knowledge of the verifier's random string. V's decision on whether to accept or reject is obtained by evaluating a determinstic polynomial-time predicate p(x, at, r), where x is the (common) input to <P, V>, 9 is the prover's message to V, and r is V's random string. Ifx e L, then some ~ exists such that, for most r's, the predicate must evaluate to ACC. In cases where x r L, for every 9 there may be a only few random strings r that cause p to evaluate to ACC, but the simulator may be such that on x ~ L it always generates conversations in which p evaluates to ACC, using these few existing strings. (Recall that the definition of zero-knowledge requires nothing of the simulator in case x r L, and therefore this kind of behavior is possible). For that purpose we substitute the random string r produced by the simulator with a truly randomly chosen r'. In this way we simulate not the text but the process of the interactive proof, retaining its desired soundness property.
+
+Construction of the BPP Machine. Following is a description of M, the BPP machine for L:
+
+On input x, machine M runs Mv on x, maintaining a step count. If Mv runs too long or does not produce an accepting conversation, M rejects. Otherwise, if I-x,r, ~] is an accepting conversation, where r is V's random string and ~ is the prover's message, M discards r, chooses a new, random string r', and outputs p(x, r', ~).
+
+Soundness of M. We claim that if x r L and r' is randomly chosen, then p(x, r', ~) will almost certainly evaluate to RE J, regardless of the value of ~. Otherwise, if it evaluates to ACC with nonnegligible probability for an infinite number of x r L, then the soundness condition of interactive proofs is violated.
+
+Completeness of M. In the case of perfect zero-knowledge, the completeness of M follows directly from the completeness condition of interactive proofs. If x ~ L, then
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+21
+
+the prover is guaranteed to produce (with high probability) an ~ that will cause V to accept for nearly all random strings r. The ~'s produced by the simulator will have the same property.
+
+The following lemma adapts the proof to computational zero-knowledge. Let l,(n) be the length of the random string used by V when interacting on input of length n.
+
+Lemma 4.3.1. Let { ( P(x), V(x) ) }~ and {Mv(x) }~ be polynomially indistinguishable and let ~(x) be the string output by M v as the "prover message" when running on input x. Then, for all but perhaps a finite set of x ~ L with very high probability, p(x, r, ~(x)) = ACC when x ~ L, if r ~ R{0, 1}I'tlxl).
+
+Proof. In a manner similar to the proof of Theorem 4.1, we use p to distinguish the
+
+text of simulation from those of real interaction. More formally: assume a constant
+
+c > 0 and an infinite sequence Seq of x e L exists for which the u produced by
+
+running Mv(x) causes p(x, r, ~) to evaluate to R E J with c-nonnegligible probability,
+
+where r ~ R{0, 1}l'~lxD.
+
+Consider the following distinguisher, A: on input H = Ix, r, ~], the algorithm
+
+chooses r' ~ R{0, 1}~r~lxDand computes p(x, r', ~). It then outputs 1 if the result is
+
+ACC and 0 otherwise. If H is a description of a real conversation, then it follows
+
+from the completeness property of interactive proofs that A will output 1 with very
+
+high probability. We assume that if H is a simulation text, then A will output 0 with
+
+c-nonnegligible probability. Therefore A will c-distinguish between {(P(x), V(x))}~
+
+and {Mv(x)}~, and the two distribution ensembles cannot be polynomially
+
+indistinguishable.
+
+[]
+
+The theorem follows.
+
+[]
+
+4.4. Two-Step Auxiliary-Input Zero-Knowledge Proofs
+We proceed to show that no two-step protocol can be auxiliary-input zeroknowledge in a nontrivial manner. Note that while one-step protocols cannot be (nontriviaUy) zero-knowledge even with respect to the prespecified verifier V, twostep protocols may be zero-knowledge (in a nontrivial manner) with respect to the prespecified verifier. In fact, such protocols (i.e., which are zero-knowledge with respect to V) are known for languages believed not to be in BPP (e.g., Quadratic nonresiduosity [GMR1] and graph nonisomorphism [GMW1]). Consequently, in order to prove our result we have to make use of the full power of the definition of zero-knowledge, specifically the requirement that, for all V *'s, a simulator My. exists. To prove an adapting lemma for this case we need to assume a stronger definition of polynomial indistinguishability, one in which the distinguishers are nonuniform (polynomial-time machines). Let us present this definition:
+
+Definition (Nonuniform Polynomial Indistinguishability). For every algorithm A which has an auxiliary input tape, let PA~)'" denote the probability that A outputs 1 on input an clement chosen according to the probability distribution D(x, y)
+
+22
+
+O. Goidreieh and Y. Oren
+
+while having string z as its auxiliary input. Denote by Dora the domain from which the pairs x, y are chosen. The distribution ensembles {D(x, Y)}x,y~aomand {D'(x, Y)}x;y~Domare nonuniformly polynomially indistinguishable if, for every probabilistic algorithm (with auxiliary input) A which runs in time polynomial in the length of its input, and, for every constant c > 0, there exists No such that, for every x, Ix[ > No, for every y such that (x, y) 6 Dom, and every z,
+IP~t~"" - P f f ~ " l < Ixl -c.
+We refer to the definition of computational auxiliary-input zero-knowledge obtained when using the above definition of polynomial indistinguishability as "nonuniform computational auxiliary-input zero-knowledge."
+Remark 4.2. If we apply this definition of polynomial indistinguishability to blackbox-simulation zero-knowledge, the relationship demonstrated in Section 3 still holds. Also, the proof of the Composition Theorem for the auxiliary-input definition (presented in Section 3) can be carried out almost unaltered when using the above definition of polynomial indistinguishability.
+We begin by an informal discussion: Two-step protocols can in general be viewed as ones in which the verifier generates questions which the prover can answer with nonnegligible probability if and only if x e L. When V follows the protocol, it "knows" the answer to its questions (and will therefore gain no knowledge from the answers), but this is no longer guaranteed for arbitrary V*'s. The proof presented in this subsection makes use of this observation to demonstrate the triviality of two-step auxiliary-input protocols. It seems that the same reasoning should apply to the original [GMR1] definition. However, in view of the result in [AH2] discussed in the introduction (relativized two-step [GMR1] zero-knowledge is not contained in relativized BPP), it is clear that the argument presented in this subsection will not extend to the [GMR1] definition, as it relativizes. In spite of that, it can be shown I-O1] that the two-step protocols mentioned above (for quadratic nonresiduosity and graph nonisomorphism) cannot be [GMRl-l-zeroknowledge unless these languages are in BPP. Both known two-step protocols mentioned above were modified by letting the verifier first "prove" to the prover that it "knows" the answers to its queries, resulting in protocols with more rounds which are zero-knowledge (with respect to any verifier) [GMR1], [GMWl].
+Returning to auxiliary-input zero-knowledge, we intend to prove:
+Theorem 4.4. Let L be a language for which a two-step perfect or nonuniformly computational auxiliary input zero-knowledge proof system exists. Then L E BPP.
+Proof. Let (P, V) be the two-step proof system for L. Without loss of generality, we can describe (P, V) in the following way:
+V: computes fl = V(x, r), where r is V's random string. V ~ P: fl. P: computes a = P(x, fl). P~V:~. V: computes p(x, r, a) ~ {ACC, R E J} and stops.
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+23
+
+The construction of the BPP machine in this case will run along the same general lines as in the one-step case, i.e., M will simulate the process of the interactive proof rather than merely its text. In a real interaction P must answer the "question" without having access to the random string r used to compute/~. The prover's ability to provide, under these conditions, an answer ~ for which p(x, r, ~) = A C C is considered sufficient evidence that x ~ L. The completeness property of interactive proofs guarantees that the prover will be able to come up with such an 9 for almost any
+= V(x, r), if x e L. The soundness condition of interactive proofs ensures that no prover could generate from ~ = V(x, r) an ~ such that p(x, r, ~) = ACC for any but a negligible fraction of the r's. Note that the prover is expected to generate such an
+given only ~ = V(x, r), whereas this ~ is tested against r itself. As in our proof we intend to substitute the simulator for the prover as a means of generating ~, it is essential that the random string r remain hiddle from the simulator. Otherwise we could not rely on the soundness of the underlying interactive proof. Asking the simulator to "answer" our "question" ~ without giving away out secret r is achieved using the auxiliary input to the verifier.
+
+Construction of the BPP Machine. Consider a verifier V* that, given a string fl* as its auxiliary input, set ~ =/~* (and sends ~ to P) instead of choosing a random r and computing fl = V(x, r). Provided that the length of 8" is polynomial in the length of x, a verifier V* as described above is clearly a polynomial-time machine, for which a simulator My. is guaranteed. Machine My., given as input x ~ L and any auxiliary input fl*, simulates the interaction between P and V*.
+Using My, we now build M, the BPP machine for L. The idea is to generate a meassage fl which is based on a truly random string r, and then use My. to obtain the prover message ~ corresponding to this ~, without giving Me. access to r. Machine M operates as follows: On input x, machine M performs the following actions:
+(1) Chooses a random string r and computes 8" = V(x, r). (2) Runs Mr.(X, ~ff*).If My. produces a legal conservation [x,/~*, r', (/~*, g)] (r'
+is the random string generated by the simulator to emulate V*'s random input in a real interaction), discard r' and goto (3). Otherwise reject. (3) Outputs p(x, r, ~).
+
+Soundness of M. Note that as far as V (or its simulated version) is concerned, we are imitating exactly the process of the interactive proof: a random string r is chosen and a message ~ = V(x, r) computed. This message is sent to some other machine, which returns a message a. Then p(x, r, ~) is used to determine whether to accept or reject. All we have done is substitute the simulator for the prover as a means of generating the message a. Therefore the soundness of M follows directly from the soundness condition of interactive proofs: if x r L and My. could generate an ~tfor which p(x, r, ~) = ACC with nonnegligible probability, then a prover P* using M v, could do the same, violating the soundness of the underlying interactive proof. It is clear therefore that M will reject any x r L with very high probability.
+
+24
+
+o. Goldreichand Y. Oren
+
+Completeness of M. If x e L, then P, when interacting with the prespecified V, is guaranteed to be able to generate an "answer" ~t such that p(x, r, ~t) = ACC for almost any random string r. Suppose now that P interacts with V*, and that V* has as auxiliary input a string fl such that fl = V(x, r) for some randomly chosen r. Since r is randomly chosen and fl is computed according to the protocol, a prover P has no way of knowing that it is interacting with a machine other than V, and will therefore behave exactly as when interacting with V, that is, will attempt to generate an 9 such that p(x, r, Qt)= ACC. The simulator in the case of perfect auxiliary-input zero-knowledge generates the same distribution as P, and will therefore also generate a suitable ~t. The completeness condition of interactive proofs can therefore be used here to establish the completeness of M. The following adapting lemma will show that this is true even for nonuniform computational zero-knowledge.
+Let l,(n) be the length of the random string used by V when interacting on input of length n.
+
+Lemma 4.4.1. I f {(P(x), V*(x, Y))}x,y and {Mr.(X, Y)}x,yare nonuniformly polynomially indistinguishable, then, for all but perhaps a finite set of x e L, if fl* = V(x, r) for r ~ R{O, 1}t~lxl~and ~ is obtained from the output of Mv.(X, fl*), then with very high probability p(x, r, ~) = ACC.
+
+Proof. A history description H, originating either from {(P(x), V*(x, Y)>}x~yor from {Mv.(X , Y)}x;y, will be of the form n = [x, fl*, r', (fl*, ct)], where fl* is the auxiliary input to V* (used as the verifier's first message) and r' is V*'s random string. Observe that r' almost certainly is not the random string r used to compute fl*, and is actually ignored by V*.
+As stated earlier, the a generated by the prover is guaranteed by the completeness condition of interactive proofs to have the following property: ~ will cause p(x, r, ~) to evaluate to ACC with very high probability, provided that r is the random string used to generate the fl*. If this property does not hold for the ~t's obtained from the output of Mv.(X, fl*), then a distinguisher testing for this property should be able to distinguish {(P(x), V*(x, y)>}x;y from {Mvo(X, y)}x~y.However, given only H, the distinguisher has no idea which random string r was used to create fl* and therefore has no way to perform the required test. We use the auxiliary input to the distinguisher, z, as a means to supply the distinguisher with the "true" random string corresponding to the conversation on its main input.
+Assume a constant c > 0 and an infinite sequence Seq of x ~ L exists for which the ctproduced by running Mr.(X, fl*), where fl* = V(x, r) and r ~ R{0, 1}t,(lxl~,causes p(x, r, ~t) to evaluate to REJ with c-nonnegligible probability.
+Denote by pMc(x, r) the probability that p(x, r, or)evaluates to ACC where fl* = V(x, r) and ~t is obtained by running Mr.(X, fl*). Similarly, p,e~c(x, r) denotes the probability that p(x, r, ~t) evaluates to A C C where fl* = V(x, r) and ~ is obtained by running ( P(x), V*(x, fl*) ).
+Let p~c(x) be defined by
+
+1
+
+M
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+25
+
+and pCc,o(x) by
+
+Z ~ " poP,c(x) =
+
+1 p~(x, r).
+
+By our assumption some c > 0 exists such that, for every x ~ Seq,
+
+p~(x) - p~
+
+1
+>_ - -
+ixl r
+
+It follows that, for every x ~ Seq, some r exists such that
+
+ixlr p,P~c(x, r) -
+
+1 pouc,(x, r) >_
+
+Consider the following distinguisher A: on input a conversation Ix, fl*, r', (fl*, ct)]
+
+and auxiliary input r, A computes p(x, r, ct)and outputs 1 if the computation results
+
+in ACC.
+
+Clearly, for every x ~ Seq, some r exists and fl* = V(x, r) such that A (running
+
+with auxiliary input r) will c-distinguish between Mv.(X, [3*)and (P(x), V*(x, [3")).
+
+We conclude that {Mv.(X, Y)}x;y and {(P(x), V*(x, Y))}x;y are not nonuniformly
+
+polynomiaUy indistinguishable.
+
+[]
+
+The theorem follows.
+
+[]
+
+4.5. Auxiliary-Input Zero-Knowledge Proof Systems with Deterministic Provers
+In this subsection we show that any language which has an auxiliary-input zeroknowledge proof system in which the prover is deterministic belongs to BPP. The proof generalizes the proof method (but not the results) of the one-step and two-step cases. As in those cases, we intend to simulate the process of the interactive proof. Our proof relativizes, and thus in view of [AH2] will not extend to [GMR1] zero-knowledge.
+
+Theorem 4.5. Let L be any language. I f L has an auxiliary-input zero-knowledge proof system in which the prover is deterministic, then L ~ BPP.
+
+Proof. If P is deterministic, then the following holds: the entire conversation between P and V is fully determined by x and by r, the verifier's random string. Furthermore, P's ith message 0ti depends only on x and on [31. . . . , fli. We exploit this property in our proof. As in the one-step and two-step cases, we imitate V's view of the interactive proof, using the simulator to generate the prover messages. We begin by choosing a random string r, and construct the unique conversation corresponding to r and x round-by-round. At first, we use the simulator to generate ~o (and ignore the rest of the text). Once we have ~o, we can compute fll as V would, using the random string r. We now run the simulator again, this time "forcing" the verifier to use the computed fll as its first message. This is achieved by placing [31 on the verifier's auxiliary input. Since the prover is deterministic (and the simulator must also be "deterministic in some sense" as we shall see) we can be sure that the
+
+26
+
+O. Goldreichand Y. Oren
+
+same 0to will be computed for the new conversation, and therefore the fll we computed will be a legal verifier message in the new conversation (that is, a string r exists such that fll = V(x, r, ~o))- From the new conversation we obtain ~1, and so on. We thus reconstruct the entire conversation, while not revealing r to the simulator throughout the process. Once we have all the prover messages, we use p to decide whether to accept or reject. It is easy to see that this method would not work if the prover were not deterministic. Consider, for example, a three-step protocol: we could first run the simulator to obtain (some) ~to. We could then compute a suitable fll and "force" the verifier to use it as its message. However, in the new conversation we would probably have a completely different ~o (because P is not deterministic and may have more than one possible ~o) and the computed fl~ would no longer be a legal message in that conversation. As a result, we could not use the new conversation to obtain a meaningful ~q.
+Construction of the BPP Machine. Consider a "verifier" V* in the auxiliary input model, which when having a string [fl*, fl~'. . . . , p*] on its auxiliary input uses fl*, fl~', ..., fl* as its i first messages to the prover, and then computes the rest of its messages in an arbitrary manner. Since the protocol is auxiliary-input zero-knowledge, a probabilistic polynomial-time machine My. exists which simulates the interaction of V* and P. We use My, to build a B P P machine, denoted M, for the language L: On input x, machine M proceeds as follows:
+Choose random r. Run Mv.(X ) with empty auxiliary input (or simply My(x), the simulator with respect to the prespecified verifier V) to obtain ~o (discard the rest of the text). For i := l to k do
+Compute fli "- V(x, r, ~o. . . . . ~i-1). Run Mv. with auxiliary input [fl~, f12. . . . . fl~] to obtain ~ (which is
+our "guess" for P(x, fit. . . . . fl~)).Discard the rest of the text. enddo output p(x, r, ~to. . . . . ~k)
+Soundness of M. As was the case for the one-step and two-step proofs, in this case we imitate exactly the process of the interactive proof as far as V is concerned, only substituting the simulator for the prover as a means of generating ~o. . . . . ~k. The simulator computes ~ti at stage i while having no knowledge of the random string used to compute fl~. . . . . fl~,precisely the conditions under which P must compute ~ti in a real interaction. It follows that Mv.'S ability to generate, under these conditions, a set of messages ~o. . . . . 0tkfor which g(x, r, 0to. . . . . ~tk)evaluates to ACC with nonnegligible probability implies the ability of some prover P* to do the same in a real interaction. The soundness of M therefore follows from the soundness of the underlying interactive proof. Note that the soundness condition does not depend in any way on the "zero-knowledge-ness" of the protocol.
+Completeness of M. Consider an interaction on input x. Let fl~. . . . . ~ be the first i verifier messages of the unique conversation corresponding to x and to some
+
+Definitionsand Properties of Zero-KnowledgeProof Systems
+
+27
+
+random string r. The prover P, when interacting on x with a verifier that uses fll ..... fit as its first i messages, will output the messages ~to..... ~tt corresponding to x and r. This is true in particular for the previously described verifier V*. Not until it receives the message flt+l can P (perhaps) realize it is interacting with a cheater V* and not with the well-behaved E Therefore all its messages up to that point will be as specified by the protocol. In the case of perfect zero-knowledge, the texts of Mr 9will have the same property. In particular, at round i the message ~t obtained from the simulation text will be the unique P(x, fll ..... fit) corresponding to x and the random string r chosen. In all, the sequence ~o. . . . . ~k of prover messages generated by M will be the unique sequence corresponding to x and r, and therefore the completeness of M follows from the completeness of (P, V).
+We now proceed to adapt the argument to computational zero-knowledge. We need to prove that, at round i, the messages 0to. . . . . at generated by My, on input x and auxiliary input [fl~ . . . . . ft] are with very high probability P(x), P(x, flit), .... P(x, f~ ..... ft). We first address the following question:
+
+Single Element Question. Let {n~'}~a be a distribution ensemble having the following property: for every large enough x the probability distribution n~ assigns high probability to one element, denoted trx (in our case, the distribution created by the prover is totally deterministic, that is, assigns probability 1 to some text try). Let {n[}x~o be a distribution ensemble which is polynomially indistinguishable from {rc~'}x~o. Must {n~}~ have essentially the same property (i.e., for every large enough x, the distribution n~ assigns high probability to try)?
+
+Before attempting to answer this question, let us examine more closely the notion of polynomial indistinguishability. In the definition of polynomial indistinguishability used throughout the paper, two distribution ensembles {n~}~ and {~z[}~, claimed to be polynomially indistinguishable, must satisfy the following condition: any polynomial-time probabilistic algorithm, on input a single string sampled from {~z~'}x, must behave approxmately the same as when given a string sampled from {Tt]}~. Another, possibly stricter, definition is the following: any polynomial-time algorithm, on input a sequence (of constant or polynomial size) of strings sampled from {~}x, must behave approximately the same as when given a sequence of strings sampled from {n[}~. We refer to the first version of the definition as single-sample polynomial indistinguishability, and to the second as multiple-sample polynomial indistinguishability.
+Multiple-sample polynomial indistinguishability bears relevance to our discussion due to the following fact: when using the multiple-sample definition a positive answer to the single element question posed earlier can be easily proved, provided that {n~}~ can be sampled in polynomial time. The following two claims demonstrate this.
+
+Claim 4.5.1. Let {n~'}x assign hioh probability (say _>3/4) to ax for every laroe enouoh x and let {n~'}x and {rc~}xbe multiple-sample polynomially indistinguishable. Then {n[}~ must, for every laroe enouoh x, assion very hioh probability (say > 3/5) to exactly one strino, denoted tr'~.
+
+28
+
+O. Goldreich and Y. Oren
+
+Proof. Assume to the contrary that no string appears in n[ with high probability (i.e., higher than 3/5). Consider the following two-sample distinguisher A: on input two strings, s~ and s2, algorithm A outputs 1 if s~ = s2 and 0 otherwise. If s~, s2 were sampled from {n~'}~,then s~ = s2 with very high probability (namely, > (3/4)2). On the other hand, if sl, s2 were sampled from {n[}~, then sl = s2 with too low probability (namely, 13/25 < 9/16). Therefore A will distinguish {~'}~ from
+[]
+
+The above claim guarantees that {n[}x assigns very high probability to a single string. We now show that this string must be o~ (single-sample polynomial indistinguishability suffices to prove the following claim).
+Claim 4.5.2. Let {n~'}~D be a distribution ensemble such that, Yx ~ D, the distribution n~ assigns probability at least 89+ 8 to one string, denoted ox. Let {rr~}~a be a distribution ensemble such that, Yx ~ D, the distribution ~ assigns probability at least 1 + e to one string, denoted axr . I f {n~'}~and {n[}~ are polynomially indistinguishable and {n[}x can be sampled in polynomial time, then, for all but finitely many x ~ D, string a~ equals strino a'.
+Proof. If otherwise, consider the following distinguisher A: on input a string s, algorithm A samples ~ to obtain, with overwhelmingly high probability, string a;, (which by hypothesis is different from ax). (The number of sample points is polynomial in 1/e.) The algorithm outputs 1 if s = a" and 0 otherwise. If s comes from hi, then with probability > 89+ ~ we have s = a'. If, on the other hand, s comes from ~ , then with probability >89+ 8 we have s = ax and hence (assuming a'x # ax) s ~ a" (with probability > 89+ 8).Therefore A will distinguish {n~}~from {n~}~. []
+All that remains in order to answer the single element question for single-sample polynomial indistinguishability is to show, if we can, that single-sample polynomial indistinguishability is equivalent to multiple-sample polynomial indistinguishability. However, can we? Polynomial indistinguishability was originally discussed in the context of probabilistic encryption [GM] and pseudorandom generators [Y]. In these cases the distributions of both the ensembles which are assumed to be polynomially indistinguishable can be sampled in polynomial time. This fact can be used to prove that in these contexts single-sample polynomial indistinguishability (the usual definition) and multiple-sample polynomial indistinguishability are equivalent (intuitively, becase the distinguisher can generate additional samples by itself).1 The same proof cannot be applied, however, in general and in particular in the context of zero-knowledge, because in this case one of the distribution ensembles, mainly (P, V), cannot be sampled in polynomial time.
+We return to our original question. Since we cannot demonstrate the equivalence single-sample polynomial indistinguishability to multiple-sample polynomial indistinguishability, we must adopt a different approach. We now demonstrate that
+
+1 In [GGM] Goldreich et al. define multiple-sample polynomial indistinguishabifity and prove its equivalenceto single-sample polynomial indistinguishability in the context ofpseudorandom generators.
+
+Definitionsand PropertiesofZero-KnowledgeProofSystems
+
+29
+
+even under single-sample polynomial indistinguishability, {Tt[}~ must assign very high probability to tT~(the string assigned high probability by g]'). For any distribution g and string s, we denote by it(s) the probability assigned by ~ to s.
+
+Single Element Lemma. Let e <_89 Let {lt~}~ D and {lt[}~ a be polynomially indistinguishable distribution ensembles such that ~ and ~ are probability distributions over strinfs of length polynomial in Ix[. Assume that, for every laroe enough x, some strino, denoted tT~,exists such that ~ assions to tTxprobability >_1 - e. Assume further that {~z~}~a can be sampled in polynomial time (thouoh { ~ } ~ D may not be). Then ~(a~) > 1 - 2e for all but finitely many x.
+
+Proof. Assume an infinite sequence Seq of x's exists such that g[ assigns Gx probability at most 1 - 2e.
+For any x ~ Seq there must be one or more strings s such that ~[(s) > 0 (a~ may or may not be one of them). These strings can be arranged in lexicographical order. For any two strings sl, s2, we write sl < s2 to mean that sa precedes s2 in lexicographical order, s~ _< s2 means sa < s2 or sx = s2.
+Let P~- be defined by
+P ; = {sl~}s~_rIt~(s)
+
+and P+ by
+
+Z
+{sis _<ox}
+
+Example. Let ax = 100 and ~ assign probability 1/5 to each of the following strings: 00, 01, 000, 100, 1001. Then P~- = 3/5 and P+ = 4/5. If (~x = 100 and) ~ assigns probability 1/4 to each of the strings 00, 01,000, 1001, then P~- = P ] = 3/4.
+
+For any x ~ Seq, we have three possible cases (not necessarily distinct):
+(1) P+ < 0.8. (2) P ; > 0.2. (3) P+ _ 0.8 and Px- < 0.2.
+Denote by St, 1 < i _ 3, the subsequence of Seq such that x ~ Si if case i holds for x. Clearly, at least one of the subsequences must be infinite. We now show how to handle each of the corresponding cases.
+Case (1). Assume S~ is infinite. Let us first prove the following claim:
+
+Claim 4.5.3. Let ~ be any probability distribution on strings. A k-experiment on will consist of sampling k times the distribution ~. Denote by si, i <_k, the result of the ith sampling in the k-experiment. Let P~denote the probability that the sample si is larger or equal to all of the samples (i.e. Pi = Prob(Vj, si >_s~)). Then P1 >- 1/k.
+
+Proof. For reasons of symmetry, Vi, j _< k, Pi = Pj. Since in every k-experiment
+
+there must be at least one maximal value, it follows that ~ i k l Pi _ 1, and therefore,
+
+Vi < k, P~> 1/k.
+
+[]
+
+30
+
+o. Goldreich and Y. Oren
+
+Consider now the following distinguisher, A: on input a string s, the distinguisher A first samples n~ for k - 1 times (k is a constant to be determined later). It then outputs 1 if s is greater than or equal to each of the k - 1 sampled strings. Suppose s was sampled from n~. We can view the whole process as a k-experiment on ~, in which s is the first sample. By the above claim, the probability that A outputs 1 in this case is greater than or equal to 1/k. On the other hand, if s was sampled from rt~' (in which case s = trx with probability > 1 - e ) , then (for every x ~ $1) the probability of a single sample being smaller than or equal to s is less than (1 - e)-0.8 + e < 0.9 (the first term is for the case s = trx). The probability that all k - 1 samples will be smaller than or equal to s, is thus less than 0.9k-1. A suitable choice of k (say k = 50) yields 0.9k-~ < 1/(2k). Clearly, for any x ~ $1, algorithm A will distinguish between ~r~'and n~, and therefore the distribution ensembles cannot be polynomially indistinguishable.
+
+Case (2). Assume $2 is infinite. This case is symmetric to the previous case, since if we reverse the lexicographical order we obtain P~+ < 0.8. It can therefore be handled in the same way.
+
+Case (3). Assume $3 is infinite. In this case reversing the lexicographical order will
+
+still leaves us in the same case. Observe, however, that if P~+ > 0.8 and P~- < 0.2, it
+
+must be that lr~(trx) > 0.6. In such a case we can find tr~ with sufficient confidence
+
+by sampling rr~ a polynomial number of times. Consider a distinguisher A which,
+
+on input a string s, samples n~ enough times to pick out, with very high probability
+
+(say > 1 - e/3), a string s' for which rr~(s') > 0.6, and then outputs 1 if s = s'. We
+
+have Prob(s' = a~) > 1 - #3. F o r any x, x ~ S3, if s was sampled from n~', then
+
+Prob~7(s = s') > 1 - e - #3. We started out the proof by assuming that, for any
+
+x ~ Seq (and therefore for any x e $3), n~(a~) < 1 - 2e and hence Prob~(s = s') <
+
+1 - 2e + #3. Clearly, A will distinguish between {zr~'}~~o and {rr~}~~o (with gap #3).
+
+The lemma follows.
+
+[]
+
+We now return to our original goal of adapting the completeness assertion of M to the case of computational zero-knowledge. The corresponding adapting lemma is an easy consequence of the Single Element Lemma.
+
+Lemma 4.5.1. Let D be the set of all pairs (x, y) for which x ~ L and y = [ fll ..... fli], such that, for some random string r,
+fll = V(x, r, [0to = P(x)]),
+f12 = V(x, r, [0co = P(x), otx = P(x, ill)]),
+fli = V(x, r, [ao = P(x), oq = P(x, ill) . . . . . ~q-1 = P(x, fit, f12. . . . . fli-l)]).
+I f the distribution ensembles {Mv.(X, Y)}(x,y)~o and {(P(x), V*(x, Y)5}tx,~o are
+polynomially indistinguishable, then in the texts produced by My. on input x and y with very high probability,
+Vj <_ i, ctj = P(x, ill, f12. . . . . fl~).
+
+Definitions and Properties of Zero-Knowledge Proof Systems
+
+31
+
+Proof. For every j < i, let n]x'y) be the distribution of the first j + 1 prover
+
+messages in P's interaction with V* on input x and auxiliary input y = [fix. . . . . flj]
+
+(note that this distribution depends solely on x and y and not on V*'s random
+
+string). Let rc~x'y) be the distribution of the first j + 1 "prover messages" produced
+
+by My* on input x and y. Clearly, if {(P(x), V*(x, Y))}~x,y~Dand {Mv,(X, Y)}~x.yj~o
+
+are polynomially indistinguishable, then so are t i J~.y)~Dand {n~x'Y~}~.yj~D. The
+
+ensemble {n~x'y)}~x,y)~o clearly can be sampled in polynomial time, and n]~'y~assigns
+
+one string (namely, [P(x), P(x,/~1)..... P(x, ~,...,/~j)]) probability 1 for any
+
+(x, y) e D. We can thus apply the Single Element Lemma.
+
+We conclude that, at round i, machine My, will produce, with very high probabil-
+
+ity, the messages P(x) . . . . . P(x, ~ . . . . . ~i) corresponding to x and the string r used
+
+to compute/~1 ..... /~i.
+
+[]
+
+The theorem follows.
+
+[]
+
+Remark 4.3. The fact that single-sample and multiple-sample polynomial indistinguishability may not be equivalent in the context of zero-knowledge raises the following questions, which deserve further investigation: can single-sample and multiple-sample polynomial indistinguishability be proved equivalent or strictly different in the context of zero-knowledge (i.e., when one ensemble cannot be sampled in polynomial time)? If they are different, which should be used in a "correct" cryptographic definition of zero-knowledge? Observe that the two definitions are equivalent if the distinguisher is allowed to have auxiliary input, as in the definition of "nonuniform" polynomial indistinguishability presented in the previous subsection.
+
+4.6. A Remark on Extension to Zero-Knowledge Arguments
+The results of the pevious subsections extend to the zero-knowledge argurhents introduced in [BCC]. In these protocols it is guaranteed that no efficient way of fooling the verifier to accept false statements exists. This is a relaxion of the soundness condition in interactive proofs where it is required that no way of fooling the verifier (to accept false statements) exists. In the extensions we use exactly the same constructions of BPP machines, and the same reasoning for the completeness condition (i.e. that th~ machine accepts, with high probability, inputs in the language). For the soundness of the BPP machine (i.e., showing that it rejects, with high probability, inputs not in the language) we use a slightly more careful reasoning. Recall that the soundness of the BPP machine is proved by relying on the soundness of the protocol. In fact, in all cases we have shown that a violation of the soundness of the BPP machine yields violation of the soundness condition for interactive proofs. This, in turn, was done by incorporating the "cheating BPP machine" inside of a "cheating prover." Hence, the "cheating prover" constructed in all cases is indeed efficient and thus contradicts the soundness condition of zero-knowledge arguments as well.
+
+32
+
+O. Goldreich and Y. Oren
+
+Acknowledgments
+
+We would like to thank Shimon Even for making useful comments on the paper. The concept of Las Vegas interactive proofs was raised by Manual Blum and communicated through Silvio Micali. The question of triviality of proof systems with deterministic provers was raised by Shimon Even.
+
+References
+[AH1] Aiello, W., and J. Hastad, Perfect Zero-Knowledge Languages Can Be Recognized in Two Rounds, Proc. 28th FOCS, 1987, pp. 439-448.
+[AH2] Aiello, W., and J. Hastad, Relativized Perfect Zero-Knowledge Is Not BPP, Inform. and Comput., Vol. 93, 1992, pp. 223-240.
+[B] Babai, L., Trading Group Theory for Randomness, Proc. 17th STOC, 1985, pp. 421-429. [BCC] Brassard, G., D. Chaum, and C. Crepeau, Minimum Disclosure Proofs of Knowledge,
+J. Comput. System Sci., Vol. 37, No. 2, Oct. 1988, pp. 156-189. [FS] Feige, U., and A. Shamir, Personal communication. IF] Fortnow, L., The Complexity of Perfect Zero-Knowledge, Proc. 19th STOC, 1987,
+pp. 204-209. [GGM] Goldreich, O., S. Goldwasser, and S. Micali, How To Construct Random Functions,J. Assoc.
+Comput. Mach., Vol. 33, No. 4, 1986, pp. 792-807. [GK] Goldreich, O., and H. Krawczyk, On the Composition of Zero-Knowledge Proof Systems,
+Proc. 17th ICALP, Lecture Notes in Computer Science, Vol. 443, Springer-Verlag, Berlin, 1990, pp. 268-282. [GMS] Goldreich, O., Y. Mansour, and M. Sipser, Interactive Proof Systems: Provers that Never Fail and Random Selection, Proc 28th FOCS, 1987, pp. 449-461. [GMW1] Goldreich, O., S. Micali, and A. Wigderson, Proofs that Yield Nothing but their Validity and a Methodology of Cryptographic Protocol Design, Proc. 27th FOCS, 1986, pp. 174-187. [GMW2] Goldreich, O., S. Micali, and A. Wigderson, How to Play any Mental Game or a Completeness Theorem for Protocols with Honest Majority, Proc. 19th STOC, 1987, pp. 218-229. [GM] Goldwasser, S., and S. Micali, Probabilistic Encryption, J. Comput. System Sci., Vol. 28, No. 2, 1984, pp. 270-299. [GMR1] Goldwasser, S., S. Micali, and C. Rackoff, Knowledge Complexity of Interactive Proofs, Proc. 17th STOC, 1985, pp. 291-304. [GMR2] Goldwasser, S., S. Mieali, and C. Rackoff, The Knowledge Complexity of Interactive Proof Systems, SIAM J. Comput., Vol. 18, No. 1, 1989, pp. 186-208. [GS] Goldwasser, S., and M. Sipser, Arthur Merlin Games Versus Interactive Proof Systems, Proc. 18th STOC, 1986, pp. 59-68. ElY] Impagliazzo, R., and Yung, M., Direct Minimum-Knowledge Computations, Advances in Cryptology--Crypto 87 (proceedings), Lecture Notes in Computer Science, Vol. 293, Springer-Verlag, Berlin, 1987, pp. 40-51. [O1] Oren, Y., Properties of Zero-Knowledge Proofs, M.Sc. Thesis, Computer Science Department, Technion, Haifa, Nov. 1987 (in Hebrew). [02] Oren, Y., On the Cunning Power of Cheating Verifiers: Some Observations about ZeroKnowledge Proofs, Proc. 28th FOCS, 1987, pp. 462-471. [S] A. Shamir, IP = PSPACE, Proc. 31st FOCS, 1990, pp. 11-15. [TW] Tompa, M., and H. Woll, Random Self-Reducibility and Zero-Knowledge Interactive Proofs of Possession of Information, Proc. 28th FOCS, 1987, pp. 472-482. IV] Yao, A. C., Theory and Applications of Trapdoor Functions, Proc. 23rd FOCS, 1982, pp. 80-91.
+

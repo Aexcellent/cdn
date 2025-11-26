@@ -1,0 +1,362 @@
+Available online at www.sciencedirect.com
+ScienceDirect
+Transportation Research Procedia 14 (2016) 243 – 252
+6th Transport Research Arena April 18-21, 2016
+Development of models predicting dwell time of import containers in port container terminals – an Artificial Neural Networks application
+Ioanna Kourounioti a,*, Amalia Polydoropoulou a, Christos Tsiklidis a
+aDepartment of Shipping, Trade and Transport, University of the Aegean, Korai 2a, Chios, 82100, GR
+Abstract The general aim of this paper is to propose the development of a methodological framework that incorporates the various factors affecting the Dwell Time (DT) of containers in container terminals. Container terminals are regarded as a key element of logistics chains since they are a link between sea and the hinterland transportation modes. Workload forecasting is essential when it comes to truck arrivals for the avoidance of bottlenecks and the smooth integration of container terminals in the supply chain. Terminal operators, tend to make stacking decisions based on mostly on factors suc the container’s weight, size and type. The suggested methodology requires the collection of aggregate data and the application of Artificial Neural Networks (ANN) to identify the determinants of Dwell Time (DT). The first results of the ANN showed that the most important factors affecting significantly the model’s accuracy are the following: containers size and type, the day and month of the container’s discharge, the vessel’s port of origin and the commodities transported. ©©22001166TThheeAAuuthtohrosr.sP.uPbulibshliesdhebdy bEylsEevliseervBie.Vr .BT.hVis..is an open access article under the CC BY-NC-ND license (Phettepr:-//rcerveiaetiwveucnomdemr orness.poorgn/sliicbeilnisteyso/bfyR-noca-ndda/4n.d0/B).ridge Research Institute (IBDiM). Peer-review under responsibility of Road and Bridge Research Institute (IBDiM) Keywords: Dwell Time; import container; marine container terminal; Artificial Neural Network; decision making; teminal policies
+* Corresponding author. Tel.: +30-227-103-5284. E-mail address: ikouroun@stt.aegean.gr
+2352-1465 © 2016 The Authors. Published by Elsevier B.V. This is an open access article under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/). Peer-review under responsibility of Road and Bridge Research Institute (IBDiM) doi:10.1016/j.trpro.2016.05.061
+
+244
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+1. Introduction
+Marine container terminals constitute a key node in global supply chains. A container terminal is the area where containers are handed before being exported in other countries or imported in the port mainland. The main transportation modes that can be found in a container terminals are vessels for deep-sea or short-sea transportation, barges for inland water transportation, trains and trucks for hinterland transportation. Hence, terminals serve as buffer zones that absorb any incompetencies and delays created in other parts of the supply chains.
+Simultaneously world container traffic, defined as the absolute number of containers carried by the sea, increased from 28.7 million TEU’s in the 90’s to 136 million TEU’s in 2008 when the world economic crisis started. World marine container terminal throughput increased from 36 million TEU’s in the 80’s to 88 to around 623 million TEU’s in 2012 Notteboom (2014). Between the years 1997 and 2008, global container trade presented an average growth of 9% per year. Nowadays, due to the enlargement of vessel size, shipping industry is facing remarkable structural changes. For example, the construction of new ships with a capacity of more than 19,000 TEU’s, such as MSC_OSCAR with a total loading capacity of 19,224 TEU’s and CSCL_GLOBE with a loading capacity over 19,000 TEU’s, are part of the abovementioned problem. Hence, the new ship’s size imposes a challenge not only on a marine container terminal level but also to the entire supply chain.
+Marine container terminals are regarded as the primary regulators of efficiency and reliability of the supply chain since they can absorb any delays and bottlenecks are created in other parts of the chain (Rodrigue et al, 2008). With containers being the dominant transportation unit of a fast growing shipping industry, terminals are challenged to cope with an increasing number of boxes that need to be handled quickly, efficiently and economically (Rodrigue and Notteboom, 2009).Therefore, marine terminals have to optimize their procedures in order to deliver containers on time and without any damages.
+Apart from challenging port efficiency the ever-growing container volumes confront terminal capacity. It is a common policy of many shippers to keep their cargoes in the terminal yard mostly taking advantage of the free storage days. The lack of available space for the expensive investment of terminal expansion, forces terminal operators to implement new policies such as financial penalties or various operational restrictions to make shippers and consignees discharge containers faster (Rodrigue et al., 2008).
+Several studies have illustrated that improvement on information regarding trucks’ arrivals to pick-up import containers could result in an important reduction of unproductive moves (Goodchild and Noronha, 2010). The movement of a container from its first stacking place in the yard for whatever a reason but the delivery or customs inspection is defined as an unproductive more. The number of unproductive moves is often used to access a terminal’s efficiency. Therefore, it could be argued that the precise and timely prediction of the daily rate of discharge for import containers is significant for the scheduling of the optimal stowage planning of containers in the yard and for the correct allocation of handling equipment and human resources. Several container marine terminals have tried to implement various methods like truck appointment systems but without having the expected results. However, the precise prediction a container’s dwell time and pick-up time-of-day could provide an input and help yard planners stack the containers in such a manner that the containers with the higher pick-up probabilities could be retrieved easily and without many unproductive moves.
+To the best of our knowledge, although there is a substantial literature focusing on factors affecting freight mode and route choice, limited scientific interest is presented regarding to the factors that affect the containers’ Dwell Time (DT). The innovation of this paper is to study these aspects of the logistic chains within a container terminal and to create a methodological framework able enough to predict the container dwell time and to provide yard planners and terminal operators with a forecasting tool that will assist them when making daily decisions regarding stacking policies, optimal equipment and human resources allocation.
+This paper is structured as followed: After introduction the existing literature on DT prediction is presented. In section 3 the input data and the methodological framework are extensively described. Section 4, presents the data input for the model development. Section 5 discusses the model estimation results. The paper concludes by identifying the implications of the research on terminal operations when the exact DT of an import container is to be predicted and suggests more areas for further research.
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+245
+
+2. Literature review
+
+Before being picked-up and transported to a terminal’s mainland or being loaded onto a ship containers are stacked inside the terminal yard. Dwell Time (DT) is defined as “the total time a container spends in one or more terminal stacks”, (Ottjes et al., 2007). Container DT may be influenced by several factors such as gate operations, availability and efficiency of hinterland connections and customs regulations. Consignee, namely the receiver of the goods can be identified as one of the key stakeholders who determine DT since he decides when to pick-up import containers or when to deliver export containers. In addition, it has been found that the stacking area needed is linearly proportional to the average container time in a container terminal (Little, 1961).
+Attempts have been made to estimate the influence of DT in terminal capacity. Specifically, Hoffman (1985) developed an equation that estimates the necessary size of the yard as a function of dwell time, the height of the stacked containers, the peak-hour and the total number of containers handled each year.
+
+‫ܻܥ‬
+
+ൌ
+
+ሺ‫ܥ‬
+
+‫כ‬
+
+‫ܣ‬
+
+‫כ‬
+
+ܶሻ
+
+‫כ‬
+
+ଵାி ଷ଺଴
+
+(1)
+
+where: CY= Container yard area (m2) C= Expected container volume (TEU) A= Area (m2) per container (TEU) T= Average container dwell time F= Peaking factor (~20%) ensuring the yard’s efficiency
+
+Furthermore, Dally (1983) developed a formula that estimates the number of containers a yard can accommodate. This equation uses the number of container ground slots, the mean stacking height and the container dwell time to estimate the annual yard capacity. He also applies a peak factor that usually varies from 1.2 to 1.3. It is expected that the new generation vessels will have an impact on the peak factor that has not yet being determined (Ottjes et al., 2007).
+
+‫ܥ‬
+
+ൌ
+
+஼௦‫כ‬ு‫כ‬ௐ‫כ‬௄ᇲ ்‫כ‬ி
+
+(2)
+
+where: C= the annual yard capacity (TEU/year) Cs= Number of ground slots H= mean profile height W= Working slots (TEU’s) expressed as a proportion (~0.8) K’= Number of days a year T= Mean container dwell time in the yard F= Peaking factor (~20%) ensuring the yard’s efficiency
+
+Hence, the average DT plays a crucial role in determining the overall terminal capacity (Chu et al., 2005). Nowadays, the increased container volumes in combination with the new massive container vessels are demanding bigger terminal capacities. One solution could be the increase of terminal size which, apart from being a very expensive investment, may be not feasible due to space limitations. Consequently, terminal operators are trying to decrease average DT. In order to do so, they have to determine the main factors that influence the number of days a container stays in the terminal. Nowadays, limited research focusing on quantifying the determinants of DT exists.
+One of the first researchers of the impact of DT on terminal capacity is Merckx (2005) who designed a framework that assists terminal operators to optimize terminal capacity, by imposing a number of pricing mechanisms based on different dwell time charging schemes. In addition Rodrigue (2008) discussed how logistic companies that use sea port terminals for their shipments and have limited distribution centres and storage areas fully utilize their free-of-charge time on the terminal’s yard. On the other hand, terminal operators react on this
+
+246
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+practice with the restriction of the dwell time and terminal access. He also proposed that the extension of gate hours on a marine terminal can reduce the container dwell time.
+Huang (2008) has proven that increased container dwell times lead to more unproductive moves that result in a decrease in the terminal’s efficiency in a very costly manner. Some of the main factors influencing DT that were identified in the literature are: 1) the location of the terminal; 2) the efficiency of terminal operations; 3) the implemented port policies such as monetary penalties for delayed shipments or extended gate hours; 4) customs; 5) the freight forwarder or the shipping company; 6) the available hinterland connections; 7) the mode of transport used; 8) the cargo being transferred; and 8) the business relationships developed between the involved parties (Moini et al. (2008); Rodrigue et al. (2008)). Moini et al (2008) applied genetic algorithms to evaluate the main factors affecting the dwell time of containers and measured their impact on the terminal productivity. Furthermore, she highlighted the importance of acquiring data on the landside recipients and on the type of the transported goods. This information is expected to enhance the predictability of the proposed models. In addition, Moini (2010) established a relationship between truck gate activities and drayage operations at a marine container terminal using both analytical and simulation approaches. By applying data mining techniques she identified the importance of the abovementioned determinants on the DT. Towards the same direction Kourounioti et al (2015) proposed the development of a methodological framework that combines aggregate and disaggregate models aiming to predict the dwell time of containers in a marine terminal. For this purpose regression models were developed that showed the influence of a container’s consignee and commodity on the DT. In addition, if the exact day a container was to be discharged from the terminal was known in advance, operators would be able to organize the yard appropriately so as to be able to retrieve containers with higher pick-up probabilities more easily, reduce rehandling moves and get full advantage of the available capacity. The importance of this information has also been highlighted in Zhao and Goodchild (2010) who developed a simulation model to evaluate how the use of information affects the efficiency of a marine terminal. The results illustrated that when the day of a truck’s arrival was known in advance there was a substantial decrease of non-productive moves.
+In order to deal with the lack of informational flow several container port terminals have implemented Truck Appointment Systems (TAS). TAS is mainly a system which books a slot for a certain number (restricted by each terminal’s capacity) of binding transactions during a predefined time period (usually one hour). One of the first TAS was implemented on the marine terminals of Los Angeles and Long Beach in order to deal with the issues of traffic congestion and air pollution (Giuliano and O’ Brien, 2007).
+The summarized reflection is that limited research exists on quantifying the factors influencing DT. It cannot be easily contradicted that knowing when a container will be picked-up from a seaport terminal is expected to assist significantly decision making in a tactical and operational level when designing terminal policies as well as in a strategic level when taking investment decisions.
+
+3. Methodological framework
+
+In this section, the methodological framework applied in this research is presented. Based on the literature review findings (Moini et al., (2008); Moini, (2010); Rodrigue, (2008)) we assume that the factors affecting DT are divided in three distinctive categories as follows: 1. Information related to the container such as
+x Container’s size (20ft, 40ft) x Container’s status (full, empty) x Container’s type (reefer, general cargo, hazardous) x Commodity x Exact date of arrival and departure from the vessel x Exact date of customs inspection (if performed) x Dwell Time 2. Information related to the ocean carrier x Ocean carrier x Ocean carrier’s assigned vessel x Port of origin
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+247
+
+3. Information related to the truck x Exact date of departing from the gates of the terminal
+
+Fig.1. Methodological framework.
+
+Data to capture freight behavioral interactions, however, are usually commercially sensitive and difficult to acquire. For the development of this study aggregate data on import containers, that are available through the container terminal information system, were applied as presented in the methodological framework of Figure 1. In order to be able to classify the containers based on their DT, Artificial Neural Networks (ANN) were applied. The ANN methodologies are described in detail in the section below.
+
+3.1. Artificial Neural Networks (ANN)
+
+Artificial Neural Networks are inspired by the brain’s abilities to learn, solve and think. A neural network is also referred as a circuit of interconnected neurons. Consequently, artificial neural networks are abstract algorithmic fabrications which fall into the category of artificial intelligence in the computer science. Therefore, a neural network “mimics” how a brain learns the relationship or patterns between input and output variables. Input variables are also called predictor or dendrites (in accordance to the human cells). The computation takes place in the hidden layer of the network (cell body) where it receives inputs from the input layer, it performs some non-linear analysis and it releases the output. Output variables are also called dependent variables or axon. In general the artificial neural networks can be presented as (equation 3):
+
+Yi= f (∑j Wij*xj )
+
+(3)
+
+where: Yi : the output, Wij : the weight from node j to node I, Xj : input node and F : activation function (logistic sigmoid)
+
+The connection weights are unknown parameters which are estimated by the training method. The training method used is backpropagation which is basically the feed-backwards propagation of error based on the rule of error correction, which is a generalization of the least squares method. During the training of the network, the parameters are adjusted incrementally until the training data satisfies the mapping as well as possible. This is until yi’ matches the desired output yi as closely as possible up to a number of iterations. This task is performed with the continuous adjustments of each node’s weights. In order for the weight adjustment to occur, the network has to compute the error derived from weighting. Afterwards, the outputs are sent back for further adjustments. The parameters of an Artificial Neural Network primarily refer to the number of hidden layers, number of hidden nodes,
+
+248
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+training and learning rules, the momentum term, the learning rate, and the training cycles. Based on the earlier data analysis, artificial neural network algorithms are deployed on 13733 instances of import containers extracted from the actual data (74% of the 20349 instances on the database had DT between 4–13 days). The first objective which will be investigated is to examine the robustness of the neural network in classification and estimation. To measure the overall performance of the model, three factors are considered:
+
+x Correctly classified instances x Kappa statistic x Root mean squared error
+
+Root mean squared error (RMSE) is computed by taking the root average of the squared differences between each predicted value and its corresponding original value. The following equation demonstrates RMSE(equation 4):
+
+ܴ‫ܧܵܯ‬
+
+ൌ
+
+ටσ೙೔సభሺ௬ି௬ᇲሻమ
+௡
+
+(4)
+
+where: y= Actual variable y’= Estimated variable n= total number of records
+
+Kappa statistic or Kappa coefficient is used as a means of classifying agreement in categorical data, which measures the agreement of predictions with the actual class. Kappa can be (equation 5):
+
+‫ ܽ݌݌ܽܭ‬ൌ ைଵିି஼஼
+
+(5)
+
+where: O = Observed agreement = Observed – corrected proportional agreement between actual and predicted classified instances C = Chance agreement = Chance – corrected proportional agreement between actual and predicted classified records
+
+‫ ܥ‬ൌ  σ௠௜ୀଵ ܰை௜ ‫ܰ  כ‬஼௜
+
+(6)
+
+where: NOi = the chance of having the observed value of I, NCi = the chance of having the predicted value classified in the same class of observed value of i
+
+A Kappa coefficient of 1 means a statistically perfect model, 0 means that every model value is different from the actual value. A Kappa statistic of 0.7 or higher is generally regarded as a good statistic correlation but of course the higher the value the better the correlation.
+The data presented in the next section were used to train the ANN.
+
+4. Data analysis
+
+This section presents the descriptive analysis of the data acquired from a container terminal in the Middle East.
+
+4.1. Database description
+
+One year aggregate data, from January 2014 to December 2014, were collected from the Terminal Operating System (TOS) of a container terminal in the Middle East. Totally, 13733 import containers picked up from Sunday
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+249
+
+to Saturday, were used to develop the model. The data were processed and dummy variables were created. Table 1 summarizes the main variables inserted in the model, their values and their frequencies.
+
+Table 1. Data analysis.
+
+Variables
+
+Values
+
+Twenties
+
+0
+
+1
+
+Reefers
+
+0
+
+1
+
+Customs
+
+0
+
+Inspection
+
+1
+
+January discharge 0
+
+1
+
+February discharge 0
+
+1
+
+March discharge 0
+
+1
+
+April discharge
+
+0
+
+1
+
+May discharge
+
+0
+
+1
+
+June discharge
+
+0
+
+1
+
+July discharge
+
+0
+
+1
+
+August discharge 0
+
+1
+
+September
+
+0
+
+discharge
+
+1
+
+October discharge 0
+
+1
+
+November
+
+0
+
+discharge
+
+1
+
+December
+
+0
+
+discharge
+
+1
+
+Port B
+
+0
+
+1
+
+Port D
+
+0
+
+1
+
+Port F
+
+0
+
+1
+
+Frequencies 62.69% 37.31% 76.98% 23.02% 59.32% 40.68% 100% 0% 98.21% 1.79% 92.62% 7.38% 87.35% 12.65% 77.81% 22.19% 80.08% 19.92% 84.88% 15.12% 93.95% 6.05% 95.59% 4.41% 96.18% 3.82% 95.61% 4.39% 97.72% 2.28% 92.14% 7.86% 94.87% 5.13% 91.82% 8.18%
+
+Variables Edible Products Sensitive Edible Products Building materials Textiles Chemicals Raw Materials Plastic products Sunday discharge Monday discharge Tuesday discharge Wednesday discharge Thursday discharge Friday discharge Saturday discharge Port A Port C Port E Port G
+
+Values 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1
+
+Frequencies 89.91% 10.09% 79.21% 20.29% 59.56% 40.44% 98.80% 1.20% 99.08% 0.92% 97.41% 2.59% 97.56% 2.44% 87.58% 12.42% 85.20% 14.80% 83.97% 16.03% 83.35% 16.65% 80.86% 19.14% 95.78% 4.22% 83.27% 16.73% 86.78% 13.22% 76.51% 23.49% 80.57% 19.43% 91.56% 8.44%
+
+For the model development the month and the day a container has be discharged from a vessel is taken under consideration. The biggest volume on containers was discharged during May while on Thursday more containers are
+
+250
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+being unloaded. In addition, 40.68% of containers pass through customs inspection and 23.2% are reefers. For the purpose of the analysis, we have selected the seven ports from which more than 1000 import containers were originated. Regarding the goods that a container carries, commodities were divided in the following categories:
+1. Edible products such as nuts, cereals, coffee, spices, dried fruits, etc. 2. Sensitive edible products such as meat, fish, dairy products, fresh fruits, vegetables, etc. 3. Building materials such as ceramic and marble products, construction materials, pipes, etc. 4. Chemicals such as glues, adhesives, clearing products, lubricants, etc. 5. Raw materials such as minerals, rocks, etc. 6. Plastic and paper products 7. Textiles 8. Other, meaning commodities that do not belong to any of the above categories.
+The majority of imported goods are sensitive edible products and building materials with the latter accounting for 40.44% possibly due to the extensive construction activity in the study area.
+4.2. Description of Dwell Time distribution
+The dwell time analysis that was conducted for the study port revealed that nearly the 80% of import container is processed during the first 18 days and more than 95% in 30 days (Figure 2). The percentage of processed non inspected containers in Port 1 rises steadily from day 1 to day 6, reaching a peak on day 9, where approximately 9% of the containers are being processed. On the other hand, almost 10% of inspected containers are being picked-up on day 8. More specifically, in Port 3 the average DT for non-inspected containers is 10.3 days with standard deviation 5.3 days, while containers that pass through customs stay on average 2 additional days.
+
+Fig. 2. DT distribution for up to 35 days.
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+251
+
+Using the abovementioned data models classifying containers based on their DT were developed as presented in the next section.
+
+5. Artificial Neural Networks results
+
+Terminal operators are asked to make decisions regarding the stacking of containers based mostly on their intuition. The available programs through the terminals operation systems help them stack containers mostly based on their weight and their size. The ANN developed in this section use information available in a TOS to classify container based on their DT.
+The properties of the ANN used for the training method are 2000 training cycles, 4 hidden layers of 25 nodes each, a network learning rate of 0.05 and a momentum term of 0.2. In order to identify how each factor affects the classification Artificial Neural Network Model (Classification), 6 tests were performed. In each test the determinants of the container DT were added in order to understand which independent variable has the most significant effect. The results of the tests are presented in the table below (Table 2).
+
+Table 2. Linear regression model VS Artificial Neural Networks model (classification).
+
+Test number
+
+ANN (Classification) Accuracy On correctly classified instances %
+
+Test1
+
+14.70%
+
+Test2
+
+15.74%
+
+Test3
+
+19.21%
+
+Test4
+
+37.26%
+
+Test5
+
+57.41%
+
+Test6
+
+65.17%
+
+In the first test, the independent variables used were the container’s size and type, specifically if the container was 20’ft or a reefer. As expected both low correlation between those factors and DT was found.
+In the next test, customs inspection was added as a variable. However, not a substantial improvement was observed in the model’s performance.
+In the third test, apart from the previous variables, the month that the container was discharged from the vessel was inserted. The model was improved because more explanatory variables were used enable mapping DT more sufficiently.
+In test 4, the independent variables used included, the container’s size, type, month of discharge, day of discharge and if it was inspected by the customs. Using this model configuration a major boost in the accuracy was observed (Accuracytest3= 19.21%-> Accuracytest4= 37.26%). Consequently, the day of discharge was found to be a very significant factor.
+The inclusion of the vessels port of origin in test 5 increased significantly model accuracy. This boost can be explained by the existence of possible correlation between the port of origin of a vessel and customs inspection, namely containers originated from particular ports present higher probabilities to pass through customs inspection.
+Finally, in test 6 all the available information was inserted. The additional variables concerned the type of transported cargo which is increased accuracy almost by 10%. This terminal handled various kinds of cargoes that had different DTs. Sensitive eatable products presented the lowest DT because possible late receipt may result in damages. On the other hand, consignees don’t feel the urgency to pick-up textiles, since they presented the highest DT. Building materials were fast processed possibly due to the extensive building activities in the area. As expected commodity is variable information that depicts both customs, since some products present higher probabilities to go through customs than other, and the urgency of the consignee to pick the container up. Unfortunately, this information is usually client sensitive and not easily available. It is highly advised that operators collect this data in order to use them to conduct analysis and/or predict DT.
+
+252
+
+Ioanna Kourounioti et al. / Transportation Research Procedia 14 (2016) 243 – 252
+
+Finally, the highest level of accuracy achieved with this dataset is 65.17% which is not very high when taking under consideration the accuracy ANN in other sciences. Having in mind, though the non-existence of tool that can predict DT even this accuracy may help the decision-making process of terminal planners and operators.
+6. Conclusions and further research
+Port container terminals are regarded as the most critical link for the transportation of goods between the sea and the hinterland. In order for the marine terminals to function effectively in a globalized supply chain they have to adapt and implement new strategies to reach their optimal performance. The biggest problem that terminals have to face nowadays is the enlargement of the vessels’ size which is accompanied by the growth of container volumes. Therefore, port operators have to redesign their strategies and policies in order to remain competitive to their rival ports. The optimization of the port operations can be assisted with the development of decision making tools.
+Until now, port operators mainly stack the containers within the yard based on their intuition or their experience without any tools in their disposal. The aim of this paper is to create a methodological framework which will enable the port operators to predict the container dwell time and subsequently to predict the daily workload regarding the arrival of trucks for the pick-up of import containers. For this purpose, ANNs were used to classify containers based on their data acquired from the TOS of a container terminal. The most important determinants of the DT were: 1) the day and month of discharge; 2) the port of origin; 3) the size and the type of container and; 4) the type of cargo transferred. From the comparison of the different Artificial Neural Networks models it is can be concluded that the more the information available the better the model accuracy. Terminal operators are therefore advised to gather as much information on each container they handle in order to use it for the development of predictive models.
+Finally, one of the most important deficits of ANN is that they work as black boxes and it is not easy to estimate the weight of each factor inserted, limiting the model’s predicting capabilities. For this purpose behavioral models may be used for the estimation of DT. The combination of aggregate with disaggregate data on the key decision makers is proposed.
+References
+Chu C., Huong W., 2005. Determining Container Terminal Capacity on the basis of an adopted yard handling system, Transport reviews, Vol. 25, No.2, pp.181–199.
+Dally H.K., 1983. Container Handling and Transport- A manual of current practices, London, Cargo systems IIR Publications Ltd., London. Giuliano G. and O’Brien T., 2007. Reducing port – related truck emissions: The terminal Gate Appointment System at the Ports of Los Angeles
+and Long Beach, Transportation Research part B, Vol.12, pp. 460–473. Hoffman P., 1985. Container facility planning: A case description. Port management textbook containerization, Institute of shipping economics
+and logistics, pp. 353–364. Huang, Y.H., Hsu, W.J., Chen, C., Ye. R. and Nautiyual, S., 2008. Capacity Analysis of Container Terminals using Simulation Techniques.
+International Journal of Computer Science, pp. 246–253. Kourounioti I., Polydoropoulou A., Tsiklidis C., 2015. Development of a methodological framework for the dwell time of containers in Marine
+Terminals- First results, In proceeding ICTR. Little JDC, 1961. A proof of the formula L=λW. Operations Research vol. 9, pp. 383–387. Merckx F., 2005. The issue of dwell time charges to optimize container terminal capacity, IAME Annual Conference, Cyprus. Moini N., Boile M., Theofanis S. and Leventhal W., 2008. Estimating the determinant factors of container DTs at seaports, Maritime Economy
+and Logistics, Vol. 14, pp. 162–177. Notteboom T., Parola F., Satta G., 2014. State of the European Port system – Market trends and structure update, Partim Transshipment Volumes,
+Portopia. Ottjes, J, H. Veeke, M. Duinkerken, J. Rijsenbrij and Lodewijks, 2007. Simulation of a multiterminal system of container handling. In Container
+Termials and Cargo, Ed: Kap Hwan Kim and Gunther Hans-Otto, Springster, pp. 15–36, ISDN 978-3-540-49549-9, Springer, New York. Rodrigue J.P., 2008. The terminalization of supply chains: Reassessing port/hinterland and logistical relationships, IAME, Kaisar E., S. Rodrigue, J.P., and T. Notteboom., 2009. The terminalization of supply chains: reassessing the role of terminals in port/hinterland logistical
+relationships. Maritime Policy and Management, Vol. 36, pp. 165–183. Zhao W., and Goodchild A., 2010. The impact of truck arrival information on container terminal rehandling , Transportation Research Part E,
+Vol. 46, pp. 327–343.
+

@@ -1,0 +1,1255 @@
+34 2 2017 2
+
+Application Ｒesearch of Computers
+
+Vol． 34 No． 2 Feb． 2017
+
+FOA
+
+LSSVM
+
+*
+
+12
+
+3
+
+1．
+
+050043 2．
+
+3．
+
+100871
+
+M156BH
+
+LSSVM
+
+。
+
+FOA
+
+LSSVM
+
+。
+
+LSSVM
+
+LSSVM
+
+、
+
+LSSVM 。
+
+ＲMSE、MAE、MAPE THEIL
+
+8 433． 0、6 670． 8、0． 018 0 0． 011 7
+
+FOA
+
+LSSVM
+
+40． 294 8 s
+
+GA PSO
+
+2． 620 8 s
+
+s
+
+。
+
+LSSVM
+
+U294． 13
+
+A
+
+1001-3695 2017 02-0409-04
+
+doi 10． 3969 / j． issn． 1001-3695． 2017． 02． 020
+
+FOA 。
+20． 701 6
+
+Forecast on railway traffic volume using mixed-kernel LSSVM optimized by FOA
+Geng Liyan1 2 Chen Lihua3
+1． School of Economics ＆ Management Shijiazhuang Tiedao University Shijiazhuang 050043 China 2． Business School Manchester Metropolitan University Manchester M156BH UK 3． Guanghua School of Management Peking University Beijing 100871 China
+Abstract It is difficult for the single-kernel least squares support vector machines LSSVM to describe accurately the complexity change feature of volumes in railway freight volume forecasting which limits the improvement of forecasting accuracy． To solve the problem this paper proposed a new forecasting method based on fruit fly optimization algorithm FOA and mixed-kernel LSSVM． First it constructed the mixed-kernel LSSVM for railway traffic volume forecasting in which the mixed kernel function that linearly combined polynomial kernel and radial basis kernel was used as the kernel function of LSSVM． Second it employed FOA to optimize the parameters of the mixed-kernel LSSVM based on the advantages of the global searching ability and quick computing speed． Finally it used the railway traffic volume of China to prove the effectiveness of the provided method． The results show that the value of ＲMSE MAE MPE and THEIL of the proposed method are 8 433． 0 6 670． 8 0． 018 0 and 0． 011 7 respectively being less than the other methods． The time for searching the optimal parameters in the mixed-kernel LSSVM by FOA is 40． 294 8 s reducing 2． 620 8 s and 20． 701 6 s relative to genetic algorithm GA and particle swarm optimization PSO algorithm． The proposed method is applicable to forecasting short-term railway freight volumes． Key words railway traffic volume forecasting method mixed-kernel LSSVM fruit fly optimization algorithm
+
+0
+。
+
+1、
+
+2
+、 。
+
+、
+。 、
+。
+
+。
+2015-12-10 15456106D
+Y-2010024
+
+2016-02-04 CSC
+
+BJ2014097
+
+。 3。
+
+、
+
+。
+
+support vector machines SVM
+
+SVM 。 chines LSSVM 5
+201608130165
+
+4。 、 least squares support vector ma-
+
+61503261 2015020206
+
+2015
+
+1979．
+
+gengliyan_28117@ 163． com
+
+1962-
+
+·410·
+
+34
+
+SVM
+
+6 。LSSVM
+
+。
+
+LSSVM
+
+LSSVM
+
+。
+
+LSSVM
+
+LSSVM 7 。 、 rithm GA 、
+LSSVM algorithm FOA
+、 。 FOA
+
+LSSVM
+
+LSSVM
+
+89
+
+genetic algo-
+
+particle swarm optimization PSO
+
+。
+
+fruit fly optimization
+
+10
+
+GA PSO
+
+FOA
+
+LSSVM
+
+LSSVM
+
+。
+
+1
+
+LSSVM
+
+1. 1
+
+LSSVM
+
+0
+
+1T   b  0 
+
+ 1 Ω + I / γ   α  =  Z 
+
+1= 1 … 1 T N－p
+
+6
+I N－p
+
+α = α1 α2 … αN － p T N － p Lagrange
+
+。Ωt j = ψ qt T ψ qj t j = 1 … N － p。
+
+Mer-
+
+cer
+
+K qt qj = ψ qt Tψ qj
+
+。
+
+4
+
+α
+
+b
+
+LSSVM
+
+N－p
+
+zt = t ∑j = 1αj K qt qj + b
+
+7
+
+1. 2
+
+LSSVM
+
+。
+
+LSSVM
+
+Poly
+
+KＲBF qt qj = exp － ‖qt － qj ‖2 /2σ2
+
+Kploy qt qj = qTt qj + 1 d
+
+σ ＞ 0 ＲBF
+
+d =1 2 …
+
+ＲBF
+
+Poly
+
+LSSVM ＲBF
+8 9
+。
+
+。
+
+τ +1 = f τ τ －1 … τ － p +1
+
+1
+
+τ +1 τ + 1
+
+τ τ －1 … τ － p +1
+
+τ=p p +1 … N N
+
+f
+
+。
+
+LSSVM
+
+LSSVM
+
+τ τ －1 … τ －p +1
+
+τ τ －1 … τ － p +1
+
+Ｒp →Ｒ。
+
+、
+
+τ +1
+
+f LSSVM
+
+ 1
+
+2
+
+… p 
+
+ p +1 
+
+
+
+
+
+
+
+
+
+
+Q=
+
+2
+
+3
+
+…
+
+p
+
++1
+
+ 
+
+Z=
+
+ 
+
+p
+
++
+
+2
+
+ 
+
+2
+
+ 
+
+
+
+
+
+
+
+ 
+
+ 
+
+N － p
+
+N － p +1
+
+…
+
+N
+
+－
+
+1
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+N
+
+ 
+
+Q = q1 q2 … qN － p T Z = z1 z2 … zN － p T
+
+qt zt t = 1 … N － p qt∈Ｒp
+
+zt ∈Ｒ
+
+。LSSVM
+
+ψ·
+
+zt = ωTψ qt + b
+
+3
+
+t =1 … N －p ω
+
+b
+
+。
+
+3
+
+min J ω b e ωbe
+
+=
+
+1 2
+
+‖ω‖2 +
+
+γ 2
+
+N－p
+
+∑
+t =1
+
+e2t
+
+s． t． zt = ωT ψ qt + b + et
+
+4
+
+t = 1 … N － p et ∈Ｒ
+
+2
+
+Lagrange
+
+γ
+
+。
+
+N－p
+
+L ωbeα
+
+=J ω b e
+
+－
+
+∑
+t =1
+
+αt
+
+ωT ψ
+
+qt
+
++ b + et － zt
+
+5
+
+t = 1 … N － p αt ∈Ｒ Lagrange 。 KKT
+
+5
+
+ω、b、e、α
+
+。
+
+LSSVM
+
+。
+
+Poly ＲBF
+
+。 Mercer
+
+Mercer
+
+Mercer
+
+KMix qt qj = ρKPoly qt qj + 1 － ρ KＲBF qt qj
+
+ρ 0≤ρ≤1
+
+。 ρ=1
+
+Poly
+
+ＲBF
+
+0 ＜ρ＜1
+
+ＲBF
+
+。
+
+ρ
+
+LSSVM
+
+。
+
+10
+ρ =0 Poly
+
+2 FOA
+
+LSSVM
+
+LSSVM
+
+γ、
+
+d、
+
+σ
+
+ρ。γ
+
+LSSVM
+
+LSSVM
+
+d
+
+d
+
+Poly
+
+σ
+
+ρ
+
+Poly ＲBF
+
+。
+
+、
+
+LSSVM
+
+。
+
+LSSVM
+
+、GA PSO 。
+
+。
+
+GA PSO
+
+LSSVM
+
+LSSVM
+
+LSSVM
+
+。
+
+LSSVM
+
+FOA
+
+γdσρ
+
+。
+
+2. 1
+
+FOA
+
+2
+
+FOA
+
+LSSVM
+
+·411·
+
+。
+
+σρ
+
+b ～d 。
+
+f
+
+。
+
+LSSVM
+
+。FOA
+
+a
+
+M、
+
+kmax
+
+X0 Y0 。
+
+b
+
+。
+
+Xi = X0 + r η － 0． 5
+
+11
+
+Yi = Y0 + r η － 0． 5
+
+12
+
+i =1 2 … M
+
+i
+
+r
+
+η 01
+
+。
+
+c
+
+Di
+
+Si
+
+13 14
+
+。
+
+Di = X2i + Y2i 1 /2
+
+13
+
+Si = 1 /Di
+
+14
+
+d F
+
+F
+
+Si
+
+Sm i = F Si
+
+15
+
+e
+
+Sm min Is min = min Sm i
+
+16
+
+Sm min
+
+Is min = Xmin Ymin 。
+
+f
+
+。
+
+Sm best = Sm min
+
+17
+
+Xbest = Xmin
+
+18
+
+Ybest = Ymin
+
+19
+
+g
+
+X Y best best
+
+b ～e 。
+
+f
+
+。
+
+2. 2
+
+LSSVM
+
+FOA
+
+LSSVM
+
+、
+
+FOA
+
+γdσρ
+
+LSSVM 。
+LSSVM
+
+。 a b
+c LSSVM
+^ τ d
+
+。 。
+。 kmax
+。 。
+LSSVM
+
+l
+
+F = l －1
+
+∑
+τ =1
+
+^ τ － τ
+
+2
+
+1 /2
+
+τ
+
+l
+
+。
+
+20
+
+M 、
+。
+20
+。
+
+e
+
+。
+
+。
+
+。
+
+LSSVM
+
+γd
+
+。
+
+Poly ＲBF
+
+LSSVM 。
+
+、
+
+、
+
+LSSVM FOA
+
+。
+
+LSSVM
+
+。
+
+LSSVM
+。FOA 。
+FOA
+
+3
+
+1991—2013
+
+《
+
+2014 》。
+
+0 1 16
+
+7
+
+。FOA
+
+M = 10 kmax = 20
+
+0 200 r = 20。
+
+LSS-
+
+VM
+
+γ = 1000 σ = 100 d 1 10
+
+ρ
+
+01
+
+。
+
+LSSVM
+
+FOA
+
+LSSVM
+
+。
+
+FOA
+
+。
+
+FOA
+
+LSSVM
+
+LSSVM
+
+。
+
+FOA
+
+ＲBF
+
+LSSVM ＲBF-LSSVM-FOA FOA
+
+Poly
+
+LSSVM Ploy-LSSVM-FOA
+
+。
+
+root mean squared er-
+
+ror ＲMSE 、
+
+mean absolute error MAE 、
+
+mean absolute percentage error MAPE Theil
+
+。
+
+。
+
+1
+
+1
+
+。1
+
+Mixed-
+
+LSSVM-FOA
+
+、
+
+ＲBF-LSSVM-FOA Poly-LSSVM-
+
+FOA
+
+LSSVM
+
+LSSVM
+
+。Mixed-LSSVM-FOA
+
+2007—
+
+2008
+
+－ 0． 72% 0． 27% 2009—
+
+2010
+
+2010
+
+－ 4． 04%
+
+2012
+
+－ 0． 83%
+
+2007、2008
+
+。1
+
+Mixed-LSSVM-FOA
+
+Mixed-LSSVM-FOA
+
+。
+
+FOA
+
+LSSVM
+
+PSO
+
+LSSVM Mixed-LSSVM-PSO GA
+
+LSSVM Mixed-LSSVM-GA
+
+2 2。
+
+2
+
+TIME
+
+·412·
+
+LSSVM
+1
+
+Mixed-LSSVM-FOA
+
+/
+2007 314 237 2008 330 354 2009 333 348 2010 364 271 2011 393 263 2012 390 438 2013 396 697
+ＲMSE MAE MAPE THEIL
+
+/
+
+/%
+
+311 979 － 0． 72
+
+331 260 0． 27
+
+328 652 － 1． 41
+
+349 539 － 4． 04
+
+379 302 － 3． 55
+
+397 306 1． 76
+
+393 423 － 0． 83
+
+8 433． 0
+
+6 670． 8
+
+0． 018 0
+
+0． 011 7
+
+s。
+
+ＲBF-LSSVM-FOA
+
+/
+
+/%
+
+293 575 － 6． 58
+
+337 730 2． 23
+
+337 781 1． 33
+
+332 831 － 8． 63
+
+386 775 － 1． 65
+
+400 185 2． 50
+
+401 818 1． 29
+
+15 365． 9
+
+12 181． 1
+
+0． 034 6
+
+0． 021 4
+
+Poly-LSSVM-FOA
+
+/
+
+/%
+
+310 028 － 1． 34
+
+322 085 － 2． 50
+
+342 276 2． 68
+
+349 523 － 4． 05
+
+373 843 － 4． 94
+
+428 105 9． 65
+
+410 615 3． 51
+
+18 411． 9
+
+15 308． 6
+
+0． 040 9
+
+0． 025 3
+
+34
+
+TIME FOA
+
+。
+
+FOA
+
+。
+
+ＲBF
+
+LSSVM
+
+FOA
+
+LSSVM
+
+LSSVM
+
+。
+
+GA PSO FOA
+LSSVM LSSVM Poly LSSVM
+
+4
+
+FOA
+
+LSSVM
+
+LSSVM
+
+FOA
+
+LSSVM
+
+。
+
+FOA
+
+、
+
+LSSVM
+
+FOA
+
+LSSVM
+
+LSSVM
+
+。
+
+2
+
+/
+2007 314 237 2008 330 354 2009 333 348 2010 364 271 2011 393 263 2012 390 438 2013 396 697
+ＲMSE MAE MAPE THEIL TIME
+
+Mixed-LSSVM-FOA
+
+/ 311 979
+
+/% － 0． 72
+
+331 260 0． 27
+
+328 652 － 1． 41
+
+349 539 － 4． 04
+
+379 302 － 3． 55
+
+397 306 1． 76
+
+393 423 － 0． 83
+
+8 433． 0
+
+6 670． 8
+
+0． 018 0
+
+0． 011 7
+
+40． 294 8
+
+Mixed-LSSVM-PSO
+
+/ 308 725
+
+/% － 1． 75
+
+331 635 0． 39
+
+341 002 2． 30
+
+347 883 － 4． 50
+
+378 413 － 3． 78
+
+397 396 1． 78
+
+393 240 － 0． 87
+
+9 562． 3
+
+8 014． 4
+
+0． 022 0
+
+0． 013 3
+
+42． 915 6
+
+Mixed-LSSVM-GA
+
+/ 313 267
+
+/% － 0． 31
+
+335 855 1． 67
+
+350 686 5． 20
+
+346 115 － 4． 98
+
+376 826 － 4． 18
+
+405 371 3． 82
+
+403 013 1． 59
+
+13 063． 0
+
+11 378． 7
+
+0． 031 1
+
+0． 018 0
+
+60． 996 4
+
+GA、PSO
+
+2
+
+2
+
+FOA
+
+Mixed-LSSVM
+
+、
+
+Mixed-LSSVM
+
+364 10 Ganu G Marian A Elhadad N． UＲSA user review structure analy-
+sis understanding online reviewing trends TＲ 668 Ｒ ． Piscataway Ｒutgers University 2010． 11 Ganu G Kakodkar Y Marian A． Improving the quality of predictions using textual information in online user reviews J ． Information Systems 2013 38 1 1-15． 12 Xu Jingnan Zheng Xiaolin Ding Weifeng． Personalized recommendation based on reviews and ratings alleviating the sparsity problem of collaborative filtering C / / Proc of the 9th IEEE International Conference on E-business Engineering． Washington DC IEEE Computer Society 2012 9-16． 13 Jo Y Oh A H． Aspect and sentiment unification model for online review analysis C / / Proc of the 4th ACM International Conference on Web Search and Data Mining． New York ACM Press 2011 815-824． 14 McAuley J Leskovec J． Hidden factors and hidden topics under-
+
+1
+
+．
+
+J．
+
+2005 36 1 158-162．
+
+2
+
+．
+
+Lyapunov
+
+J．
+
+2014 36 4 7-13．
+
+3
+
+．
+
+J．
+
+2010 32 5 1-6．
+
+4
+
+．
+
+J．
+
+2011 43 2 138-143．
+
+5 Suykens J A K Vandevalle J． Least squares support vector machine
+
+classifiers J ． Neural Processing Letters 1999 9 3 293-300．
+
+6
+
+．
+
+LSSVM
+
+J．
+
+2012 47 1 144-150．
+
+7
+
+．
+
+J．
+
+2013 26 3 74-78．
+
+8
+
+．
+
+J．
+
+2012 10 2 84-
+
+88 131．
+
+9
+
+．
+
+LS-SVM
+
+J．
+
+2012 19 1 81-85．
+
+10 Pan W T． A new fruit fly optimization algorithm taking the financial
+
+distress model as an example J ． Knowledge-Based Systems
+
+2012 26 1 69-74．
+
+standing rating dimensions with review text C / / Proc of the 7th ACM
+
+Conference on Ｒecommender Systems． New York ACM Press 2013
+
+165-172．
+
+15
+
+．
+
+J．
+
+2015 3 80-90．
+
+16 Lemire D Maclachlan A． Slope one predictors for online rating-based
+
+collaborative filtering C / / Proc of SIAM Data Mining Conference．
+
+2005 1-5．
+
+17 Papagelis M Plexousakis D Kutsuras T． Alleviating the sparsity
+
+problem of collaborative filtering using trust inferences C / / Proc of
+
+the 3rd International Conference on Trust Management． Berlin
+
+Springer-Verlag 2005 224-239．
+
+18 Dong Ｒuihai O’Mahony M P Schaal M et al． Combining similarity
+
+and sentiment in opinion mining for product recommendation J ．
+
+Journal of Intelligent Information Systems 2016 46 2 285-
+
+312．
+

@@ -1,0 +1,439 @@
+Future Generation Computer Systems 140 (2023) 321–330
+Contents lists available at ScienceDirect
+Future Generation Computer Systems
+journal homepage: www.elsevier.com/locate/fgcs
+
+TEBDS: A Trusted Execution Environment-and-Blockchain-supported IoT data sharing system
+Hui Xie a, Jun Zheng a, Teng He b, Shengjun Wei a,∗, Changzhen Hu a
+a School of Cyberspace Science and Technology, Beijing Institute of Technology, Beijing, China b School of Computer Science and Technology, Beijing Institute of Technology, Beijing, China
+
+article info
+Article history: Received 4 May 2022 Received in revised form 10 October 2022 Accepted 17 October 2022 Available online 22 October 2022
+Keywords: Data sharing Internet of things TEE Blockchain IoT security
+
+abstract
+Data sharing services based on massive IoT data have been widely used in various fields such as health monitoring and image recognition, providing users with more reliable, efficient, and flexible data services and significantly improving the user service quality. With the popularization of IoT applications, the usage rate of IoT data is getting higher and higher. Due to the dangerous network environment, the security of IoT data faces challenges. On the one hand, attacks such as data tampering can lead to the failure of IoT tasks, and on the other hand, the intrusion of malicious users can lead to the collapse of the entire IoT network. In recent years, many protection schemes used for IoT data security have been proposed. However, security flaws still exist in these schemes. Therefore, to solve the data security and identity security issues in the IoT data sharing process, in this paper, we propose a TEE-and-Blockchain-supported IoT data sharing architecture(TEBDS), which combines on-chain and off-chain methods to meet the security requirements of the IoT data sharing framework. Therein, the consortium blockchain realizes the protection of on-chain IoT data and the access control of IoT users. An Intel SGX-based Distributed Storage System (SDSS) is proposed to secure off-chain data. Besides, an incentive mechanism is developed to facilitate the whole system. Security analysis shows that TEBDS meets the requirements of data security and identity security. Experimental results show that TEBDS has better performance than the centralized method SPDS.
+© 2022 Published by Elsevier B.V.
+
+1. Introduction
+The Internet of things(IoT) generates massive volumes of IoT data every day, to utilize data from different IoTs effectively and offer better services, different IoT owners begin to explore privacy-preserving data sharing methods in recent years. Cloud Storage owns a powerful storage capacity, which is widely used to construct privacy-preserving data sharing methods recently. But these methods have the problem of a single point of failure [1,2].
+To achieve secure data sharing and guarantee the security of both on-chain and off-chain data, Yuntao Wang et al. [3] propose a secure and auditable private data sharing (SPDS) scheme in the smart grid. They apply blockchain to achieve trust-free private data computation and data usage tracking, and smart contracts are employed to specify fine-grained data usage policies. They also design a trusted execution environment based off-chain smart contract execution mechanism to process confidential user
+∗ Corresponding author.
+E-mail addresses: huixie@bit.edu.cn (H. Xie), zhengjun@bit.edu.cn (J. Zheng), 3220211013@bit.edu.cn (T. He), sjwei@bit.edu.cn (S. Wei), chzhoo@bit.edu.cn (C. Hu).
+https://doi.org/10.1016/j.future.2022.10.016 0167-739X/© 2022 Published by Elsevier B.V.
+
+datasets and relieve the computation overhead in blockchain systems. Besides, a two-phase atomic delivery protocol is designed to ensure the atomicity of data transactions in computing result release and payment. Although their method secures on-chain and off-chain data based on the characteristics of blockchain and TEE, respectively, the TEE module only exists in the cloud center and still can lead to the problem of a single point of failure.
+Blockchain, a decentralized method, features immutability and traceability, which can verify the identities of entities in the network while protecting data. Besides, a Trusted execution environment(TEE) with the isolation property, such as Intel SGX [4–7], can ensure that the content inside will not be affected even if the operating system(OS), as well as the privileged software, are controlled by an attacker. Thus, by combining blockchain and SGX technology, our method has the following advantages: 1. the single point of failure problem can be solved by the distributed feature of blockchain. 2. blockchain gives trust to different IoTs, every entity in the network has its own legal identity. 3. user’s operation recorded in the blockchain is secure, traceable, and untamperable. 4. SGX enclave secures off-chain data and code.
+In this paper, to achieve data security and identity security in the process of IoT data sharing, we propose a TEE-andBlockchain-supported data sharing system for IoT(TEBDS).
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+Blockchain in our method is used to secure user communications, and TEE is used to guarantee the security of the offchain data. Specifically, all kinds of nodes, including full nodes with SGX(FNS), full nodes without SGX(FN), and lightweight nodes(LN), maintain a consortium blockchain to ensure the secure read/write operations between users and record all the users’ behavior in IoT. Besides, an SGX-based distributed storage system(SDSS) formed by all FNSs is designed to store off-chain IoT data and respond to read/write requests. As storage nodes, FNSs also can choose to store a certain amount of data based on their capability and find out the correct data based on the user’s signature. Furthermore, an incentive mechanism is developed to facilitate the fairness of TEBDS. The contribution of this paper is shown as follows:
+• A TEE-and-Blockchain-supported data sharing architecture
+for IoT(TEBDS) is proposed to achieve secure distributed IoT data sharing and user authentication. Therein blockchain is used to achieve on-chain data security and user access control, and TEE is used to secure the off-chain IoT data. TEBDS realizes the security of both on-chain and off-chain data instead of focusing on on-chain data security like traditional methods.
+• A SGX-based distributed storage system(SDSS) is designed
+to store off-chain IoT data securely, where the Hash bucket links IoT data in an untrusted environment and prevents the rollback attack. Besides, nodes in SDSS can selectively store part or all of the IoT data according to their storage resources, making full use of the node’s fragmented resources. Furthermore, the distributed features of SDSS can guarantee the availability of off-chain IoT data. Because nodes that support SDSS may store some redundant data, when a node fails, it will not affect the data of other nodes, and the data requester can still obtain the complete data requested. SDSS provides a feasible solution for secure storage of off-chain data.
+• A novel incentive mechanism is introduced to encourage
+FNSs to store data and promote FNSs, FNs, and LNs to maintain the ledger, ensuring that only honest and active users can get more rewards.
+• We design a comprehensive experiment to analyze the avail-
+ability and performance of TEBDS. First, benchmark experiments prove that the addition of Intel SGX has little effect on the performance of TEBDS. In addition, we also compare the read and write performance of TEDBS with centralized SPDS, and the results show that TEBDS outperforms SPDS. Finally, the blockchain experimental results show that the blockchain applied in TEBDS is also efficient and effective.
+The remainder of this paper is organized as follows. In the rest of this paper, we introduce some related work in Section 2. Section 3 outlines the threat model and design goals. In Section 4, the design of TEBDS will be discussed in detail. Experiment and performance evaluation of TEBDS are given in Section 5. Finally, Section 6 concludes the whole paper.
+2. Related work
+2.1. Data processing models based on blockchain
+The advent of blockchain gives a new way for researchers to explore data processing methods with privacy preservation. Based on the decentralization property of blockchain, many data processing methods are proposed. Haiping Si et al. [8] introduce a lightweight IoT information sharing security mechanism based on blockchain technology. Songlin He et al. [9] propose a decentralizing IoT management system to resist censorship using blockchain. Can Zhang et al. [10] propose a smart parking method based on blockchain to achieve fairness and reliability. Kuan Fan et al. [11] design a decentralized IoT auditing scheme(Dredas) based on a
+
+smart contract to offer honest auditing results, which ensures a secure audition.
+To achieve data protection, Meng Shen et al. [12] propose a secure IoT device authentication mechanism based on blockchain (BASA) to avoid unauthenticated access from illegal devices. Mohsin Ur Rahman et al. [13] propose an access control management method for decentralized online social networks based on blockchain. To protect privacy, Keke Gai et al. [14] combine blockchain with differential privacy and propose a Blockchainbased Internet-of-Edge (BIoE) model. Liehuang Zhu et al. [15] propose a privacy-preserving authentication and data aggregation scheme for a fog-based smart grid.
+The mentioned methods secure on-chain data and user identity. However, they do not describe how to guarantee the security of the off-chain data. In TEBDS, the security of both on-chain and off-chain data can be guaranteed by blockchain and SDSS.
+2.2. Application of blockchain combined with SGX
+Recently, the SGX enclave is used to explore secure data processing methods to prevent sensitive data and code from attackers. Yili Luo et al. [16] propose an accountable data sharing scheme based on blockchain and SGX. Gbadebo Ayoade et al. [17] design a decentralized IoT data management scheme using blockchain and SGX. Shorouq Alansari et al. [18] design a distributed access control system for cloud federations based on blockchain and SGX. Weiqi Dai et al. [19] propose a secure blockchain-based data trading ecosystem(SDTE) to achieve secure data trading.
+Sinisa Matetic et al. [20] propose a new approach to protect the privacy of light clients in Bitcoin(BITE). Muoi Tran et al. [21] introduce a secure and efficient bitcoin mixer using TEE to fuzzy several send addresses and receive addresses. Jieren Cheng et al. [22] propose a lightweight mobile clients privacy protection method based on TEE and blockchain(LMCPTEE).
+Besides, Marcus Brandenburger et al. [23] analyze challenges and conceptional differences of on-chain and off-chain execution for combining smart contracts with trusted computing. Rui Yuan et al. [24] propose ShadowEth to put the execution and storage of personal contracts into SGX and only put the verification process to the blockchain. Fan Zhang et al. [25] present an authenticated data feed system called Town Crier (TC) as a bridge between smart contracts and existing websites. S. M. Muzammal et al. [26] review and analyze existing secure IoT architectures and study the security issues and requirements of IoT networks and RPL routing protocol against attacks such as Blackhole, Spoofing, Rank, etc.
+The above method gives the idea of combining blockchain and SGX to ensure data security and code security but does not consider the feasibility of massive data storage and processing in TEE. In TEBDS, the capacity of FNSs is considered, FNSs can selectively process and store moderate amounts of data.
+3. Problem statement
+In this section, we introduce the motivation and give an application scenario for TEBDS. Then, we discuss the threat model and the goal of the proposed architecture.
+3.1. Motivation
+Let us take an example of health detection, people continuously detect their health status through smart devices such as smart bracelets, and service providers of different devices will return health results based on their respective detection data. These data are all private, and the service provider will store them
+
+322
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+Although the potentials for side-channel privacy leakage exist in
+
+SGX, these attacks are out of scope in this work.
+
+(2) The maximum faulty consensus nodes of the blockchain
+
+are
+
+assumed
+
+to
+
+be
+
+less
+
+than
+
+or
+
+equal
+
+to
+
+1 3
+
+M,
+
+where
+
+M
+
+is
+
+the
+
+total
+
+number of nodes in the consensus stage.
+
+3.3. Design goals
+
+Fig. 1. TEBDS scenario.
+in its private database to ensure data security and user privacy. However, the health results provided by these devices are only one-sided, such as heart rate, body fat, etc. When comprehensive health status results are required, people need to visit different service providers to aggregate the information, which is inconvenient. At the same time, frequent interactions can also lead to the problem of data security and privacy leaks. To share health information between different providers, cloud-based data sharing methods are proposed in recent years. But due to the problems of a single point of failure, privacy leakage, and the latency of data transmission, these centralized methods are not suitable. To alleviate the pressure on the cloud center and to improve the transmission speed, edge computing is widely used in smart factories, smart cities, and other fields. Combined with blockchain technology, the problems of a single point of failure and privacy leakage can be avoided. Besides, blockchain can guarantee the security and traceability of the data inside, which is difficult for a cloud center to do. Fig. 1 illustrates the health detection scenario, where different service providers receive detection data collected from their devices and share their detection information index on a consortium blockchain maintained by them, only the legal entity can obtain the complete detection information from target providers. Furthermore, to protect the security of off-chain data, service providers select SGX-supported servers(FNSs) to construct a SDSS that can offer the service of secure storage and data sharing.
+3.2. Threat model
+The scenario demonstrated in Fig. 1 seems to be promising, as the confidentiality and integrity of IoT data can be guaranteed by SDSS and the user’s behavior can be checked by the consortium blockchain. However, some potential adversaries should be considered during data sharing.
+(1) Honest-but-curious FNSs: All FNSs are assumed to be honest-but-curious, which honestly execute each operation required in the system for the storage and processing of IoT data while being curious about the stored data.
+(2) Repudiation and fraud attack: The devices/users that have been added to IoT are vulnerable, they can send malicious requests to the blockchain to get data stored in SDSS. They also can deny their read/write operations.
+(3) Lazy entity and greedy entity: Lazy entity means a competent entity refuses to participate in cyber missions. A greedy entity means he/she can obtain more rewards by performing an illegal operation.
+Besides, the following security assumptions are made in the design of TEBDS.
+(1) The SGX enclave is assumed to be secure for off-chain IoT data storage and processing. The Seal() Algorithm can guarantee that no entity other than the SGX decrypts the sealed data.
+
+The goal of this paper is to achieve data security and identity security when sharing IoT data in IoT. Specifically related to the following aspects.
+Authentication: Key management center(KMC) manages entities’ identity information, which makes any legitimate entity in the consortium blockchain have a legal identity for a certain period.
+User-centric fine-grained data access: TEBDS aims to bring full control of personal data back to data owners. After verifying the identity of a data requester, data owners can release their data stored in SDSS by their commands.
+Data confidentiality and integrity: On one hand, sensitive information of IoT data should be encrypted and only the authenticated user can decrypt it. On the other hand, To maintain the consistency between the stored data and the original data, the integrity of the data should be guaranteed.
+Transparency, auditability, and provenance traceability: Each data owner should have a transparent view that who has accessed his/her data. Users’ operations on data and the ownership of personal data should be auditable and non-repudiable.
+Data economy: TEBDS should offer a moderate reward to encourage users’ participation and high-quality data sharing.
+4. The proposed TEBDS
+4.1. Overview
+As shown in Fig. 1, TEBDS involves four types of entities: smart devices that users wear, a device service provider(DSP), a consortium blockchain, and a key management center(KMC).
+Smart devices: Smart devices, such as smart bracelets, and body fat scales, have limited storage and processing resources and can temporarily store the data they collect and process the data briefly. In addition, smart devices have networking capabilities and can communicate with other entities through various communication protocols, such as WiFi, etc., and forward the data they collect to other entities. Smart devices are represented as lightweight nodes(LN) in the blockchain that can send read requests.
+Device service providers: DSPs can manage all devices and receive the data from the devices. We define DSP as computers/servers with enough storage and processing capacity. In particular, the servers with SGX are defined as the full node with SGX(FNS) in the blockchain and construct the SGX-based distributed storage system(SDSS). The servers without SGX are the full node without SGX(FN) in the blockchain and have the duty to complete consensus together with FNSs.
+Consortium blockchain: All users’ operations are recorded in the blockchain to ensure the transparency, auditability, and traceability of user behavior. Besides, secure communication between all users can be guaranteed by the blockchain.
+Key management center: KMC is fully trusted and responsible for generating key pairs for all entities in TEBDS. It also manages all entities and revokes the identity of the suspicious user when malicious behavior is detected.
+The lightweight smart device continuously collects user health data and transmits it to the owning DSP. The DSP records the data index to the blockchain. At the same time, as the data owner,
+
+323
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+Fig. 2. Data write process.
+
+the DSP issues a data write request on the blockchain to write the data into SDSS. FNSs in SDSS that receive write requests selectively verify and store a certain number of data packets according to their capacity. When a DSP acts as a data requester, it can issue a data read request on the blockchain, and the data owner can verify the legitimacy of the DSP’s identity and notify SDSS to send the requested data. The detailed write/read process is introduced in the following subsections.
+
+4.2. Data write process
+
+Fig. 3. SGX-based distributed storage system.
+
+The process of data write involves DSPs, FNSs, and blockchain, the details are demonstrated in Fig. 2.
+Step 1: Data split. To improve the difficulty that attackers obtain complete data packets and to make use of the fragmented storage space of SDSS, after a DSP receives data packets from its smart devices, the data packets are divided into multiple small data packets. The Split Algorithm is shown as follows:
+
+k = ⌊log L⌋
+
+(1)
+
+where L is the length of the compressed data, and k is named initial splitting quantity. To split the compressed data into n packets, there are three cases of relationships between k and n.
+
+• k < n. The length of the first k − 1 packets are 2i−1(i =
+
+1, 2, . . . , k − 1). The rest part of the data is split into n − k
+
+packets,
+
+where
+
+n
+
+−
+
+k
+
++
+
+1
+
+packets
+
+are
+
+of
+
+length
+
+2k−1
+⌊ n−k+1 ⌋
+
+and
+
+the
+
+last
+
+packet
+
+is
+
+of
+
+length.
+
+L
+
+−
+
+2k−1
+
+−
+
+(n
+
+−
+
+k)⌊
+
+2k−1 n−k+1
+
+⌋
+
+• k = n. The length of the first k − 1 packets are 2i−1(i =
+
+1, 2, . . . , k − 1), while the last packet is of length 2k−1 + 1.
+
+• k > n. The length of the first k − 1 packets are 2i−1(i =
+
+1, 2, . . . , k − 1). The length of the last packet is L − 2k−1 + 1.
+
+Step 2: After the split, the DSP DSP1 broadcasts a write-ready request to the blockchain, and the FNSs who receive the request and have enough capacity will respond. Then, DSP1 performs remote attestation with SGX enclaves in the FNSs to ensure the integrity and correctness of the SGX enclaves. If the enclaves are integrated and run correctly, secure channels are built between DSP1 and enclaves in FNSs, which are used to transmit DSP1’s AES key; otherwise, channels cannot be built.
+Step 3: After attestation, DSP1 starts to construct write requests with its AES key and sends them to the enclaves in SDSS. In particular, the write request contains Hash(data), data, timestamp and signature. Hash(data) is the hash value of the split data packet. timestamps of different split data packets increase monotonically according to the sequence of split data packets and are strictly
+within the time range of t +∆t. The timestamp is used to put split
+data packets together correctly when the data is read. signature is used to verify the identity of the data owner and construct the hash bucket in SDSS. Finally, different FNSs store different numbers of split data packets based on their capacities.
+Step 4: SGX-based distributed storage system(SDSS). For the sake of simplicity, take one FNS as an example to introduce the
+
+storage system(See Fig. 3, the red solid line is the step of the write request, and the red dotted line is the step of the read request). After receiving a write request, the SGX enclave in the FNS stores several data packets randomly or all the packets based on their capacity. Then, the enclave starts its write process which is shown as follows:
+a. The enclave decrypts the request using DSP1’s AES key to obtain the plaintext of split IoT data, its hash, and timestamp. Then, the enclave computes the hash of the IoT data and compares it with the received hash to verify its integrity.
+b. Based on DSP1’s signature, the enclave can compute the
+identity k1(= hash(sig)) of DSP1 which will be used in a hash
+bucket in the enclave. c. Hash bucket is the storage forerunner of the SDSS, which
+contains an identity chain and several data chains. The identity chain stores the identities of different DSPs who send requests. Data chain stores some indication information of split data and links to related identity blocks to indicate the data ownership. Thus, the enclave first finds k1 in the hash bucket, if it exists,
+the enclave then constructs a triplet ⟨hash, timestamp, point⟩ to
+indicate the split data and links it to the tail of the k1’s data chain; otherwise, the enclave constructs a new identity k1 and links it to the penultimate block of identity chain, then constructs the triplet and links it to k1’s data chain. After that, the enclave stores the IoT data and its hash in the untrusted environment based on the Algorithm Seal() of Intel SGX. In particular, in terms of the triplet, hash is the hash value of split IoT data and its hash. timestamp is the same as that of the split IoT data. point is a pointer in which the address of the related split data packet and its hash in the untrusted environment is stored.
+Step 5: After the operation of the SGX enclave, the FNS sends a transaction that contains DSP1’s behavior and its behavior to the blockchain. After PBFT consensus, a new block that contains this transaction will be appended to the integrated ledger.
+4.3. Data read process
+The process of a read request is shown in Fig. 4. Step 1: A DSP DSP2 first sends a request which contains the type of data it wants to the blockchain. When a DSP DSP1 respond, DSP2 sends a read request which contains timerange of DSP1’s data it wants as well as its signature to DSP1, DSP1 authenticates the
+
+324
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+In our method, the public key is generated based on the entity information by KMC and is unique, and only KMC and the related entity keep it. KMC can authenticate the entity based on the public key in subsequent operations. Thus the public key is longstanding. While the pseudo-anonymous identity is generated by an entity. The entity can construct the pseudo-anonymous identity in different ways. For example, DSP1 can choose a random number and links it to its public key. Then, the message is hashed as the pseudo-anonymous identity. After confirmation by KMC, the signature private key of the pseudo-anonymous identity can be obtained, which is used by the entity to sign subsequent operations. Pseudo-anonymous identity is short-time [12].
+
+Fig. 4. Data read process.
+
+4.5. Blockchain in TEBDS
+
+signature of DSP2 based on KMC. If the signature is valid, DSP1 sends a read request which contains DSP2’ identity, timerange, and its signature to the blockchain. At the same time, DSP2 sends a read-ready request to the blockchain, and FNSs who receive the request will respond. Then, DSP2 performs remote attestation with different enclaves and builds secure channels to transmit its public key PUBKEYDSP2 .
+Step 2: After receiving the read request from DSP1, enclave decrypts it and computes DSP1’s identity k′1 based on its signature (See Fig. 3). Then, the enclave compares k′1 and the k1 in the hash bucket. If they are identical, the enclave silts the linked triplet based on timerange and the timestamp in the triplet. For the triplet whose timestamp is in timerange, using point to get the original data in the untrusted environment. In particular, original data contains split IoT data and its hash. When the enclave gets them, the enclave will compute the hash hash′ of them. If hash′ is the same as hash in the triplet, then the original data is correct. Next, according to the DSP2’s identity in the read-ready request, the enclave can find DSP2’s public key to encrypt the original data. Finally, the enclave sends the encrypted data to DSP2. DSP2 can decrypt the data with its related private key PRIKEYDSP2 .
+Step 3: After the operation of the SGX enclave, FNS sends a transaction that contains DSP1’s behavior, DSP2’s behavior, and its behavior to the blockchain. After PBFT consensus, a new block that contains this transaction will be appended to the integrated ledger.
+4.4. Key management center
+The key management center(KMC) is responsible for system initialization, building the system master key, and publishing public parameters. In this method, the AES algorithm is used to construct a symmetric key pair, the Elliptic Curve Cryptography(ECC) algorithm is used to construct an asymmetric key pair, and SHA256 is used as the hash algorithm. For all entities in the network, KMC generates secret key pairs for them to perform encryption and signing operations. Taking a DSP as an example, when it wants to join the network, KMC will negotiate with the DSP to generate an AES key pair, an ECC key pair, and a signature key pair based on their parameters. Specifically, the AES key pair is used to secure a data package when the DSP sends the data package to an enclave. The ECC key pair is used to secure the data package when the enclave responds to a read request. The signature key pair is used to sign each request and transaction in TEBDS. The hash algorithm is used to guarantee the integrity of the data package in TEBDS. Besides, KMC can construct pseudo-anonymous identities and manage all entities using an access control list(ACL). For example, when a DSP DSP1
+receives a key pair (SKDSP1 , PKDSP1 ), DSP1 can negotiate pseudo-
+anonymous identity(PKDSPp1 ) with KMC and obtain a signature private key(SKDSPp1 ). Besides, KMC updates ACL periodically.
+
+In TEBDS, blockchain nodes are divided into three types: FNS, FN, and LN. In particular, LN needs to communicate with FN/FNS to obtain integrated information when it wants to check blockchain data. FNS and FN maintain integrated ledgers and complete consensus to obtain rewards.
+Transaction. In TEBDS, all entities’ behavior processing requests are recorded as transactions.
+For a data owner, the owner can initiate two kinds of transactions. One is data write transaction that records the hash value of the owner’s data, signature, and timestamp. The other is the data read transaction that records the data requester’s identity, the hash of the requester’s read request, data owner’s identity, data owner’s signature, and the timestamp.
+For a data requester, the requester constructs a transaction that contains the requester’s read request and timestamp. When the requester gets data from enclaves, he/she also initiates a transaction that records the enclaves’ identities, the hash of received data packets, and the timestamp.
+For a SDSS, it constructs two kinds of transactions. When a data owner broadcasts data packets that he/she wants to store, the SDSS that stores the data packets will construct a transaction that records the data owner’s identity, the number of data packets the SDSS stores, the hash of data packets, SDSS’s signature and timestamp. When the SDSS completes a read request, it will initiate a transaction that contains the data requester’s identity, the data owner’s identity, the number of data packets the SDSS responds to, the hash of data packets, the SDSS’s signature, and the timestamp. Of course, storing users’ behavior information directly on the blockchain can lead to privacy leakage. To solve this problem, before sending the transaction, the Pendersen commitment and the modified transaction structure proposed in [2] can be used.
+Consensus mechanism. Practical Byzantine Fault Tolerance (PBFT) is applied to achieve consensus in this paper, and all FNSs and FNs participate in the consensus. Bookkeeping successes when more than two-thirds of all participants agree to a block.
+Incentive mechanism. To improve the participation of blockchain nodes, we propose a new incentive mechanism.
+For a data owner, the owner should pay a certain amount of coins to SDSS based on the number of split data packets that SDSS stored(Cost1). Of course, the unit price can be negotiated by all FNSs or the data owner and SDSS. In addition to purchasing storage services, data owners need to pay a small part of their coins to reward consensus participants(Cost2).
+For a data requester, his/her payment includes three parts: to the data owner(Cost3), to the SDSS(Cost4), and to the consensus participants(Cost5). The coin paid to the data owner is used to buy the data he/she wants, so it accounts for a large proportion. The coin given to SDSS is used to purchase its read service. A small amount of coins is given to consensus participants to reward them.
+
+325
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+For a SDSS, it only needs to pay consensus participants for blockchain services(Cost6).
+For a miner, he/she mines based on PBFT. After obtaining accounting rights and completing accounting, he/she will get a reward. Besides, the miner needs to take a tiny fraction of his reward and give it to honest voters on average(Cost7).
+Thus, the incentive formula for the above participants is shown as follows:
+For the data owner,
+
+Benefitdataowner = Cost3 − (Cost1 + Cost2) > 0
+
+(2)
+
+For the data requester,
+
+Benefitdatarequester = Benefitroleasdataowner − (Cost3 + Cost4 + Cost5) > 0
+
+(3)
+
+For the SDSS,
+
+BenefitSDSS = Cost1 + Cost4 − Cost6 > 0
+
+(4)
+
+For the consensus participants,
+
+Benefitconsensusparticipant = Cost2 + Cost5 + Cost6
+
+(5)
+
+− Cost7 > 0
+
+All payments can be pre-stored in a smart contract, and entities obtain their coins by triggering the contract.
+D. The performance of TEBDS and its comparison experiments
+
+4.6. Security analysis
+
+Entity authentication: In TEBDS, every entity is managed by KMC based on an ACL. All entities can verify the identities and requests of other entities based on KMC. Besides, if an entity is abnormal, KMC can revoke its public key, then the related pseudoanonymous identities are invalid. The revoked entity cannot do anything after that.
+Data confidentiality: In TEBDS, since the IoT data packets are encrypted by each data owner before storing in SDSS, and the encryption/decryption key pair is only known by the data owner and KMC and kept secret to others, thus the confidentiality of IoT data outside the SGX is ensured. Besides, as a secure container, the SGX enclave can deny access from any unauthenticated entity, OS threads, and privileged software. As a consequence, the risks arising from honest-but-curious FNSs in off-chain data storage can be prevented.
+Data integrity: In TEBDS, both the SGX enclave and storage medium in the untrusted environment store the hash value of original IoT data packages. The integrity of the original data package can be guaranteed by comparing the two hash values. Besides, if the data packet is modified, the data read request will not be affected. Because in all FNSs, some enclaves will store duplicate data. Thus, the data requester can get the complete data packets they want at a reasonable rate.
+Transparency, auditability, and provenance traceability: In TEBDS, all users’ operations are recorded in the form of transactions and transparently stored in the blockchain, which is publicly auditable for all authenticated entities. The operations in the blockchain are immutable and traceable, and data owners can easily find out who requests their data based on signatures.
+Data economy: In TEBDS, the exchange of cryptocurrency and processing outcome between each user is automatically and atomically executed. Meanwhile, users’ operations are publicly recorded in the immutable blockchain, and the data requester cannot repudiate them and refuse to pay. Additionally, a moderate amount of rewards can encourage entities to actively maintain the entire network.
+
+5. Experiment
+In this section, we design comprehensive experiments to verify the performance of TEBDS.
+A. Experiment circumstance
+The experiments are conducted with Intel SGX SDK v2.11,
+and the configuration of hardware is as follows. CPU: Intel i710510U @ 1.80 GHz to 2.30 GHz; Memory: 16 GB; OS: windows 10. In addition, the hash algorithm adopted is SHA256, and the value of the two parameters SGX_AESGCM_KEY_SIZE and SGX_AESGCM_MAC_SIZE in the algorithm Rijndael AESGCM are both 16 Bytes, the trusted thread number TCSNum is 16. The complexity of the read and write process is both O(n2).
+B. Intel SGX benchmark Table 1 demonstrates the performance of ten algorithms under
+the Windows10 with and without SGX. We can know that the
+performance of these algorithms under both situations is very close. This is because SGX threads will consume some resources when entering or exiting the enclave, which is inevitable and is also an inherent bottleneck problem of SGX. This problem has been solved by [2,10,24,25] and is out of the scope of this paper. Generally, although the SGX wastes some resources, the impact of SGX on TEBDS is within an acceptable range.
+C. The performance of blockchain The performance of blockchain under PoW, PBFT, and RAFT is compared in this part. Figs. 5(a) and 5(b) demonstrate the number of blocks generated per minute (BPM) and the number of transactions confirmed per second(TPS) of the blockchain under PoW, PBFT, and RAFT when the number of nodes is different. Fig. 5(a) shows as the number of nodes increases, PoW, PBFT, and RAFT have similar performance, but RAFT still has the best BPM. This is because RAFT only broadcasts blocks, and does not verify the crash nodes. PBFT considers the crash nodes, and thus owns a worse performance than RAFT. PoW strictly generates a block in ten minutes, regardless of the number of nodes, and therefore has the worst performance. Fig. 5(b) shows PBFT owns the best TPS because PBFT obeys the majority rule. RAFT and PoW own a worse TPS. Figs. 5(c) and 5(d) show the TPS and BPM of the blockchain with PoW, PBFT, and RAFT when the size of the block changes. Fig. 5(c) illustrates that the TPS of RAFT and PBFT decreases as the block size increases, while the TPS of PoW increases. This is because PoW follows a fixed block generation time, and the larger the block size, the more transactions are included in it. Fig. 5(d) shows as the block size increases, PoW owns the worst BPM for the same reason. RAFT has the best BPM because it does not consider the crash nodes. Thus the PBFT is applied in this paper. C. The performance of TEBDS and the comparison experiment We separately test the read and write performance of TEBDS in multi-thread mode, and compare the results with those of SPDS [3]. SPDS uses Intel SGX to effectively protect smart contracts so that neither unauthorized users nor privileged software can access or tamper with smart contracts. But SPDS is a centralized data protection method, the smart contract will not be available once the node storing the smart contract fails. TEBDS utilizes the fragmented storage space of distributed nodes to redundantly store one or more data packets, which can improve data availability while ensuring data security. Figs. 6(a) and 6(b) show the CPU occupancy rate of TEBDS and SPDS when the read/write request is executed. From Fig. 6(a), we can know that under the different number of tasks, as the number of threads increases, the CPU occupancy rate of read requests of TEBDS is always lower than that of SPDS. Fig. 6(b) shows that the CPU occupancy rate of write requests of TEBDS is also lower than that of SPDS, although when the task number is 256 TEBDS owns a higher CPU occupancy rate than SPDS. The underlying fact that causes such phenomenons is that the traditional methods
+
+326
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+Table 1 Benchmark for Intel SGX.
+
+TEST
+
+Intel with SGX
+
+Iterations/s Old index Pentium 90*
+
+NUMERIC SORT STRING SORT BITFIELD FP EMULATION FOURIER ASSIGNMENT IDEA HUFFMAN NEURAL NET LU DECOMPOSITION
+
+1858.3 924.32 7.1955e+08 632.61 57006 79.936 18722 7564.8 129.55 3718.9
+
+47.66 413.01 123.43 303.56 64.83 304.17 286.35 209.77 208.12 192.66
+
+New index AMD K6/223*
+15.65 63.93 25.78 70.05 36.41 78.89 85.02 66.99 87.54 139.12
+
+Intel without SGX
+
+Iterations/s Old index Pentium 90*
+
+1777 2011.6 9.8378e+08 941.02 82693 86 17341 7845.4 153.13 3856.5
+
+45.57 898.85 168.75 451.55 94.05 327.25 265.22 217.55 245.99 199.79
+
+New index AMD K6/223*
+14.97 139.13 35.25 104.19 52.82 84.88 78.75 69.47 103.47 144.27
+
+Fig. 5. The BPM and TPS of the blockchain under PoW, PBFT, and RAFT when the number of nodes or block sizes is different.
+
+directly use SGX to read and write data in untrusted storage, which wastes a lot of CPU resources. In TEBDS, before reading and writing data packets, the hash bucket in SGX is used to verify the existence and legality of the requested data or user. If the data does not exist or the user is illegal, the request is directly rejected, and SGX does not need to occupy a lot of CPU to perform subsequent read and write operations. If the requested data exists or the user is legitimate for read requests, the hash bucket can quickly locate the data in the untrusted storage. For write requests, the selected split data packets are written into untrusted storage while the hash bucket is updated.
+Figs. 6(c) and 6(d) show the time occupancy rate of TEBDS and SPDS. From Fig. 6(c), we can know that TEDBS saves much more time than SPDS when executing read requests, this is because TEBDS can obtain the exact address of the stored data from the hash bucket instead of directly searching the untrusted storage as SPDS has done. Fig. 6(d) shows that when executing write requests, TEBDS owns a higher time occupancy rate than SPDS,
+
+the major time-consuming procedure in our approach is the construction of the hash bucket. Before storing data in the untrusted storage, TEBDS needs to construct the hash bucket by calling the Ocall and Ecall functions of Intel SGX, which will waste some time.
+Figs. 6(e) and 6(f) demonstrate the results of the memory occupancy rate of TEBDS and SPDS in multi-thread mode. From Fig. 6(e), we can know that when executing read requests, TEBDS owns a slightly higher memory occupancy rate than SPDS. Fig. 6(f) shows when the write requests are executed, the memory occupancy rate of TEBDS is obviously higher than that of SPDS. But as the number of threads and write tasks increase, the memory occupancy rate of TEBDS will become similar to that of SPDS. The reason why the memory occupancy rate of TEBDS is higher than that of SPDS is that TEBDS needs to maintain a hash bucket in its memory, and the hash bucket changes all the time. For read requests, the hash bucket is always accessed to get the exact location of required data, and for write requests, the hash bucket is always updated to add data storage records.
+
+327
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+Fig. 6. The CPU occupancy rate, time occupancy rate and memory occupancy rate of read and write process for TEBDS and SPDS.
+
+6. Conclusion
+The IoT data sharing service facilitates human daily life, but the data security and identity security issues cannot be ignored. In this paper, we propose a TEE-and-Blockchain-supported IoT data sharing architecture(TEBDS), where the consortium blockchain is used to protect on-chain IoT data and achieve secure access control for IoT users. Intel SGX is applied to build SDSS to alleviate the storage pressure of blockchain and secure off-chain IoT data. In addition, the new incentive mechanism restricts user behavior in a rewarding manner. Security analysis and experimental results
+
+show that our method can guarantee IoT data security and user identity security, and compared with the method SPDS, TEBDS has better performance.
+CRediT authorship contribution statement
+Hui Xie: Conceptualization, Methodology, Writing – original draft, Writing – review & editing. Jun Zheng: Supervision. Teng He: Data curation, Investigation, Validation. Shengjun Wei: Supervision. Changzhen Hu: Supervision.
+
+328
+
+H. Xie, J. Zheng, T. He et al.
+
+Future Generation Computer Systems 140 (2023) 321–330
+
+Declaration of competing interest
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Data availability
+No data was used for the research described in the article.
+Acknowledgments
+This work was supported by the Defense Industrial Technology Development Program, China (JCKY2017204B063).
+References
+[1] Shaomin Zhang, Jieqi Rong, Baoyi Wang, A privacy protection scheme of smart meter for decentralized smart home environment based on consortium blockchain, Electr. Power Energy Syst. 121 (2020) 1–10, http: //dx.doi.org/10.1016/j.ijepes.2020.106140.
+[2] Neha Narula, Willy Vasquez, Madars Virza, Zkledger: Privacy-preserving auditing for distributed ledgers, in: 15th USENIX Symposium on Networked Systems Design and Implementation, NSDI 2018, Renton, WA, USA, April 9-11, 2018, 2018, pp. 65–80, URL: https://www.usenix.org/ conference/nsdi18/presentation/narula.
+[3] Yuntao Wang, Zhou Su, Ning Zhang, Jianfei Chen, Xin Sun, Zhiyuan Ye, Zhenyu Zhou, SPDS: a secure and auditable private data sharing scheme for smart grid based on blockchain, IEEE Trans. Ind. Inform. 17 (11) (2021) 7688–7699, http://dx.doi.org/10.1109/TII.2020.3040171.
+[4] Meni Orenbach, Pavel Lifshits, Marina Minkin, Mark Silberstein, Eleos: ExitLess OS services for SGX enclaves, in: Proceedings of the Twelfth European Conference on Computer Systems, EuroSys 2017, Belgrade, Serbia, April 23-26, 2017, 2017, pp. 238–253, http://dx.doi.org/10.1145/3064176. 3064219.
+[5] Sergei Arnautov, Bohdan Trach, Franz Gregor, Thomas Knauth, André Martin, Christian Priebe, Joshua Lind, Divya Muthukumaran, Dan O’Keeffe, Mark Stillwell, David Goltzsche, David M. Eyers, Rüdiger Kapitza, Peter R. Pietzuch, Christof Fetzer, SCONE: secure linux containers with intel SGX, in: 12th USENIX Symposium on Operating Systems Design and Implementation, OSDI 2016, Savannah, GA, USA, November 2-4, 2016, 2016, pp. 689–703, URL: https://www.usenix.org/conference/osdi16/technicalsessions/presentation/arnautov.
+[6] Maurice Bailleu, Jörg Thalheim, Pramod Bhatotia, Christof Fetzer, Michio Honda, Kapil Vaswani, SPEICHER: securing LSM-based key-value stores using shielded execution, in: 17th USENIX Conference on File and Storage Technologies, FAST 2019, Boston, MA, February 25-28, 2019, 2019, pp. 173–190, URL: https://www.usenix.org/conference/fast19/presentation/ bailleu.
+[7] Taehoon Kim, Joongun Park, Jaewook Woo, Seungheun Jeon, Jaehyuk Huh, ShieldStore: Shielded in-memory key–value storage with SGX, in: Proceedings of the Fourteenth EuroSys Conference 2019, Dresden, Germany, March 25-28, 2019, 2019, pp. 14:1–14:15, http://dx.doi.org/10.1145/ 3302424.3303951.
+[8] Haiping Si, Changxia Sun, Yanling Li, Hongbo Qiao, Lei Shi, IoT information sharing security mechanism based on blockchain technology, Future Gener. Comput. Syst. 101 (2019) 1028–1040, http://dx.doi.org/10.1016/j.future. 2019.07.036.
+[9] Songlin He, Qiang Tang, Chase Qishi Wu, Xuewen Shen, Decentralizing IoT management systems using blockchain for censorship resistance, IEEE Trans. Ind. Inform. 16 (1) (2020) 715–727, http://dx.doi.org/10.1109/TII. 2019.2939797.
+[10] Can Zhang, Liehuang Zhu, Chang Xu, Chuan Zhang, Kashif Sharif, Huishu Wu, Hannes Westermann, BSFP: blockchain-enabled smart parking with fairness, reliability and privacy protection, IEEE Trans. Veh. Technol. 69 (6) (2020) 6578–6591, http://dx.doi.org/10.1109/TVT.2020.2984621.
+[11] Kuan Fan, Zijian Bao, Mingxi Liu, Athanasios V. Vasilakos, Wenbo Shi, Dredas: decentralized, reliable and efficient remote outsourced data auditing scheme with blockchain smart contract for industrial IoT, Future Gener. Comput. Syst. 110 (2020) 665–674, http://dx.doi.org/10.1016/j.future.2019. 10.014.
+[12] Meng Shen, Huisen Liu, Liehuang Zhu, Ke Xu, Hongbo Yu, Xiaojiang Du, Mohsen Guizani, Blockchain-assisted secure device authentication for cross-domain industrial IoT, IEEE J. Sel. Areas Commun. 38 (5) (2020) 942–954, http://dx.doi.org/10.1109/JSAC.2020.2980916.
+
+[13] Mohsin Ur Rahman, Barbara Guidi, Fabrizio Baiardi, Blockchain-based access control management for decentralized online social networks, J. Parallel Distrib. Comput. 144 (2020) 41–54, http://dx.doi.org/10.1016/j. jpdc.2020.05.011.
+[14] Keke Ga, Yulu Wu, Liehuang Zhu, Zijian Zhang, Meikang Qiu, Differential privacy-based blockchain for industrial internet-of-things, IEEE Trans. Ind. Inform. 16 (6) (2020) 4156–4165, http://dx.doi.org/10.1109/TII.2019. 2948094.
+[15] Liehuang Zhu, Meng Li, Zijian Zhang, Chang Xu, Ruonan Zhang, Xiaojiang Du, Nadra Guizani, Privacy-preserving authentication and data aggregation for fog-based smart grid, IEEE Commun. Mag. 57 (6) (2019) 80–85, http: //dx.doi.org/10.1109/MCOM.2019.1700859.
+[16] Yili Luo, Jia Fan, Chunhua Deng, Yixin Li, Yue Zheng, Jianwei Ding, Accountable data sharing scheme based on blockchain and SGX, in: 2019 International Conference on Cyber-Enabled Distributed Computing and Knowledge Discovery, CyberC 2019, Guilin, China, October (2019) 17-19, 2019, pp. 9–16, http://dx.doi.org/10.1109/CyberC.2019.00012.
+[17] Gbadebo Ayoade, Vishal Karande, Latifur Khan, Kevin W. Hamlen, Decentralized IoT data management using BlockChain and trusted execution environment, in: 2018 IEEE International Conference on Information Reuse and Integration, IRI 2018, Salt Lake City, UT, USA, July 6-9, 2018, 2018, pp. 15–22, http://dx.doi.org/10.1109/IRI.2018.00011.
+[18] Shorouq Alansari, Federica Paci, Vladimiro Sassone, A distributed access control system for cloud federations, in: 37th IEEE International Conference on Distributed Computing Systems, ICDCS 2017, Atlanta, GA, USA, June 5-8, 2017, 2017, pp. 2131–2136, http://dx.doi.org/10.1109/ICDCS.2017.241.
+[19] Weiqi Dai, Chunkai Dai, Kim-Kwang Raymond Choo, Changze Cui, Deqing Zou, Hai Jin, SDTE: a secure blockchain-based data trading ecosystem, IEEE Trans. Inf. Forensics Secur. 15 (2020) 725–737, http://dx.doi.org/10.1109/ TIFS.2019.2928256.
+[20] Sinisa Matetic, Karl Wüst, Moritz Schneider, Kari Kostiainen, Ghassan Karame, Srdjan Capkun, BITE: bitcoin lightweight client privacy using trusted execution, in: 28th USENIX Security Symposium, USENIX Security 2019, Santa Clara, CA, USA, August 14-16, 2019, 2019, pp. 783–800, URL: https://www.usenix.org/conference/usenixsecurity19/presentation/matetic.
+[21] Muoi Tran, Loi Luu, Min Suk Kang, Iddo Bentov, Prateek Saxena, Obscuro: A bitcoin mixer using trusted execution environments, in: Proceedings of the 34th Annual Computer Security Applications Conference, ACSAC 2018, San Juan, PR, USA, December 03-07, 2018, 2018, pp. 692–701, http://dx.doi.org/10.1145/3274694.3274750.
+[22] Jieren Cheng, Jun Li, Naixue Xiong, Meizhu Chen, Hao Guo, Xinzhi Yao, Lightweight mobile clients privacy protection using trusted execution environments for blockchain, Comput. Mater. Contin. 12 (2020) 2247–2262.
+[23] Marcus Brandenburger, Christian Cachin, Challenges for combining smart contracts with trusted computing, in: Proceedings of the 3rd Workshop on System Software for Trusted Execution (SYSTEX’18), 2018, pp. 20–21, URL: https://doi.org/10.1145/3268935.3268944.
+[24] Rui Yuan, Yubin Xia, Haibo Chen, Binyu Zang, Jan Xie, ShadowEth: Private smart contract on public blockchain, J. Comput. Sci. Technol. 33 (3) (2018) 542–556, http://dx.doi.org/10.1007/s11390-018-1839-y.
+[25] Fan Zhang, Ethan Cecchetti, Kyle Croman, Ari Juels, Elaine Shi, Town crier: An authenticated data feed for smart contracts, in: Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security, Vienna, Austria, October 24-28, 2016, 2016, pp. 270–282, http: //dx.doi.org/10.1145/2976749.2978326.
+[26] Syeda Mariam Muzammal, Raja Kumar Murugesan, N.Z. Jhanjhi, A comprehensive review on secure routing in internet of things: Mitigation methods and trust-based approaches, IEEE Internet Things J. 8 (6) (2021) 4186–4210, http://dx.doi.org/10.1109/JIOT.2020.3031162.
+Hui Xie is a PHD candidate of School of Cyberspace Security and Technology, Beijing Institute of Technology, China. Her research interests are network Security, Data Security and Blockchain technology. Her E-mail address is 1263893585@qq.com.
+
+329
+
+H. Xie, J. Zheng, T. He et al.
+Jun Zheng is a professor of School of Cyberspace Security, Beijing Institute of Technology, China. She mainly studies cloud storage security, network attack and defense, artificial intelligence security, big data and intelligent information processing technology, etc. She has a great influence in the field of network security. Her E-mail address is zhengjun@bit.edu.cn.
+Teng He is pursuing his M.S. degree in School of Computer Science from Beijing Institute of Technology, China. His research interests are privacy protection, cryptography and blockchain technology. His E-mail is csheteng@163.com.
+
+Future Generation Computer Systems 140 (2023) 321–330
+Shengjun Wei is an associate professor in the School of Cyberspace Security at Beijing Institute of Technology. He mainly studies cryptography, cyber attack and defense, UAV security, big data and intelligent information processing technology, etc. He has great influence in the field of cyber security. His E-mail address is sjwei@bit.edu.cn.
+Changzhen Hu is a professor of School of Cyberspace Security, Beijing Institute of Technology, China. He mainly studies cryptography, cloud storage security, network attack and defense, artificial intelligence security, UAV security, big data and intelligent information processing technology, etc. He has a great influence in the field of network security. His E-mail address is chzhoo@bit.edu.cn.
+
+330
+

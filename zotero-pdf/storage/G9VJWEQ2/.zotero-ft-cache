@@ -1,0 +1,1064 @@
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+3813
+
+Many-Objective Automatic Service Composition Based on Temporal Goal Decomposition
+Zhaoning Wang , Bo Cheng, Member, IEEE, Wenkai Zhang , and Junliang Chen
+
+Abstract—With the evolution of Web technologies, various services have become available in a pervasive network environment. Combining simple atomic services into sophisticated applications with a quality-of-service (QoS) guarantee has become a widely studied problem. Given the increasing number of QoS attributes to be considered, conventional service composition approaches with manual workﬂows and massive computational burdens are no longer effective. Therefore, this article ﬁrst suggests an efﬁcient many-objective (with four or more objectives) automatic service composition approach named MaSC. In particular, this article introduces a temporal goal decomposition mechanism based on a temporal model to divide an unwieldy problem into several ﬁne-grained subproblems. Viewing this model as an individual representation, we employ an evolutionary process with a novel ﬁtness function to explore the composition solution. The experimental results on the benchmarks show that our approach can simultaneously optimize up to six objectives and achieve a better trade-off between the computation cost and the QoS than two recently proposed automatic composition approaches.
+Index Terms—Service composition, QoS awareness, manyobjective optimization, AI planning.
+I. INTRODUCTION
+W ITH the rapid development of cloud and edge networks in recent years, Web services are becoming increasingly pervasive and diverse [1]–[3]. Service-oriented computing (SOC) aims to package heterogeneous resources (software or hardware) as services that are modular Web-based selfdescribed components implementing a collection of functions or operations identiﬁed by URIs (uniform resource identiﬁers). Service providers publish and transmit services over cloud and edge networks [4], while service consumers locate and access services through syntactic descriptions [5], including functional descriptions and quality of service (QoS) attributes [6].
+In practice, as single services can no longer satisfy complicated and dynamic requirements, the service composition (SC) is proposed for aggregating atomic, simple, and easily
+Manuscript received August 23, 2020; revised January 19, 2021; accepted January 26, 2021. Date of publication February 2, 2021; date of current version September 9, 2021. This work is supported by the National Key Research and Development Program of China under grant 2018YFB1003804, in part by the National Natural Science Foundation of China under grant 61921003, 61972043. The associate editor coordinating the review of this article and approving it for publication was J. J. Yang. (Corresponding author: Bo Cheng.)
+The authors are with the State Key Laboratory of Networking and Switching Technology, Beijing University of Posts and Telecommunications, Beijing 100876, China (e-mail: asimoo@bupt.edu.cn; chengbo@bupt.edu.cn; zwk@bupt.edu.cn; chjl@bupt.edu.cn).
+Digital Object Identiﬁer 10.1109/TNSM.2021.3056414
+
+executable services to accomplish sophisticated functionalities, while QoS attributes are crucial factors for determining the performance [7], [8] and client experiences. Therefore, the QoS-aware service composition (QSC) is proposed to generate composite services while employing QoS optimization. A wealth of previous research results solve the QSC problem concerning a single QoS [9]–[12]. However, services with multiple QoS attributes fail cannot be precisely evaluated by methods for a single QoS. Therefore, multiobjective optimization, which chooses two or three QoS attributes, has become an attractive topic [11], [13]. In contrast, scenarios with four or more objectives known as many-objective problems have rarely been investigated. In practical applications, more QoS factors have emerged, such as security, maintainability, reputation, and energy consumption. The manyobjective QSC problem has been investigated for the purpose of equally considering these attributes [14].
+Conventional approaches address multi- and many-objective QSC problems with a static composition approach; these approaches employ a business process consisting of abstract services to be completed with concrete services. Some studies combine multiple QoS attributes into a single attribute [15] or employ a multiconstrained composition, where a constraint is speciﬁed for each QoS attribute and the objective is to satisfy all the QoS constraints [16]–[19]. However, multiple, often conﬂicting QoS attributes need to be simultaneously optimized [20]. Therefore, some studies propose the use of subheuristic algorithms to solve the problem by iterative improvement of a set of solutions [1], [20]–[26] to achieve the best possible trade-offs between antagonistic objectives. Moreover, some existing studies apply this method to many-objective QSC problems [21], [22]. However, the predeﬁned business process limits the scope of the search space and fails to fulﬁll the dynamic and complex requirements. Consequently, these methods cannot ensure the global optimality of the solutions. Furthermore, the business process must be deﬁned before composition, which means the business process has to be manually designed.
+The automatic composition approach abandons the predeﬁned business process and formulates the service composition as an artiﬁcial intelligence (AI) planning process. Speciﬁcally, it maps atomic services to planning operators, and the planning solution represents a composite service determined by the planning algorithms. Several methods have been proven effective for a single objective [27]–[29]. A number of automatic approaches transform multiple objectives to a single objective [9], [30]. Nevertheless, the existing
+
+1932-4537 c 2021 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3814
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+automatic approaches rely on a graph, which results in a high computational burden because of the exhaustive exploration of the search space. When the problem size becomes large in the real world, these methods often become extremely slow and cannot ﬁnd a satisfactory solution within the given time budget. Although the graph-based approach can optimize a single QoS attribute in polynomial time, it requires exponential time when simultaneous optimizing multiple attributes. In addition, none of the multi- or many-objective algorithms in the static approach can be directly applied to address automatic service composition. As a result, creating an efﬁcient automatic service composition approach with multi- or many-objective optimization has become an open topic.
+As metaheuristic algorithms have been shown to be particularly effective in achieving a good balance between exploration and exploitation, obtaining high-quality near-optimal solutions within a reasonable given time budget for multi- and many-objective problems in static composition approaches, the application of meta-heuristics in automatic composition is a promising research direction. Studies [6], [31] have proposed multi-objective automatic service composition approaches with the genetic algorithm (GA) and graph-based representation. However, the modiﬁcation of graph-based representations using variation operators in the GA can be difﬁcult, as removing any given node in the graph may impact the correctness of the service ﬂow, which negatively inﬂuences the solution exploration and the computation time, especially when the number of QoS attributes and the scale of the service repository grow in practice.
+In summary, there still exist three major challenges to effectively utilizing metaheuristic algorithms to solve manyobjective problems in automatic service composition. The ﬁrst open challenge concerns the identiﬁcation of a suitable and efﬁcient candidate individual representation. The choice of variation operators for individuals to employ during the evolutionary process is the second open challenge. The ﬁnal challenge is how to develop an appropriate ﬁtness function to rapidly evaluate the ﬁtness and the correctness of the individual representations. To address these issues, inspired by the principle of a temporal AI planning algorithm, DAEX [32], we ﬁrst introduce a temporal model as the representation with corresponding variation operators and ﬁtness function in the evolutionary process. The major contributions in this article are as follows:
+1) We formulate the many-objective QSC problem as a planning problem and propose a novel temporal model that deﬁnes an execution timeline to represent the subgoals and then estimates the earliest appearance time in the execution process of a composite service.
+2) We propose a many-objective service composition (MaSC) algorithm that uses the temporal model to generate the execution timeline as the representations. This algorithm employs an evolutionary process with a series of temporal variation operators and a reachable nondominated sorting (RNS) mechanism evaluating the quality and correctness of the obtained execution timelines to
+
+explore the search space and determine the approximated Pareto set of solutions. 3) Finally, we perform experiments on the benchmark datasets. Compared to two recently proposed graphbased algorithms, our approach achieves a better balance between the quality of the composition solutions and the search efﬁciency. The rest of the article is organized as follows: In Section II, we introduce the existing related literature. In Section III, we present some deﬁnitions and formulate the problem. In Section IV, we show the details of the proposed MaSC algorithm. In Section V, we present the experiment results. Conclusions are drawn in Section VI.
+II. RELATED WORK
+In this section, we describe the previous proposals for multi-objective QSC problems from two service composition approaches: static and dynamic approaches.
+A. Static Composition Approach
+Previous studies mostly solve this type of problem via a static composition approach with predeﬁned business processes and then search for the candidate services of each service from chains to determine the optimal or nearoptimal solution. According to the approaches for handling the optimization objectives, the works around the static approach can be classiﬁed into the following categories:
+• Scalarization: In [15], [16], [33]–[35], QoS vectors to represent each service are proposed, and a multiple criteria decision-making process is applied to calculate the QoS value of the services using the weights of each QoS attribute assigned by users.
+• Multiple Constraints: In this type of model, studies adopt single-objective multiconstrained optimization. One QoS attribute is selected as the primary objective to be optimized, while for the rest of the attributes, a worst case bound is set (often termed constraints). In [17]–[19], selecting the primary parameter to optimize is a challenging problem and often depends on users’ preferences. Moreover, determining the constraint values is not an easy task and may lead to no solution in turn.
+• Metaheuristic: In [5], Zeng et al. ﬁrst formalize the general service selection procedure in an integer programming approach. Then, in [1], Ardagna and Pernici propose a ﬂexible service selection model. In [36], Mabrouk et al. ﬁrst select multiple services for every abstract service class of a complex process template by a metaheuristic algorithm, aiming to determine a set of near-optimal service compositions. The work [37] considers a mobile-trajectory-aware multi-service composition model and leverages a bio-inspired algorithm for yielding high-quality service composition solutions. A signiﬁcant number of research results have been obtained based on evolutionary algorithms, such as bee colony optimization (BCO) [38], the genetic algorithm (GA) [24], [39], and the teaching-learning-based optimization (TLBO) algorithm [23].
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3815
+
+• QoS Dependency: This model considers the dependencies at the QoS level. In [25], Chen et al. propose a QoS dependency-aware service composition considering the dependency that the QoS values of a service are correlated to other services. When these services are selected together, their QoS values change. In [20], Wagner et al. study QoS dependency on the time of the execution or the input data and proposed a genetic algorithm to obtain approximations of the Pareto optimal solution set.
+Due to the limitations of the predeﬁned business process, although multiple QoS objectives have been widely considered with various algorithms, it is difﬁcult to ensure the globally optimal solutions. When the requirements become more complicated, it becomes more difﬁcult to manually determine a business process.
+B. Automatic Composition Approach
+The theoretical foundation of the automatic composition approach includes AI planning technologies that have been widely applied. The existing automatic composition approaches dynamically generate composite services according to users’ expected goal output. From the aspect of the categories of AI planning, the automatic composition approaches can be classiﬁed as follows:
+• Classic Planning: Some studies use forward-chaining or backward-chaining planning for service composition, and some even employ bidirectional planning algorithms to ﬁnd a solution with the minimum execution time cost [40]–[42]. In [43], Rahmani et al. propose a novel backward search for automatically directing the composition process of Web services.
+• Graphplan: A dependency graph is generated to analyze the relationships among Web services in graphplan. Most early works only consider the functional requirements [12]. In the work [44], a search algorithm based on A* is adopted to ﬁnd the optimal solution. The QoS value is viewed as the weight of the graph and single-objective optimization is proposed in some studies [13], [16]. In [45], Zheng and Yan apply the Dijkstra algorithm to determine the solution with the optimal single QoS value. Furthermore, some studies adopt the scalarization approach to combine multiple QoS attributes into a single rank score [11], [46]. To optimize the computational consumption, a hybrid optimization algorithm is proposed in [9].
+• Metaheuristic: The nondominated sorting genetic algorithm (NSGA) and a graph-based individual representation are adopted to ﬁnd an approximated Pareto front of solutions in the work [6]. The work [31] proposes a subgraph-based representation and approach to search the Pareto set based on the nondominated sorting genetic Algorithm II (NSGA II). The disadvantages of graphbased methods include that constructing the graph is timeconsuming and that it is difﬁcult to ensure correctness with the modiﬁcation of representations.
+• SAT Planning: This automatic model dynamically adjusts the service sequences with changes in the QoS values.
+
+In [47], Zou et al. adopt CSP (cost-sensitive planning) technology to ﬁnd a local optimal solution based on multiple QoS constraints in dynamic service composition. • HTN Planning: Hierarchical task networks (HTNs) provide useful templates for service composition. In the work [48], Sirin et al. present the HTN-DL formalism, an extension to the HTN planning formalism, to generate compositions of Web services based on these templates. In [49], Sohrabi and McIlraith propose HTNWSC-P, which recursively decomposes a composition task into subtasks and stops until primitive tasks that can be performed directly by atomic services are reached. The existing automatic composition approaches obtain a broader search space and a more ﬂexible service composition than the static approaches but overrelies on the graph structure to explore the search space and determine the solutions. As a result, these approaches may lead to high computational burdens, especially for multi- and many-objective problems.
+III. PROBLEM FORMULATION
+Deﬁnition 1 (Elementary Service): An elementary service w can be denoted as a tuple (I(w),O(w)Q(w)), where I (w ) = {i1(w ), i2(w ) · · · } is a set of input parameters, O(w ) = {o1(w ), o2(w ) · · · } is a set of output parameters, and Q(w ) = q1(w ), q2(w ) · · · qn (w ) (n ≥ 4) is a tuple of QoS values.
+The deﬁnition of an elementary service encompasses functional attributes and nonfunctional attributes. The parameter is the smallest data unit consisting of a concept and an instance, where the concept represents a type of instance based on an agreed-upon service ontology [50] that deﬁnes a set of concepts and assertions about the relationships of the concepts and corresponding instances. In this article, the concept relationships determine the parameter relationships, i.e., if a parameter set P1 is subsumed by another parameter set P2, all concepts in P1 belong to the concepts in P2; in other words, each instance in P1 is also an instance in P2.
+The functional attributes indicate the input and output parameters of the services, and the nonfunctional attributes indicate a set of end-to-end quality of service (QoS) attributes, such as price, availability, reliability, and reputation, determining the execution performance of services [51]–[53]. Each elementary service corresponds with an operation such that an elementary service can represent an atomic operation in the planning problem, and the QoS values map to the temporal properties of the operations, such as the execution duration and the cost. The QoS tuple is viewed as the decision vector for evaluating the quality of the elementary or composite service in our proposed approach.
+A set of elementary services and their relationships consist of a composite service. A composite service is connected based on the dependency relationships of the input set and the output set. Services that depend on other services are called applicable services.
+Deﬁnition 2 (Service Applicability): Given a service w = (I(w),O(w),Q(w)), I(w) ⊆ P denotes that w is applicable to a parameter set P.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3816
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+Fig. 1. The directed acyclic graph of composite services.
+TABLE I QOS COMPUTATIONS FOR THE COMPOSITE SERVICES [5]
+
+attributes are negative, i.e., the lower the value is, the higher the quality, while other attributes are positive, i.e., the higher the value is, the higher the quality, and the different categories of QoS attributes above have different ranges. Therefore, we use a set of equations to normalize these values to the range of [0, 10] and to unify them to be negative before using them. Given a QoS attribute qi for an elementary Web service wj , we calculate a utility value qˆi (wj ). For negative attributes, such as the response time and execution time, the values are normalized using equation (1). For positive and nonmultiplication attributes, the values are normalized using equation (2). Similarly, we can calculate the normalized QoS values of the composite Web services qˆi (C ). For positive and multiplication attributes, i.e., reliability and reputation, the values are normalized using equation (3). The aforementioned equations are deﬁned as follows:
+
+qˆi (wj ) = qˆi (wj ) = qˆi (wj ) =
+
+qi (wj )−qimin qimax −qimin
+10,
+
+∗ 10,
+
+qimax − qimin = 0 qimax − qimin = 0;
+
+(1)
+
+qimax −qi (wj ) qimax −qimin
+10,
+
+∗
+
+10,
+
+qimax − qimin = 0 qimax − qimin = 0;
+
+(2)
+
+ln(qimax )−ln(qi (wj )) ln(qimax )−ln(qimin )
+10,
+
+∗ 10,
+
+qimax qimax
+
+− qimin − qimin
+
+= =
+
+0 0.
+
+(3)
+
+As described in the deﬁnition, determining a service’s applicability to a parameter set is subject to whether the input requirements of the service are subsumed in the parameter set. Given a parameter set P, a Web service w is applicable to this set. Therefore, let P be an input set, the output parameters after w executing are P = (P−I(w)) ∪ O(w). Another Web service w is applicable to P’. We say that w’ is dependent on w and that these two services have a dependency relationship. Several services that have dependency relationships are combined together and become a composite service.
+Deﬁnition 3 (Composite Service): A composite service C is modeled as a tuple (W(C), R(C), Q(C)), where W (C ) = {w1, w2, . . . , wn } is a set of services, R(C ) = {r (wi , wj )|wi ∈ W (C ), wj ∈ W (C )} is a set of dependency relationships between two services, and Q(C ) = q1(C ), q2(C ) · · · is a QoS tuple of the composite service.
+Each service pair r (wi , wj ) in the relationship set R(C) indicates that service wj depends on service wi , which means I (wj ) ⊆ O(wi ). As shown in Fig. 1, a composite service can be depicted as a directed acyclic graph, where W(C) represents a set of nodes and R(C) represents a set of edges. Therefore, sequence and parallel constructs can exist among different composite services. The QoS attributes describing elementary services are also utilized to evaluate the QoS of composite services. Considering a set of composite services C including n services {w1, w2, . . . , wn }, the QoS values qi (C ) are calculated according to the equations in Table I.
+When multiple QoS attributes are considered, it is common to use normalized QoS values. Some of the above QoS
+
+After normalization, for each QoS attribute, normalized val-
+
+ues closer to 0 indicate higher quality, while normalized values
+
+closer to 1 indicate lower quality.
+
+Deﬁnition 4 (QSC Problem): A QSC problem is denoted as
+
+a tuple (W, P, R, G), where W = {w1, w2 · · · } is a service
+
+repository including a set of Web services, P = {p1, p2, . . . , }
+
+is of
+
+a set of applicable parameters, R requested input parameters, and G
+
+= =
+
+{{ppR1G1 ,,ppR2G2 ······}}
+
+is is
+
+a a
+
+set set
+
+of expected output results.
+
+Deﬁnition 5 (Composition Solution): Given a QSC
+
+problem (W, P, R, G), a composition solution σ to the
+
+problem is a composite service, such that I (σ) ⊆ R and
+
+G ⊆ O (σ).
+
+In a many-objective QSC problem, we may not ﬁnd a sin-
+
+gle solution that is optimal in all respects; rather, we may
+
+ﬁnd a Pareto front consisting of a set of nondominated solu-
+
+tions. The feasible solutions obtained from the Pareto front
+
+constitute the optimal solution space of our problem. In this
+
+section, we deﬁne the terminologies about Pareto optimization
+
+and nondominance.
+
+Deﬁnition 6 (Nondominated Solution): A composition
+
+solution σi is a nondominated solution if and only if ∃σj such that qk (σj ) ∈ Q(σj ) for which qk (σj ) is better than qk (σi ) and the rest of the QoS attributes in σj are at least as good as those in σi .
+
+Deﬁnition 7 (Pareto Front): The set of nondominated solu-
+
+tions with respect to a query is called the Pareto front.
+
+According to all the deﬁnitions above, the problem we are
+
+about to solve in this article is as follows. Given a QSC
+
+problem (W, P, R, G) , our goal is to ﬁnd the Pareto front of
+
+the composition solutions, while the requested input set and
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3817
+
+Fig. 2. The overall process of the MaSC algorithm.
+
+Fig. 3. The execution timeline and the goal decomposition mechanism.
+
+the expected output set are satisﬁed. To simplify the calculation in this article, we use the QoS value scaled by equations (1)-(3) in the following algorithms. The objective function of the QSC problem is
+
+arg σm∈iΩn(qˆ1(σ), qˆ2(σ) · · · qˆk (σ)),
+
+(4)
+
+where Ω represents all the possible composition solutions to the QSC problem and k ≥ 4. The objective is to ﬁnd the solution with the optimal overall QoS.
+
+IV. MASC ALGORITHM
+In this section, we present the detailed architecture of the MaSC algorithm. The core idea of MaSC is introducing a novel temporal model including an execution timeline and a goal decomposition mechanism to realize the main MaSC algorithm process that optimizes the execution timeline as an individual representation such that the composition solution can be constructed. Fig. 2 depicts two general phases of the main MaSC algorithm process with circular arrows: the initialization process marked by grey and the evolutionary process marked by blue. First, in the initialization process, a service dependency graph is constructed to analyze the relationships and to obtain a heuristic function of the possible position of the services in the composition solution, and the graph is destroyed after the heuristic function extraction. Second, a number of execution timelines with the heuristic function as the ﬁrst generation of the population are generated, and an evolutionary process is conducted to iteratively mutate, select, and ultimately determine an approximated Pareto set from the search space.
+
+A. The Temporal Model
+Before presenting the algorithm process, we ﬁrst introduce the temporal model, which includes two major parts. First, the model deﬁnes an execution timeline of the composition solution for the evolutionary process as an individual representation. Second, the model provides a goal decomposition mechanism to reasonably split the problem.
+1) The Execution Timeline: A composition solution is executed in a continuous period of time during which the service participants in the solution periodically produce output parameters. Therefore, each composition solution could imply a chronology consisting of the parameters produced by services
+
+at the speciﬁed time point during this execution period. This fact inspires us to conclude that a sequence of intermediate parameter sets in the timeline could represent a service execution path of a composition solution. As a result, we deﬁne an execution timeline and the related terminologies. Note that the formulations of the execution timeline refer to some concepts of temporal AI planning technologies but have different implications in this article.
+Deﬁnition 8 (Temporal Subgoal): A temporal subgoal can be denoted as a tuple t, P , where P = {p1, p2 · · · } is a set of parameters and t is a temporal variable representing the earliest time point at which the parameters appear.
+A temporal subgoal (TSG) indicates the earliest time point at which the parameter set can appear, and a set of TSGs can reﬂect the trend of the parameter states during the execution of a composite service. The temporal variable is a discrete positive ﬂoat number that represents comparable time points. For instance, ti < tj denotes that the temporal variable ti is smaller than the temporal variable tj .
+Deﬁnition 9 (Execution Timeline): An execution timeline Φ can be denoted as a tuple (F, T , S), where F represents a set of temporal subgoals, T represents a sequence of temporal variables, and S represents the corresponding composition solution of this execution timeline.
+The temporal variable sequence T indicates the time order among different temporal variables in an execution timeline. The composition solution S is initially empty and determined by the TSG set F in the evolutionary process. Fig. 3 shows a typical execution timeline. The rectangles in the ﬁgure represents the parameters. In particular, the execution timeline in the ﬁgure has two special TSGs referred to as the requested set and the goal set in the QSC problem as the ﬁrst and the last TSGs, respectively. The timeline has 4 TSGs, G1, G2, the requested input set R and the goal set G.
+2) Goal Decomposition: For an original QSC problem, directly searching the composition solutions reaching the original goal set in the problem leads to combinatorial explosion in the search space. In particular, the graphplan algorithm, storing a graph that contains all possible solutions to the query, frequently experiences memory overﬂow. Therefore, only searching for solutions of sequential partial goals or subgoals while limiting the scale of subgoals to describe the solutions is a more practical method for efﬁciently and
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3818
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+widely exploring the search space. However, this raises another issue: how can the subgoals of the individuals be chosen in a ﬂexible and diverse way while ensuring correctness. For these concerns, on the one hand, the execution timeline with TSGs successfully provides a reasonable problem division. On the other hand, the heuristics extracted from the dependency graph provide a small data structure for generating the correct execution timeline without storing the graph structure.
+Considering that an execution timeline Φ implies a set of TSGs Gsub = {G1, G2 · · · Gn } and letting g0 = R, we can denote the original problem as a set of subproblems Qi = (W , P , Gˆi , Gi+1)i∈[0,n], where Gˆi is the parameter set from the composition solution of the last subproblem Qi−1 combining the subgoal set Gi . As shown in Fig. 3, the QSC problem is divided into three subproblems. Each solution to a subproblem in an execution timeline is called a subsolution. All subsolutions consist of a composition solution to the QSC problem. Moreover, whether an execution timeline can determine a composition solution decides whether this execution timeline is correct, which is known as the correctness of the execution timeline. A correct execution timeline always has subsolutions for all subproblems. In contrast, if any subproblems do not have subsolutions, this execution timeline is incorrect.
+As the TSG in an execution timeline represents the possible time of parameters produced by services, the generation of an execution timeline needs to estimate the appearance time for each parameter so that the correctness of this execution timeline can be ensured. The concept of heuristics refers to the concepts of AI planning technologies that indicate the expected quality information of sortable nodes. Therefore, the dependency graph in graphplan, which contains all the possible solutions, is an appropriate source for extracting the heuristics of the parameters. The details are described in a following paper.
+The evolutionary process is based on evolutionary algorithms, which are optimization algorithms for general purposes and have been proven to be highly ﬂexible and robust in handling multiple or many objectives. Since the general evolutionary algorithms are problem independent, we need to implement a new problem-dependent evolutionary process, which requires the deﬁnition of the representation of candidate solutions, the ﬁtness function, and the variation operators. The evolutionary process is a metaheuristic algorithm based on a metaphor of the Darwinian evolution of biological populations: the interaction of natural selection and blind variations results in the emergence of individuals who are adapted to their environment. Individuals are candidate solutions to optimization problems. The environment is given by the value of the objective functions, also known as the ﬁtness. The temporal model provides a ﬂexible approach for decomposing a complicated goal set into several intermediate simpler subgoal sets that can be solved as subproblems, which greatly reduces the complexity of directly solving difﬁcult composition problems, laying the foundation of the MaSC algorithm.
+B. The Initialization Process
+The initialization process prepares the essential analysis for the evolutionary process. This process mainly constructs a
+
+Fig. 4. The service dependency graph.
+dependency graph, and during graph construction, it extracts a heuristic function from the relations among services.
+1) Graph Construction: A dependency graph is constructed according to the dependency relationships among the services in the service repository. The graph depicts all the possible service sequences of the composition solutions. Therefore, we can obtain the earliest appearance time of the parameters, and the parameter sets from the graph are called the heuristic information with a computing principle.
+Deﬁnition 10 (Dependency Graph): A dependency graph Π is a directed layered graph denoting a sequence of parameter layers and Web service layers P0, W1, P1, . . . , Wn , Pn , where layer P0 denotes the input parameters Rin of the QSC problem, layer W1 denotes the applicable Web service set of layer P0, and layer P1 is the union set of layer W1’s output set and layer P1.
+Whether the parameters can be reached is deﬁned as the reachability of the parameters. According to the deﬁnition, the dependency graph is a directed layered graph where the service layers and the parameter layers alternately appear. Fig. 4 shows a standard service dependency graph. The services in the same layer can execute in parallel. The parameters in the same layer can be reached by the services in the previous layer. The dependency relationship between the services and the reachability of the parameters are two signiﬁcant features that the dependency graph implies.
+Constructing the dependency graph is a process that starts from the ﬁrst layer and expands the graph until the layers stop changing. As shown in Algorithm 1, the input of this algorithm is the QSC problem, and a graph initialized with the requested input set is the ﬁrst layer P0. The output is the dependency graph. Lines 4-6 estimate whether the graph has been completely constructed by judging two conditions: the goal set or the ﬁxed point layer after which the layer of the graph stops changing is reached. The function Fixedpoint() is used to check whether the ﬁxed point layer has been reached. Lines 8-12 ﬁnd an applicable service set Candidates for the present parameter layer P0, where all services whose input set are applicable to the last parameter layer. Then, the output of all services in this service layer and the last parameter layer combine and become the next parameter layer. Lines 14-18 recursively analyze the reachability of each service and ﬁlter the redundant services in Candidates with the function Expand (), then add the remaining reachable services to a new service layer. The details of the function Expand () are demonstrated in Algorithm 2. Correspondingly, the requested input
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3819
+
+Algorithm 1 Constructing the Dependency Graph
+
+Input: (W , P , R, G) is a QSC problem,P0 ← R, Π ← P0 Output: Dependency graph Π = P0, W1, P1, ..., Wn , Pn
+1: function CONSTRUCT(W , R, G)
+2: Candidates ← ∅, Label ← 0
+
+3: /*Determine if the graph has been completely con-
+
+structed*/ 4: if G ⊆ R or Fixedpoint(Π) then
+
+5:
+
+return true
+
+6: end if
+
+7: /*Find an applicable service set*/
+
+8: for w ∈ W do
+
+9:
+
+if I (w ) ⊆ P0 then
+
+10:
+
+Candidates ← Candidates ∪ {w }
+
+11:
+
+end if
+
+12: end for
+
+13: /*Reachability Analysis*/
+
+14: if Expand (Candidates, W , R, G, Label ) then
+
+15:
+
+Wi ← Candidates
+
+16:
+
+Pi ← R
+
+17:
+
+Π = Π + Wi , Pi
+
+18: end if
+
+19: if Construct(W , R, G) then
+
+20:
+
+return true
+
+21: end if
+
+22: return false
+
+23: end function
+
+set R is updated and added as the new parameter layer. Lines 19-21 recursively construct the graph until the terminating conditions in lines 4-6 are satisﬁed.
+Algorithm 2 demonstrates the details of the function Expand (), which expands the dependency graph. The input data include the unprocessed applicable service set Candidates, the Web service set W , the initial parameter set R, the goal set G, and a positive integer for labeling the recursive level num. To reduce the scale of the service layer and to optimize the memory utilization, we use a recursion process to ﬁlter the services in the candidate set that cannot reach the goal set. Each time the process enters into a new recursion, 1 is added to num. As shown in lines 6-7, num is an indicator identifying whether the algorithm needs to scan all services in the candidate set, since it is necessary for analyzing all candidate service reachabilities in the ﬁrst level, while the internal recursive levels only have to ﬁnd one existing path through which to arrive at the goal set. In lines 11-14, a subset of the candidates including all applicable services for the updated initial state R is generated to obtain the internal recursions. As shown in lines 15-20, once the goal set arrives, the algorithm backtracks to the ﬁrst level and keeps this service in the candidate set; otherwise, the candidate is removed. This backtracking approach is a DFS-like process that can not only analyze the reachability but also can update the heuristics. Each time the parameter layer is updated, the heuristic information is updated by the function UpdatedDelta(), which is described in detail in the next subsection.
+
+Algorithm 2 Expanding the Dependency Graph and
+
+Extracting the Heuristics
+
+Input: (W , P , R, G) is a QSC problem, Candidates (a set of
+
+services for expansion), and num (a label of the recursive
+
+level) Output: Heuristic function h(p)
+1: function EXPAND(Candidates, W , R, G, num) 2: SubCan ← ∅, num ← num + 1 3: for w ∈ Candidates do
+
+4:
+
+/*If the parameter has been reached, update
+
+Δ(R, p)*/
+
+5:
+
+R ← R ∪ O(w )
+
+6:
+
+if G ⊆ R then R ← R , UpdateDelta(w )
+
+7:
+
+if num = 1 then return true
+
+8:
+
+end if
+
+9:
+
+else
+
+10:
+
+if R = R then delete w from Candidates
+
+11:
+
+end if
+
+12:
+
+for w ∈ W do
+
+13:
+
+if I (w ) ⊆ R then add w to SubCan
+
+14:
+
+end if
+
+15:
+
+end for
+
+16:
+
+if SubCan = ∅ and
+
+17:
+
+Expand (SubCan, W , R , G, num) then
+
+18:
+
+R ← R , UpdateDelta(w )
+
+19:
+
+else
+
+20:
+
+delete w from Candidates
+
+21:
+
+end if
+
+22:
+
+end if
+
+23: end for 24: if Candidates = ∅ then return true
+
+25: end if
+
+26: return false
+
+27: end function
+
+2) Heuristic Extraction: The heuristics can be obtained via multiple proposed principles. In this article, we calculate the heuristics of the parameters from the dependency graph based on a classical algorithm, HSP-R [54]. Consequently, the heuristics we can obtain are the estimated appearance times of the parameters in services. Given a parameter p, h(p) denotes an approximation value of this parameter. We use the estimated time distance Δ(R, p) from the requested input set R to a parameter p that is produced by a service in a composite service to represent the heuristic information. We assume that the time at which the composite service starts to execute is the original point and that the earliest time at which the parameter is produced by services is the heuristic value of this parameter, h(p). Speciﬁcally, we calculate the time distance with the response time of the QoS attributes as the time cost of the Web services, which can be denoted as:
+
+cost(w ) = qˆrt (w )
+
+(5)
+
+The heuristic function can be denoted as:
+
+h(p) = Δ(R, p)
+
+(6)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3820
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+TABLE II EXAMPLE SERVICES
+
+After the initialization process, we can obtain the following heuristic function:
+
+h(p) : p1 → 0, p2 → 0, p3 → 2.4, p4 → 2.4, p5 → 3,
+
+p6 → 2.4, p7 → 9.4, p8 → 7.9.
+
+(8)
+
+Assuming the goal set G, h(G) denotes the minimum time distance from the initial set to the goal set, which can be determined by the minimum time cost of each parameter h(p) in the goal set G. The value of Δ can be calculated with the equation below:
+
+⎧ ⎪⎪⎪⎪⎪⎪⎪⎪⎪⎨
+
+Δ(R, Δ(R, Δ(R,
+
+p) = 0 p) = ∞ G) = 0
+
+p∈R ∀w ∈ W , p ∈ O(w ), p ∈ R G ⊆R
+
+⎪⎪⎪⎪⎪⎪⎪⎪⎪⎩
+
+Otherwise : if p ∈ O(w ): Δ(R, p) = min{Δ(R,
+
+p
+
+),
+
+cost
+
+(w
+
+)
+
++
+
+maxq
+
+∈I
+
+(w
+
+)
+
+Δ(R,
+
+q
+
+)}
+
+Δ(R, G) = maxp∈G Δ(R, p)
+
+(7)
+
+Algorithm 2 calculates and updates the heuristic values with the function UpdateDelta(w ) in lines 5 and 17 when
+ﬁnding a reachable service w. For each parameter in O(w), UpdateDelta(w ) updates the value of Δ(R, p) according to equation (7).
+Following equation (7), after the dependency graph is con-
+structed, the initialization process is complete, and we obtain a
+complete estimating distance function h(p) from the requested
+input set R to all the reachable parameters p. The depen-
+dency graph is destroyed after the heuristic function is com-
+pleted. We utilize an example to demonstrate the initialization
+process.
+Example 1: In the following, we use an example to demon-
+strate the initialization process. To simplify the calcula-
+tions, we use a small service set. Assume a QSC problem
+where: • W = {w1, w2, w3, w4, w5} • P = {p1, p2, p3, p4, p5, p6, p7, p8} • R = {p1, p2} • G = {p7, p8}
+The details of the service set are described in Table II.
+According to the descriptions of the input and output param-
+eters, the dependency relationships can be analyzed with the
+heuristic information extracted. For instance, the ﬁrst parameter layer is the initial set R = {p1, p2}. Therefore, the applicable services w1 and w2 consist of the service layer. Then, we can update the heuristic values of the corresponding output parameters h(p3), h(p4) and h(p5) from the values of qˆrt (w1) and qˆrt (w2). Particularly, since p4 can be reached by both w1 and w2, we choose the smaller value as the heuristic value. Similarly, the initialization process is executed layer by
+layer.
+
+C. The Evolutionary Process
+The evolutionary process ﬁrst produces the execution timelines in batches as the initial population with the aid of the heuristic function and then iteratively selects the individuals with the ﬁtness function and creates new individuals with the variation operators. In this section, we introduce the generation approach of the execution timeline, our novel ﬁtness function, reachable nondominated sorting, and the temporal variation operators.
+1) Execution Timeline Generation: Generating execution timelines is equivalent to decomposing the goal set that includes the expected ﬁnal output parameters of a composition solution into different sets of subgoal sequences. Consequently, a problem is split into several subproblems whose subsolutions can consist of the composition solution of the original problem. Subgoal sequences vary with the different execution timelines, resulting in multiple composition solutions so that the search space of the composition solutions can be diversely explored.
+Another concern of generating the subgoals is the evaluation of whether the resulting subproblems of an execution timeline are easier to handle in practice than the original problem. Therefore, we use a syntactic metric denoted dist to evaluate the remaining difﬁculty of solving the current problem.
+Deﬁnition 11 (Syntactic Distance): Assume an execution timeline of a QSC problem, where g is the goal (or subgoal) set, p is a parameter set in the execution timeline, and the syntactic distance of p and g represents the number of parameters in p but not in g.
+The generation of execution timelines can occur by two procedures: randomly choosing the temporal variables T and generating the TSGs according to the temporal variables and the heuristic function.
+Given a heuristic function h(p) extracted from a dependency graph, initializing the execution timelines generates the subgoals of the goal set G. The procedures are as follows:
+• The ﬁrst step is to ﬁnd all the possible temporal variables in the heuristic function and create a temporal variable set T.
+• The second step is to uniformly choose temporal variables (the number is a predeﬁned parameter and not greater than the size of T) and add them in the temporal variable set T in chronological order.
+• The third step is to uniformly choose parameters (the number is predeﬁned or randomly generated) p, which yields h(p) = t, t ∈ T, and denote them as a set of TSGs. Note that we initialize the solution S of each timeline as empty and ﬁll it in the following procedures. Note that to keep the subproblems simple enough, we set a threshold for two neighboring subgoals.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3821
+
+• As a result, an execution timeline (F, T , S) is created. Repeat the above process N times, and an initial population with N individuals is obtained.
+Example 2: We continue to use the QSC problem in Example 1 to demonstrate the generation of an execution timeline. The ﬁrst step is to construct a temporal variable set from the heuristic function. According to h(p), we ﬁnd all the possible times when the parameters might appear except for 0 and obtain the set T = {2.4, 3, 7.9, 9.4}. The second step is to randomly choose temporal variables from the set. Before variables are chosen, a random positive integer smaller than the number of T is chosen as the number of variables in this execution timeline. Assuming that the number 2 is chosen, this execution timeline has two temporal variables. Then, we randomly choose two variables from T. For instance, 2.4 and 3 are chosen. Third, we randomly determine the parameters whose heuristic values are 2.4 and 3. We assume that p3 and p5 are chosen. Finally, we construct an empty execution timeline Φ and assign the corresponding values to it. In this example, the obtained execution timeline can be represented as ({ 2.4, p3 , 3, p5 }, 2.4, 3 , null ).
+2) Reachable Nondominated Sorting: The ﬁtness function is the key technology for exploring the search space. In this section, we propose a reachable nondominated sorting (RNS) mechanism to not only compute the ﬁtness value and sort the individuals but also evaluate the correctness of the individual. The conventional ﬁtness value is an indicator of the quality of the individual. However, the execution timeline needs to consider not only the quality but also the correctness in determining whether the solution of the execution timeline can successfully reach the goal set. Considering this particular feature of the execution timeline, RNS evaluates the reachability of an execution timeline, with an AI planner to ensure the correctness and with fast nondominated sorting [55] from NSGA II to rank the QoS vectors of the individuals. This sentence was restructured to improve its clarity. Please ensure that the intended meaning has been maintained.
+RNS encompasses two phases in general. First, given a population P including a set of execution timelines, RNS analyzes the reachability of each execution timeline in P by dividing the problem into multiple subproblems with the goal decomposition mechanism. The composition function ﬁnds the subsolution for each subproblem according to the subgoals using a heuristic search algorithm based on an AI planner, YAHSP2 [56], which applies a heuristic search planner to determine the composite service. We modify the algorithm to adapt to the service composition. All the subsolutions of the subproblems consist of the solution of the execution timeline. To avoid a search explosion, we set an upper boundary for the maximum step, which means that if the planner cannot ﬁnd the subsolution in the speciﬁed step number, the planner stops searching. If a solution can be found by the planner, the individual is reachable and kept in the population; if it cannot be found, it is discarded. Second, RNS calculates the QoS vector of each reachable execution timeline according to Table I, and then fast nondominated sorting is employed to rank the population. Finally, the individuals with the top rank are kept in the next evolutionary loop.
+
+Algorithm 3 Reachable Nondominated Sorting
+
+Input: P is a population to evaluate, and b is the max step
+
+in a subproblem
+
+Output: Po is an ordered population 1: function EVALUATE(P )
+
+2: PQ ← ∅ 3: for Φ ∈ P do
+
+4:
+
+i ← R, g ← ∅, k ← 0, u ← 0
+
+5:
+
+/*Derive TSGs*/
+
+6:
+
+Gsub ← getSubgoals(Φ)
+
+7:
+
+/*Find all subsolutions*/
+
+8:
+
+while g = G do
+
+9:
+
+g ← Gsub .gk
+
+10:
+
+σk ← Composition(i , g)
+
+11:
+
+if #σ > 0 then
+
+12:
+
+u =u+1
+
+13:
+
+else
+
+14:
+
+σk ← ⊥
+
+15:
+
+break
+
+16:
+
+end if
+
+17:
+
+i ← O (σk ) ∪ Gsub .gk+1
+
+18:
+
+k ←k +1
+
+19:
+
+end while
+
+20:
+
+/*Abandon the incorrect execution timeline*/
+
+21:
+
+if k < #Φ.T then
+
+22:
+
+P ← P \Φ
+
+23:
+
+else
+
+24:
+
+/*Combine all subsolutions*/
+
+25:
+
+σ ← Combine((σj )0≤j ≤k )
+
+26:
+
+Φ.Sol ← σ
+
+27:
+
+g ← Exec(g, σ)
+
+28:
+
+end if
+
+29: end for
+
+30: /*Order the population*/
+
+31: Po ← FastNondominatedSorting(P ) 32: return Po 33: end function
+
+The pseudocode of RNS is depicted in Algorithm 3. The input is a population P, and the output is a population Po ordered by fast nondominated sorting. Lines 3 to 24 are the main loops that ﬁnd the composition solution of each execution timeline in the population. In line 5, the subgoals are derived from the execution timeline and denoted as a set Gsub . Lines 8 to 19 are the main loops implementing the process of sequentially ﬁnding the subsolutions of subproblems by the function Composition() (line 10). If the subproblem cannot be resolved in the max number of steps, an empty solution is returned, and this execution timeline is abandoned in line 22. In line 25, the function Combine() combines all the subsolutions of subproblems together to obtain a ﬁnal solution for the original problem. In line 31, FastNondominatedSorting() collects the remaining reachable execution timelines and calculates the corresponding QoS vector and then orders them with fast nondominated sorting to obtain an ordered population Po.
+3) TSG Variation Operators: Variation operators in the general evolutionary process modify the individuals such that
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3822
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+Algorithm 4 Temporal Variable Crossover
+
+Input: Φ1, Φ2 are two execution timelines
+
+Output: Φ3 is the offspring
+
+1: function CROSSOVER(Φ1, Φ2)
+
+2: sa ← U(Φ1.T )
+
+//Φ1.T = s1, s2...sn
+
+3: tb ← U(Φ2.T )
+
+//Φ2.T = t1, t2...tm
+
+4: if sa < tb then
+
+5:
+
+Φ3.T ← s1...sa , tb ...tm
+
+6: else
+
+7:
+
+Φ3.T ← t1...tb , sa ...sn
+
+8: end if
+
+9: UpdateTSG(Φ3) return Φ3 10: end function
+
+the search space can be explored widely. Mostly, variation operators follow the ergodicity principle to ensure that any individual in the search space must be reachable with a nonzero probability from any other individuals using a ﬁnite number of applications of variation operations. In addition, modiﬁcations of the variation operators should be favored due to the randomness of the evolutionary process. In consideration of the temporal model, we introduce a group of temporal variation operators, named TSG variation operators, that modify the TSGs of execution timelines to indirectly control the individual variation. As a TSG consists of two major parts, the temporal variable and the subgoal set, the TSG variation operators are divided into these two categories according to the position where the modiﬁcation appears in the execution timeline.
+Temporal Variable Crossover: The temporal variable crossover operator is a basic 1-point crossover for subgoals in the execution timelines. As described in Algorithm 4, given two individuals Φ1 and Φ2, this operator uniformly chooses two temporal variables sa and tb as cut points from timelines, then links the parts of both temporal variable sequences that maintain the corresponding subgoals, and resets the solution, obtaining a new execution timeline as an offspring. Fig. 5 depicts the process of crossover and offspring generation.
+Subgoal Mutation: As shown in Fig. 6, the subgoal mutation operators have four different types: add/delete the subgoal set and add/delete the parameter. Considering an execution timeline Φ, the mutation operators modify the subgoals or parameters in the subgoals to create another individual. Algorithm 5 shows the operator modifying the subgoals and the temporal variable sequence. This operator randomly chooses a temporal variable and uniformly ﬁnds a set of parameters not only from these temporal variables but also from its neighborhood of radius r to generate a subgoal according to the heuristic function from lines 2 to 5. Line 6 uniformly chooses a number of subgoals. Lines 7-10 add the subgoal to the original individual so that a new execution timeline is obtained. Reciprocally, deleting a subgoal is removing a subgoal at uniformly random temporal variables to obtain a new execution timeline.
+Algorithm 6 shows the operators that randomly modify the individuals at the parameter level. AddSubgoal () adds and/or changes one random parameter in each parameter set of the
+
+Fig. 5. Temporal variable crossover.
+Fig. 6. Subgoal mutation.
+temporal variables. Similarly, DeleteSubgoal () removes one uniformly chosen parameter in each temporal variable of the execution timeline.
+4) Evolutionary Loop: The evolutionary loop is the main process for exploring and determining the solution set. Algorithm 7 shows the details of the evolutionary loop. First, it uniformly generates a set of execution timelines with the function GenerateInds() as the initial population. Then, the main evolutionary loop comes from line 6 to line 24. The offspring set comprises individuals from the previous generation that are either the results of the crossover operator
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3823
+
+Algorithm 5 Subgoal Mutation
+
+Input: Φ is an execution timeline
+
+Output: Φ is the offspring
+
+1: function ADDSUBGOAL(Φ)
+
+2: s ← ∅
+
+3: j ← U([1, Length(Φ.T )])
+
+4: t ← U({t ∈ Φ.T |tj < t ≤ tj +1}) 5: Pt ← {p ∈ P |t − r ≤ t ≤ t + r + 1} 6: N ← U([1, #Pt ]) 7: while #s = N do
+
+8:
+
+s ← U(Pt )
+
+9:
+
+Pt ← Pt \{p}
+
+10: end while
+
+11: Φ ← Insert(Φ, s, j )
+
+12: return Φ
+
+13: end function
+
+Algorithm 6 Parameter Mutation
+
+Input: Φ is an execution timeline, pa is the probability of adding parameters, and pc is the probability of changing parameters
+
+Output: Φ
+
+1: function ADDPARAMETER(Φ)
+
+2: for t ∈ Φ.T do
+
+3:
+
+if U([0, 1]) < pa then
+
+4:
+
+s ← U({s ∈ W |h(s) = t})
+
+5:
+
+Φ.F[t] ← Φ.F[t] ∪ {s}
+
+6:
+
+end if
+
+7:
+
+if
+
+U([0, 1]) <
+
+pd Length(Φ.T )
+
+then
+
+8:
+
+s ← U(Φ.F [ti ])
+
+9:
+
+s ← U({s ∈ W \{s}|h(s ) = t})
+
+10:
+
+Φ.F[t] ← (Φ.F[t]\{s}) ∪ {s }
+
+11:
+
+end if
+
+12: end for
+
+13: end function
+
+Algorithm 7 Evolutionary Loop
+
+Input: PopSize, OﬀspringSize, MaxGen, MaxChg,
+
+pcross , pmutation , wAddSub , wDelSub , wAddPara , wDelPara Output: Solution is a Pareto set approximation
+
+1: function EVOLUTIONARY(Φ)
+
+2: pop ← ∅, gen = 0
+
+3: repeat
+
+4:
+
+pop ← pop ∪ {GenerateInds(U([1, #P ]))}
+
+5: until #pop = PopSize
+
+6: repeat
+
+7:
+
+/*Initialize the offspring set*/
+
+8:
+
+oﬀspring ← ∅
+
+9:
+
+gen ← gen + 1
+
+10:
+
+repeat
+
+11:
+
+/*Uniformly choose the variation operators*/
+
+12:
+
+ind1 ← U(pop)
+
+13:
+
+if U([0, 1]) < pcross then
+
+14:
+
+ind2 ← U(pop)
+
+15:
+
+newind ← Crossover (ind1, ind2)
+
+16:
+
+else
+
+17:
+
+newind ← ind1
+
+18:
+
+end if
+
+19:
+
+if U([0, 1]) < pmutation then
+
+20:
+
+f ← Uweighted (AddSubgoal , DelSubgoal ,
+
+21: AddParameter , DelParameter , wAddSub ,
+
+22: wDelSub , wAddPara , wDelPara )
+
+23:
+
+newind ← APPLY (f , newind )
+
+24:
+
+end if
+
+25:
+
+oﬀspring ← oﬀspring ∪ {newind }
+
+26:
+
+until #oﬀspring = OﬀspringSize
+
+27:
+
+/*Evaluate and select the survivors*/
+
+28:
+
+Evaluate(pop ∪ oﬀspring)
+
+29:
+
+pop ← Selection(pop ∪ oﬀspring)
+
+30:
+
+/*Determine if the loop is over*/
+
+31: until gen > MaxGen or noImprovement()
+
+32: return OptimalInds(Evaluate(pop))
+
+33: end function
+
+between two individuals or the results of the mutation operator. Lines 8 and 9 initialize the offspring set as an empty set and calculate the generation counter. Line 12 uniformly chooses an individual set from the initialized population to employ the temporal variation operators. In lines 13 to 24, the variation operator is chosen according to the probabilities pcross and pmutation . Moreover, the execution timeline mutation operator chooses the mutation type according to the weight (wAddSub , wDelSub , wAddPara , wDelPara ) of each mutation type. Then, it evaluates the population and selects the surviving individuals for the next generation in lines 28 and 29. The evolutionary loop stops under the condition that the maximum generation time has been reached or no improvement in the population has been observed for a number of generations. Finally, a near-optimal composition solution set is found from the top ranking individuals of the last generation in line 31.
+
+V. EVALUATION AND ANALYSIS
+A. Experiment Settings
+1) Datasets: We tested our algorithm and the baseline algorithms on two public standard benchmarks, Web Services Challenge 2008 (WSC-2008) [57] and 2009 (WSC-2009) [58]. The WSC-2008 dataset provides 8 test sets that contain approximately 150, 500, 500, 1000, 1000, 2000, 4000 and 8000 services with approximately 1500, 1500, 3000, 3000, 3000, 12000, 3000 and 12000 concepts, and the WSC-2009 dataset provides 5 test sets containing approximately 500, 4000, 8000 and 15000 services with more than 1500, 10000, 15000 and 25000 concepts, respectively. Each test set consists of four ﬁles: a WSDL ﬁle, describing services of the registry by their inputs/outputs, hierarchically organized in terms of concepts using an ontology recorded in an OWL ﬁle, a WSLA ﬁle, storing the QoS (response time and throughput) values of each service, and an XML ﬁle storing the inputs and outputs of the query associated with the service registry. As
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3824
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+TABLE III PARAMETER SETTINGS OF MASC IN EXPERIMENTS
+the WSC-2008 dataset does not provide QoS data and WSC 2009 only includes data of two QoS attributes, response time and throughput, we used the monitor data from the work [44], which monitored six QoS attributes (response time, execution price, latency, availability, success rate, and reliability) from the real website data and associated it with each service in the datasets.
+2) Computing Environment: We carried out the experiments on a PC with an Intel Core i3-8100 with a 3.6 GHz processor and 16 GB RAM under an Arch Linux kernel 4.19.66-1-Manjaro and Java SE build 1.8.0_171-b11.
+3) Approach Conﬁgurations: We implemented the MaSC algorithm in Java. Table III depicts the parameter settings of MaSC in the experimental process. Additionally, we implemented two previously proposed automatic service composition approaches as baselines for comparison with our approach: the scalable service composition mechanism (SSCM) from the work [31] adopts a multi-objective NSGA II with a graph-based individual representation to determine the approximately optimal composite service. The hybrid optimization algorithm (HOA) in [9] employs a series of optimization algorithms to reduce the search time in the dependency graph. Since the predeﬁning business process is hard to determine, we abandon the static approaches as baselines to ensure the comparability of the experimental results. SSCM represents a graph-based metaheuristic algorithm, and HOA represents an optimized graphplan algorithm. We conﬁgured the parameters of the SSCM’s evolutionary process to be the same as those of MaSC. The conﬁgurations of HOA were based on the parameters of the experiments in [9]. The hypothesis was that the graph-based approach, regardless of metaheuristic or graphplan, would perform worse for the following two reasons: the graph-based approach has a higher space consumption and an exponential time complexity, resulting in a lower efﬁciency, and it is difﬁcult for the graphbased individual representation in the metaheuristic algorithm to ensure the correctness of the individual with the standard genetic operators, as any modiﬁcations of the given node in the graph may impact the neighbor node, limiting the searching efﬁciency in the evolutionary process.
+4) Evaluation Metrics: To test the inﬂuence of graph-based approaches and show the priorities of MaSC, we conducted a series of experiments and analyzed the experimental results
+
+from three different perspectives. First, we measured the evolutionary trajectories to evaluate the convergence performance of the evolutionary process. In this experiment, we compared the results of our approach and SSCM, as HOA does not use the evolutionary process. Second, we evaluated the solution quality of the composition solutions on each QoS attribute for MaSC and two baselines. Finally, we evaluated the average computation time of the searching process for the three approaches. These features were evaluated via the following metrics:
+• Inverse Generational Distance (IGD): The inverse generational distance (IGD) was employed to provide combined information about the convergence and diversity of the obtained composition solutions. The IGD was used to measure the average distance from the set of nondominated points S obtained by each approach to the known set of Pareto-optimal points T in the objective space, as described in the following equation:
+
+1 |T | |S |
+
+IGD(S , T )
+
+=
+
+|T |
+
+i
+
+=1
+
+min
+j =1
+
+d
+
+(ti
+
+,
+
+sj
+
+)
+
+(9)
+
+where d (ti , sj ) is the Euclidean distance between point ti in the targeted Pareto front and point sj in the set of nondominated points found by the approach. Since the Pareto front was not available, we executed the complete dependency graph on the server and analyzed the Pareto front for each dataset. • Solution Quality: To evaluate the solution quality, we needed to know how close all the QoS attributes were to the optimal value. Therefore, we executed our algorithm and baselines on all datasets and calculated the average values separately for six QoS objectives. To unify the order of magnitude, we kept the normalized values for each QoS attribute. Moreover, as HOA is a single-objective optimization approach, in each round of experiments, we executed HOA six times to obtain the independent results for all QoS attributes. • Average Computation Time: To evaluate the computation efﬁciency of the service composition process, we measured the computation time from the start of the process until the output of the composition solution set for MaSC and baselines on all datasets. We executed each for 100 rounds and recorded the average computation time of each dataset. Speciﬁcally, for HOA, we uniformly chose a QoS attribute to execute in each round of the experiments.
+
+B. Evaluation Results
+1) Evolutionary Trajectory: Fig. 7 shows the evolutionary trajectories on all datasets with our approach and SSCM. From the ﬁgure, it can be observed that the convergence of MaSC is obviously superior to that of SSCM, which converges too early to reach the optimal solutions, especially when the scale of the datasets becomes large. It can be seen from the ﬁgures of WSC2008_08 and WSC2009_05, which are two of the largest datasets, that MaSC successfully converges at a low position while SSCM converges far away from the Pareto front. The performance of the evolutionary trajectory is largely
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3825
+
+Fig. 7. Evolutionary trajectories of IGD on all datasets.
+
+inﬂuenced by the individual representation, the ﬁtness function, and the variation strategies. In the evolutionary process of SSCM, individuals are mutated and evaluated with the classical mechanisms in NSGA II without specialized optimization to adapt to the service composition. As a result, SSCM fails to dynamically balance the overall QoS attributes and continuously and widely expands the search space when stuck in local optima, so the diversity and quality of the solutions cannot be ensured, as shown in the line charts. MaSC evaluates the individuals via RNS to ensure the correctness, and the TSG variation operators are available to ensure the diversity of the individuals, so the search space of the solutions can be fully explored. Moreover, it can be seen from the ﬁgure that when the scale of the test sets becomes larger, SSCM converges much earlier and becomes stuck in local optima, as the graph-based representation is largely dependent on the scale of the graph, which increases rapidly with the scale of the test set. However, MaSC is hardly affected by changes in scale. Therefore, MaSC with RNS and TSG variation operators is more appropriate for qualifying the many-objective individuals to achieve a better trade-off. Generally, our approach shows a better performance in rapidly selecting balanced solutions than SSCM in this experiment.
+2) Solution Quality: Fig. 8 compares six categories of QoS values in the composition solutions for MaSC and the two baseline approaches abbreviated as explained in Table I in the bar charts. As MaSC and SSCM are approximate approaches, while HOA is an optimal approach based on graphplan, its QoS values of the composition solutions are seen as optimal. Therefore, the deviations of HOA and the two approximate approaches can be seen as the solution quality of the approximated solution. It can be observed from the bar charts that most composition solutions of MaSC are fairly close to the results of HOA, while the results of SSCM are obviously
+
+Fig. 8. Solution quality.
+worse than those of MaSC. Moreover, when the data size increases, the deviations slightly increase. According to the results, the QoS values from our approach are approximately 19% higher than those of the solutions from HOA on average and much better than those of SSCM, approximately 47% higher. This is further proof of how the graph structure affects the graph-based approaches. When the scale of the graph increases, the classical evolutionary process fails to effectively explore the search space in order to approach the optimal space to the largest extent. Therefore, beneﬁtting from the RNS and the TSG variation strategy and simultaneously considering the results in the experiments, the composition solutions of MaSC have obviously better quality than those of SSCM.
+3) Average Computation Time: Fig. 9 depicts a graphical comparison of the average computation times of our approach
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3826
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+Fig. 9. Average computation time.
+and the baselines. From the line chart, it can be observed that the average computation time of HOA is obviously affected by the number of datasets. For datasets with more data, such as WSC2008_03, WSC2008_08, and WSC2009_05, the computation times of HOA and SSCM can exceed 50 seconds, while the computation time of MaSC steadily remains under 10 seconds and is hardly affected by the size of the datasets. The computation time of SSCM is better than that of HOA but worse than that of our approach, as SSCM still relies on the construction of the complete graph to generate individuals, so the data structure of the graph must be stored in the buffered memory for a long time. In contrast, MaSC only uses streamlined information, the heuristic function, extracted from the graph to massively generate representations, and the dependency graph is destroyed after the initialization process. For this reason, MaSC is more appropriate for handling large-scale datasets. Therefore, our approach performs basically equal to the two baselines on normal-scale datasets but much more efﬁciently than the two baselines when handling large-scale datasets in this experiment. In other words, we can conclude that MaSC successfully eliminates the negative inﬂuences of the graph on the computational efﬁciency.
+C. Complexity Discussion
+The conventional automatic service composition approaches are largely dependent on the complete search space. They transform the layered dependency graph to a complete service dependency graph and employ search algorithms to ﬁnd the optimal execution path such that the graph structure affects the large-scale search efﬁciency. Furthermore, when the scale of the dataset increases, the number of layers increases rapidly, resulting in a high computational burden. The space complexity of the conventional graph-based approach is approximately O(2N ), where N is the number of services and the time complexity is exponential [31]. In contrast, the whole process of MaSC has polynomial complexity such that the computational burden is signiﬁcantly lower than those of graph-based approaches. The space complexity of MaSC is not greater than O(N 2) and the time complexity is approximately O(N 2) according to NSGA II [55]. The process of extracting the heuristics from the dependency graph and destroying the graph
+
+after the initialization process ensures that our approach can use the dependency information of services like the graphbased approaches without storing the whole path graph, which means that the searching process has no relationships with the graph. However, the most time-consuming process in MaSC comes from the composition planner in the RNS ﬁtness function. To restrict the process in the controllable range, we use the upper boundary of the syntactic distance and the max step of the planner to efﬁciently limit the search scale of each subproblem in the execution timeline and reduce the negative impact on the computation time. The RNS ﬁtness function ensures the correctness of the solution, which increases the efﬁciency of searching by ﬁltering the incorrect execution timelines and leaving the variation space to explore more individuals in the evolutionary process. As a result, the average solution quality maintains a low bias compared with the optimal quality. Generally, our approach ﬁnds a balance point between the computational complexity and the QoS optimality.
+VI. CONCLUSION AND FUTURE WORK
+This article presented a novel efﬁcient many-objective automatic service composition approach, MaSC, based on a temporal model that splits a massive problem into several ﬁne-grained subproblems with execution timelines. To search for the optimal solutions of many objectives, our approach explores the search space with an evolutionary process and determines the approximate Pareto front of the composition solutions with the execution timeline as the individual representation with the RNS ﬁtness function. In general, this approach signiﬁcantly reduces the computational complexity and achieves better trade-offs among multiple QoS attributes. We evaluated our approach with eight public repositories published in WSC-2008 and ﬁve public repositories published in WSC-2009 and compared it with two recent automatic service compositions regarding evolutionary trajectory, solution optimality, and computation time. The results show that our approach performs better at in handling a large number of QoS attributes and more effectively guarantees QoS values, with much greater computational efﬁciency than the baselines.
+Our approach still has shortcomings. The generation and variation processes of the individuals are too random, so many useless individuals are generated, which increases the search time. The RNS ﬁtness function needs to be further optimized to adapt to many-objective problems. In the future, we will focus on upgrading the evolutionary process and continuing to improve the composition performance.
+REFERENCES
+[1] D. Ardagna and B. Pernici, “Adaptive service composition in ﬂexible processes,” IEEE Trans. Softw. Eng., vol. 33, no. 6, pp. 369–384, Jun. 2007.
+[2] Y. Xia, M. Zhou, X. Luo, Q. Zhu, J. Li, and Y. Huang, “Stochastic modeling and quality evaluation of infrastructure-as-a-service clouds,” IEEE Trans. Autom. Sci. Eng., vol. 12, no. 1, pp. 162–170, Jan. 2015.
+[3] C. Wu et al., “Online user allocation in mobile edge computing environments: A decentralized reactive approach,” J. Syst. Archit., to be published. [Online]. Available: http://www.sciencedirect.com/science/ article/pii/S1383762120301739
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: MANY-OBJECTIVE AUTOMATIC SERVICE COMPOSITION BASED ON TEMPORAL GOAL DECOMPOSITION
+
+3827
+
+[4] D. Wu, X. Han, Z. Yang, and R. Wang, “Exploiting transfer learning for emotion recognition under cloud-edge-client collaborations,” IEEE J. Sel. Areas Commun., vol. 39, no. 2, pp. 479–490, Feb. 2021.
+[5] L. Zeng, B. Benatallah, A. H. H. Ngu, M. Dumas, J. Kalagnanam, and H. Chang, “QoS-aware middleware for Web services composition,” IEEE Trans. Softw. Eng., vol. 30, no. 5, pp. 311–327, May 2004.
+[6] S. Chattopadhyay, A. Banerjee, and N. Banerjee, “A fast and scalable mechanism for Web service composition,” ACM Trans. Web, vol. 11, no. 4, pp. 1–36, 2017.
+[7] L. Zeng, B. Benatallah, M. Dumas, J. Kalagnanam, and Q. Z. Sheng, “Quality driven Web services composition,” in Proc. 12th Int. World Wide Web Conf. (WWW), 2003, pp. 411–421.
+[8] Z. Li, Y. Jiang, Y. Gao, L. Sang, and D. Yang, “On buffer-constrained throughput of a wireless-powered communication system,” IEEE J. Sel. Areas Commun., vol. 37, no. 2, pp. 283–297, Feb. 2019.
+[9] P. Rodríguez-Mier, M. Mucientes, and M. Lama, “Hybrid optimization algorithm for large-scale QoS-aware service composition,” IEEE Trans. Services Comput., vol. 10, no. 4, pp. 547–559, Jul./Aug. 2017.
+[10] C. Lv, W. Jiang, S. Hu, J. Wang, G. Lu, and Z. Liu, “Efﬁcient dynamic evolution of service composition,” IEEE Trans. Services Comput., vol. 11, no. 4, pp. 630–643, Jul./Aug. 2018.
+[11] Y. Chen, J. Huang, C. Lin, and J. Hu, “A partial selection methodology for efﬁcient QoS-aware service composition,” IEEE Trans. Services Comput., vol. 8, no. 3, pp. 384–397, May/Jun. 2015.
+[12] P. Bartalos and M. Bieliková, “Automatic dynamic Web service composition: A survey and problem formalization,” Comput. Informat., vol. 30, no. 4, pp. 793–827, 2011.
+[13] P. Rodríguez-Mier, M. Mucientes, and M. Lama, “Automatic Web service composition with a heuristic-based search algorithm,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), Washington, DC, USA, 2011, pp. 81–88.
+[14] Y. Yu, H. Ma, and M. Zhang, “F-MOGP: A novel many-objective evolutionary approach to QoS-aware data intensive Web service composition,” in Proc. IEEE Congr. Evol. Comput. (CEC), Sendai, Japan, 2015, pp. 2843–2850.
+[15] B. Wu, C.-H. Chi, and S. Xu, “Service selection model based on QoS reference vector,” in Proc. IEEE Int. Conf. Serv. Comput. Workshops (SCW), Salt Lake City, UT, USA, 2007, pp. 270–277.
+[16] S. Chattopadhyay and A. Banerjee, “QSCAS: QoS aware Web service composition algorithms with stochastic parameters,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), San Francisco, CA, USA, 2016, pp. 388–395.
+[17] M. Alrifai and T. Risse, “Combining global optimization with local selection for efﬁcient QoS-aware service composition,” in Proc. 18th Int. Conf. World Wide Web (WWW), 2009, pp. 881–890.
+[18] M. Alrifai, D. Skoutas, and T. Risse, “Selecting skyline services for QoS-based Web service composition,” in Proc. 19th Int. Conf. World Wide Web (WWW), 2010, pp. 11–20.
+[19] P. Wang, Z. Ding, C. Jiang, and M. Zhou, “Constraint-aware approach to Web service composition,” IEEE Trans. Syst., Man, Cybern., Syst., vol. 44, no. 6, pp. 770–784, Jun. 2014.
+[20] F. Wagner, A. Klein, B. Klöpper, F. Ishikawa, and S. Honiden, “Multiobjective service composition with time- and input-dependent QoS,” in Proc. IEEE 19th Int. Conf. Web Serv., Honolulu, HI, USA, 2012, pp. 234–241.
+[21] J. Zhou, X. Yao, Y. Lin, F. T. S. Chan, and Y. Li, “An adaptive multi-population differential artiﬁcial bee colony algorithm for many-objective service composition in cloud manufacturing,” Inf. Sci., vol. 456, pp. 50–82, Aug. 2018.
+[22] J. Zhou, L. Gao, X. Yao, C. Zhang, F. T. S. Chan, and Y. Lin, “Evolutionary algorithms for many-objective cloud service composition: Performance assessments and comparisons,” Swarm Evol. Comput., vol. 51, Dec. 2019, Art. no. 100605.
+[23] S. Deng, H. Wu, W. Tan, Z. Xiang, and Z. Wu, “Mobile service selection for composition: An energy consumption perspective,” IEEE Trans. Autom. Sci. Eng., vol. 14, no. 3, pp. 1478–1490, Jul. 2017.
+[24] S. Deng, L. Huang, J. Taheri, J. Yin, M. Zhou, and A. Y. Zomaya, “Mobility-aware service composition in mobile communities,” IEEE Trans. Syst., Man, Cybern., Syst., vol. 47, no. 3, pp. 555–568, Mar. 2017.
+[25] Y. Chen, J. Huang, C. Lin, and X. Shen, “Multi-objective service composition with QoS dependencies,” IEEE Trans. Cloud Comput., vol. 7, no. 2, pp. 537–552, Apr.–Jun. 2019.
+[26] Y. Wang, I.-R. Chen, J.-H. Cho, A. Swami, and K. S. Chan, “Trust-based service composition and binding with multiple objective optimization in service-oriented mobile ad hoc networks,” IEEE Trans. Services Comput., vol. 10, no. 4, pp. 660–672, Jul./Aug. 2017.
+[27] S. Kambhampati and R. S. Nigenda, “Distance-based goal-ordering heuristics for graphplan,” in Proc. 5th Int. Conf. Artif. Intell. Plan. Syst., 2000, pp. 315–322.
+
+[28] J. Hoffmann, P. Bertoli, and M. Pistore, “Web service composition as planning, revisited: In between background theories and initial state uncertainty,” in Proc. 22nd AAAI Conf. Artif. Intell., 2007, pp. 1013–1018.
+[29] F. Lécué and A. Delteil, “Making the difference in semantic Web service composition,” in Proc. 22nd AAAI Conf. Artif. Intell., 2007, pp. 1383–1388.
+[30] Y. Yan and M. Chen, “Anytime QoS-aware service composition over the GraphPlan,” Serv. Orient. Comput. Appl., vol. 9, no. 1, pp. 1–19, 2015.
+[31] S. Chattopadhyay and A. Banerjee, “QoS-aware automatic Web service composition with multiple objectives,” ACM Trans. Web, vol. 14, no. 3, p. 12, May 2020. [Online]. Available: https://doi.org/10.1145/3389147
+[32] M. R. Khouadjia, M. Schoenauer, V. Vidal, J. Dréo, and P. Savéant, “Pareto-based multiobjective AI planning,” in Proc. 23rd Int. Joint Conf. Artif. Intell., Beijing, China, 2013, pp. 2321–2327.
+[33] C. Ba, “An exact cover-based approach for service composition,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), San Francisco, CA, USA, 2016, pp. 631–636.
+[34] L. Qi, Y. Tang, W. Dou, and J. Chen, “Combining local optimization and enumeration for QoS-aware Web service composition,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), Miami, FL, USA, 2010, pp. 34–41.
+[35] F. Wagner, F. Ishikawa, and S. Honiden, “QoS-aware automatic service composition by applying functional clustering,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), Washington, DC, USA, 2011, pp. 89–96.
+[36] N. B. Mabrouk, S. Beauche, E. Kuznetsova, N. Georgantas, and V. Issarny, “QoS-aware service composition in dynamic service oriented environments,” in Proc. ACM/IFIP/USENIX 10th Int. Middlew. Conf. Distrib. Syst. Platforms Open Distrib. Process., vol. 5896, 2009, pp. 123–142.
+[37] Q. Peng et al., “Reliability-aware and deadline-constrained mobile service composition over opportunistic networks,” IEEE Trans. Autom. Sci. Eng., early access, Jun. 2, 2020, doi: 10.1109/TASE.2020.2993218.
+[38] R. Liu, Z. Wang, and X. Xu, “Parameter tuning for ABC-based service composition with end-to-end QoS constraints,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), Anchorage, AK, USA, 2014, pp. 590–597.
+[39] Z. Zhang, S. Zheng, W. Li, Y. Tan, Z. Wu, and W. Tan, “Genetic algorithm for context-aware service composition based on context space model,” in Proc. IEEE 20th Int. Conf. Web Serv., Santa Clara, CA, USA, 2013, pp. 605–606.
+[40] S.-C. Oh, D. Lee, and S. R. T. Kumara, “Effective Web service composition in diverse and large-scale service networks,” IEEE Trans. Services Comput., vol. 1, no. 1, pp. 15–32, Jan.–Mar. 2008.
+[41] S. C. Oh, D. Lee, and S. R. T. Kumara, “Web service planner (WSPR): An effective and scalable Web service composition algorithm,” Int. J. Web Serv. Res., vol. 4, no. 1, pp. 1–22, 2007.
+[42] N. Chen, N. Cardozo, and S. Clarke, “Goal-driven service composition in mobile and pervasive computing,” IEEE Trans. Services Comput., vol. 11, no. 1, pp. 49–62, Jan./Feb. 2018.
+[43] H. Rahmani, G. GhasemSani, and H. Abolhassani, “Automatic Web service composition considering user non-functional preferences,” in Proc. 4th Int. Conf. Next Gener. Web Serv. Pract., Seoul, South Korea, Oct. 2008, pp. 33–38.
+[44] P. Rodríguez-Mier, M. Mucientes, J. C. Vidal, and M. Lama, “An optimal and complete algorithm for automatic Web service composition,” Int. J. Web Serv. Res., vol. 9, no. 2, pp. 1–20, 2012.
+[45] X. Zheng and Y. Yan, “An efﬁcient syntactic Web service composition algorithm based on the planning graph model,” in Proc. IEEE Int. Conf. Web Serv. (ICWS), Beijing, China, 2008, pp. 691–699.
+[46] M. Chen and Y. Yan, “QoS-aware service composition over graphplan through graph reachability,” in Proc. IEEE Int. Conf. Serv. Comput. (SCC), Anchorage, AK, USA, 2014, pp. 544–551.
+[47] G. Zou, Q. Lu, Y. Chen, R. Huang, Y. Xu, and Y. Xiang, “QoSaware dynamic composition of Web services using numerical temporal planning,” IEEE Trans. Services Comput., vol. 7, no. 1, pp. 18–31, Jan.–Mar. 2014.
+[48] E. Sirin, B. Parsia, and J. A. Hendler, “Template-based composition of semantic Web services,” in Proc. Agents Semantic Web Papers AAAI Fall Symp., 2005, pp. 85–92.
+[49] S. Sohrabi and S. A. McIlraith, “Optimizing Web service composition while enforcing regulations,” in Proc. 8th Int. Semantic Web Conf. (ISWC), vol. 5823, 2009, pp. 601–617.
+[50] H. Ma, K.-D. Schewe, and Q. Wang, “An abstract model for service provision, search and composition,” in Proc. 4th IEEE Asia–Pac. Serv. Comput. Conf. (APSCC), Singapore, 2009, pp. 95–102. [Online]. Available: http://ieeexplore.ieee.org/document/5394133/
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+
+3828
+
+IEEE TRANSACTIONS ON NETWORK AND SERVICE MANAGEMENT, VOL. 18, NO. 3, SEPTEMBER 2021
+
+[51] J. E. Haddad, M. Manouvrier, and M. Rukoz, “TQoS: Transactional and QoS-aware selection algorithm for automatic Web service composition,” IEEE Trans. Services Comput., vol. 3, no. 1, pp. 73–85, Jan.–Mar. 2010.
+[52] C. Jatoth, G. R. Gangadharan, and R. Buyya, “Computational intelligence based QoS-aware Web service composition: A systematic literature review,” IEEE Trans. Services Comput., vol. 10, no. 3, pp. 475–492, May/Jun. 2017.
+[53] R. Aggarwal, K. Verma, J. A. Miller, and W. Milnor, “Constraint driven Web service composition in METEOR-S,” in Proc. IEEE Int. Conf. Serv. Comput. (SCC), Shanghai, China, 2004, pp. 23–30.
+[54] X. Nguyen and S. Kambhampati, “Extracting effective and admissible state space heuristics from the planning graph,” in Proc. 17th Nat. Conf. Artif. Intell. 12th Conf. Innovat. Appl. Artif. Intell., 2000, pp. 798–805.
+[55] K. Deb, S. Agrawal, A. Pratap, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput., vol. 6, no. 2, pp. 182–197, Apr. 2002. [Online]. Available: https://doi.org/10.1109/4235.996017
+[56] V. Vidal, “A lookahead strategy for heuristic search planning,” in Proc. 14th Int. Conf. Autom. Plan. Sched. (ICAPS), 2004, pp. 150–160.
+[57] A. Bansal, M. B. Blake, S. Kona, S. Bleul, T. Weise, and M. C. Jaeger, “WSC-08: Continuing the Web services challenge,” in Proc. 10th IEEE Int. Conf. E-Commerce Technol. (CEC) 5th Int. Conf. Enterprise Comput. E-Commerce E-Serv., Washington, DC, USA, 2008, pp. 351–354.
+[58] S. Kona, A. Bansal, M. B. Blake, S. Bleul, and T. Weise, “WSC-2009: A quality of service-oriented Web services challenge,” in Proc. IEEE Conf. Commerce Enterprise Comput. (CEC), Vienna, Austria, 2009, pp. 487–490.
+
+Bo Cheng (Member, IEEE) received the Ph.D. degree in computer science from the University of Electronics Science and Technology of China in 2006. He is currently a Professor with the State Key Laboratory of Networking and Switching Technology, Beijing University of Posts and Telecommunications. His research interests include the Internet of Things, mobile Internet, and services computing.
+Wenkai Zhang is currently pursuing the master’s degree in computer science and technology with the State Key Laboratory of Networking and Switching Technology, Beijing University of Posts and Telecommunications. His current research interests include service computing, mobile service, and AI.
+
+Zhaoning Wang is currently pursuing the Ph.D. degree in computer science and technology with the State Key Laboratory of Networking and Switching Technology, Beijing University of Posts and Telecommunications. His current research interests include service composition, pervasive computing, and mobile service.
+
+Junliang Chen is a Professor with the Beijing University of Posts and Telecommunications. His research interests are in the area of service creation technology. He was elected as a Member of the Chinese Academy of Sciences in 1991 and the Chinese Academy of Engineering in 1994.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on February 28,2022 at 13:47:13 UTC from IEEE Xplore. Restrictions apply.
+

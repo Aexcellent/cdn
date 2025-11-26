@@ -1,0 +1,106 @@
+Skip to Main Content 
+ 
+    IEEE.org 
+    IEEE Xplore 
+    IEEE-SA 
+    IEEE Spectrum 
+    More Sites  
+ 
+SUBSCRIBE 
+ 
+    Cart  
+    Create Account 
+    Personal Sign In 
+ 
+IEEE Xplore logo - Link to home 
+ 
+    Browse 
+    My Settings 
+    Help 
+ 
+Institutional Sign In 
+IEEE logo - Link to IEEE main site homepage 
+ADVANCED SEARCH 
+Conferences > Proceedings of IEEE 36th Annu... 
+Private information retrieval 
+Publisher: IEEE 
+Cite This 
+PDF 
+B. Chor ; O. Goldreich ; E. Kushilevitz ; M. Sudan 
+All Authors 
+447 
+Paper 
+Citations 
+4 
+Patent 
+Citations 
+1519 
+Full 
+Text Views 
+ 
+    Alerts 
+ 
+Abstract 
+Authors 
+References 
+Citations 
+Keywords 
+Metrics 
+Abstract: 
+We describe schemes that enable a user to access k replicated copies of a database (k/spl ges/2) and privately retrieve information stored in the database. This means that each individual database gets no information on the identity of the item retrieved by the user. For a single database, achieving this type of privacy requires communicating the whole database, or n bits (where n is the number of bits in the database). Our schemes use the replication to gain substantial saving. In particular, we have: A two database scheme with communication complexity of O(n/sup 1/3/). A scheme for a constant number, k, of databases with communication complexity O(n/sup 1/k/). A scheme for 1/3 log/sub 2/ n databases with polylogarithmic (in n) communication complexity. 
+Published in: Proceedings of IEEE 36th Annual Foundations of Computer Science 
+Date of Conference: 23-25 Oct. 1995 
+Date Added to IEEE Xplore : 06 August 2002 
+Print ISBN: 0-8186-7183-1 
+Print ISSN: 0272-5428 
+INSPEC Accession Number: 5125623 
+DOI: 10.1109/SFCS.1995.492461 
+Publisher: IEEE 
+Conference Location: Milwaukee, WI, USA 
+Authors 
+References 
+Citations 
+Keywords 
+Metrics 
+More Like This 
+A one-phase algorithm to detect distributed deadlocks in replicated databases 
+ 
+IEEE Transactions on Knowledge and Data Engineering 
+ 
+Published: 1999 
+View divergence of freshness in replicated database systems: A review 
+ 
+2011 3rd International Conference on Electronics Computer Technology 
+ 
+Published: 2011 
+Show More 
+References 
+References is not available for this document. 
+IEEE Personal Account 
+ 
+    Change username/password  
+ 
+Purchase Details 
+ 
+    Payment Options 
+    View Purchased Documents  
+ 
+Profile Information 
+ 
+    Communications Preferences 
+    Profession and Education 
+    Technical interests  
+ 
+Need Help? 
+ 
+    US & Canada: +1 800 678 4333 
+    Worldwide: +1 732 981 0060 
+    Contact & Support  
+ 
+Follow 
+ 
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | Privacy & Opting Out of Cookies 
+ 
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity. 
+ 
+© Copyright 2022 IEEE - All rights reserved. 

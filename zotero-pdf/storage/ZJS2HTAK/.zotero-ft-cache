@@ -1,0 +1,2415 @@
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+4277
+
+FedBCD: A Communication-Efﬁcient Collaborative Learning Framework for Distributed Features
+Yang Liu , Xinwei Zhang , Student Member, IEEE, Yan Kang, Liping Li , Tianjian Chen, Mingyi Hong , Senior Member, IEEE, and Qiang Yang , Fellow, IEEE
+
+Abstract—We introduce a novel federated learning framework allowing multiple parties having different sets of attributes about the same user to jointly build models without exposing their raw data or model parameters. Conventional federated learning approaches are inefﬁcient for cross-silo problems because they require the exchange of messages for gradient updates at every iteration, and raise security concerns over sharing such messages during learning. We propose a Federated Stochastic Block Coordinate Descent (FedBCD) algorithm, allowing each party to conduct multiple local updates before each communication to effectively reduce communication overhead. Under a practical security model, we show that parties cannot infer others’ exact raw data (“deep leakage”) from collections of messages exchanged in our framework, regardless of the number of communication to be performed. Further, we provide convergence guarantees and empirical evaluations on a variety of tasks and datasets, demonstrating signiﬁcant improvement inefﬁciency.
+Index Terms—Federated learning, data privacy, federated stochastic block coordinate descent, cross-silo federated learning, distributed features.
+I. INTRODUCTION
+F EDERATED and collaborative learning has emerged to be an attractive solution to the data silo and privacy problem. While distributed learning (DL) frameworks [1] originally aims at parallelizing computing power and distributes data identically across multiple servers, federated learning (FL) [2], [3] focuses on data locality, non-IID distribution and privacy. In most of the existing federated learning frameworks, data are distributed
+Manuscript received 17 November 2021; revised 1 June 2022 and 25 July 2022; accepted 26 July 2022. Date of publication 11 August 2022; date of current version 12 September 2022. The associate editor coordinating the review of this manuscript and approving it for publication was Dr. Ketan Rajawat. This work was supported by the National Key Research and Development Program of China under Grant 2018AAA0101100. (Yang Liu and Xinwei Zhang are co-ﬁrst authors.) (Corresponding authors: Yang Liu; Qiang Yang.)
+Yang Liu is with the Institute for AI Industry Research, Tsinghua University, Beijing 100084, China (e-mail: yangliu@webank.com).
+Xinwei Zhang and Mingyi Hong are with the University of Minnesota, Minneapolis 55455 USA (e-mail: zhan6234@umn.edu; mhong@umn.edu).
+Yan Kang and Liping Li are with the Department of Artiﬁcial Intelligence, Webank, Shenzhen 518063, China (e-mail: yangkang@webank.com; shmily20@ mail.ustc.edu.cn).
+Tianjian Chen is with the Hong Kong University of Science and Technology, Hong Kong (e-mail: tobychen@webank.com).
+Qiang Yang is with the Department of Artiﬁcial Intelligence, Webank, Shenzhen, China, and also with the Hong Kong University of Science and Technology, Hong Kong (e-mail: qyang@cse.ust.hk).
+Digital Object Identiﬁer 10.1109/TSP.2022.3198176
+
+by samples thus share the same set of attributes. However, a different scenario is cross-organizational federated learning problems where parties share the same users but have different set of features. For example, a local bank and a local retail company in the same city may have large overlap in user base and it is beneﬁcial for these parties to build collaborative learning models with their respective features.
+Feature-partitioned collaborative learning problems have been studied in the setting of both DL [4], [5], [6] and FL [7], [8], [9], [10]. However, existing architectures have not sufﬁciently addressed the communication and privacy problem especially in communication-sensitive scenarios where data are geographically distributed and data locality and privacy are of paramount signiﬁcance (i.e., in a FL setting). In these approaches, per-iteration communication are often required, since the update of algorithm parameters needs contributions from all parties. In sample-partitioned FL [2], it is demonstrated that multiple local updates can be performed with federated averaging (FedAvg), reducing the number of communication round effectively. Whether it is feasible to perform such multiple local update strategy over distributed features is not clear. In addition, recent attacks to FL [11] show that sharing gradients during training processes may leak raw data. Privacy concerns in the distributed-feature settings are yet to be addressed to prevent inference over the messages exchanged.
+In this paper, we propose a collaborative learning framework for distributed features named Federated stochastic block coordinate descent (FedBCD), where parties only share an inner product of model parameters and raw data per sample during each communication, and can continuously perform local model updates (in either a parallel or sequential manner) without per-iteration communication. While FedAvg applies to samplepartitioned FL scenarios where complete sets of model parameters are averaged after multiple local updates, FedBCD targeted the feature-partitioned FL scenarios where subsets of model parameters and features perform multiple local gradient updates independently to reduce communication overhead. Therefore FedBCD does not apply to the sample-partitioned FL scenario. In the proposed framework, all raw data and model parameters stay local, and each party does not learn other parties’ data or model parameters either before or after the training. There is no loss in performance of the collaborative model as compared to the model trained in a centralized manner. In our paper, we demonstrate experimentally that the communication cost can
+
+1053-587X © 2022 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4278
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+be signiﬁcantly reduced by adopting FedBCD. Compared with the existing distributed (stochastic) coordinate descent methods [12], [13], [14], [15], we show for the ﬁrst time that when the number of local updates, mini-batch size and learning rate√s are selected appropria√tely, the FedBCD converges to a O(1/ T ) accuracy with O( T ) rounds of communications despite performing multiple local updates using staled information. We further provide security guarantees for exchanging transmitted data under a mild and practical security protocol, removing the hard constraint for data encryption. We show that it is not possible to infer raw data values not only from a single round of communication, but from the collections of all exchanged messages through the learning process regardless of how many iterations are performed. Our framework is applicable to parties with arbitrary local sub-models (e.g.neural networks) as long as they connect at a ﬁnal linear layer (e.g. linear and logistic regression).
+II. RELATED WORK
+Traditional distributed learning adopts a parameter server architecture [1] to enable a large amount of computation nodes to train a shared model by aggregating locally-computed updates. The issue of privacy in DL framework is considered in [16]. FL [2] adopted a FedAvg algorithm which runs Stochastic Gradient Descent (SGD) for multiple local updates in parallel to achieve better communication efﬁciency. The authors of [17] studied the FedAvg algorithm under the parallel restarted SGD framework and analyzed the convergence rate and communication savings under IID settings. In [18], the convergence of the FedAvg algorithm under non-IID settings was investigated. All the work above consider the sample-partitioned scenario.
+Feature-partitioned learning architectures have been developed for models including trees [9], linear and logistic regression [4], [6], [7], [8], and neural networks [5], [10]. Distributed Coordinate Descent [12] used balanced partitions and decoupled computation at the individual coordinate in each partition; Distributed Block Coordinate Descent [13] assumes feature partitioning is given and performs synchronous block updates of variables which is suited for MapReduce systems with high communication cost settings. These approaches require synchronization at every iteration. Asynchronous BCD [14] and Asynchronous ADMM algorithms [15] tries to tame various kinds of asynchronicity using strategies such as small stepsize, and careful update scheduling, and the design objective is to ensure that the algorithm can still behave reasonably under non-ideal computing environment. [19] propose a dynamic diffusion approach which requires communications between parties with its related neighbours. Our approach tries to address the expensive communication overhead problem in the primal domain in FL scenario by systematically adopting BCD with sufﬁcient number of local updates guided by theoretical convergence guarantees. We assume only one party has labels and all the other parties communicate only with that party to minimize information exchanges in the system.
+To prevent data leakage in federated learning, privacypreserving techniques, such as Homomorphic Encryption (HE)
+
+[20], Secure Multi-party Computation (SMPC) [21] are typically applied to transmitted data [7], [9], [10], adding expensive communication overhead to the architectures. Differential Privacy (DP) is also a commonly-adopted approach, but such approaches suffer from precision loss [5], [6]. Hybrid approaches [22], [23] are also proposed to achieve better trade-off between accuracy and security. [24] adds noise to data but requires an anonymization network to cancel the noise. [25] propose a LANN-SVD algorithm implemented in distributed settings but it applies to single-layer neural networks only. We prove that the proposed learning protocol is secure under a practical and heuristic security model for a variety of models, leading to much more efﬁcient solutions and providing a trade off between security and efﬁciency.
+
+III. PROBLEM DEFINITION
+
+Suppose K data parties collaboratively train a machine learn-
+ing model based on a dataset with N data samples D {ξi}Ni=1, where the samples consist of the feature and the label ξ (x, y). The feature vector xi ∈ R1×d are distributed among K parties {xi,k ∈ R1×dk }Kk=1, where dk is the feature dimension of party k. We assume one that part K holds the labels of all the data.
+Let us denote the data set as Dk {xi,k}Ni=1, for k ∈ [K − 1], DK {xi,K , yi,K }Ni=1.Then the collaborative training problem
+can be formulated as
+
+min L(Θ; D)
+Θ
+
+1 N
+
+N
+
+K
+f (θ1, . . . , θK ; ξi) + λ
+
+γ (θk )
+
+(1)
+
+i=1
+
+k=1
+
+where θk ∈ Rdk denotes the training parameters of the kth party; Θ = [θ1; . . . ; θK ]; f (·) and γ(·) denotes the loss function and regularizer and λ is the hyperparatemer; For a wide range of
+models such as linear and logistic regression, and support vector
+machines, the loss function has the following form:
+
+K
+
+f (θ1, . . . , θK ; ξi) = f
+
+xi,kθk, yi,K
+
+(2)
+
+k=1
+
+The objective is for each party k to ﬁnd its θk without sharing its data Dk or parameter θk to other parties.
+
+IV. THE PROPOSED FEDBCD ALGORITHMS
+
+If a mini-batch S ⊂ D of S data points is sampled, the stochastic partial gradient w.r.t. θk is given by
+
+gk(Θ; S) ∇kf (Θ; S) + λ∇γ(θk).
+
+(3)
+
+Let Hik xi,kθk and Hi tion in equation (2), we have
+
+K k=1
+
+Hik
+
+,
+
+then
+
+for
+
+the
+
+loss
+
+func-
+
+∇kf (Θ; S)
+
+=
+
+1 S
+
+ξi ∈S
+
+∂
+
+f
+
+(Hi, yi,K ∂Hi
+
+)
+
+(xi,k
+
+)T
+
+(4)
+
+To compute ∇kf (Θ; S) locally, each party k ∈ [K − 1] sends
+
+ISk,K {Hik}i∈S to party K, who then calculates ISK,q
+
+{
+
+∂
+
+f
+
+(Hi ,yi,K ∂Hi
+
+)
+
+}i∈S
+
+and
+
+sends
+
+to
+
+other
+
+parties.
+
+I q,k (·)
+
+is
+
+the
+
+col-
+
+lection of the information required from party q to k. And ﬁnally
+
+all parties can compute gradient updates with equation (4).
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+LIU et al.: FEDBCD: A COMMUNICATION-EFFICIENT COLLABORATIVE LEARNING FRAMEWORK FOR DISTRIBUTED FEATURES
+
+4279
+
+Fig. 1. Illustration of a 2-party collaborative learning framework (a) with neural network(NN)-based local model. (b) FedBCD-s and FedBCD-p algorithms
+
+For an arbitrary loss function, let us deﬁne the collection of information needed to compute ∇kf (Θ; S) as
+
+IS−k {ISq,k}q=k.
+
+(5)
+
+where the stochastic gradients (3) can be computed as the following:
+
+gk(Θ; S) = ∇kf (IS−k, θk; S) + λ∇γ(θk)
+
+gk(IS−k, θk; S).
+
+(6)
+
+Therefore, the overall stochastic gradient is given as
+
+g(Θ; S) [g1(IS−1, θ1; S); · · · ; gK (IS−K , θK ; S)]. (7)
+
+A direct approach to optimize (1) is to use the vanilla stochastic gradient descent (SGD) algorithm given below
+
+θk ← θk − ηgk(IS−k, θk; S), ∀ k,
+
+(8)
+
+which requires communication of intermediate results at every
+
+iteration. This could be very inefﬁcient, especially when K is
+
+large or the task is communicationally heavy. This vanilla SGD
+algorithm (termed FedSGD) converges with a rate of O( √1 ),
+T
+regardless of the choice of K [26]. Since each iteration requires
+
+one round of communication among all the parties, T rounds of communication is required to achieve an error of O( √1 ). In our
+T
+proposed FedBCD, each party performs Q (with Q ≥ 1) con-
+
+secutive local gradient updates before communicating the inter-
+
+mediate results among each other either in parallel (FedBCD-p)
+
+or sequentially (FedBCD-s), see Figure 1(b). Note that when
+
+Q = 1, FedBCD-p reduces to FedSGD.
+
+Because IS−k the most recent
+
+is the intermediate information synchronization, gk(IS−k, θk; S
+
+obtained from ) may contain
+
+staled information so it may no longer be an unbiased estimate of the true partial gradient ∇kL(Θ). On the other hand, during the Q local updates no inter-party communication is required. Therefore, one could expect that there will be some interesting trade-off between communication efﬁciency and computational efﬁciency. These trade-offs will be analyzed in our theoretical results, and illustrated in our numerical experiments.
+
+V. CONVERGENCE ANALYSIS
+
+In this section, we perform convergence analysis of the Fed-
+BCD algorithm. Our analysis will be focused on Algorithm 1 and
+the sequential version can be analyzed use similar techniques.
+Let r denote the iteration index, in which each iteration one round
+of local update is performed; Let r0 denote the latest iteration before r in which synchronization has been performed, and the intermediate information IS−k’s are exchanged. Let ykr denote the “local vector” that node k uses to compute its local gradient
+at iteration r, that is
+
+gk(ykr ; S) = gk([Θr−0k, θkr ]; S])
+
+(9)
+
+where [v−k, w] denotes a vector v with its kth element replaced
+by w. Note that by Algorithm 1, each node k always updates the kth element of ykr , while the information about Θr−0k is obtained by the most recent synchronization step. Further, we use the “global” variable Θr to collect the most updated parameters at
+each iteration of each node, where yk,j denotes the jth element of yk:
+
+Θr = [θ1r; . . . ; θKr ] [y1r,1; . . . ; yKr ,K ].
+
+(10)
+
+Note that {Θr} is only a sequence of “virtual” variables, it is never explicitly formed in the algorithm.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4280
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+We make the following assumptions to the problem and the algorithm.
+A1: Uniform Sampling. We assume that Sl is a mini-batch of size S, and each sample in Sl is sampled i.i.d from D for all .
+A2: Bounded Variance. Assume that the variance of the stochastic gradient satisﬁes the following:
+Eξ gk(Θ; ξ) − ∇kL(Θ) 2 ≤ σ2, ∀ Θ.
+
+A3: Lipschitz Gradient. Assume that the loss function satisﬁes the following:
+
+∇L(Θ1) − ∇L(Θ2) ≤ L Θ1 − Θ2 , ∀ Θ1, Θ2.
+
+Eξ [ gk(Θ1; ξ) − gk(Θ2; ξ) ] ≤ Lk Θ1 − Θ2 , ∀ Θ1, Θ2.
+
+Note that the second assumption of A3, which we refer to as the
+
+averaged gradient Lipschitz smooth condition, is stronger than
+
+directly assuming Lipschitz smoothness, but it is still a rather
+
+standard assumption in SGD analysis; see, e.g., [27], [28].
+
+Based on the above assumption, we have the following con-
+
+vergence result for Algorithm 1.
+
+Theorem 1: Suppose assumptions A1-A3 hold. Running Al-
+
+gorithm 1 for T iterations, with the stepsize parameter chosen
+
+as η ≤ L+2Q2
+
+, 1
+
+K k=1
+
+L2k
+
+/L
+
+Q
+
+≥
+
+S/K, we have:
+
+1
+
+T −1
+E
+
+∇L(Θr) 2 ≤
+
+2
+
+E[L(Θ0) − L(ΘT )]
+
+T
+
+ηT
+
+r=0
+
++ 2ηKC1 + 2η2Q2KC2 · σ2,
+
+(11)
+
+S
+
+where
+
+C1 = 6 + 72L2 + 120L4,
+
+C2 = C1 · (
+
+K k=1
+
+L2k
+
++
+
+maxk{L2k}) are two positive constants.
+
+Remark 1: It is non-trivial to ﬁnd an unbiased estimator
+
+for the local stochastic gradient gk(ykr ; S) because after each synchronization step, each agent k performs Q deterministic
+
+steps based on the same data set S while ﬁxing all the rest of the variable blocks at Θr−0k. This is signiﬁcantly different
+from FedAvg-type algorithms, where at each iteration a new
+
+mini-batch is sampled at each node. The proof for Theorem 1 is
+
+provided in Appendix A.
+
+Remark 2: Let us discuss how to choose T, η, and Q so that
+
+accuracy is achieved, such that the following holds:
+
+1
+
+T −1
+E
+
+∇L(Θr )
+
+2 = O( ).
+
+T
+
+r=0
+
+First, it is clear that the following choices are valid:
+
+T
+
+≥
+
+4(L(Θ0) − L) ,
+η
+
+η
+
+≤
+
+S 8KC1 ,
+
+Q
+
+≤
+
+S 8Kη2C2 ,
+
+where L = infΘ{L(Θ)} denotes the lower bound of L(·). Then,
+
+to understand the precise relation between the communication
+
+and
+
+computation,
+
+let
+
+us
+
+ﬁx
+
+the
+
+stepsize
+
+as
+
+η
+
+=
+
+S 8K C1
+
+.
+
+Then
+
+the total number of required local updates T and the local
+
+communication rounds Q can be chosen as
+
+T
+
+=
+
+32K
+
+C1
+
+(L(Θ0) S2
+
+−
+
+L)
+
+,
+
+Q
+
+=
+
+8KC12 . SC2
+
+Therefore, the total number of communication required is
+
+T Q
+
+=
+
+O
+
+K 1/2 S1/2 3/2
+
+.
+
+Remark 3: The previous remark indicates that with any ﬁxed
+
+S and K, we can choose η = O( ), Q =
+
+; 1
+1/2
+
+it
+
+also
+
+shows
+
+that
+
+the
+
+convergence
+
+speed
+
+of
+
+the
+
+algorithm
+
+is
+
+O(
+
+1
+2
+
+)
+
+in
+
+terms
+
+of
+
+the
+
+total
+
+number
+
+of
+
+local
+
+updates,
+
+and
+
+O(
+
+) 1
+3/2
+
+in
+
+terms
+
+of
+
+the total number of communication rounds. To the best of our
+
+knowledge, it is the ﬁrst time that such rates have been proven
+
+for any algorithms with multiple local steps designed for the
+
+feature-partitioned federated learning problem.
+
+Remark 4: Compared with the existing distributed stochastic
+
+coordinate descent methods [12], [13], [14], [15] that requires O(1/ 2) communication/computation update to achieve O( )
+
+accuracy, our results are different. It shows that, despite using
+
+stochastic gradients and performing multiple local updates using staled information, only O(1/ 3/2) communication rounds are requires (out of total for O(1/ 2) iterations) to achieves O( )
+
+accuracy. Compare with vanilla BCD, FedBCD saves commu-
+
+nication by having multiple local updates.
+
+Remark 5: If we consider the impact of the number of nodes K
+
+and the batch size S, then from Remark 1 we have T
+
+=
+
+O(
+
+K 2S
+
+)
+
+and
+
+T Q
+
+=
+
+K 1/2 3/2 S 1/2
+
+.
+
+This
+
+indicates
+
+that
+
+the
+
+proposed
+
+algorithm
+
+has a slow down w.r.t the number of parties involved and a
+
+speed up w.r.t the batch size. In practice, the factor of K is mild
+
+assuming that the total number of parties involved is usually not
+
+large and we can always pick larger batch size S > K to cancel
+
+the impact of K.
+
+VI. SECURITY ANALYSIS
+
+Here we aim to ﬁnd out whether one party can learn other party’s data (xki ) from collections of messages exchanged (Gk,q(ISk)) during training. Whereas previous research studied data leakage from exposing complete set of model parameters
+
+or gradients, of dimension dk [11], [29], [30], in our protocol model parameters are kept private, and only the intermediate
+
+results (such as inner product of model parameters and feature),
+
+which is of reduced dimension, 1 in the case of the linear model,
+
+are exposed. Thus, the gradients exchanged from party K to
+
+others are also the gradients with respect to this intermediate
+
+message, of reduced dimension, not the model parameters them-
+
+selves. Therefore the previous leakage attack do not apply in our
+
+scenario.
+
+In the following discussion, we assume that we use the 2-
+
+norm
+
+square
+
+regularizer
+
+in
+
+(1)
+
+γ (θk )
+
+=
+
+1 2
+
+θk
+
+2.
+
+Security Deﬁnition Let Sr be the set of data point sampled at
+
+the rth iteration and ir denotes the ith sample of the rth iteration.
+
+Hikr is the contribution of the ith sample from the kth party to other parties. At the (r + 1)th iteration, we update weight
+
+variables according to equation (4)
+
+⎛
+
+⎞
+
+θkr+1
+
+=
+
+θkr
+
+−
+
+ηr
+
+⎝1 S
+
+g(Hir , yir,K )(xir,k)T + λθkr ⎠
+
+ξir ∈Sr
+
+(12)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+LIU et al.: FEDBCD: A COMMUNICATION-EFFICIENT COLLABORATIVE LEARNING FRAMEWORK FOR DISTRIBUTED FEATURES
+
+4281
+
+The security deﬁnition is that for any party k with undisclosed dataset Dk and training parameters θk following FedBCD, there exists inﬁnite solutions for {x } ir,k ir∈Sr,r=0,...,T that yield the same set of contributions {Hikr }r=0,...,T . That is, one can not determine party k’s data xi,k uniquely from its exchanged messages of {Hrk}r=0,··· ,T regardless the value of T , the total number of iterations.
+With only one iteration (T = 1), such a security deﬁnition is inline with prior security deﬁnitions proposed in privacypreserving machine learning and secure multiple computation (SMC), such as [7], [31], [32], [33], [34]. Here the assumption is that no prior information about other parties is available, so it is impossible to infer the exact raw data xi,k. Note under this heuristic security deﬁnition, when some prior knowledge about the data is known, an adversary may be able to eliminate some alternative solutions or certain derived statistical information may be revealed [32], [33]. However to infer the exact raw data xi,k one needs additional prior information about the data, which is not always available. In our work, we assume zero knowledge about other parties. Our main focus is to propose a general framework for performing much efﬁcient feature-partitioned collaborative learning with lossless accuracy based on a practical and heuristic security model, which tradeoffs between privacy and efﬁciency and allows much more efﬁcient solutions.
+Over multiple iterations, the observations by other parties are iterative outputs from FedBCD algorithm and are all correlated based on equation (12). That is, parties obtain T − 1 times more information. Although it is easy to show security of xi,k by sending only one round of Hikr due to the reduced dimensionality, it is unclear whether raw data will be leaked after thousands or millions of rounds of iterative communications. To our best knowledge, we are the ﬁrst to provide proof for the multipleiteration scenario (see Proof of Theorem 2 in Appendix).
+Theorem 2: For K-party collaborative learning framework following (2) with K ≥ 2, the FedBCD Algorithm is secured for party k if k’s feature dimension is greater than 1, i.e., dk ≥ 2.
+The security proof can be readily extended to collaborative systems where parties have arbitrary local sub-models (such as neural networks) but connect at the ﬁnal prediction layer with loss function (2) (see Figure 1(a)). Let Gk be the local transformation on xi,k and is unknown to parties other than k. We choose Gk to be the identity map, i.e. Gk(xi,k) = xi,k, then the problem reduces to Theorem 2.
+VII. EXPERIMENTS
+A. Datasets and Models
+MIMIC-III. We compile a subset of the MIMIC-III [35] database containing more than 31 million clinical events that correspond to 17 clinical variables and get the ﬁnal training and test sets of 17,903 and 3,236 ICU stays, respectively. For each variable we compute six different sample statistic features on seven different subsequences of a given time series, obtaining 17 × 7 × 6 = 714 features. We focus on the in-hospital mortality prediction task based on the ﬁrst 48 hours of an ICU stay We partition each sample vertically by its clinical features. In a practical situation, clinical variables may come from different
+
+hospitals or different departments in the same hospital and can
+
+not share their data due to the patients personal privacy. This
+
+task is referred to as MIMIC-LR.
+
+NUS-WIDE. The NUS-WIDE dataset [36] consists of 634
+
+low-level images features extracted from Flickr images as well
+
+as their associated tags and ground truth labels. We assign image
+
+features to one party and textual tag features to another party.
+
+The objective is to perform a federated transfer learning (FTL)
+
+task studied in [10]. Each party utilizes a neural network having
+
+one hidden layer with 64 units to learn feature representation
+
+from their raw inputs. Then, the feature representations of both
+
+sides are fed into a ﬁnal federated layer. This task is refered to
+
+as NUS-FTL.
+
+MNIST. We partition each MNIST [37] image with shape
+
+28 × 28 × 1 vertically into two parts (each part has shape
+
+28 × 14 × 1). Each party uses a local CNN sub-model (two
+
+3x3 convolution layers with 64 channels, followed by a fully
+
+connected layer with 256 units) to learn feature representation,
+
+which then are fed into a logistic regression layer with 512
+
+parameters for a binary classiﬁcation task. We refer this task
+
+as MNIST-CNN.
+
+Default-Credit. We partition the features into 15 demo-
+
+graphic features and 18 payment features, which often hap-
+
+pens when banks leverage alternative data for user credit risk
+
+prediction. We perform a FTL task as described above but
+
+with homomorphic encryption applied. We refer to this task as
+
+Credit-FTL.
+
+For all experiments, we adopt a decay learning rate strategy
+
+with ηr
+
+=
+
+√η0 r+1
+
+,
+
+where
+
+η0
+
+is optimized for each experiment. We
+
+ﬁx the batch size to 64 and 256 for MIMIC-LR and MNIST-CNN
+
+respectively. Note although not considered in our experiments,
+
+in real-world settings, some features may be overlapping or
+
+distributed feature selection [38], [39] may need to be performed.
+
+B. Evaluation Metric
+For all dataset, we consider the training loss (loss for short) L(Θ; D) and Area Under Curve (AUC) as the performance metrics. The training loss is deﬁned by (1) and evaluated using training dataset. AUC is the area under the receiver operating characteristics (ROC) curve, which represents the relationship between false-positive rate and true-positive rate for different probability thresholds of model predictions. This area is bounded to 1. The perfect AUC score is 1 and the worst is 0, meaning the model gives wrong prediction for every sample. AUC is a preferred metric especially in classiﬁcation problems with imbalanced samples. Our objective is to minimize the training loss as shown in (1) and maximize the AUC. As loss is minimized during training, the performance of the model, indicated by AUC, is also maximized. In experiments, we demonstrate the loss and AUC as a function of communication rounds during training to compare the convergence rate of different algorithms.
+
+C. Results and Discussion
+FedBCD-p vs FedBCD-s. We ﬁrst study the impact of varying local iterations on the communication efﬁciency of both
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4282
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+Fig. 2. Comparison of AUC and training loss in MIMIC-LR, MNIST-CNN, NUS-FTL with varying Q local iterations.
+
+TABLE I NUMBER OF COMMUNICATION ROUNDS TO REACH A TARGET AUC FOR
+FEDBCD-P, FEDBCD-S AND FEDSGD ON MIMIC-LR AND MNIST-CNN RESPECTIVELY
+FedBCD-p and FedBCD-s algorithms based on MIMIC-LR and MNIST-CNN (Figure 2). We observe similar convergence for FedBCD-s and FedBCD-p for various values of Q. However, for the same communication round, the running time of FedBCD-s doubles that of FedBCD-p due to sequential execution. As the number of local iteration increases, we observe that the required number of communication rounds reduce dramatically (Table I). Therefore, by reasonably increasing the number of local iteration, we can take advantage of the parallelism on participants and save the overall communication costs by reducing the number of total communication rounds required.
+Impact of Q. Theorem 1 suggests that as Q grows the required number of communication rounds may ﬁrst decrease and then increase again, and eventually the algorithm may not converge to optimal solution. To further investigate the relationship between the convergence rate and the local iteration Q, we evaluate FedBCD-p algorithm on NUS-FTL with a large range of Q. The results are shown in Figure 2 and Figure 3(a), which illustrate that FedBCD-p achieves the best AUC with the least number
+
+of communication rounds when Q = 15. For each target AUC, there exists an optimal Q. This manifests that one needs to carefully select Q to achieve the best communication efﬁciency, as suggested by Theorem 1.
+Figure 3(b) shows that for very large local iteration Q = 25, 50 and 100, the FedBCD-p cannot converge to the AUC of 83.7%. This phenomenon is also supported by Theorem 1, where if Q is too large the right hand side of (11) may not go to zero. Next we further address this issue by making the algorithm less sensitive in choosing Q.
+Proximal Gradient Descent. [40] proposed adding a proximal term to the local objective function to alleviate potential divergence when local iteration is large. Here, we explore this idea to our scenario. We rewrite (9) as follows:
+
+gk(ykr ; ξi) = gk([Θr−0k, θkr ]; ξi]) + μ(θkr − θkr0 )
+
+(13)
+
+where θkr0 ||2,
+
+μ(θkr − θkr0 ) is which exploits
+
+the the
+
+gradient of the proximal term initial model θkr0 of party k to
+
+μ 2
+
+||θkr
+
+−
+
+limit the
+
+impact of local updates by restricting the locally updated model
+
+to be close to θkr0 . We denote the proximal version of FedBCD-p
+
+as FedPBCD-p. We then apply FedPBCD-p with μ = 0.1 to
+
+NUS-FTL for Q = 25, 50 and 100 respectively. Figure 3(b)
+
+illustrates that if Q is too large, FedBCD-p fails to converge
+
+to optimal solutions whereas the FedPBCD-p converges faster
+
+and is able to reach at a higher test AUC than FedBCD-p.
+
+Increasing number of Parties. In this section, we increase
+
+the number of parties to ﬁve and seventeen and conduct ex-
+
+periments for MIMIC-LR task. We partition data by clinical
+
+variables with each party having all the related features of the
+
+same variable. We adopt a decay learning rate strategy with √ η0 according to Theorem 1. The results are shown in
+(r+1)K
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+LIU et al.: FEDBCD: A COMMUNICATION-EFFICIENT COLLABORATIVE LEARNING FRAMEWORK FOR DISTRIBUTED FEATURES
+
+4283
+
+Fig. 3. (a) Communication round vs Q. (b) Comparison between FedBCD-p and FedPBCD-p for large local iterations. Comparison of AUC in MIMIC-III dataset with varying Q and number of parties K. (c) FedBCD-p; (d) FedBCD-s.
+
+TABLE II NUMBER OF COMMUNICATION ROUNDS, COMPUTATION, COMMUNICATION
+AND TOTAL TRAINING TIME (MINS) TO REACH TARGET AUC FOR FEDSGD VERSUS FEDBCD-P
+
+and the relaxed privacy constraint leads to much more efﬁcient solutions. Our approach signiﬁcantly reduces the number of communication rounds and the total communication overhead. We theoretically prove that the algorithm achieves global convergence with a decay learning rate and proper choice of local updates. The approach is supported by our extensive experimental evaluations. In the future, we plan to investigate ways to further improve communication efﬁciency of such approaches for more complex and asynchronized collaborative systems.
+
+Figure 3(c) and 3(d). We can see that the proposed method still performs well when we increase the local iterations for multiple parties. As we increase the number of parties to ﬁve and seventeen, FedBCD-p is slightly slower than the two-party case, but the impact of node K is very mild, which veriﬁes the theoretical analysis in Remark 3.
+Implementation with HE. In this section, we investigate the efﬁciency of FedBCD-p algorithm with homomorphic encryption (HE) applied. Using HE to protect transmitted information ensures higher security but it is extremely computationally expensive to perform computations on encrypted data. In such a scenario, carefully selecting Q may reduce communication rounds but may also introduce computational overhead because the total number of local iterations may increase (Q× number of communication rounds). We integrated the FedBCD-p algorithm into the current FTL implementation on FATE [41] and simulate two-party learning on two machines with Intel Xeon Gold model with 20 cores, 80G memory and 1T hard disk. The experimental results are summarized in Table II. It shows that FedBCD-p with larger Q costs less communication rounds and total training time to reach a speciﬁc AUC with a mild increase in computation time but more than 70 percents reduction in communication round from FedSGD to Q = 10.
+VIII. CONCLUSIONS AND FUTURE WORK
+In this paper, we propose a federated learning framework for distributed features, in which parties perform more than one local update of gradients before communication. We provide proof that exact raw data are not exposed in such protocol
+
+APPENDIX A CONVERGENCE ANALYSIS
+
+In this section, we provide the proof of the convergence result Theorem 1.
+Before we begin the proof, we ﬁnd the following relations useful:
+a+b 2 = a−c+c−b 2
+
+≤ (1 + α) a − c 2 + 1 + 1 c − b 2 , ∀α > 0. (14) α
+
+For notation simplicity, let us deﬁne the stacked stochastic gradient as iteration r as:
+
+Gr [g1(IS−l1, θ1r; Sl); · · · ; gK (IS−lK , θKr ; Sl)].
+
+(15)
+
+Proof of Theorem 1: First apply Lipschitz condition of L, we
+
+have:
+
+L(Θr+1) − L(Θr) ≤ ∇L(Θr), Θr+1 − Θr
+
++
+
+L 2
+
+Θr+1 − Θr 2
+
+(=a) −η ∇L(Θr), Gr
+
++
+
+Lη2 2
+
+Gr 2
+
+(=b)
+
+−
+
+η 2
+
+∇L(Θr) 2 + Gr 2 − ∇L(Θr) − Gr 2
+
++
+
+Lη2 2
+
+Gr 2
+
+=
+
+−
+
+η 2
+
+∇L(Θr )
+
+2−
+
+η 2
+
+(1
+
+−
+
+ηL)
+
+Gr 2
+
++
+
+η 2
+
+∇L(Θr) − Gr 2 ,
+
+(16)
+
+where (a) applies the update rule of Algorithm 1; (b) use the
+
+fact that
+
+a, b
+
+=
+
+1 2
+
+(
+
+a
+
+2+
+
+a 2−
+
+a − b 2). For simplicity,
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4284
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+we use Er0 to denote the expectation conditioned on all the past histories of the algorithm up to iteration r0. Taking expectation,
+we have:
+
+Er0 [L(Θr+1)
+
+−
+
+L(Θr )]
+
+≤
+
+−
+
+η 2
+
+Er0
+
+∇L(Θr) 2
+
+− η (1 − ηL) Er0 Gr 2 + η Er0 ∇L(Θr) − Gr 2
+
+2
+
+2
+
+(=a)
+
+−
+
+η 2
+
+Er0
+
+∇L(Θr )
+
+2+
+
+η 2
+
+Er0
+
+∇L(Θr) − Gr 2
+
+−
+
+η 2
+
+(1
+
+−
+
+ηL)(
+
+Er0 Gr
+
+2 + Er0
+
+Gr − Er0 Gr 2)
+
+(b)
+≤
+
+−
+
+η 2
+
+Er0
+
+∇L(Θr) 2
+
+−
+
+η 2
+
+(1
+
+−
+
+ηL)(
+
+Er0 Gr
+
+2 + Er0
+
+Gr − Er0 Gr 2)
+
++ η 1 + 1 Er0 ∇L(Θr) − Er0 Gr 2
+
+2
+
+ηL
+
++(1 + ηL) Er0 Er0 Gr − Gr 2
+
+= − η Er0 ∇L(Θr) 2 − η (1 − ηL) Er0 Gr 2
+
+2
+
+2
+
++ η2L Er0 Gr − Er0 Gr 2
+
+Term 1
+
++
+
+1
+
++ ηL 2L
+
+Er0
+
+∇L(Θr) − Er0 Gr 2,
+
+(17)
+
+Term 2
+
+where (a) uses the fact that E(X)2 = E(X2) + E(X − E(X))2; (b) uses (14) with α = ηL. Next, we bound Term 1
+and Term 2 in the above inequality separately.
+
+A. Bound of Term 1
+1) Let us ﬁrst bound Er0 [ Gr − Er0 Gr 2]. First, we denote the variables updated using minibatch Sl as Θr(Sl), using sample ξ as Θr(ξ) starting from Θr0 . That is, we have the following update rules:
+
+Θrk0+1(Sl) Θkr0+τ (Sl)
+
+Θrk0 − ηgk(Θr0 ; Sl), Θkr0+τ−1(Sl) − ηgk(ykr0+τ−1(Sl); Sl), (18)
+
+where ykr (Sl) [Θr−0k, θkr(Sl)] is the model used for updating the parameters of party k, and
+
+Θrk0+1(ξ) Θrk0 − ηgk(Θr0 ; ξ),
+
+Θkr0+τ (ξ) Θkr0+τ−1(ξ) − ηgk(ykr0+τ−1(ξ); ξ),
+
+(19)
+
+where ykr (ξ) [Θr−0k, θkr (ξ)]. Additionally, we have ykr0 = Θr0 , ∀k ∈ [K]. Further let us deﬁne r r0 + τ .
+Using the above notations, we can rewrite Er0 [ Gr − Er0 Gr 2] as:
+
+Er0 [ Gr − Er0 Gr 2]
+
+K
+
+=
+
+ESl
+
+k=1
+
+(a) K
+
+≤
+
+ESl
+
+k=1
+
+gk(ykr0+τ (Sl); Sl) − ESl gk(ykr0+τ (Sl); Sl) 2
+
+gk(ykr0+τ (Sl); Sl) − Eξ∈D gk(ykr0+τ (ξ); ξ) 2
+
+Aτ,k
+
+(20)
+
+where (a) uses the fact that E(X − E(X))2 ≤ E(X − Y )2 for
+all constant Y . Then we can bound Aτ,k by the following terms Bτ,k, στ2,k:
+
+Aτ,k
+
+(14)
+≤ 2 ESl
+
+gk(ykr0+τ (Sl); Sl) − Eξ ∈Sl gk(ykr0+τ (ξ ); ξ ) 2
+
++ 2 ESl Eξ ∈Sl gk(ykr0+τ (ξ ); ξ )
+
+− Eξ∈D gk(ykr0+τ (ξ); ξ) 2
+
+(a)
+≤ 2 ESl Eξ ∈Sl
+
+gk(ykr0+τ (Sl); ξ ) − gk(ykr0+τ (ξ ); ξ ) 2
+
+Bτ,k
+
++
+
+2 S2
+
+ESl
+
+gk(ykr0+τ (ξ ); ξ )
+ξ ∈Sl
+
+2
+− Eξ∈D gk(ykr0+τ (ξ); ξ)
+
+= 2Bτ,k
+
++
+
+2 S2
+
+ESl
+
+ξ ∈Sl
+
+gk(ykr0+τ (ξ ); ξ )
+
+− Eξ∈D gk(ykr0+τ (ξ); ξ) 2
+
++
+
+2 S2
+
+ESl
+
+ξ =ξ ∈Sl
+
+gk(ykr0+τ (ξ ); ξ )
+
+− Eξ∈D gk(ykr0+τ (ξ); ξ),
+
+gk(ykr0+τ (ξ ); ξ ) − Eξ∈D gk(ykr0+τ (ξ); ξ)
+
+(=b)
+
+2Bτ,k
+
++
+
+2 S
+
+ESl Eξ ∈Sl gk(ykr0+τ (ξ ); ξ )−Eξ∈D gk(ykr0+τ (ξ); ξ) 2 ,
+
+στ2,k
+(21)
+
+where in (a) we use Eξ ∈Sl gk(ykr0+τ (Sl); ξ )
+
+the and
+
+fact apply
+
+that gk(ykr0+τ (Sl); Sl) = Jensen’s inequality to the
+
+ﬁrst term and break the expectation; in (b) we use assumption
+
+A1 that ξ ∈ Sl are i.i.d sampled from D so that the last terms are all zero. We then bound Bτ,k and στ2,k separately by recursion.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+LIU et al.: FEDBCD: A COMMUNICATION-EFFICIENT COLLABORATIVE LEARNING FRAMEWORK FOR DISTRIBUTED FEATURES
+
+4285
+
+First, the term Bτ,k can be bounded as below:
+
+(a)
+Bτ,k ≤ L2k ESl Eξ ∈Sl
+
+ykr0+τ (Sl) − ykr0+τ (ξ ) 2
+
+⎡
+
+τ −1
+
+(=b) L2k ESl Eξ ∈Sl ⎣ Θr0 − η
+
+gk(ykr0+τ1 (Sl); Sl)
+
+τ1 =0
+
+⎤
+
+τ −1
+
+2
+
+−Θr0 + η
+
+gk(ykr0+τ1 (ξ ); ξ ) ⎦
+
+τ1 =0
+
+(c)
+
+τ −1
+
+≤ η2L2kτ
+
+ESl Eξ ∈Sl
+
+τ1 =0
+
+gk(ykr0+τ1 (Sl); Sl) − gk(ykr0+τ1 (ξ ); ξ ) 2
+
+(14)
+
+τ −1
+
+≤ 2η2L2kτ
+
+ESl Eξ ∈Sl
+
+τ1 =0
+
+gk(ykr0+τ1 (Sl); Sl) − Eξ∈D gk(ykr0+τ1 (ξ); ξ) 2
+
++ Eξ∈D gk(ykr0+τ1 (ξ); ξ) − gk(ykr0+τ1 (ξ ); ξ ) 2
+
+τ −1
+
+= 2η2L2kτ
+
+(Aτ1,k + στ21,k),
+
+τ1 =0
+
+(22)
+
+where (a) applies block Lipschitz assumption A3.2; in (b) we expand the updates to Θr0 ; (c) applies Cauchy–Schwarz
+inequality. We then bound στ2,k. First, note that when τ = 0, we have
+
+σ02,k = ESl Eξ ∈Sl
+
+gk(ykr0 ; ξ ) − Eξ∈D gk(ykr0 ; ξ) 2
+
+A2
+≤
+
+σ2
+
+(23)
+
+For the general case when τ ≥ 1, we have:
+
+στ2,k = Eξ ∈D[ gk(ykr0+τ (ξ ); ξ ) − gk(Eξ ∈D[ykr0+τ (ξ )]; ξ ) + gk(Eξ ∈D[ykr0+τ (ξ )]; ξ ) − Eξ∈D[gk(Eξ ∈D[ykr0+τ (ξ )]; ξ)] + Eξ∈D[gk(Eξ ∈D[ykr0+τ (ξ )]; ξ)] − Eξ∈D gk(ykr0+τ (ξ); ξ) 2]
+
+(14)
+≤ 3 Eξ ∈D[
+
+gk(ykr0+τ (ξ ); ξ )
+
+− gk(Eξ ∈D[ykr0+τ (ξ )]; ξ ) 2]
+
++ 3 Eξ ∈D[ gk(Eξ ∈D[ykr0+τ (ξ )]; ξ )
+
+− Eξ∈D[gk(Eξ ∈D[ykr0+τ (ξ )]; ξ)] 2]
+
++ 3 Eξ ∈D[ Eξ∈D[gk(Eξ ∈D[ykr0+τ (ξ )]; ξ)]
+
+− Eξ∈D gk(ykr0+τ (ξ); ξ) 2]
+
+(a)
+≤
+
+3
+
+Eξ
+
+∈D
+
+L2k [
+
+ykr0+τ (ξ ) − Eξ
+
+∈D[ykr0+τ (ξ
+
+)]
+
+2] + 3σ2
+
++ 3 Eξ ∈D[ Eξ∈D[gk(Eξ ∈D[ykr0+τ (ξ )]; ξ) − gk(ykr0+τ (ξ); ξ)] 2]
+
+(b)
+≤ 3L2k Eξ ∈D[
+
+ykr0+τ (ξ ) − Eξ
+
+∈D[ykr0+τ (ξ
+
+)]
+
+2] + 3σ2
+
++ 3L2k Eξ∈D[ Eξ ∈D[ykr0+τ (ξ )] − ykr0+τ (ξ) 2]
+
+(=c) 6η2L2k Eξ ∈D
+
+τ −1
+gk(ykr0+τ1 (ξ ); ξ )
+τ1 =0
+
+− Eξ ∈D
+
+τ −1
+gk(ykr0+τ1 (ξ ); ξ )
+τ1 =0
+
+2
++ 3σ2
+
+(d)
+≤
+
+6η 2 L2k τ
+
+τ −1
+
+Eξ ∈D[
+
+gk(ykr0+τ1 (ξ ); ξ )
+
+τ1 =0
+
+− Eξ ∈D gk(ykr0+τ1 (ξ ); ξ ) 2] + 3σ2
+
+τ −1
+
+= 6η2L2kτ
+
+στ21,k + 3σ2,
+
+τ1 =0
+
+(24)
+
+where (a) applies assumption A3.2 to the ﬁrst term, A2 to the second term; in (b) we have merged the two expectations, and
+applied assumption A3.2 to the last term; notice the expectation
+on ξ and ξ are independent for the ﬁrst and the third term, so in (c) we merge the ﬁrst and the third terms and recursively apply (19) to ykr0+τ (ξ ), ykr0+τ (ξ ) until Θr0 , and cancel Θr0 ; (d) applies Cauchy–Schwarz inequality.
+At this point, we have the following relations:
+
+K
+
+Er0 [ Gr − Er0 Gr 2] ≤
+
+Aτ ,k ,
+
+k=1
+
+Aτ,k
+
+≤
+
+2Bτ,k
+
++
+
+2στ2,k S
+
+≤ 4η2L2kτ
+
+τ −1
+(Aτ1,k + στ21,k) +
+
+2στ2,k , S
+
+τ1 =0
+
+τ −1
+
+σ02,k ≤ σ2, στ2,k ≤ 6η2L2kτ
+
+στ21,k + 3σ2.
+
+τ1 =0
+
+Notice that τ ≤ Q. By choosing 6η2L2kQ2 ≤ 1, which implies
+
+that
+
+η
+
+≤
+
+√1 6QLk
+
+,
+
+and
+
+by
+
+recursively
+
+substituting
+
+the
+
+terms,
+
+we
+
+have the following bounds:
+
+στ2,k ≤ 3 + 18(τ 2 − τ )η2L2k + 36τ 3η4L4k σ2
+
+Aτ,k ≤
+
+6+ S
+
+12 + 60 S
+
+τ 2η2L2k
+
++
+
+40 + 80 S
+
+τ 4η4L4k · σ2
+
+Er0 [ Gr − Er0 Gr 2 ≤
+
+6K + S
+
+12 + 60 S
+
+K
+Q2η2 L2k
+
+k=1
+
++
+
+40 + 80 S
+
+K
+Q4η4 L4k · σ2.
+
+k=1
+
+(25)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4286
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+This completes bounding term E[ Gr − Er0 Gr 2].
+
+B. Proof of Term 2
+2) Then, let us bound Er0 ∇L(Θr) − Er0 Gr 2. We have the following series of relations:
+
+Er0 ∇L(Θr) − Er0 Gr 2
+
+K
+
+2
+
+= ESl ∇kL(Θr(Sl)) − ESl gk(ykr (Sl); Sl)
+
+k=1
+
+(a)
+≤
+
+K
+ESl ESl
+
+gk(Θr(Sl); Sl) − gk(ykr (Sl); Sl) 2
+
+k=1
+
+(b)
+≤
+
+K
+L2k ESl ESl
+
+Θr(Sl) − ykr (Sl) 2
+
+k=1
+
+K
+
+(=c)
+
+L2k ESl ESl
+
+k=1
+
+θkr (Sl) − θkr (Sl) 2
+
++
+
+θjr(Sl) − θjr0 2
+
+j=k
+
+K
+
+(=d) η2
+
+L2k ESl ESl
+
+k=1
+
+r−1
+(gk(ykτ (Sl); Sl)
+τ =r0
+
+− gk(ykτ (Sl); Sl)) 2
+
+r−1
+
+2⎤
+
++
+
+gj (yjτ (Sl); Sl) ⎦
+
+j=k τ =r0
+
+(e)
+
+τ −1 K
+
+≤ η2τ
+
+L2k ESl ESl
+
+τ1=0 k=1
+
+gj (yjr0+τ1 (Sl); Sl) 2
+j=k
+
++ gk(ykr0+τ1 (Sl); Sl)
+
+−gk(ykr0+τ1 (Sl); Sl) 2
+
+⎛
+
+⎞
+
+τ −1 K
+
+K
+
+(=f) η2τ
+
+⎝L2k + L2j ⎠ ESl
+
+τ1=0 k=1
+
+j=1
+
+gk(ykr0+τ1 (Sl); Sl) 2
+
+(g)
+≤
+
+η2τ
+
+K
+L2k + mkax{L2k}
+k=1
+
+τ −1
+Er0 [ Gr0+τ1 2]
+τ1 =0
+
+= η2τ
+
+K
+L2k + mkax{L2k}
+k=1
+
+τ −1
+
+×
+
+Er0
+
+Gr0+τ1 − Er0 Gr0+τ1 2 + Er0 Gr0+τ1 2 ,
+
+τ1 =0
+
+(26)
+
+where (a) uses the fact that ∇kL(Θr(Sl)) = ESl gk(Θr (Sl); Sl) and applies Jensen’s inequality, that is
+2
+ESl gk(Θr(Sl); Sl) − ESl gk(ykr (Sl); Sl)
+≤ ESl gk(Θr(Sl); Sl) − gk(ykr (Sl); Sl) 2 ;
+(b) uses Jensen’s inequality that
+gk(Θr(Sl); Sl) − gk(ykr (Sl); Sl) 2
+≤ Eξ∈Sl gk(Θr(Sl); ξ) − gk(ykr (Sl); ξ) 2 and applies assumption A3.2; (c) applies the deﬁnition of ykr (Sl) that ykr (Sl) [Θr−0k, θkr(Sl)]; in (d) we expand the update steps until r0; (e) applies Cauchy-Schwarz inequality; in (f ) we reorder the sum and apply the i.i.d. assumption A1 to Sl, Sl; in (g) we plug in the deﬁnition of G. This completes bounding the term E ∇L(Θr) − E Gr 2.
+
+C. Proof of Main Result
+
+Main result: Substitute the last term in (17) with (26) and let
+
+τ = r − r0, we have:
+
+Er0 [L(Θr+1)
+
+−
+
+L(Θr )]
+
+≤
+
+−
+
+η 2
+
+Er0
+
+∇L(Θr) 2
+
+−
+
+η 2
+
+(1
+
+−
+
+ηL)
+
+Er0 Gr 2 + η2L Er0
+
+Gr − Er0 Gr 2
+
++
+
+1
+
++ ηLη2 2L
+
+K
+L2k + mkax{L2k}
+k=1
+
+τ −1
+
+τ
+
+Er0 Gr0+τ1 2
+
+τ1 =0
+
++
+
+1
+
++ ηL 2L
+
+η
+
+2
+
+K
+L2k + mkax{L2k} τ
+
+k=1
+
+τ −1
+
+×
+
+Er0 Gr0+τ1 − Er0 Gr0+τ1 2
+
+τ1 =0
+
+≤
+
+−
+
+η 2
+
+Er0
+
+∇L(Θr )
+
+2−
+
+η 2
+
+(1
+
+−
+
+ηL)
+
+Er0 Gr 2
+
++
+
+1
+
++ ηL 2L
+
+η
+
+2
+
+K
+L2k + mkax{L2k}
+k=1
+
+τ −1
+
+τ
+
+Er0 Gr0+τ1 2
+
+τ1 =0
+
++ η2
+
+L
+
++
+
+η
+
+1
+
++ ηL 2L
+
+K
+L2k + mkax{L2k} τ 2 × σ2
+
+k=1
+
+×
+
+6K S
+
++
+
+12
+
++
+
+60 S
+
+K
+Q2η2 L2k
+
+k=1
+
++
+
+40 + 80 S
+
+K
+Q4 η4L4k ,
+
+k=1
+
+where
+
+in
+
+the
+
+second
+
+inequality,
+
+we
+
+set
+
+η
+
+≤
+
+√1 6QLk
+
+and
+
+plug
+
+in
+
+(25). Average over r = 0, . . . , T − 1 and reorganize the terms,
+
+we obtain:
+
+1
+
+T −1
+E
+
+∇L(Θr) 2 ≤
+
+2
+
+E
+
+L(Θ0) − L(ΘT )
+
+T r=0
+
+ηT
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+LIU et al.: FEDBCD: A COMMUNICATION-EFFICIENT COLLABORATIVE LEARNING FRAMEWORK FOR DISTRIBUTED FEATURES
+
+4287
+
+−
+
+1−η
+
+L
+
++
+
+1
+
++ ηL 2L
+
+K
+L2k
+
+k=1
+
++ mkax{L2k} Q2 E Er0 Gr 2
+
++ 2η
+
+L
+
++
+
+η
+
+1
+
++ ηL 2L
+
+K
+L2k + mkax{L2k} Q2
+
+k=1
+
+×
+
+6K + S
+
+12 + 60 S
+
+K
+Q2η2 L2k
+
+k=1
+
++
+
+40 + 80 S
+
+K
+Q4η4 L4k · σ2.
+
+k=1
+
+Let
+
+1−η
+
+L
+
++
+
+1
+
++ ηL 2L
+
+K
+L2k + mkax{L2k} Q2
+
+k=1
+
+η≤ L + 2Q2
+
+1
+
+K k=1
+
+L2k
+
+/L
+
+,
+
+≥ 0,
+
+then we have
+
+1
+
+T −1
+E
+
+∇L(Θr) 2 ≤
+
+2
+
+E[L(Θ0) − L(ΘT )]
+
+T
+
+ηT
+
+r=0
+
++ 2η ·
+
+L
+
++
+
+η
+
+1
+
++ ηL 2L
+
+K
+L2k + mkax{L2k} Q2
+
+k=1
+
+×
+
+6K + S
+
+12 + 60 S
+
+K
+Q2η2 L2k
+
+k=1
+
++
+
+40 + 80 S
+
+K
+Q4η4 L4k .
+
+k=1
+
+· σ2 (27)
+
+Further let Q ≥
+
+S/K ,
+
+we
+
+have
+
+1+ηL 2L
+
+≤
+
+1
+
+and
+
+12 + 60 S
+
+K
+Q2η2 L2k +
+
+k=1
+
+≤
+
+72L2 + 120L4
+
+K ,
+
+S
+
+40 + 80 S
+
+K
+Q4η4 L4k
+k=1
+
+therefore we have:
+
+1
+
+T −1
+E
+
+∇L(Θr) 2 ≤
+
+2
+
+E[L(Θ0) − L(ΘT )]
+
+T
+
+ηT
+
+r=0
+
++ 2ηKC1 + 2η2Q2KC2 · σ2, S
+
+where
+
+C1 = 6 + 72L2 + 120L4,
+
+C2 = C1 · (
+
+K k=1
+
+L2k
+
++
+
+maxk{L2k}). This completes the proof of Theorem 1.
+
+APPENDIX B PROOF OF THEOREM 2
+
+We ﬁrst show that the conclusion holds for the case when
+k < K. Let xkij denotes the ith sample of the data set Sj sampled at
+jth iteration. With initial weight θk0 ∈ Rdk , we ﬁrst show that if we can ﬁnd inﬁnite number of non-identity orthogonal matrix U ∈ Rdk×dk such that
+
+θk0 = U T θk0.
+
+(28)
+
+then for any {xir,k}i∈Sr,r=0,...,T that yields observations {Hikr }r=0,...,T , we can construct another set of data
+
+x˜ir,k := xir,kU
+
+(29)
+
+where U is chosen to satisfy condition (28), to produce the same
+exchanged values {Hikr }r=0,...,T . Let {H˜ikr } be observations generated by {x˜ir,k}, and {θ˜kr} be
+weight variables with
+
+θ˜k0 = U T θk0.
+
+(30)
+
+That means for all r = 0, . . . , T ,
+
+H˜ikr = Hikr
+
+(31)
+
+θ˜kr = U T θkr .
+
+(32)
+
+Proof: We adopt recursive proof here. First, it is easy to verify (31) for r = 0, since,
+
+Hik0 = xi0,kU U T θk0 = (xi0,kU )(U T θk0)
+
+= x˜i0,kθ˜k0
+
+= H˜ik0 ,
+
+From equation (7), we deﬁne
+
+gir := g(Θ; ξir )
+
+(33)
+
+Now assuming that condition (31) and (32) hold for r ≤ τ . That is,
+
+gir = g˜ir
+
+(34)
+
+θ˜kr = U T θkr
+
+(35)
+
+Then (32) holds for r = τ + 1 because
+
+θ˜kτ +1
+
+(36)
+
+= θ˜kτ − η
+
+1 S
+
+g˜i(x˜i,k)T + λθ˜kτ
+
+(37)
+
+i∈Sτ
+
+= U T θkτ − η
+
+1 S
+
+gi(xi,kU )T + λU T θkτ
+
+(38)
+
+i∈Sτ
+
+= UT
+
+θkτ − η
+
+1 S
+
+gi(xi,k)T + λθkτ
+
+(39)
+
+i∈Sτ
+
+= U T θkτ +1
+
+(40)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4288
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+where (38) follows from (34) and (35). Note if Q local updates are performed, locally we have
+
+θkr,q+1 − θkr,q = (1 − ηλ)(θkr,q − θkr,q−1)
+
+(41)
+
+where θkr,q denotes the qth local update of rth iteration. it is thus easy to show that
+
+θ˜kτ +1,q = U T θkτ +1,q
+
+(42)
+
+Next we show (31) holds for r = τ + 1.
+
+H˜ikτ+1 = x˜iτ+1,kθ˜kτ +1
+
+= xiτ+1,kU U T θkτ +1
+
+= xiτ+1,kθkτ +1
+
+=
+
+Hk
+iτ +1
+
+(43) (44) (45) (46)
+
+The proof is completed for k < K. Next we show the conclusion holds for k = K. Similarly
+for any {xir,K }r=0,...,T and {yir,K }, we construct a different solution as follows:
+
+x˜ir,K := xir,K U
+
+(47)
+
+y˜ir,K := yir,K .
+
+(48)
+
+where U ∈ Rdk×dk is a non-identity orthogonal matrix satisfying (29) for k = K. Therefore we have
+
+HiKr = g(Hir , yir,K )
+
+(49)
+
+= g(H˜ir , y˜ir,K )
+
+(50)
+
+= H˜iKr
+
+(51)
+
+which means the constructed output is identical to the original
+output.
+Finally, we only need to show that we can ﬁnd inﬁnite number of non-identity orthogonal matrix U ∈ Rdk×dk to satisfy (28).
+This proof is provided in the following Lemma. Lemma 1: For any vector θ0 ∈ Rdk . There exists inﬁnite
+many of non-identity orthogonal matrix U ∈ Rdk×dk such that
+
+UUT = I
+
+(52)
+
+Uθ0 = θ0
+
+(53)
+
+Proof: First we construct a orthogonal U1 satisfying (52) and (53) for
+
+θ0 := e1 = (1, 0, · · · , 0)T ∈ Rdk
+
+(54)
+
+Then we complete the proof by generalizing the construction for an arbitrary θ0 ∈ Rdk .
+With θ0 = e1, we construct U1 in the following way
+
+U1 :=
+
+1 0
+
+0 V
+
+(55)
+
+where V ∈ R(dk−1)×(dk−1) is any non-identity orthogonal matrix with dk > 2, i.e.,
+
+V V T = I.
+
+(56)
+
+Condition (52) is satisﬁed since
+
+U1U1T =
+
+1 0
+
+0 V
+
+1 0
+
+0 VT
+
+(57)
+
+=
+
+1 0
+
+0 VVT
+
+(58)
+
+= I,
+
+(59)
+
+and condition (53) is satisﬁed trivially, i.e.,
+
+U1e1 = 1 0, . . . , 0 T = e1
+
+(60)
+
+For any arbitrary θ0, we apply the Householder transformation to “rotate” it to the basis vector e1, i.e.,
+
+θ0 = θ0 2P e1
+
+(61)
+
+where P is the Householder transformation operator such as
+
+P = PT
+
+(62)
+
+PPT = PP = I
+
+(63)
+
+Therefore from U1 deﬁned in (55) we can construct U by
+
+U = P U1P.
+
+(64)
+
+Finally, we veriﬁes that U satisﬁes condition (52)) and (53)):
+
+U U T = P U1P (P U1T P )
+
+(65)
+
+= P U1(P P )U1T P
+
+(66)
+
+= P U1U1T P
+
+(67)
+
+= PP = I
+
+(68)
+
+U θ0 = P U1P θ0
+
+(69)
+
+= θ0 2P (e1U1)
+
+(70)
+
+= θ0 2P e1
+
+(71)
+
+= θ0
+
+(72)
+
+where (70) holds since from (61) we have P θ0 = θ0 2e1
+
+REFERENCES
+[1] J. Dean et al., “Large scale distributed deep networks,” in Advances in Neural Information Processing Systems 25, F. Pereira, C. J. C. Burges, L. Bottou, and K. Q. Weinberger, Eds. Red Hook, NY, USA: Curran Associates, Inc., 2012, pp. 1223–1231. [Online]. Available: http://papers. nips.cc/paper/4687-large-scale-distributed-deep-networks.pdf
+[2] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y. Arcas, “Communication-efﬁcient learning of deep networks from decentralized data,” in Proc. Artif. Intell. Statist., 2017, pp. 1273–1282.
+[3] P. Kairouz et al., “Advances and open problems in federated learning,” Found. Trends Mach. Learn., vol. 14, no. 1–2, pp. 1–210, 2021.
+[4] C. Gratton, N. K. D. Venkategowda, R. Arablouei, and S. Werner, “Distributed ridge regression with feature partitioning,” in Proc. 52nd Asilomar Conf. Signals, Syst., Comput., 2018, pp. 1423–1427.
+[5] Y. Hu, D. Niu, J. Yang, and S. Zhou, “FDML: A collaborative machine learning framework for distributed features,” in Proc. 25th ACM SIGKDD Int. Conf. Knowl. Discov. Data Mining, 2019, pp. 2232–2240.
+[6] Y. Hu, P. Liu, L. Kong, and D. Niu, “Learning privately over distributed features: An ADMM sharing approach,” 2019, arXiv:1907.07735.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+LIU et al.: FEDBCD: A COMMUNICATION-EFFICIENT COLLABORATIVE LEARNING FRAMEWORK FOR DISTRIBUTED FEATURES
+
+4289
+
+[7] Q. Yang, Y. Liu, T. Chen, and Y. Tong, “Federated machine learning: Concept and applications,” ACM Trans. Intell. Syst. Technol. (TIST), vol. 10, no. 2, pp. 1–19, 2019.
+[8] S. Hardy et al., “Private federated learning on vertically partitioned data via entity resolution and additively homomorphic encryption,” 2017, arXiv:1711.10677.
+[9] K. Cheng et al., “Secureboost: A lossless federated learning framework,” IEEE Intell. Syst., vol. 36, no. 6, pp. 87–98, 2021.
+[10] Y. Liu, Y. Kang, C. Xing, T. Chen, and Q. Yang, “A secure federated transfer learning framework,” IEEE Intell. Syst., vol. 35, no. 4, pp. 70–82, 2020.
+[11] L. Zhu, Z. Liu, and S. Han, “Deep leakage from gradients,” in Advances in Neural Information Processing Systems 32, H. Wallach, H. Larochelle, A. Beygelzimer, F. dÁlché-Buc, E. Fox, and R. Garnett, Eds. Red Hook, NY, USA: Curran Associates, Inc., 2019, pp. 14774–14784. [Online]. Available: http://papers.nips.cc/paper/9617-deep-leakage-from-gradients.pdf
+[12] P. Richtárik and M. Takácˇ, “Distributed coordinate descent method for learning with big data,” J. Mach. Learn. Res., vol. 17, no. 1, pp. 2657–2681, Jan. 2016. [Online]. Available: http://dl.acm.org/citation. cfm?id=2946645.3007028
+[13] D. Mahajan, S. S. Keerthi, and S. Sundararajan, “A distributed block coordinate descent method for training l1 regularized linear classiﬁers,” J. Mach. Learn. Res., vol. 18, no. 1, pp. 3167–3201, Jan. 2017. [Online]. Available: http://dl.acm.org/citation.cfm?id=3122009.3176835
+[14] Z. Peng, Y. Xu, M. Yan, and W. Yin, “Arock: An algorithmic framework for asynchronous parallel coordinate updates,” SIAM J. Sci. Comput., vol. 38, no. 5, pp. A2851–A2879, 2016.
+[15] B. Recht, C. Re, S. Wright, and F. Niu, “Hogwild!: A lock-free approach to parallelizing stochastic gradient descent,” Adv. Neural Inf. Process. Syst., vol. 24, 2011.
+[16] R. Shokri and V. Shmatikov, “Privacy-preserving deep learning,” in Proc. 22nd ACM SIGSAC Conf. Comput. Commun. Secur., New York, NY, USA, 2015, pp. 1310–1321. [Online]. Available: http://doi.acm.org/10. 1145/2810103.2813687
+[17] H. Yu, S. Yang, and S. Zhu, “Parallel restarted SGD with faster convergence and less communication: Demystifying why model averaging works for deep learning,” in Proc. AAAI Conf. Artif. Intell., 2019, vol. 33, pp. 5693– 5700.
+[18] X. Li, K. Huang, W. Yang, S. Wang, and Z. Zhang, “On the convergence of FedAvg on non-iid data,” 2019, arXiv:1907.02189.
+[19] B. Ying, K. Yuan, and A. H. Sayed, “Supervised learning under distributed features,” IEEE Trans. Signal Process., vol. 67, no. 4, pp. 977–992, Feb. 2019.
+[20] R. L. Rivest, L. Adleman, and M. L. Dertouzos, “On data banks and privacy homomorphisms,” Found. Secure Comput., Academia Press, vol. 4, no. 11, pp. 169–180, 1978.
+[21] A. C. Yao, “Protocols for secure computations,” in Proc. 23rd Annu. Symp. Found. Comput. Sci., 1982, pp. 160–164.
+[22] S. Truex et al., “A hybrid approach to privacy-preserving federated learning,” in Proc. 12th ACM Workshop Artif. Intell. Secur., 2019, pp. 1–11.
+[23] M. Hao, H. Li, G. Xu, S. Liu, and H. Yang, “Towards efﬁcient and privacy-preserving federated deep learning,” in Proc. ICC IEEE Int. Conf. Commun., 2019, pp. 1–6.
+[24] V. Hartmann and R. West, “Privacy-preserving distributed learning with secret gradient descent,” 2019, arXiv:1906.11993.
+[25] O. Fontenla-Romero, B. Guijarro-Berdiñas, B. Pérez-Sánchez, and M. Gómez-Casal, “LANN-DSVD: A privacy-preserving distributed algorithm for machine learning,” in Proc. 26th Eur. Symp. Artif. Neural Netw., Bruges, Belgium, Apr. 25–27, 2018. [Online]. Available: http: //www.elen.ucl.ac.be/Proceedings/esann/esannpdf/es2018-140.pdf
+[26] S. Ghadimi and G. Lan, “Stochastic ﬁrst-and zeroth-order methods for nonconvex stochastic programming,” SIAM J. Optim., vol. 23, no. 4, pp. 2341–2368, 2013.
+[27] H. Wang and A. Banerjee, “Randomized block coordinate descent for online and stochastic optimization,” 2014, arXiv:1407.0107.
+[28] H. Eichner, T. Koren, B. McMahan, N. Srebro, and K. Talwar, “Semicyclic stochastic gradient descent,” in Proc. Int. Conf. Mach. Learn., 2019, pp. 1764–1773.
+[29] B. Hitaj, G. Ateniese, and F. Perez-Cruz, “Deep models under the gan: Information leakage from collaborative deep learning,” in Proc. ACM SIGSAC Conf. Comput. Commun. Secur., New York, NY, USA, 2017, pp. 603–618. [Online]. Available: http://doi.acm.org/10.1145/3133956. 3134012
+[30] L. Melis, C. Song, E. D. Cristofaro, and V. Shmatikov, “Exploiting unintended feature leakage in collaborative learning,” in Proc. IEEE Symp. Secur. Privacy, 2018, pp. 691–706.
+
+[31] Q. Li, Z. Wen, and B. He, “Practical federated gradient boosting decision trees,” in Proc. 34th AAAI Conf. Artif. Intell., 2020, pp. 4642–4649.
+[32] W. Du, Y. Han, and S. Chen, “Privacy-preserving multivariate statistical analysis: Linear regression and classiﬁcation,” in Proc. SIAM Int. Conf. Data Mining, M. Berry, U. Dayal, C. Kamath, and D. Skillicorn, Eds., 2004, pp. 222–233.
+[33] J. Vaidya and C. Clifton, “Privacy preserving association rule mining in vertically partitioned data,” in Proc. 8th ACM SIGKDD Int. Conf. Knowl. Discov. Data Mining, New York, NY, USA, 2002, pp. 639–644. [Online]. Available: http://doi.acm.org/10.1145/775047.775142
+[34] O. L. Mangasarian, E. W. Wild, and G. M. Fung, “Privacy-preserving classiﬁcation of vertically partitioned data via random kernels,” ACM Trans. Knowl. Discov. Data, vol. 2, no. 3, pp. 12:1–12:16, Oct. 2008. [Online]. Available: http://doi.acm.org/10.1145/1409620.1409622
+[35] A. E. Johnson et al., “Mimic-III, a freely accessible critical care database,” Sci. Data, vol. 3, 2016, Art. no. 160035.
+[36] T.-S. Chua, J. Tang, R. Hong, H. Li, Z. Luo, and Y. Zheng, “NUS-WIDE: A real-world web image database from National University of Singapore,” in Proc. ACM Int. Conf. Image Video Retrieval, 2009, pp. 1–9.
+[37] Y. LeCun and C. Cortes, “MNIST handwritten digit database,” 2010. [Online]. Available: http://yann.lecun.com/exdb/mnist/
+[38] V. Bolón-Canedo, K. Sechidis, N. Sánchez-Maroño, A. Alonso-Betanzos, and G. Brown, “Insights into distributed feature ranking,” Inf. Sci., vol. 496, pp. 378–398, 2019. [Online]. Available: http://www.sciencedirect.com/ science/article/pii/S0020025518307588
+[39] L. Morán-Fernández, V. Bolón-Canedo, and A. Alonso-Betanzos, “Centralized vs. distributed feature selection methods based on data complexity measures,” Knowl.-Based Syst., vol. 117, pp. 27 – 45, 2017. [Online]. Available: http://www.sciencedirect.com/science/article/ pii/S0950705116303537
+[40] T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, and V. Smith, “Federated optimization in heterogeneous networks,” in Proc. Mach. Learn Syst., vol. 2, pp. 429–450, 2020.
+[41] Y. Liu, T. Fan, T. Chen, Q. Xu, and Q. Yang, “Fate: An industrial grade platform for collaborative learning with data protection,” J. Mach. Learn. Res., vol. 22, no. 226, pp. 1–6, 2021. [Online]. Available: http://jmlr.org/ papers/v22/20-815.html
+Yang Liu received the B.S. degree in chemical engineering from Tsinghua University, Beijing, China, and the Ph.D. degree in chemical and biological engineering from Princeton University, Princeton, NJ, USA. She is currently an Associate Professor with the Institute for AI Industry Research, Tsinghua University, Beijing, China. Before joining Tsinghua, she was the Principal Researcher and Research Team Lead with WeBank. Her research interests include federated learning, machine learning, multi-agent systems, statistical mechanics, and AI industrial applications. Her research work was recognized with multiple awards, such as AAAI Innovation Award and CCF Technology Award.
+Xinwei Zhang (Student Member, IEEE) received the B.S. degree in automation from the University of Science and Technology of China, Hefei, China, in 2018. He is currently working toward the Ph.D. degree with the Electrical and Computer Engineering Department, University of Minnesota, Minneapolis, MN, USA. His research interests include distributed optimization and power system control.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+
+4290
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 70, 2022
+
+Yan Kang received the B.S. degree in computer science from Chongqing Technology and Business University, Chongqing, China, and the Ph.D. degree in computer science from the University of Maryland Baltimore County, Baltimore, MD, USA. He is currently a Research Team Lead with the AI Department of WeBank, Shenzhen, China. His works focus on the research and implementation of privacy-preserving machine learning and federated learning. His research was authored in well-known conferences and journals, including IEEE Intelligence Systems, IJCAI, and ACM TIST, and coauthored the book, Federated Learning.
+
+Mingyi Hong (Senior Member, IEEE) received the Ph.D. degree from the University of Virginia, Charlottesville, Virginia, in 2011. He is currently an Associate Professor with the Department of Electrical and Computer Engineering, University of Minnesota, Minneapolis, MN, USA. His research interests include optimization theory and applications in signal processing and machine learning. He serves on the IEEE Signal Processing for Communications and Networking Technical Committee, and an Associate Editor for IEEE TRANSACTIONS ON SIGNAL PROCESSING. Haoran Sun and Mingyi Hong were supported, in part, by the NSF award CNS-2003033, CIF-1910385, and a research gift from the Intel Corporation.
+
+Liping Li received the B.S. and M.S. in automation from the University of Science and Technology of China, Hefei, China. Her research interests include distributed optimization and federated learning.
+Tianjian Chen received the B.S. degree in electrical engineering degree from Tsinghua University Beijing, China. He has 15 years’ experience in big data technology innovation, including dynamic information retrieval for web search and recommender systems, high performance computing for genomics, AI driven cyber-security. He is one of the early active developers of federated learning and start multiple open-source projects to promote this technology. He is currently system architect of Meituan UAV Team and working on decentralized AI systems on drones.
+
+Qiang Yang received the Ph.D. from the University of Maryland, College Park, MD, USA, in 1989. He is currently a Fellow of the Royal Society of Canada and Canadian Academy of Engineering. He is the Chair Professor with Computer Science and Engineering Department, Hong Kong University of Science and Technology (HKUST), Hong Kong. Prior to HKUST, he was a Professor with Simon Fraser University, Burnaby, BC, Canada, and the University of Waterloo, Waterloo, ON, Canada. His research interests include artiﬁcial intelligence, machine learning, especially transfer learning, and federated learning. He is a Fellow of AAAI, ACM, IAPR, CAAI, and AAAS and the Founding Editor in Chief of the ACM Transactions on Intelligent Systems and Technology (ACM TIST) and IEEE TRANSACTIONS ON BIG DATA (IEEE TBD). He was the recipient of the ACM SIGKDD Distinguished Service Award in 2017, AAAI Distinguished Applications Award in 2018 and 2020, Best Paper Award of ACM TiiS in 2017, and championships of ACM KDDCUP in 2004 and 2005. He is a Past President of IJCAI (from 2017–2019) and the General Chair for AAAI 2021 and KDD 2012. He is also the President of Hong Kong Society for AI and Robotics.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:16:25 UTC from IEEE Xplore. Restrictions apply.
+

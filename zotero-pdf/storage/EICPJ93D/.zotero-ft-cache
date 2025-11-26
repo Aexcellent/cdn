@@ -1,0 +1,1302 @@
+The Thirty-Fifth AAAI Conference on Artificial Intelligence (AAAI-21)
+
+Sample Efﬁcient Reinforcement Learning with REINFORCE
+Junzi Zhang1, Jongho Kim2, Brendan O’Donoghue3, Stephen Boyd2
+1 Institute for Computational & Mathematical Engineering, Stanford University, USA 2 Department of Electrical Engineering, Stanford University, USA 3 DeepMind, Google
+junziz@stanford.edu, jkim22@stanford.edu, bodonoghue85@gmail.com, boyd@stanford.edu
+
+Abstract
+Policy gradient methods are among the most effective methods for large-scale reinforcement learning, and their empirical success has prompted several works that develop the foundation of their global convergence theory. However, prior works have either required exact gradients or state-action visitation measure based mini-batch stochastic gradients with a diverging batch size, which limit their applicability in practical scenarios. In this paper, we consider classical policy gradient methods that compute an approximate gradient with a single trajectory or a ﬁxed size mini-batch of trajectories under soft-max parametrization and log-barrier regularization, along with the widely-used REINFORCE gradient estimation procedure. By controlling the number of “bad” episodes and resorting to the classical doubling trick, we establish an anytime sub-linear high probability regret bound as well as almost sure global convergence of the average regret with an asymptotically sub-linear rate. These provide the ﬁrst set of global convergence and sample efﬁciency results for the wellknown REINFORCE algorithm and contribute to a better understanding of its performance in practice.
+1 Introduction
+In this paper, we study the global convergence rates of the REINFORCE algorithm (Williams 1992) for episodic reinforcement learning. REINFORCE is a vanilla policy gradient method that computes a stochastic approximate gradient with a single trajectory or a ﬁxed size mini-batch of trajectories with particular choice of gradient estimator, where we use ‘vanilla’ here to disambiguate the method from more exotic variants such as natural policy gradient methods. REINFORCE and its variants are among the most widely used policy gradient methods in practice due to their good empirical performance and implementation simplicity (Mnih and Gregor 2014; Gu et al. 2015; Zoph and Le 2016; Rennie et al. 2017; Guu et al. 2017; Johnson et al. 2017; Yi et al. 2018; Kool, van Hoof, and Welling 2018, 2020). Related methods include the actor-critic family (Konda and Tsitsiklis 2003; Mnih et al. 2016) and deterministic and trust-region based variants (Silver et al. 2014; Schulman et al. 2017, 2015).
+The theoretical results for policy gradient methods have, up to recently, been restricted to convergence to local stationary points (Agarwal et al. 2019). Lately, a series of
+Copyright c 2021, Association for the Advancement of Artiﬁcial Intelligence (www.aaai.org). All rights reserved.
+
+works have established global convergence results. These recent developments cover a broad range of issues including global optimality characterization (Fazel et al. 2018; Bhandari and Russo 2019), convergence rates (Zhang et al. 2019; Mei et al. 2020; Bhandari and Russo 2020; Cen et al. 2020), the use of function approximation (Agarwal et al. 2019; Wang et al. 2019; Fu, Yang, and Wang 2020), and efﬁcient exploration (Agarwal et al. 2020) (for more details, see the related work section, which we defer to the longer version of this paper (Zhang et al. 2020, Appendix E) due to space limits). Nevertheless, prior work on vanilla policy gradient methods either requires exact and deterministic policy gradients or only guarantees convergence up to Θ(1/M p) with a ﬁxed mini-batch size M > 0 of trajectories collected when performing a single update (where p > 0 is 1/2 in most cases), while global convergence is only achieved when the batch size M goes to inﬁnity. By contrast, practical implementations of policy gradient methods typically use either a single or a ﬁxed number of sample trajectories, which tends to perform well. In addition, prior theoretical results (for general MDPs) have used the state-action visitation measure based gradient estimation (see e.g., (Wang et al. 2019, (3.10))), which are typically not used in practice.
+The main purpose of this paper is to bridge this gap between theory and practice. We do this in two major ways. First, we derive performance bounds for the case of a ﬁxed mini-batch size, rather than requiring diverging size. Second, we remove the need for the state-action visitation measure based gradient, instead using the REINFORCE gradient estimator. It is nontrivial to go from a diverging mini-batch size to a ﬁxed one. In fact, by allowing for an arbitrarily large batch size, existing works in the literature were able to make use of IID samples to decouple the analysis into deterministic gradient descent/ascent and error control of stochastic gradient estimations. In contrast, with a single trajectory or a ﬁxed batch size, such a decoupling is no longer feasible. In addition, the state-action visitation measure based gradient estimations are unbiased and unbounded, while REINFORCE gradient estimations are biased and bounded. Hence a key to the analysis is to deal with the bias while making better use of the boundedness. Our analysis not only addresses these challenges, but also leads to convergence results in almost sure and high probability senses, which are stronger than the expected convergence results that dominate
+
+10887
+
+the literature (for vanilla policy gradient methods). We also emphasize that the goal of this work is to provide a deeper understanding of a widely used algorithm, REINFORCE, with little or no modiﬁcations, rather than tweaking it to achieve near-optimal performance bounds. Lastly, our analysis is not the complete picture and several open questions about the performance of policy gradient methods remain. We discuss these issues in the conclusion.
+
+1.1 Contribution
+Our major contribution can be summarized as follows. We establish the ﬁrst set of global convergence results for the REINFORCE algorithm. In particular, we establish an anytime sub-linear high probability regret bound as well as almost sure global convergence of the average regret with an asymptotically sub-linear rate for REINFORCE, showing that the algorithm is sample efﬁcient (i.e., with polynomial/non-exponential complexity). To our knowledge, these (almost sure and high probability) results are stronger than existing global convergence results for (vanilla) policy gradient methods in the literature. Moreover, our convergence results remove the non-vanishing Θ(1/M p) term (with M > 0 being the mini-batch size of the trajectories and p > 0 being some constant exponent) and hence show for the ﬁrst time that policy gradient estimations with a single or ﬁnite number of trajectories also enjoy global convergence properties. Finally, the widely-used REINFORCE gradient estimation procedure is studied, as opposed to the state-action visitation measure based estimators typically studied in the literature but rarely used in practice.
+
+2 Problem Setting and Preliminaries
+Below we begin with our problem setting and some preliminaries on MDPs and policy optimization. For brevity we restrict ourselves to the stationary inﬁnite-horizon discounted setting. We brieﬂy discuss potential extensions beyond this setting in §6.
+
+2.1 Problem Setting
+
+We consider a ﬁnite MDP M, which is characterized by
+
+a ﬁnite state space S = {1, . . . , S}, a ﬁnite action space
+
+A = {1, . . . , A}, a transition probability p (with p(s |s, a)
+
+being the probability of transitioning to state s given the
+
+current state s and action a), a reward function r (with
+
+r(s, a) being the instantaneous reward when taking action
+
+a at state s), a discount factor γ ∈ [0, 1) and an initial state
+
+distribution ρ ∈ ∆(S). Here ∆(X ) denotes the probability
+
+simplex over a ﬁnite set X . A (stationary, stochastic) policy
+
+π is a mapping from S to ∆(A). We will use π(a|s), π(s, a)
+
+or πs,a alternatively to denote the probability of taking action a at state s following policy π. The policy π can also be
+
+viewed as an SA dimensional vector in
+
+Π = π ∈ RSA
+
+A
+
+a=1 πs,a = 1 (∀s ∈ S),
+
+(1)
+
+πs,a ≥ 0 (∀s ∈ S, a ∈ A) .
+
+Notice that here we use the double indices s and a for notational convenience. We use π(s, ·) ∈ RA to denote the subvector (π(s, 1), . . . , π(s, A)). We also assume that r(s, a)
+
+is deterministic for any s ∈ S and a ∈ A for simplic-
+
+ity, although our results hold for any r with an almost sure
+
+uniform bound. Here r can be similarly viewed as an SA-
+
+dimensional vector. Without loss of generality, we assume
+
+that r(s, a) ∈ [0, 1] for all s ∈ S and a ∈ A, which is a com-
+
+mon assumption (Jaksch, Ortner, and Auer 2010; Agarwal
+
+et al. 2019; Mei et al. 2020; Even-Dar and Mansour 2003;
+
+Jin et al. 2018). We also assume that ρ is component-wise
+
+positive, as is assumed in (Bhandari and Russo 2019).
+
+Given a policy π ∈ Π, the expected cumulative reward of
+
+the MDP is deﬁned as
+
+F (π) = E
+
+∞ t=0
+
+γtr(st,
+
+at),
+
+(2)
+
+where s0 ∼ ρ, at ∼ π(·|st), st+1 ∼ p(·|st, at), ∀t ≥ 0, and the goal is to ﬁnd a policy π which solves the following
+
+optimization problem:
+
+maximizeπ∈Π F (π).
+
+(3)
+
+Any policy π ∈ argmaxπ∈Π F (π) is said to be optimal, and the corresponding optimal objective value is denoted as
+F = F (π ). Note that in the literature, F (π) is also commonly written as Vρπ and referred to as the value function. Here we hide the dependency on ρ as it is ﬁxed throughout
+the paper.
+
+2.2 Vanilla Policy Gradient Method and REINFORCE Algorithm
+When the transition probability p and reward r are fully known, problem (3) reduces to solving an MDP, in which case various classical algorithms are available, including value iteration and policy iteration (Bertsekas 2017). In this paper, we consider the episodic reinforcement learning setting in which the agent accesses p and r by interacting with the environment over successive episodes, i.e., the agent accesses the environment in the form of a ρ-restart model (Shani, Efroni, and Mannor 2019), which is commonly adopted in the policy gradient literature (Kakade et al. 2003). In addition, we focus on the REINFORCE algorithm, a representative policy gradient method.
+
+Policy parametrization and surrogate objectives. Here we consider parametrizing the policy with parameter θ ∈ Θ, i.e., πθ : Θ → Π, and take the following (regularized) optimization problem as an approximation to (3):
+maximizeθ∈Θ Lλ(θ) = F (πθ) + λR(θ), (4)
+where λ ≥ 0 and R : Θ → R is a differentiable regularization term that improves convergence, to be speciﬁed later. Although our ultimate goal is still to solve the original problem (3) this regularized optimization problem is a useful surrogate and our approach will be to tackle problem (4) with progressively smaller λ regularization penalties, thereby converging to solving the actual problem we care about.
+
+Policy gradient method. In each episode n, the policy
+
+gradient method directly performs an online stochastic gradient ascent update on a surrogate objective Lλn (θ), i.e.,
+
+θn+1 = θn + αn∇θLλn (θn),
+
+(5)
+
+10888
+
+Algorithm 1 Policy Gradient Method with Single Trajec-
+tory Estimates
+1: Input: initial parameter θ0, step-sizes αn and regularization parameters λn (n ≥ 0).
+2: for n = 0, 1, . . . do 3: Choose Hn, sample trajectory τ n from M follow-
+ing policy πθn , and compute an approximate gradient ∇θLλn (θn) of Lλn using trajectory τ n. 4: Update θn+1 = θn + αn∇θLλn (θn).
+5: end for
+where αn is the step-size and λn is the regularization parameter. Here the stochastic gradient ∇θLλn (θn) is computed by sampling a single trajectory τ n following policy πθn from M with the initial state distribution ρ. Here τ n = (sn0 , an0 , r0n, sn1 , an1 , r1n, . . . , snHn , anHn , rHn n ), where Hn is a ﬁnite (and potentially random) stopping time of the trajectory (to be speciﬁed below), sn0 ∼ ρ, ant ∼ πθn (·|snt ), snt+1 ∼ p(·|snt , ant ) and rtn = r(snt , ant ) for all t = 0, . . . , Hn. We summarize the generic policy gradient method (with single trajectory gradient estimates) in Algorithm 1. An extension to mini-batch scenarios will be discussed in §5. As is always (implicitly) assumed in the literature of episodic reinforcement learning (e.g., cf. (Marbach and Tsitsiklis 2001)), given the current policy, we assume that the sampled trajectory is conditionally independent of all previous policies and trajectories.
+REINFORCE algorithm. There are several ways of choosing the stochastic gradient operator ∇θ in the policy gradient method, and the well-known REINFORCE algorithm (Williams 1992) corresponds to a speciﬁc family of estimators based on the policy gradient theorem (Sutton et al. 2000) (cf. §3). Other common alternatives include zeroth order/random search (Fazel et al. 2018; Malik et al. 2018) and actor-critic (Konda and Tsitsiklis 2003) approximations. One may also choose to parametrize the policy as a mapping from the parameter space to a speciﬁc action, which would then result in deterministic policy gradient approximations (Silver et al. 2014).
+Although our main goal is to study the REINFORCE algorithm, our analysis indeed holds for rather generic stochastic gradient estimates. In the next section, we introduce the (mild) assumptions needed for our convergence analysis and the detailed gradient estimation procedures in the REINFORCE algorithm, and then verify that the assumptions do hold for these gradient estimations.
+2.3 Phased Learning and Performance Criteria
+Phased learning. To facilitate the exposition below, we divide the optimization in Algorithm 1 into successive phases l = 0, 1, . . . , each with length Tl > 0. We then ﬁx the regularization coefﬁcient λl within each phase l ≥ 0. In addition, a post-processing step is enforced at the end of each phase to produce the initialization of the next phase. The resulting
+
+Algorithm 2 Phased Policy Gradient Method
+
+1: Input: initial parameter θ˜0,0, step-sizes αl,k, regularization parameters λl, phase lengths Tl (l, k ≥ 0) and postprocessing tolerance pp ∈ (0, 1/A].
+2: Set θ0,0 = PostProcess(θ˜0,0, pp). 3: for phase l = 0, 1, 2, . . . do
+
+4: for episode k = 0, 1, . . . , Tl − 1 do
+
+5:
+
+Choose Hl,k, sample trajectory τ l,k from M fol-
+
+lowing policy πθl,k , and compute an approximate
+
+gradient ∇θLλl (θl,k) of Lλl using trajectory τ l,k.
+
+6:
+
+Update θl,k+1 = θl,k + αl,k∇θLλl (θl,k).
+
+7: end for
+
+8: Set θl+1,0 = PostProcess(θl,Tl , pp).
+
+9: end for
+
+algorithm is described in Algorithm 2. Here the trajectory is
+
+denoted as τ l,k
+
+=
+
+(sl0,k
+
+,
+
+al0,k
+
+,
+
+r0l,k
+
+,
+
+.
+
+.
+
+.
+
+,
+
+sl,k
+H l,k
+
+,
+
+al,k
+H k,l
+
+,
+
+rl,k
+H l,k
+
+),
+
+and we will refer to θl,k as the (l, k)-th iterate hereafter.
+
+The post-processing function is required to guarantee that
+
+the resulting policy πθ is lower bounded by a pre-speciﬁed
+
+tolerance pp ∈ (0, 1/A] to ensure that the regularization is
+
+bounded (cf. Algorithm 3 for a formal description and §3.1
+
+for an example realization).
+
+Note that here the k-th episode in phase l corresponds
+
+to the n-th episode in the original indexing with n =
+
+l−1 j=0
+
+Tj
+
++
+
+k.
+
+For
+
+notational
+
+compactness
+
+below,
+
+for
+
+T
+
+=
+
+{Tj}∞ j=0, we deﬁne BT : Z+ × Z+ → Z+, where
+
+BT (l, k) =
+
+l−1 j=0
+
+Tj
+
++
+
+k
+
+maps
+
+the
+
+double
+
+index
+
+(l,
+
+k)
+
+to
+
+the
+
+corresponding original episode number, with dom BT =
+
+{(l, k) ∈ Z+ × Z+ | 0 ≤ k ≤ Tl − 1}. The mapping BT is a bijection and we denote its inverse by GT .
+
+Algorithm 3 PostProcess(θ, pp)
+Input: pp ∈ (0, 1/A], θ ∈ Θ. Return θ (near θ) such that πθ (s, a) ≥ s, a ∈ S × A.
+
+pp for each
+
+Performance criteria. The criterion we adopt to evaluate the performance of Algorithm 2 is regret. For any N ≥ 0, the regret up to episode N is deﬁned as the cumulative suboptimality of the policy over the N episodes. Formally, we deﬁne
+
+regret(N ) =
+
+F
+{(l,k)|BT (l,k)≤N }
+
+− Fˆl,k(πθl,k ). (6)
+
+Here the summation is over all (l, k)-th iterates whose cor-
+
+responding original episode numbers are smaller or equal
+
+to N , and Fˆl,k(πθl,k ) = El,k
+
+H l,k t=0
+
+γ t r(slt,k ,
+
+alt,k ),
+
+where
+
+s0 ∼ ρ, alt,k ∼ πθl,k (·|slt,k), slt,+k1 ∼ p(·|slt,k, alt,k),
+
+10889
+
+∀t ≥ 0, and El,k denotes the conditional expectation given the (l, k)-th iteration θl,k. Notice that the regret deﬁned above takes into account the fact that the trajectories are stopped/truncated to have ﬁnite horizons Hl,k, which characterizes the actual loss caused by sampling the trajectories in line 5 of Algorithm 2. A similar regret deﬁnition for the episodic (discounted) reinforcement learning setting considered here is adopted in (Fu, Yang, and Wang 2020). We remark that all our regret bounds remain correct up to lower order terms when we replace Fˆl,k with F or an expectationfree version.
+Similarly, we also deﬁne the single phase version of regret as follows. The regret up to episode K ∈ {0, . . . , Tl − 1} in phase l is deﬁned as
+
+regretl(K) =
+
+K
+F
+k=0
+
+− Fˆl,k(πθl,k ).
+
+(7)
+
+Notice that (6) and (7) are connected via
+
+lN −1
+
+regret(N ) =
+
+regretl(Tl −1)+regretlN (kN ), (8)
+
+l=0
+
+where (lN , kN ) = GT (N ). We provide high probability regret bounds in §4. We re-
+mark that a regret bound of the form regret(N )/(N + 1) ≤ R (for some R > 0) immediately implies that minl,k: BT (l,k)≤N F − F (πθl,k ) ≤ R, where the latter is also a commonly adopted performance criteria in the litera-
+ture (Agarwal et al. 2019; Wang et al. 2019).
+
+3 Assumptions and REINFORCE Gradients
+3.1 Assumptions
+Here we list a few fundamental assumptions that we require for our analysis.
+Assumption 1 (Setting). The regularization term is a logbarrier, i.e.,
+
+R(θ)
+
+=
+
+1 SA
+
+log(πθ(s, a)),
+s∈S ,a∈A
+
+and the policy is parametrized to be a soft-max, i.e.,
+
+πθ(s, a) =
+
+a
+
+exp(θs,a ) ∈A exp(θs,a
+
+),
+
+with
+
+Θ
+
+=
+
+RSA.
+
+The ﬁrst assumption concerns the form of the policy pa-
+
+rameterization and the regularization. Notice that the regu-
+
+larization term here can also be seen as a relative entropy/KL
+
+regularization (with a uniform distribution policy reference)
+
+(Agarwal et al. 2019). Such kind of regularization terms are
+
+also widely adopted in practice (although typically with vari-
+
+ations) (Peters, Mulling, and Altun 2010; Schulman, Chen,
+
+and Abbeel 2017).
+
+With Assumption 1, the post-processing function in Al-
+
+gorithm 3 can be for example realized by ﬁrst calculat-
+
+ing πˆ = pp1 + (1 − A pp)πθ, and then return θ with
+θs,a = log πˆs,a + cs. Here 1 is an all-one vector and cs ∈ R (s = 1, . . . , S) are arbitrary real numbers.
+
+Assumption 2 (Policy gradient estimator). There exist constants C, C1, C2, M1, M2 > 0, such that for all l, k ≥ 0,
+
+we have ∇θLλl (θl,k) 2 ≤ C1 almost surely and that
+
+∇θLλl (θl,k)T El,k∇θLλl (θl,k) ≥ C2
+
+∇θLλl (θl,k)
+
+2 2
+
+−
+
+δl,k ,
+
+El,k
+
+∇θLλk (θl,k)
+
+2 2
+
+≤
+
+M1
+
++
+
+M2
+
+∇θLλl (θl,k)
+
+22 ,
+
+where
+
+Tl −1 k=0
+
+δl2,k
+
+≤
+
+C, ∀ l
+
+≥
+
+0. In addition, Hl,k
+
+≥
+
+log1/γ(k + 1), ∀ l, k ≥ 0.
+
+The second assumption requires that the gradient esti-
+mates are almost surely bounded, nearly unbiased and sat-
+isfy a bounded second-order moment growth condition. This
+is a slight generalization of standard assumptions in the
+stochastic gradient descent literature (Bottou, Curtis, and
+Nocedal 2018). Additionally, we also require that the trajectory lengths Hl,k are at least logarithmically growing in k to control the loss of rewards due to truncation. For no-
+tational simplicity, hereafter we omit to mention the trajectory sampling (i.e., s0 ∼ ρ, alt,k ∼ πθl,k (·|slt,k), slt,+k1 ∼ p(·|slt,k, alt,k), ∀t ≥ 0) when we write down El,k.
+Notice that Assumption 2 immediately holds if
+∇θLλl (θl,k) is unbiased and has a bounded secondorder moment. We have implicitly assumed that Lλ is differentiable, which we can do due to the following lemma:
+
+Proposition 1 ((Agarwal et al. 2019, Lemma E.4)). Under
+
+Assumption 1, Lλ is strongly smooth with parameter βλ =
+
+8 (1−γ)3
+
++
+
+2λ S
+
+,
+
+i.e.,
+
+∇θLλ(θ) − ∇θLλ(θ ) 2 ≤ βλ θ − θ
+
+2
+
+for any θ, θ ∈ RSA.
+
+3.2 REINFORCE Gradient Estimations
+
+Now we introduce REINFORCE gradient estimation with baselines, and specify the hyper-parameters under which the technical Assumption 2 holds, when operating under the setting Assumption 1.
+REINFORCE gradient estimation with log-regularization takes the following form:
+
+∇θLλl (θl,k) =
+
+β H l,k t=0
+
+γt(Ql,k(slt,k, alt,k) − b(slt,k))
+
+× ∇θ log πθl,k (alt,k|slt,k)
+
+(9)
+
++
+
+λl SA
+
+s∈S,a∈A ∇θ log πθl,k (a|s),
+
+where β ∈ (0, 1), Ql,k(slt,k, alt,k) =
+
+H l,k t =t
+
+γt
+
+−t rtl,k ,
+
+and
+
+the second term above corresponds to the gradient of the
+
+regularization R(θ). Notice that here the outer summation
+
+is only up to βHl,k , which ensures that Qˆl,k(slt,k, alt,k) is sufﬁciently accurate. Here b : S → R is called the base-
+
+line, and is required to be independent of the trajectory τ l,k
+
+(Agarwal, Jiang, and Kakade 2019, §4.1). The purpose of
+
+subtracting b from the approximate Q-values is to (poten-
+
+tially) reduce the variance of the “plain” REINFORCE gradient estimation, which corresponds to the case when b = 0.
+
+With this we have the following result, the proof of which
+
+can be found in the Appendix in the longer version of this
+
+paper (Zhang et al. 2020).
+
+Lemma 2. Suppose that Assumption 1 holds, β ∈ (0, 1), and that for all l, k ≥ 0, λl ≤ λ¯,
+
+H ≥ l,k
+
+2 log1/γ
+
+8(k+1) (1−γ )3
+
+3 min{β,1−β}
+
+(= Θ(log(k + 1))).
+
+(10)
+
+10890
+
+Assume in addition that |b(s)| ≤ B for any s ∈ S, where B > 0 is a constant. Then for the gradient estimation (9), Assumption 2 holds with
+
+C = 16
+
+1 (1−γ)2
+
++ λ¯
+
+2
+,
+
+C1
+
+=
+
+2(1+B(1−γ)) (1−γ)2
+
++
+
+2λ¯,
+
+C2 = 1,
+
+M1
+
+=
+
+32 (1−γ)4
+
++ V¯b,
+
+M2 = 2.
+
+and δl,k =
+
+2 (1−γ)2
+
++ 2λ¯
+
+(k
+
++
+
+1)−
+
+2 3
+
+,
+
+∀
+
+l,
+
+k
+
+≥
+
+0. Here
+
+V¯b ∈
+
+0, 4
+
+1+B(1−γ) (1−γ)2
+
++
+
+λ¯
+
+2
+
+is the uniform upper bound
+
+on variances of policy gradient estimations with form (9).
+
+This result extends without modiﬁcation to non-stationary
+
+baselines blt,k, as long as each blt,k is independent of trajec-
+
+tory τ l,k and |blt,k(s)| ≤ the explicit upper bound
+
+B on
+
+for V¯b
+
+any t, l, k ≥ is pessimistic,
+
+0. Note that and in prac-
+
+tice V¯b is usually much smaller than V¯0 with appropriate
+
+choices of baselines (e.g., the adaptive reinforcement base-
+
+lines (Williams 1992; Zhao et al. 2011)), although the latter
+
+has a smaller upper bound as stated in Lemma 2.
+
+4 Main Convergence Results
+4.1 Preliminary Tools We ﬁrst present some preliminary tools for our analysis.
+
+Non-convexity and control of “bad” episodes. One of the key difﬁculties in applying policy gradient methods to solve an MDP problem towards global optimality is that problem (3) is in general non-convex (Agarwal et al. 2019). Fortunately, we have the following result, which connects the gradient of the surrogate objective Lλ with the global optimality gap of the original optimization problem (3).
+
+Proposition 3 ((Agarwal et al. 2019, Theorem 5.3)). Under
+
+Assumption 1, for any > 0, suppose that we have
+
+∇θLλ(θ) 2 ≤ and that ≤ λ/(2SA). Then F −
+
+F (πθ)
+
+≤
+
+2λ 1−γ
+
+dπρ ρ
+
+.
+
+∞
+
+Here for any policy π ∈ Π, dπρ = (1 −
+
+γ)
+
+∞ t=0
+
+γ t Probπ (st
+
+=
+
+s|s0
+
+∼
+
+ρ)
+
+is
+
+the
+
+discounted
+
+state
+
+visitation distribution, where Probπ(st = s|s0 ∼ ρ) is the
+
+probability of arriving at s in step t starting from s0 ∼ ρ following policy π in M. In addition, the division in dπρ /ρ is component-wise.
+
+Now motivated by Proposition 3, when analyzing the re-
+
+gret up to episode K in phase l, we deﬁne the following set
+
+of “bad episodes”:
+
+I+ = {k ∈ {0, . . . , K} | ∇θLλl (θl,k) 2 ≥ λl/(2SA)}.
+
+Then one can show that for any > 0, if we choose
+
+λl =
+
+(1−γ) 2
+
+,
+
+we
+
+have
+
+that
+
+F
+
+− F (πθl,k ) ≤
+
+dπρ /ρ ∞
+
+for
+
+any k ∈ {0, . . . , K}\I+, while F − F (πθl,k ) ≤ 1/(1 − γ)
+
+holds trivially for k ∈ I+ due to the assumption that the re-
+
+wards are between 0 and 1. We then establish a sub-linear (in
+
+K) bound the size of I+, which serves as the key stepping
+
+stone for the overall sub-linear regret bound. The details of
+
+these arguments can be found in the Appendix in the longer
+
+version of this paper (Zhang et al. 2020).
+
+Doubling trick. The second tool is a classical doubling trick that is commonly adopted in the design of online learning algorithms (Besson and Kaufmann 2018; Basei, Guo, and Hu 2020), which can be used to stitch together the regret over multiple learning phases in Algorithm 2.
+Notice that Proposition 3 suggests that for any prespeciﬁed tolerance , one can select λ proportional to and then run (stochastic) gradient ascent to drive F − F (πθ) below the tolerance. To obtain the eventual convergence and regret bound in the long run we apply the doubling trick, which speciﬁes a growing phase length sequence with Tl+1 ≈ 2Tl in Algorithm 2 and a suitably decaying sequence of regularization parameters {λl}∞ l=0.
+
+From high probability to almost sure convergence. The last tool is an observation that an arbitrary anytime sublinear high probability regret bound with logarithmic dependency on 1/δ immediately leads to almost sure convergence of the average regret with a corresponding asymptotic rate. Although such an observation seems to be informally well-known in the theoretical computer science community, we provide a compact formal discussion below for self-contained-ness.
+Lemma 4. Suppose that ∀ δ ∈ (0, 1), with probability at least 1 − δ, ∀ N ≥ 0, we have
+regret(N ) ≤ d1(N + c)d2 (log(N/δ))d3 + d4(log N )d5 (11)
+
+for some constants c, d1, d3, d4, d5 ≥ 0 and d2 ∈ [0, 1). Then we also have
+
+Prob ∃ N¯ ∈ Z+, such that ∀ N ≥ N¯ , AN holds = 1,
+
+where the events AN = {regret(N )/(N + 1) ≤ (∗)}, and
+
+(∗) = d1N −(1−d2)
+
+1
+
++
+
+c N
+
+d2
+
+(3 log N )d3
+
++
+
+d4(log N )d5 N
+
+.
+
+To put it another way, we have
+
+lim regret(N )/(N + 1) = 0 almost surely
+N →∞
+
+with an asymptotic rate of (∗).
+Notice that here we restrict the right-hand side of (11) to a rather speciﬁc form simply because our bounds below are all of this form. However, similar results hold for much more general forms of bounds.
+
+4.2 Regret Analysis
+In this section, we establish the regret bound of Algorithm 2, when used with the REINFORCE gradient estimator from §3.2. We begin by bounding the regret of a single phase and then use the doubling trick to combine these into the overall regret bound.
+
+Single phase analysis. We begin by bounding the regret
+deﬁned in (7) of each phase in Algorithm 2. Note that a sin-
+gle phase in Algorithm 2 is exactly Algorithm 1 terminated in episode Tl, with λn = λl for all n ≥ 0 and θ0 = θl,0. Also notice that for a given phase l ≥ 0, in order for Theo-
+rem 5 below to hold, we actually only need the conditions in Assumption 2 to be satisﬁed for this speciﬁc l.
+
+10891
+
+Theorem 5. Under Assumptions 1 and 2, for phase l ≥ 0
+
+suppose
+
+that
+
+we
+
+choose
+
+αl,k
+
+=
+
+Cl,α
+
+√ k+3
+
+1 log2
+
+(k+3)
+
+for
+
+some
+
+Cl,α ∈ (0, C2/(M2βλl )]. Then for any > 0, if we choose
+
+λl =
+
+(1−γ) 2
+
+,
+
+then
+
+∀
+
+δ
+
+∈
+
+(0, 1),
+
+with
+
+probability
+
+at
+
+least
+
+1 − δ, for any K ∈ {0, . . . , Tl − 1}, we have
+
+√
+
+√
+
+regretl(K) ≤ U1
+
+K+1 log2(K+3)
+2
+
+log(2/δ)
+
++ (K + 1)
+
+dπρ ρ
+
+∞
+
++
+
+2γ 1−γ
+
+log(K
+
++
+
+3).
+
+(12)
+
+Here the constant U1 only depends on the underlying MDP M, phase initialization θl,0 and the constants C, C1, C2, M1, Cl,α, λl.
+
+The proof as well as a more formal statement of Theorem
+
+5 with details of the constants (cf. Theorem 9) are deferred to
+
+the Appendix in the longer version of this paper (Zhang et al.
+
+2020). Here the constant βλ is the smoothness constant from
+
+Proposition 1. We remark that when is ﬁxed, the regret
+
+bound (12) can be seen as a sub-linear (in K as K → ∞)
+
+regret term plus an error term (K + 1)
+
++
+
+2γ 1−γ
+
+log(K
+
++
+
+3).
+
+Alternatively, one can interpret it as follows:
+
+regretl (K ) K +1
+
+≤
+
+U1
+
+log2
+
+(K + 3) √ K+
+
+log(2/δ) 12
+
+2γ log(K + 3)
+
++
+
++
+
+1−γ K+1
+
+dπρ ρ
+
+.
+∞
+
+Namely, the average regret in episode l converges to a constant multiple of the pre-speciﬁed tolerance at a sub-linear rate (as K → ∞).
+
+Overall regret bound. Now we stitch together the single phase regret bounds established above to obtain the overall regret bound of Algorithm 2, with the help of the doubling trick. This leads to the following theorem.
+
+Theorem 6 (Regret for REINFORCE). Under Assump-
+
+tion 1, suppose that for each l ≥ 0, we choose αl,k =
+
+Cl,α
+
+√ k+3
+
+1 log2
+
+(k+3)
+
+,
+
+with
+
+Cl,α
+
+∈
+
+[1/(2βλ¯), 1/(2βλl )] and
+
+λ¯ =
+
+1−γ 2
+
+,
+
+and
+
+choose
+
+Tl
+
+=
+
+2l,
+
+l = Tl−1/6 = 2−l/6,
+
+λl =
+
+l (1−γ ) 2
+
+and
+
+pp = 1/(2A). In addition, suppose that
+
+(9) is adopted to evaluate ∇θLλl (θl,k), with β ∈ (0, 1),
+
+|b(s)| ≤ B for any s ∈ S (where B > 0 is a constant),
+
+and that (10) holds for Hl,k for all l, k ≥ 0. Then we have
+
+for any δ ∈ (0, 1), with probability at least 1 − δ, for any
+
+N ≥ 0, we have
+
+regret(N ) = O
+
++ S 2 A2
+
+dπρ
+
+(1−γ)7
+
+ρ
+
+In addition, we have
+
+N
+
+5 6
+
+(log
+
+N δ
+
+5
+)2
+
+.
+
+(13)
+
+∞
+
+lim regret(N )/(N + 1) = 0 almost surely (14)
+N →∞
+
+with asymptotic rate O
+
++ S 2 A2
+
+dπρ
+
+(1−γ)7
+
+ρ
+
+N
+
+−
+
+1 6
+
+(log
+
+N
+
+)
+
+5 2
+
+.
+
+∞
+
+Note that the almost sure convergence (14) is immediately
+
+implied by the high probability bound (13) via Lemma 4.
+
+Here for clarity, we have restricted the statement to the case when we use the REINFORCE gradient estimation from §3.2. A more general counterpart result can be found in Appendix B.3 in the longer version of this paper (Zhang et al. 2020), from which Theorem 6 is immediately implied. See also (Zhang et al. 2020, Appendix C) for a more formal statement of the regret bound (cf. Corollary 11) for REINFORCE with detailed constants.
+Notice that compared to the single phase regret bound in (12), the overall regret bound in (13) now gets rid of the dependency on a pre-speciﬁed tolerance > 0. This should be attributed to the adaptivity in the regularization parameter sequence. Also notice that here we have followed the convention of the reinforcement learning literature to make all the problem dependent quantities (e.g., γ, S, A, etc.) explicit in the big-O notation.
+One crucial difference between our regret bound and those in the existing literature of vanilla policy gradient methods in the general MDP settings (which are sometimes not stated in the form of regret, but can be easily deduced from their proofs in those cases) is that the previous results either require exact and deterministic updates or contain a non-vanishing Θ(1/M p) term, with M being the minibatch size (of the trajectories) and p > 0 being some exponent (with a typical value of 1/2). By removing such nonvanishing terms, we obtain the ﬁrst sub-linear regret bound for model-free vanilla policy gradient methods with ﬁnite mini-batch sizes.
+
+5 Extension to Mini-Batch Updates
+
+We now consider extending our previous results to mini-
+batch settings, by modifying Algorithm 2 as follows. Firstly,
+in each inner iteration, instead of sampling only one trajectory in line 5, we sample M ≥ 1 independent trajectories τ1l,k, . . . , τMl,k from M following policy πθl,k and then compute an approximate gradient ∇(θi)Lλl (θl,k) (i = 1, . . . , M ) using each of these M trajectories. We then modify the up-
+date in line 6 as
+
+θl,k+1 = θl,k + αl,k 1 M
+
+M
+
+∇(θi)Lλl (θl,k).
+
+i=1
+
+See Algorithm 4 in Appendix D in the longer version of this paper (Zhang et al. 2020) for a formal description of the modiﬁed algorithm.
+
+Regret with mini-batches. Notice that since each inner iteration (in Algorithm 4) now consists of M episodes, we need to slightly modify the deﬁnition of the regret up to episode N (N ≥ 0) as follows:
+
+regret(N ; M ) =
+
+M (F
+
+{(l,k)|BT (l,k)≤
+
+N M
+
+−1}
+
+− Fˆl,k(πθl,k ))
+
+(15)
+
+N + N −M
+M
+
+(F − Fˆl,k(πθlN,M ,kN,M )),
+
+where (lN,M , kN,M ) = GT ( N/M ) and Fˆl,k(πθl,k ) is the same as in (6). The above deﬁnition accounts for the fact
+
+10892
+
+that each of the M episodes in an inner iteration/step (l, k) corresponds to the same iterate θl,k and hence has the same
+contribution to the regret. The second term on the right-hand side accounts for the contribution of the (remaining) N − M N/M episodes (among a total of M episodes) in inner iteration/step (lN,M , kN,M ).
+Then the following regret bound can be established.
+
+Corollary 7 (Regret for mini-batch REINFORCE). Under
+
+Assumption 1, suppose that for each l ≥ 0, we choose αl,k =
+
+Cl,α
+
+√ k+3
+
+1 log2
+
+(k+3)
+
+,
+
+with
+
+Cl,α
+
+∈
+
+[1/(2βλ¯), 1/(2βλl )] and
+
+λ¯ =
+
+1−γ 2
+
+,
+
+and
+
+choose
+
+Tl
+
+=
+
+2l,
+
+l = Tl−1/6 = 2−l/6,
+
+λl =
+
+l (1−γ ) 2
+
+and
+
+pp = 1/(2A). In addition, suppose that
+
+the assumptions in Lemma 12 hold (note that Assumption 1
+
+and λl ≤ λ¯ already automatically hold by the other assump-
+
+tions). Then we have for any δ ∈ (0, 1), with probability at
+
+least 1 − δ, jointly for all episodes N , we have (for the mini-
+
+batch Algorithm 4)
+
+regret(N ; M ) = O
+
++ S 2 A2
+
+dπρ
+
+(1−γ)7
+
+ρ
+
+∞
+
+1
+× (M 6
+
++
+
+M
+
+−
+
+5 6
+
+)(N
+
+5
+
+5
+
++ M ) 6 (log(N/δ)) 2
+
++
+
+M (log N )2 1−γ
+
+.
+
+In addition, we also have
+
+lim regret(N ; M )/(N + 1) = 0 almost surely
+N →∞
+with an asymptotic rate of
+
+O
+
++ S 2 A2
+
+dρπ
+
+(1−γ)7
+
+ρ
+
+∞
+
+1
+× (M 6
+
++
+
+M
+
+−
+
+5 6
+
+)N
+
+−
+
+1 6
+
+1
+
++
+
+M N
+
+5 6
+
+5
+(log N ) 2
+
++
+
+M (log N )2 (1−γ)N
+
+.
+
+Again, we note that the almost sure convergence above is directly implied by the high probability bound via Lemma 4. The proof and a more formal statement of this corollary (cf. Corollary 13) can be found in Appendix D in the longer version of this paper (Zhang et al. 2020). In particular, when M = 1, the bound above reduces to (13). In addition, we can see that there might be a trade-off between the terms M 1/6 and M −5/6. The intuition behind this is a trade-off between lower variance with larger batch sizes and more frequent updates with smaller batch sizes.
+
+6 Conclusion and Open Problems
+In this work, we establish the global convergence rates of practical policy gradient algorithms with a ﬁxed size minibatch of trajectories combined with REINFORCE gradient estimation.
+Although in §4 and §5, we only instantiate the bounds for the REINFORCE gradient estimators, we note that our general results (in particular, Theorem 10 in Appendix B.3 in the longer version of this paper (Zhang et al. 2020)) can be easily applied to other gradient estimators (e.g., actor-critic and state-action visitation measure based estimators) as well, as long as one can verify the existence of the constants in Assumption 2 in a similar way to Lemma 2. In addition, one can also easily derive sample complexity results as by-products of our analysis. In fact, our proof of Theorem 5 immediately
+
+implies a O˜(1/ 4) sample complexity bound (for Algorithm 1 with REINFORCE gradient estimators and a constant regularization parameter) for any pre-speciﬁed tolerance > 0, where we use O˜ to indicate the big-O notation with logarithmic terms suppressed. We have focused only on regret in this paper mainly for clarity purposes.
+It is also relatively straightforward to extend our results to ﬁnite horizon non-stationary settings, in which the soft-max policy parametrization will have a dimension of SAH and different policy gradient estimators can be adopted (without trajectory truncation), with H being the horizon of each episode. In this case, it’s also easy to rewrite the regret bound as a function of the total number of time steps T ≤ HN , where N is the total number of episodes. Other straightforward extensions include reﬁned convergence to stationary points (in both almost sure and high probability senses and with no requirement on large batch sizes), and inexact convergence results when δl,k (cf. Assumption 2) is not square summable (e.g., when Hl,k is ﬁxed or not growing sufﬁciently fast).
+There are also several open problems that may be resolved by combining the techniques introduced in this paper with existing results in the literature. Firstly, it would be desirable to remove the “exploration” assumption that the initial distribution ρ is component-wise positive. This may be achieved by combining our results with the policy cover technique in (Agarwal et al. 2020) or the optimistic bonus tricks in (Cai et al. 2019; Efroni et al. 2020). Secondly, the bounds in our paper are likely far from optimal (i.e., sharp). Hence it would be desirable to either reﬁne our analysis or apply our techniques to accelerated policy gradient methods (e.g., IS-MBPG (Huang et al. 2020)) to obtain better global convergence rates and/or last-iterate convergence. Thirdly, it would be very interesting to see if global convergence results still hold for REINFORCE when the relative entropy regularization term used in this paper is replaced with the practically adopted entropy regularization term in the literature. The answer is afﬁrmative when exact gradient estimations are available (Mei et al. 2020; Cen et al. 2020), but it remains unknown how these results might be generalized to the stochastic settings in our paper. We conjecture that entropy regularization leads to better global convergence rates and can help us remove the necessity of the PostProcess steps in Algorithm 2 as they are uniformly bounded. Finally, one may also consider relaxing the uniform bound assumption on the rewards r to instead being sub-Gaussian, introducing function approximation, and extending our results to natural policy gradient and actor-critic methods as well as more modern policy gradient methods like DPG, PPO and TRPO.
+Acknowledgments
+We would like to thank Anran Hu for pointing out a mistake in the proof of an early draft of this paper. We thank Guillermo Angeris, Shane Barratt, Haotian Gu, Xin Guo, Yusuke Kikuchi, Bennet Meyers, Xinyue Shen, Mahan Tajrobehkar, Jonathan Tuck, Jiaming Wang and Xiaoli Wei for their feedback on some preliminary results in this
+
+10893
+
+paper. We thank Junyu Zhang for several detailed and fruitful discussions of the draft. We also thank the anonymous (meta-)reviewers for the great comments and suggestions. Jongho Kim is supported by Samsung Scholarship.
+References
+Agarwal, A.; Henaff, M.; Kakade, S.; and Sun, W. 2020. PCPG: Policy Cover Directed Exploration for Provable Policy Gradient Learning. arXiv preprint arXiv:2007.08459 .
+Agarwal, A.; Jiang, N.; and Kakade, S. 2019. Reinforcement Learning: Theory and Algorithms. Technical report, Department of Computer Science, University of Washington.
+Agarwal, A.; Kakade, S.; Lee, J.; and Mahajan, G. 2019. Optimality and approximation with policy gradient methods in Markov decision processes. arXiv preprint arXiv:1908.00261 .
+Basei, M.; Guo, X.; and Hu, A. 2020. Linear Quadratic Reinforcement Learning: Sublinear Regret in the Episodic Continuous-Time Framework. arXiv preprint arXiv:2006.15316 .
+Bertsekas, D. 2017. Dynamic programming and optimal control, volume II. Athena scientiﬁc Belmont, MA, 4th edition.
+Besson, L.; and Kaufmann, E. 2018. What doubling tricks can and can’t do for multi-armed bandits. arXiv preprint arXiv:1803.06971 .
+Bhandari, J.; and Russo, D. 2019. Global optimality guarantees for policy gradient methods. arXiv preprint arXiv:1906.01786 .
+Bhandari, J.; and Russo, D. 2020. A Note on the Linear Convergence of Policy Gradient Methods. arXiv preprint arXiv:2007.11120 .
+Bottou, L.; Curtis, F.; and Nocedal, J. 2018. Optimization methods for large-scale machine learning. SIAM Review 60(2): 223–311.
+Cai, Q.; Yang, Z.; Jin, C.; and Wang, Z. 2019. Provably efﬁcient exploration in policy optimization. arXiv preprint arXiv:1912.05830 .
+Cen, S.; Cheng, C.; Chen, Y.; Wei, Y.; and Chi, Y. 2020. Fast Global Convergence of Natural Policy Gradient Methods with Entropy Regularization. arXiv preprint arXiv:2007.06558 .
+Efroni, Y.; Shani, L.; Rosenberg, A.; and Mannor, S. 2020. Optimistic Policy Optimization with Bandit Feedback. arXiv preprint arXiv:2002.08243 .
+Even-Dar, E.; and Mansour, Y. 2003. Learning rates for Qlearning. Journal of machine learning Research 5(Dec): 1– 25.
+Fazel, M.; Ge, R.; Kakade, S.; and Mesbahi, M. 2018. Global convergence of policy gradient methods for the linear quadratic regulator. arXiv preprint arXiv:1801.05039 .
+Fu, Z.; Yang, Z.; and Wang, Z. 2020. Single-Timescale Actor-Critic Provably Finds Globally Optimal Policy. arXiv preprint arXiv:2008.00483 .
+
+Gu, S.; Levine, S.; Sutskever, I.; and Mnih, A. 2015. MuProp: Unbiased backpropagation for stochastic neural networks. arXiv preprint arXiv:1511.05176 .
+Guu, K.; Pasupat, P.; Liu, E.; and Liang, P. 2017. From language to programs: Bridging reinforcement learning and maximum marginal likelihood. arXiv preprint arXiv:1704.07926 .
+Huang, F.; Gao, S.; Pei, J.; and Huang, H. 2020. Momentum-Based Policy Gradient Methods. arXiv preprint arXiv:2007.06680 .
+Jaksch, T.; Ortner, R.; and Auer, P. 2010. Near-optimal regret bounds for reinforcement learning. Journal of Machine Learning Research 11(Apr): 1563–1600.
+Jin, C.; Allen-Zhu, Z.; Bubeck, S.; and Jordan, M. 2018. Is Q-learning provably efﬁcient? In Advances in Neural Information Processing Systems, 4863–4873.
+Johnson, J.; Hariharan, B.; Van Der Maaten, L.; Hoffman, J.; Fei-Fei, L.; Lawrence Zitnick, C.; and Girshick, R. 2017. Inferring and executing programs for visual reasoning. In Proceedings of the IEEE International Conference on Computer Vision, 2989–2998.
+Kakade, S.; et al. 2003. On the sample complexity of reinforcement learning. Ph.D. thesis, University of London London, England.
+Konda, V.; and Tsitsiklis, J. 2003. On actor-critic algorithms. SIAM journal on Control and Optimization 42(4): 1143–1166.
+Kool, W.; van Hoof, H.; and Welling, M. 2018. Attention, learn to solve routing problems! arXiv preprint arXiv:1803.08475 .
+Kool, W.; van Hoof, H.; and Welling, M. 2020. Estimating gradients for discrete random variables by sampling without replacement. arXiv preprint arXiv:2002.06043 .
+Malik, D.; Pananjady, A.; Bhatia, K.; Khamaru, K.; Bartlett, P.; and Wainwright, M. 2018. Derivative-free methods for policy optimization: Guarantees for linear quadratic systems. arXiv preprint arXiv:1812.08305 .
+Marbach, P.; and Tsitsiklis, J. 2001. Simulation-based optimization of Markov reward processes. IEEE Transactions on Automatic Control 46(2): 191–209.
+Mei, J.; Xiao, C.; Szepesvari, C.; and Schuurmans, D. 2020. On the Global Convergence Rates of Softmax Policy Gradient Methods. arXiv preprint arXiv:2005.06392 .
+Mnih, A.; and Gregor, K. 2014. Neural variational inference and learning in belief networks. arXiv preprint arXiv:1402.0030 .
+Mnih, V.; Badia, A.and Mirza, M.; Graves, A.; Lillicrap, T.; Harley, T.; Silver, D.; and Kavukcuoglu, K. 2016. Asynchronous methods for deep reinforcement learning. In International conference on machine learning, 1928–1937.
+Peters, J.; Mulling, K.; and Altun, Y. 2010. Relative entropy policy search. In Proceedings of the AAAI Conference on Artiﬁcial Intelligence, volume 24(1).
+
+10894
+
+Rennie, S.; Marcheret, E.; Mroueh, Y.; Ross, J.; and Goel, V. 2017. Self-critical sequence training for image captioning. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 7008–7024.
+Schulman, J.; Chen, X.; and Abbeel, P. 2017. Equivalence between policy gradients and soft Q-learning. arXiv preprint arXiv:1704.06440 .
+Schulman, J.; Levine, S.; Abbeel, P.; Jordan, M.; and Moritz, P. 2015. Trust region policy optimization. In International conference on machine learning, 1889–1897.
+Schulman, J.; Wolski, F.; Dhariwal, P.; Radford, A.; and Klimov, O. 2017. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 .
+Shani, L.; Efroni, Y.; and Mannor, S. 2019. Adaptive trust region policy optimization: Global convergence and faster rates for regularized MDPs. arXiv preprint arXiv:1909.02769 .
+Silver, D.; Lever, G.; Heess, N.; Degris, T.; Wierstra, D.; and Riedmiller, M. 2014. Deterministic Policy Gradient Algorithms. In Proceedings of the 31st International Conference on Machine Learning, volume 32(1), 387–395.
+Sutton, R.; McAllester, D.; Singh, S.; and Mansour, Y. 2000. Policy gradient methods for reinforcement learning with function approximation. In Advances in Neural Information Processing Systems, 1057–1063.
+Wang, L.; Cai, Q.; Yang, Z.; and Wang, Z. 2019. Neural policy gradient methods: Global optimality and rates of convergence. arXiv preprint arXiv:1909.01150 .
+Williams, R. 1992. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning 8(3-4): 229–256.
+Yi, K.; Wu, J.; Gan, C.; Torralba, A.; Kohli, P.; and Tenenbaum, J. 2018. Neural-symbolic VQA: Disentangling reasoning from vision and language understanding. In Advances in neural information processing systems, 1031– 1042.
+Zhang, J.; Kim, J.; O’Donoghue, B.; and Boyd, S. 2020. Sample efﬁcient reinforcement learning with REINFORCE. Accessed March 23. [Online]. Available: https://stanford. edu/∼boyd/papers/conv reinforce.html.
+Zhang, K.; Koppel, A.; Zhu, H.; and Bas¸ar, T. 2019. Global convergence of policy gradient methods to (almost) locally optimal policies. arXiv preprint arXiv:1906.08383 .
+Zhao, T.; Hachiya, H.; Niu, G.; and Sugiyama, M. 2011. Analysis and improvement of policy gradient estimation. In Advances in Neural Information Processing Systems, 262– 270.
+Zoph, B.; and Le, Q. 2016. Neural architecture search with reinforcement learning. arXiv preprint arXiv:1611.01578 .
+10895
+

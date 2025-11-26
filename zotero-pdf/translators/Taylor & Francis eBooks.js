@@ -9,7 +9,7 @@
 	"priority": 100,
 	"inRepository": true,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2021-05-28 02:50:00"
+	"lastUpdated": "2024-03-07 16:00:00"
 }
 
 /*
@@ -102,15 +102,15 @@ function scrape(doc, url, itemType) {
 	if (itemType == 'bookSection') {
 		item.bookTitle = text(doc, 'a.product-book-link');
 	}
-	
-	for (let creator of text(doc, '.product-banner-author-name').split(", ")) {
+
+	for (let creator of text(doc, '.product-banner-author-name').split(",")) {
 		let creatorType = text(doc, '.product-banner-author').includes('Edited')
 			? 'editor'
 			: 'author';
 		item.creators.push(ZU.cleanAuthor(creator, creatorType, false));
 	}
 	
-	for (let row of doc.querySelectorAll('product-more-details .display-row')) {
+	for (let row of doc.querySelectorAll('product-more-details .display-row, shared-lib-product-more-details .display-row')) {
 		let label = text(row, 'span:first-child');
 		let value = text(row, 'span:last-child');
 
@@ -134,11 +134,11 @@ function scrape(doc, url, itemType) {
 		}
 	}
 	
-	item.abstractNote = text(doc, '#collapseContent');
+	item.abstractNote = text(doc, '#collapseContent') || attr(doc, 'meta[name="description"]', 'content');
 
-	if (doc.cookie) {
+	if (doc.cookie && text(doc, '#product-detail-page-state')) {
 		let apiId = JSON.parse(
-			doc.getElementById('pyramid-website-ssr-state').textContent
+			doc.getElementById('product-detail-page-state').textContent
 				.replace(/&q;/g, '"')
 		).product._id;
 		

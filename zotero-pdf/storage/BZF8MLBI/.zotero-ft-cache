@@ -1,0 +1,186 @@
+ JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article 
+Elsevier logo ScienceDirect 
+ 
+    Journals & Books  
+ 
+Register Sign in 
+View PDF 
+ 
+    Seamless access 
+ 
+    Access through your institution 
+    Purchase PDF  
+ 
+Article preview 
+ 
+    Abstract 
+    Introduction 
+    Section snippets 
+    References (29) 
+    Cited by (49) 
+    Recommended articles (6)  
+ 
+Elsevier 
+Government Information Quarterly 
+Volume 37, Issue 3 , July 2020, 101493 
+Government Information Quarterly 
+Data governance: Organizing data for trustworthy Artificial Intelligence 
+Author links open overlay panel Marijn Janssen a Paul Brous a Elsa Estevez b c Luis S. Barbosa d e Tomasz Janowski f g 
+Show more 
+Add to Mendeley 
+Share 
+Cite 
+https://doi.org/10.1016/j.giq.2020.101493 Get rights and content 
+Abstract 
+ 
+The rise of Big, Open and Linked Data (BOLD) enables Big Data Algorithmic Systems (BDAS) which are often based on machine learning, neural networks and other forms of Artificial Intelligence (AI). As such systems are increasingly requested to make decisions that are consequential to individuals, communities and society at large, their failures cannot be tolerated, and they are subject to stringent regulatory and ethical requirements. However, they all rely on data which is not only big, open and linked but varied, dynamic and streamed at high speeds in real-time. Managing such data is challenging. To overcome such challenges and utilize opportunities for BDAS, organizations are increasingly developing advanced data governance capabilities. This paper reviews challenges and approaches to data governance for such systems, and proposes a framework for data governance for trustworthy BDAS. The framework promotes the stewardship of data, processes and algorithms, the controlled opening of data and algorithms to enable external scrutiny, trusted information sharing within and between organizations, risk-based governance, system-level controls, and data control through shared ownership and self-sovereign identities. The framework is based on 13 design principles and is proposed incrementally, for a single organization and multiple networked organizations. 
+Introduction 
+ 
+Organizations in general, and public sector organizations in particular, increasingly collect and use Big and Open Linked Data (BOLD) (Janssen, Matheus, & Zuiderwijk, 2015). The rise of BOLD, combined with machine learning and other forms of Artificial Intelligence (AI) results in the increasing use of Big Data Algorithmic Systems (BDAS). Such systems are used to make decisions about: access to affordable loans amid the shortage of credit files; matching of skills and jobs to promote access to employment; implementing admission to schools while helping individuals choose the right school; and mitigating risks of disparities in the treatment of individuals by law enforcement while helping build trust between the public and law enforcement (Executive Office of the President, 2016). 
+ 
+The use of BDAS for improving and opening government is met with a lot of enthusiasm. However, BDAS rely heavily on the use of data combined from various sources, some controlled by the organization itself, others controlled by partner organizations, yet others controlled by unknown entities. Without control over such data to ensure quality and compliance, BDAS would be too risky to be entrusted with consequential decisions. Therefore, many organizations are turning to data governance as a means to exercise control over the quality of their data and over compliance with relevant legal and ethical requirements in order to guarantee the delivery of trustworthy decisions. The concept of trustworthiness, which can be directly controlled or indirectly influenced (Yang & Anguelov, 2013), refers to properties through which a trusted entity is serving the interests of the trustor (Levi & Stoker, 2000). In the situation under study, the trustor (an organization) entrusts its system (BDAS, which itself uses BOLD and AI) in making sound decisions. 
+ 
+Data governance is about allocating authority and control over data (Brackett & Earley, 2009) and the exercise of such authority through decision-making in data-related matters (Plotkin, 2013). To fulfil its goals, data governance should focus not just on data, but on the systems through which data is collected, managed and used. Specifically, people are essential in these systems (Benfeldt, Persson, & Madsen, 2020); thus data governance should provide incentives and sanctions to stimulate desirable behaviour of the persons involved in collecting, managing and using data. Beyond a single organization, data governance depends on collaboration between organizations and persons that make up the system. This multi-organizational context requires trusted frameworks to ensure reliable data-sharing between all organizations involved, that the right data is securely and reliably shared between participating organizations, while complying with General Data Protecting Regulation (GDPR) (European Parliament and European Council, 2016) and other relevant laws and regulations. 
+ 
+Consistent with this context, we define data governance as: 
+ 
+    Organizations and their personnel defining, applying and monitoring the patterns of rules and authorities for directing the proper functioning of, and ensuring the accountability for, the entire life-cycle of data and algorithms within and across organizations. 
+ 
+This definition takes into account both data and data processing by AI and other algorithms, considers that both data and algorithms change during their respective life-cycles, accounts for the personnel responsible for creating and use of data and algorithms, and adopts a systems (multi-organizational) view. 
+ 
+Data governance is a success factor for BDAS (Brous, Janssen, & Krans, 2020) and has an overall positive effect on the performance of organizations that apply BDAS (Zhang, Zhao, & Kumar, 2016). The purpose is to increase the value of data and minimize data-related costs and risks (Abraham, Schneider, & vom Brocke, J., 2019). Given the consequential and repetitive nature of the BDAS decision-making, mistakes in data governance that affect the working of such systems can have profound legal, financial and social implications on the organizations involved, citizens and businesses, and society at large. Such mistakes can result in systemic bias, unlawful decisions, large financial exposures, political crises, lives lost or any combination thereof. In the interconnected world, where data is collected by (and about) governments, businesses and citizens, and is processed by different entities using various algorithms, dependencies grow, mistakes accumulate, and accountability is gradually lost in the process. 
+ 
+The rationale outlined above directly leads to the goal of this article. The goal is threefold. First, to define and conceptualize data governance for AI-based BDAS. Second, to review the challenges and approaches to such governance. Third, to propose the concept of trusted AI-based BDAS and a framework for data governance for such systems. 
+ 
+The rest of the article is structured as follows. Section 2 introduces the concept of data governance, followed by data governance for AI-based BDAS. Different forms of data governance for AI-based BDAS are outlined in Section 3. Section 4 formulates the main proposal: trusted AI-based BDAS and a data governance framework for such systems. The proposal consists of: system-level governance model of BDAS in Section 4.1, data stewardship and base registries as the foundation for data governance in Section 4.2, and the trusted framework and self-sovereign identities for data sharing in Section 4.3. Finally, essential data governance principles are outlined in Section 5. 
+Section snippets 
+Data governance 
+ 
+Data governance has been given scant attention and is often overlooked by organizations in their efforts to realize BDAS and create Fair, Accountable and Transparent (FAT) algorithms. Often the focus is on experimenting with AI, but acquiring and preparing data for AI, which often consumes most of the time, is given less consideration. However, the ubiquitous nature of data, when using large volumes and varieties of data from multiple sources, the uncertain impact of data flows on data quality, 
+Data governance approaches 
+ 
+A common challenge with data governance is that the data flow and logic may not follow the structure of an organization. The mismatch between organizational structure and data usage can easily result in data silos, duplications, unclear responsibilities, and missing control of data over its entire life-cycle. This is particularly the case for BDAS, which are typically crossing departmental boundaries, not bound to any single function or process, and have to deal with data originating in 
+Data governance for trusted BDAS 
+ 
+This section aims to formulate the main proposal of this article: the concept of trusted AI-based BDAS and a framework for data governance for such systems. The proposal consists of three elements: system-level governance model for BDAS (Section 4.1), data stewardship and based registries (Section 4.2), and the trusted data-sharing framework based on self-sovereign identities and data-sharing agreements (Section 4.3). 
+Essential data governance principles 
+ 
+Although the foundation of trustworthy BDAS is sound data governance, this area is often overlooked. Data governance for BDAS is a complex field, and the development of BDAS without due attention to data governance is a significant risk. Data governance can be viewed as organizations and their personnel defining, applying and monitoring the patterns of rules and authorities for directing the proper functioning of, and ensuring the accountability for, the entire life-cycle of data and algorithms 
+ 
+Marijn Janssen is a full Professor in ICT & Governance and head of the Information and Communication Technology (ICT) research group of the Technology, Policy and Management (TPM) Faculty of Delft University of Technology. 
+References (29) 
+ 
+    S. Ølnes et al. 
+    Blockchain in government: Benefits and implications of distributed ledger technology for information sharing 
+    Government Information Quarterly 
+    (2017) 
+    M. Janssen et al. 
+    Adaptive governance: Towards a stable, accountable and responsive government 
+    Government Information Quarterly 
+    (2016) 
+    M. Janssen et al. 
+    The challenges and limits of big data algorithms in technocratic governance 
+    Government Information Quarterly 
+    (2016) 
+    S.S. Dawes 
+    Stewardship and usefulness: Policy principles for information-based transparency 
+    Government Information Quarterly 
+    (2010) 
+    R. Abraham et al. 
+    Data governance: A conceptual framework, structured review, and research agenda 
+    International Journal of Information Management 
+    (2019) 
+    Executive Office of the President 
+    Big data: A report on algorithmic systems, opportunity, and civil rights 
+    (2016) 
+    O. Benfeldt et al. 
+    Data governance as a collective action problem 
+    Information Systems Frontiers 
+    (2020) 
+    E. Beretta et al. 
+    Ethical and socially-aware data labels . Paper presented at the Annual International Symposium on Information Management and Big Data. 
+    (2018) 
+    M. Brackett et al. 
+    The DAMA guide to the data management body of knowledge (DAMA-DMBOK guide) 
+    (2009) 
+    P. Brous et al. 
+    Data governance as success factor for data science. Responsible Design, Implementation and Use of Information and Communication Technology: 19th IFIP WG 6.11 Conference on e-Business, e-Services, and e-Society, I3E 2020, Skukuza, South Africa, April 6–8, 2020, Proceedings, Part I, 12066 
+    (2020) 
+ 
+View more references 
+Cited by (49) 
+ 
+    Sustainable AI: An integrated model to guide public sector decision-making 
+    2022, Technology in Society 
+    Show abstract 
+    Artificial intelligence and speedy trial in the judiciary: Myth, reality or need? A case study in the Brazilian Supreme Court (STF) 
+    2022, Government Information Quarterly 
+    Show abstract 
+    Public and private value creation using artificial intelligence: An empirical study of AI voice robot users in Chinese public sector 
+    2021, International Journal of Information Management 
+    Show abstract 
+    A data quality approach to the identification of discrimination risk in automated decision making systems 
+    2021, Government Information Quarterly 
+    Show abstract 
+    Is big data used by cities? Understanding the nature and antecedents of big data use by municipalities 
+    2021, Government Information Quarterly 
+    Show abstract 
+    Implications of the use of artificial intelligence in public governance: A systematic literature review and a research agenda 
+    2021, Government Information Quarterly 
+    Show abstract 
+ 
+View all citing articles on Scopus 
+Recommended articles (6) 
+ 
+    Research article 
+    Ambidextrous governance of IT-enabled services: A pragmatic approach 
+    Information and Organization, Volume 30, Issue 4, 2020, Article 100325 
+    Show abstract 
+    Research article 
+    Citizens' continuous use of eGovernment services: The role of self-efficacy, outcome expectations and satisfaction 
+    Government Information Quarterly, Volume 37, Issue 3, 2020, Article 101485 
+    Show abstract 
+    Research article 
+    The leading role of the government CIO at the local level: Strategic opportunities and challenges 
+    Government Information Quarterly, Volume 37, Issue 3, 2020, Article 101218 
+    Show abstract 
+    Research article 
+    Do the right thing right! Understanding the hopes and hypes of data-based policy 
+    Government Information Quarterly, Volume 37, Issue 3, 2020, Article 101491 
+    Show abstract 
+    Research article 
+    Governance: the key driver for data-driven innovation 
+    Computer Fraud & Security, Volume 2021, Issue 4, 2021, pp. 10-13 
+    Show abstract 
+    Research article 
+    Opportunity for renewal or disruptive force? How artificial intelligence alters democratic politics 
+    Government Information Quarterly, Volume 37, Issue 3, 2020, Article 101489 
+    Show abstract 
+ 
+Marijn Janssen is a full Professor in ICT & Governance and head of the Information and Communication Technology (ICT) research group of the Technology, Policy and Management (TPM) Faculty of Delft University of Technology. 
+ 
+Paul Brous is researcher at the Information and Communication Technology (ICT) research group of the Technology, Policy and Management (TPM) Faculty of Delft University of Technology. 
+ 
+Elsa Estevez is the Chair holder of the UNESCO Chair on Knowledge Societies and Digital Governance at Universidad Nacional del Sur, Independent Researcher at the Consejo Nacional de Investigaciones Científicas y Técnicas (CONICET), and full professor at Universidad Nacional de La Plata, all in Argentina. 
+ 
+Luís Soares Barbosa is the deputy head of UNU-EGOV and full professor at the Department of Informatics at the University of Minho. 
+ 
+Tomasz Janowski is head of the Department of Informatics in Management at the Faculty of Economics and Management, Gdańsk University of Technology, Poland and invited professor at the Department for E -Governance and Administration, Faculty of Business and Globalization, Danube University Krems, Austria. 
+View full text 
+© 2020 Published by Elsevier Inc. 
+Elsevier logo with wordmark 
+ 
+    About ScienceDirect 
+    Remote access 
+    Shopping cart 
+    Advertise 
+    Contact and support 
+    Terms and conditions 
+    Privacy policy  
+ 
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies . 
+ 
+Copyright © 2022 Elsevier B.V. or its licensors or contributors. ScienceDirect ® is a registered trademark of Elsevier B.V. 
+ 
+ScienceDirect ® is a registered trademark of Elsevier B.V. 
+RELX group home page 

@@ -1,0 +1,862 @@
+Scientific Journals
+of the Maritime University of Szczecin
+2020, 62 (134), 71–79 ISSN 1733-8670 (Printed) ISSN 2392-0378 (Online) DOI: 10.17402/421
+
+Zeszyty Naukowe
+Akademii Morskiej w Szczecinie
+Received: 28.01.2020 Accepted: 21.04.2020 Published: 29.06.2020
+
+Statistical analysis for modeling ship operation processes in ports
+Emin Deniz Özkan, Umay Uzunoğlu Koçer, Selçuk Nas
+Dokuz Eylül University e-mail: {deniz.ozkan; umay.uzunoglu; snas}@deu.edu.tr  corresponding author
+Key words: port, ship, ship operations, statistical distributions, goodness of fit, modeling Abstract The proper selection of statistical distributions is important for modeling port operations using simulations or queuing theory. The aim of this study was to determine the appropriate statistical distributions for modeling random processes related to ship operations in ports, including ship arrivals, berthing maneuver processes, service processes, and unberthing maneuver processes. A literature review was performed on the statistical distributions used in these random processes. In addition, the port data on ship operations gathered from three different ports in Turkey were examined. Goodness of fit tests were conducted to determine the appropriate distribution for each process.
+
+Introduction
+The ship operation processes in a port begin with an entry request upon the arrival of a ship. Ships with the permission of port authorities may enter the port; otherwise, they wait at anchor until permission is granted. The ships are allowed to sail at a specific berth through the approach channel or entrance waterway, and then berthing occurs, and the loading/unloading operations begin. When the loading/unloading operations are completed, ships are allowed to leave the port once they are granted permission (Olba et al., 2018).
+A ship’s arrival date/time, service time, idle time, and departure date/time affect the port capacity (Kia, Shayan & Ghotb, 2002). UNCTAD states that the berth occupancy rate and number of berths depend on the probability distributions of ship arrivals and service times at berth (Tang et al., 2016).
+The interarrival time is defined as the time between the arrivals of two consecutive ships at a port area (Shabayek & Yeung, 2001). The arrival distribution of ships is vital for port planning; thus, simulations are used to develop theoretical queuing
+Zeszyty Naukowe Akademii Morskiej w Szczecinie 62 (134)
+
+models for port capacity analysis and for distribution selection models (Kuo et al., 2006).
+Service time is related to the time that ships spend at berth for loading/unloading operations (Lee, Park & Lee, 2003; Shabayek & Yeung, 2001). The average service time and statistical distribution of service time reflect the components of cargo handling and storage facilities in a port system (Agerschou, 2004). The service time of a ship depends on the amount of cargo that the ship carries and determines the waiting time of ships in the queue (Layaa & Dullaert, 2014). Table 1 provides a summary of the literature related to the statistical distributions used in studies for interarrival times and the service times of ships, as well as the types of terminals examined.
+The simulation method has most often been used in port operation studies. Table 1 reveals that the majority of studies have focused on container terminal operations, but no research on liquid bulk terminals has been conducted by statistically analyzing processes. Lai and Shih (Lai & Shih, 1992) focused on berth assignment problems in container terminals and used heuristics and computer simulations to measure different assignment strategies for
+71
+
+Emin Deniz Özkan, Umay Uzunoğlu Koçer, Selçuk Nas
+
+Table 1. Literature review
+
+Author(s)
+Lai and Shih (1992)
+Groenveld and Wanders (1999) Kia, Shayan and Ghotb (2002) Demirci (2003) Lee, Park and Lee (2003) Imai et al. (2005) Dragovic, Park and Radmilovic (2006)
+Bugaric and Petrovic (2007) Huang et al. (2008) Esmer, Yildiz & Tuna (2013) Nas (2013) Layaa and Dullaert (2014)
+Tang et al. (2014) Tang et al. (2016)
+
+Terminal / Port
+
+Method(s) used
+
+Container
+Container Container Port (multipurpose) Container Container Container
+Bulk cargo Container Container Port (multipurpose) General cargo, Container Port (multipurpose) Container
+
+Heuristics, Simulation Simulation Simulation Simulation Simulation Heuristics Queuing theory, Simulation Simulation Simulation Simulation Simulation Queuing theory, Simulation Simulation Simulation
+
+Interarrival time distribution Exponential
+Exponential Exponential Exponential Erlang Exponential Exponential
+Exponential Exponential Gamma Exponential Gamma, Weibull
+Exponential Exponential
+
+Service time distribution –
+– Erlang Exponential Beta Uniform Erlang
+– – Erlang, Beta – Log-normal, Log-normal Exponential Erlang
+
+a container terminal operator in Hong Kong. In their study, data were examined, and according to the chi-square goodness of fit test, the interarrival times of ships fitted an exponential distribution. Groenveld and Wanders (Groenveld & Wanders, 1999) conducted simulations to determine the capacity of a container terminal, and they assumed that the interarrival times of ships were exponentially distributed. Kia et al. (Kia, Shayan & Ghotb, 2002) examined the role of computer simulations in assessing the performance of a container terminal with respect to handling techniques and their effects on terminal capacity. Container terminal data were examined, and a chi-square test showed that the interarrival time followed an exponential distribution. The Erlang distribution (K = 4) was used for service time, i.e. the time that ships spent at berth. Demirci (Demirci, 2003) used simulations to examine the bottlenecks of a port in Turkey and the investment required to correct them. According to the data analysis, the interarrival time and service time fitted an exponential distribution. Lee et al. (Lee, Park & Lee, 2003) used simulations to apply a supply chain modeling and analysis framework to a port industry supply chain. Analyzing the data from a container terminal in South Korea showed that the interarrival time of ships followed an Erlang distribution, and the service time of ships followed a beta distribution. Imai et al. (Imai et al., 2005) focused on berth assignments in container terminals and developed heuristics. An exponential distribution was used for the interarrival
+
+times of ships, and a uniform distribution was used for the handling time of ships at berth.
+Dragovic et al. (Dragovic, Park & Radmilovic, 2006) proposed two models based on simulations and queuing theory to evaluate the performance of ship-berth links at ports. They evaluated the effectiveness of the models for a container terminal in South Korea. It was determined that the interarrival time of ships followed an exponential distribution and that service time of ships followed an Erlang distribution. Bugaric and Petrovic (Bugaric & Petrovic, 2007) examined methods to increase the capacity of bulk cargo terminals by developing a strategy related to the operation of handling equipment. They developed simulation models using an exponential distribution for the interarrival times of ships. Huang et al. (Huang et al., 2008) developed a simulation model that integrated all activities in a container terminal. According to the data obtained from a terminal, the interarrival times of ships followed an exponential distribution. Esmer et al. (Esmer, Yildiz & Tuna, 2013) developed a simulation modeling approach for the continuous berth allocation of a container terminal in Turkey. According to the chisquare goodness of fit test, the interarrival time of ships followed a gamma distribution. In their study, ships were divided into 5 classes according to their lengths, and service time distributions were determined using this classification. It was determined that the service times of the first 4 ship classes followed an Erlang distribution, and the service time of
+
+72
+
+Scientific Journals of the Maritime University of Szczecin 62 (134)
+
+Statistical analysis for modeling ship operation processes in ports
+
+the 5th ship class fitted a beta distribution. Nas (Nas, 2013) conducted a simulation study to determine the optimum parking locations for tugboats serving a port area in Turkey. According to the data analysis, it was found that the interarrival time of ships followed an exponential distribution. Layaa and Dullaert (Layaa & Dullaert, 2014) developed queuing and simulation models to analyze the capacity of a port in Tanzania. For a general cargo terminal, the interarrival time of ships showed a gamma distribution, and service times of ships showed a log-normal distribution. They found that the interarrival times of a container terminal fitted a Weibull distribution, and that the service time fitted a log-normal distribution. Tang et al. (Tang et al., 2014) proposed the use of an anchorage for ships to temporarily anchor to improve performance in ports with very long oneway entrance channels. They developed a simulation model and examined the data from a port in China and found that both the service time and interarrival time showed an exponential distribution. Tang et al. (Tang et al., 2016) conducted a simulation study to examine the effect of entrance channel dimensions on the berth occupancy of a container terminal. In their study, exponential and Erlang-3 distributions were used for interarrival times and service times, respectively.
+Examining the interarrival time distributions shows that an exponential distribution (Poisson point process) was used in most studies, as well as gamma, Weibull, and Erlang distributions (Huang et al., 2008; Tang et al., 2014; Tang et al., 2016). Even if ship arrivals are planned, when arriving ship traffic is considered, the interarrival times are randomly distributed and corresponds to an exponential distribution. Unpredictable weather conditions and service delays by other ports of call can increase the randomness of arrivals (Huang et al., 2008).
+In the simplest queuing systems, the most common distribution used for service times is the exponential distribution. In some cases, service time distributions may have heavier tails than the exponential distribution. Examining the service time distributions in ports (Table 1) shows that tailed distributions such as Erlang and log-normal are used, as well as beta and uniform distributions.
+Another literature review was performed to investigate the statistical distributions used in berthing and unberthing maneuver processes. These processes consist of pilotage and towage services provided for ship approaches to a port and departures from a port (Nas, 2013; Uğurlu, Yüksekyildiz & Köse, 2014). Most studies used deterministic
+
+values instead of statistical distributions for the time elapsed during these processes (Dragovic, Park & Radmilovic, 2006; Zhou, Guo & Song, 2006; Lin, Gao & Zhang, 2014; Uğurlu, Yüksekyildiz & Köse, 2014). Nas et al. (Nas, Özkan & Uçan, 2016) conducted a simulation study to determine the required number of tugboats in towage service authorization areas using a normal distribution for both the berthing maneuver time and unberthing maneuver time.
+Problem statement
+Some studies in the literature review assumed the statistical distributions that were used in the ship operation processes. However, in other studies, the authors analyzed real data from the ports, and they found and used appropriate distributions for these processes. Consequently, there is a need to reveal such differences in the literature regarding the statistical distributions of ship operations in ports and to develop suggestions for distributions of ship operations.
+The aim of this study was to determine the statistical distributions that may be used to model random processes related to ship operations in ports.
+Methodology
+The examined ship operation processes are ship arrivals, berthing maneuvers, service process at berth, and unberthing maneuvers. A literature review was performed to examine the statistical distributions used in these random processes. In addition, port data on ship operations gathered from three different ports in Turkey were examined, whose locations are shown in Figure 1.
+Port A and Port B are multipurpose ports where various cargoes are handled. The data of Port A consists of ship operation records belonging to five terminals located in the Gulf of Gemlik. Container, Ro-Ro, general cargo, bulk cargo, project cargo, oil tanker, and chemical tanker ships are serviced in the region of Port A. The data of Port B includes nine terminals located in the Gulf of Nemrut. The ship types arriving at this port area include bulk cargo, general cargo, container, oil tanker, chemical tanker, and LPG tanker ships. Port C is a liquid bulk terminal located near the Gulf of Nemrut. The data of Port C consists of operation records of oil, chemical, and LPG tanker ships.
+Previous studies have shown that ship operation processes vary according to the ship size (Esmer, Yildiz & Tuna, 2013; Nas, 2013, Tang et al., 2016).
+
+Zeszyty Naukowe Akademii Morskiej w Szczecinie 62 (134)
+
+73
+
+Emin Deniz Özkan, Umay Uzunoğlu Koçer, Selçuk Nas
+
+Data of “Port A” for the year of 2018
+Data of “Port B” for the year of 2010 Data of “Port C” for the year of 2017
+
+Figure 1. Port regions
+
+In this study, port data were analyzed according to four ship size classes depending on gross tonnages of ships (Table 2). The port regulations in Turkey were taken into consideration when making this classification (Ports Regulation, 2012).
+
+Table 2. Ship size classes
+Gross tonnage (GRT) Less than 2000 2000–5000 5001–45,000
+45,001 and above
+
+Ship size class I II III IV
+
+According to the data sets obtained from the ports, the number of ships arriving at ports annually according to ship size classes are given in Table 3.
+The data of the port regions were examined for ship arrival, service, berthing maneuvers, and unberthing maneuver processes. The sequence of these processes within the time frame is shown in Figure 2.
+Ship size classes were not taken into consideration when examining ship arrivals. The classifications
+
+Table 3. Number of ships arriving at ports
+
+Ship size class I II III IV
+Total
+
+Port A 419 729 2009 299 3456
+
+Port B 356 1067 1247 6 2676
+
+Port C 552 135 375 123 1185
+
+specified in Table 2 were taken into consideration for service, berthing maneuvers, and unberthing maneuver processes. The StatFit program included in ProModel simulation software was used to identify suitable distributions for these processes. Kolmogorov-Smirnov (K-S) and Anderson-Darling (A-D) goodness of fit tests were conducted.
+Findings
+The statistical analysis findings of the ship operation processes were examined under the titles of “Ship Arrival”, “Service”, “Berthing Maneuver and Unberthing Maneuver”.
+
+NOTICE of READINESS PILOT of BOARD PILOT LEFT PILOT of BOARD PILOT LEFT
+
+Figure 2. Ship operation processes in a port
+74
+
+Scientific Journals of the Maritime University of Szczecin 62 (134)
+
+Statistical analysis for modeling ship operation processes in ports
+
+Ship arrival process
+The interarrival time distribution of ships is the distribution of times between ship arrivals at a port, and port data were examined to determine the distribution of times between ship arrival times. In the ship operation data of Port A and B, the first time record of a ship arriving at the port area is the moment when the pilot is on board. Therefore, when examining the data from Port A and Port B, the time elapsed between the “POB (Pilot on Board) times” of each ship were calculated. On the other hand, in the data of Port C, the first time record is the “Notice of Readiness” time. Thus, when examining the data of Port C, the time elapsed between the “NOR (Notice of Readiness) times” of each ship were calculated.
+The distributions applied for the interarrival times, the p-values obtained from K-S and A-D test results of these distributions, and the fitness percentages of the distributions are given in Table 4. No suitable distribution was found for the data sets of Port A or Port B. In addition, the data set of Port C was suitable for various distributions, which are summarized in Table 4. Additionally, Figure 3 shows the frequency distributions of the interarrival times in all ports.
+
+Table 4. Goodness of fit tests for the interarrival times of ships
+
+Distribution
+Gamma Erlang Weibull Exponential Johnson SB Inverse Gaussian Lognormal
+
+p-values
+
+K-S
+
+A-D
+
+PORT C
+
+0.686
+
+0.772
+
+0.266
+
+0.330
+
+0.304
+
+0.210
+
+0.273
+
+0.100
+
+0.196
+
+0.122
+
+0.057
+
+0.038
+
+0.056
+
+0.027
+
+Fitness %
+100 16.6 12.0 5.16 4.51 0.40 0.29
+
+Table 4 gives the goodness of fit tests of the interarrival time distribution for Port C, and the following hypotheses can be established: H0: The data are fitted by a “Gamma” distribution. H1: The data does not fit a “Gamma” distribution.
+The significance level for the goodness of fit test was α = 0.05. The null hypothesis cannot be rejected since the p-values for both K-S and A-D goodness of fit tests were > α. The StatFit program lists the appropriate distributions according to their relative goodness of fit, i.e. fitness percentage. The distributions that are appropriate for the interarrival times are listed in Table 4 according to the fitness percentages.
+
+Frequency
+
+Histogram of Port A
+
+700
+
+1000
+
+600 800
+500
+
+400
+
+600
+
+Frequency
+
+300
+
+400
+
+200
+200 100
+
+0
+
+0.0
+
+3.5
+
+7.0
+
+10.5
+
+14.0 17.5 21.0 24.5
+
+Hour
+
+0
+
+0
+
+5
+
+Histogram of Port C
+250
+
+Histogram of Port B
+
+10
+
+15
+
+20
+
+25
+
+30
+
+35
+
+Hour
+
+200
+
+Frequency
+
+150
+
+100
+
+50
+
+0 0
+
+8
+
+16
+
+24
+
+32
+
+40
+
+48
+
+Hour
+
+Figure 3. Frequency distributions of the interarrival times
+
+Zeszyty Naukowe Akademii Morskiej w Szczecinie 62 (134)
+
+75
+
+Emin Deniz Özkan, Umay Uzunoğlu Koçer, Selçuk Nas
+
+The most appropriate interarrival time distribution for Port C was the “Gamma” distribution, with 95% confidence.
+While the Port C data set was suitably described by some distributions, no distribution was suitable for the Port A and B data sets, likely due to differences in time references accepted for ship arrival times. The arrival times were accepted as NOR times in Port C; on the other hand, the POB times were used as a reference in Port A and B. The POB times are based on constraints such as the berthing permission of a ship, the availability of a maritime pilot, and the time for a maritime pilot to reach the ship. NOR times are unaffected by the above-mentioned constraints, indicating the randomness of ship arrivals in a port area.
+
+Service process
+
+The service time distribution refers to the distribution of times spent by ships at berth to perform loading and unloading services. Port data were examined to determine the distributions that may be appropriate for the service time. When examining the data sets, the time elapsed between “End of Pilotage for Berthing” and “Start of Pilotage for Unberthing” was calculated for each size class of ships.
+The investigated distributions for the service time of class I ships, the p values obtained from K-S and A-D test results of these distributions, and the fitness percentages of the distributions are given in Table 5. No suitable distribution was found for the Port C data. The results of Port A and B data sets are summarized in Table 5.
+
+Table 5. Goodness of fit tests for the service times of class I ships
+
+Distribution
+Weibull Pearson 6
+Inverse Gaussian Johnson SB Log-normal Pearson 6 Log-Logistic Pearson 5 Inverse Weibull Gamma Weibull Beta
+
+p-values
+
+K-S
+
+A-D
+
+PORT A
+
+0.153
+
+0.079
+
+0.071
+
+0.056
+
+PORT B
+
+0.913
+
+0.932
+
+0.853
+
+0.918
+
+0.765
+
+0.879
+
+0.469
+
+0.713
+
+0.592
+
+0.490
+
+0.445
+
+0.620
+
+0.356
+
+0.511
+
+0.133
+
+0.279
+
+0.097
+
+0.121
+
+0.063
+
+0.169
+
+Fitness %
+39.3 12.8
+100.0 92.1 79.1 39.2 34.1 32.5 21.3 4.36 1.38 1.25
+
+The most suitable service time distributions for class I ships were the “Weibull” for the Port A data set and the “Inverse Gaussian” for the Port B data set.
+The investigated distributions for the service times of class II ships, the p-values obtained from K-S and A-D test results of these distributions, and the fitness percentages of the distributions are given in Table 6.
+
+Table 6. Goodness of fit tests for the service times of class II ships
+
+Distribution
+Inverse Gaussian Log-normal Pearson 6 Pearson 5 Log-Logistic Inverse Weibull Gamma Weibull
+Log-Logistic Inverse Weibull Pearson 5
+Log-Logistic Inverse Weibull Pearson 5 Pearson 6 Log-normal Inverse Gaussian Gamma
+
+p-values
+
+K-S
+
+A-D
+
+PORT A
+
+0.836
+
+0.783
+
+0.720
+
+0.744
+
+0.647 0.298 0.417
+
+0.499 0.409 0.155
+
+0.206
+
+0.290
+
+0.105
+
+0.091
+
+0.055
+
+0.022
+
+PORT B
+
+0.209 0.101
+
+0.118 0.123
+
+0.055
+
+0.084
+
+PORT C
+
+0.451 0.319 0.261
+
+0.560 0.359 0.255
+
+0.169
+
+0.173
+
+0.186
+
+0.146
+
+0.129 0.052
+
+0.092 0.028
+
+Fitness %
+100.0 81.8 49.3 18.6 9.87 9.14 1.46 0.19
+96.0 48.5 17.9
+100.0 45.3 26.4 11.5 10.7 4.71 0.58
+
+The most appropriate service time distributions for class II ships were the “Inverse Gaussian” for the Port A data set and the “Log-Logistic” for both Port B and C data sets.
+The investigated distributions for the service times of class III ships, the p-values obtained from K-S and A-D test results of these distributions, and the fitness percentages of the distributions are given in Table 7. No suitable distribution was identified for Port A and B data sets. The results of the Port C data set are summarized in Table 7.
+The most appropriate service time distributions for class III ships was the “Log-normal” for the Port C data set. The investigated distributions for the service time of class IV ships, the p-values obtained from K-S and A-D test results of these distributions, and the fitness percentages of the distributions are given in Table 8. The Port B data set could not be examined because of insufficient data. The results
+
+76
+
+Scientific Journals of the Maritime University of Szczecin 62 (134)
+
+Statistical analysis for modeling ship operation processes in ports
+
+of the Port A and C data sets are summarized in Table 8.
+Table 8 shows that the most appropriate service time distributions for class IV ships were the “Inverse Weibull” for the Port A data set and the “Weibull” for the Port C data set.
+
+Table 7. Goodness of fit tests for the service times of class III ships
+
+Distribution
+Log-normal Pearson 6 Inverse Gaussian Erlang Pearson 5 Gamma Inverse Weibull Log-Logistic Beta Weibull
+
+p-values
+
+K-S
+
+A-D
+
+PORT C
+
+0.408 0.330
+
+0.439 0.286
+
+0.367 0.299
+
+0.361 0.184
+
+0.243 0.254
+
+0.262 0.165
+
+0.184 0.207
+
+0.217 0.096
+
+0.124 0.058
+
+0.075 0.019
+
+Fitness %
+64.3 60.0 52.5 31.9 29.5 20.7 18.2 9.93 3.46 0.67
+
+Table 8. Goodness of fit tests for the service times of the class IV ships
+
+Distribution
+Inverse Weibull Pearson 5 Log-normal Log-Logistic Extreme Value IA Inverse Gaussian Erlang Pearson 6 Gamma Beta Chi Square Weibull Rayleigh
+Weibull Beta Gamma Extreme Value IA Erlang Inverse Gaussian Log-normal Pearson 5 Rayleigh Log-Logistic Pearson 6 Chi Square Logistic Normal
+
+p-values
+
+K-S
+
+A-D
+
+PORT A
+
+0.960
+
+0.925
+
+0.942
+
+0.929
+
+0.864
+
+0.871
+
+0.751
+
+0.883
+
+0.690
+
+0.856
+
+0.740
+
+0.777
+
+0.607
+
+0.634
+
+0.747
+
+0.486
+
+0.555
+
+0.557
+
+0.552
+
+0.505
+
+0.286
+
+0.338
+
+0.161
+
+0.075
+
+0.069
+
+0.043
+
+PORT C
+
+0.816
+
+0.902
+
+0.750
+
+0.859
+
+0.552
+
+0.739
+
+0.503
+
+0.534
+
+0.497
+
+0.539
+
+0.438
+
+0.596
+
+0.422
+
+0.555
+
+0.408
+
+0.517
+
+0.445
+
+0.443
+
+0.392
+
+0.359
+
+0.360
+
+0.369
+
+0.369
+
+0.332
+
+0.416
+
+0.226
+
+0.323
+
+0.190
+
+Fitness %
+99.6 98.2 84.5 74.4 66.2 64.5 43.2 40.8 34.7 31.3 10.8 1.36 0.33
+100.0 87.5 55.4 36.4 36.4 35.4 31.8 28.7 26.8 19.1 18.0 16.7 12.8 8.31
+
+Berthing maneuver and unberthing maneuver processes
+
+Berthing / unberthing time distributions are the distribution of times spent by each ship for berthing / unberthing when in company with tugs and harbor pilots. The port data were examined to determine the distributions that may be appropriate for the berthing and unberthing times. For the berthing times, when examining the data sets of the ports, the time elapsed between the “Start of Pilotage for Berthing” times and the “End of Pilotage for Berthing” times was calculated for each size class of ships. For the unberthing times, when examining the data set of the ports, the time elapsed between the “Start of Pilotage for Unberthing” times and the “End of Pilotage for Unberthing” times were calculated for each size class of ships.
+In all datasets, no statistical distribution was found to be suitable for the berthing and unberthing times of the ships in class I, II, or III. In Figure 4 and Figure 5, the frequency distribution graphs of the berthing and unberthing times of class II ships are shown as an example.
+Figure 4 and Figure 5 show that the berthing and unberthing times have very high frequencies at certain values, which is a similar problem in all ports whose data were analyzed. The data sets of Port A and C were examined for the berthing times of the class IV ships (Table 9), but the data set of Port B could not be examined due to insufficient data.
+
+Table 9. Goodness of fit tests for the berthing time of class IV ships
+
+Distribution
+Log-Logistic Log-normal Logistic
+Log-normal Pearson 5 Log-Logistic Erlang Gamma Beta Logistic Weibull Pearson 6 Chi Square Extreme Value IA Normal Inverse Gaussian Rayleigh
+
+p-values
+
+K-S
+
+A-D
+
+PORT A
+
+0.187
+
+0.421
+
+0.053
+
+0.287
+
+0.073
+
+0.180
+
+PORT C
+
+0.482
+
+0.604
+
+0.456
+
+0.607
+
+0.497
+
+0.529
+
+0.444
+
+0.591
+
+0.440
+
+0.591
+
+0.360
+
+0.538
+
+0.427
+
+0.381
+
+0.243
+
+0.436
+
+0.247
+
+0.364
+
+0.222
+
+0.395
+
+0.161
+
+0.385
+
+0.163
+
+0.252
+
+0.100
+
+0.248
+
+0.064
+
+0.163
+
+Fitness %
+100.0 19.3 16.6
+96.4 91.7 87.1 86.9 86.0 64.0 53.9 35.1 29.7 29.0 20.5 13.5 8.20 3.46
+
+Zeszyty Naukowe Akademii Morskiej w Szczecinie 62 (134)
+
+77
+
+Emin Deniz Özkan, Umay Uzunoğlu Koçer, Selçuk Nas
+
+Frequency Frequency
+Frequency
+
+160 140 120 100 80 60 40 20
+0 20
+
+Histogram of Port A
+
+40
+
+60
+
+80
+
+100
+
+Minute
+
+50
+
+Histogram of Port B
+300
+
+250
+
+200
+
+150
+
+100
+
+50
+
+0
+
+120
+
+12.5 25.0 37.5 50.0 62.5 75.0 87.5 100.0
+
+Minute
+
+Histogram of Port C
+
+40
+
+30
+
+20
+
+10
+
+0
+
+10
+
+20
+
+30
+
+40
+
+50
+
+60
+
+Minute
+
+Figure 4. Frequency distributions of the berthing times of class II ships
+
+Frequency Frequency
+
+Histogram of Port A
+250 200 150 100 50
+
+Histogram of Port B
+400 300 200 100
+
+0
+
+12.5
+
+25.0
+
+37.5
+
+50.0
+
+62.5
+
+75.0
+
+87.5
+
+Minute
+
+0
+
+15
+
+30
+
+45
+
+60
+
+75
+
+90
+
+105
+
+Minute
+
+Figure 5. Frequency distributions of the unberthing times of class II ships
+
+The most appropriate berthing time distributions for class IV ships were the “Lognormal” for the Port C data set and the “Log-Logistic” for the Port A data set. For the unberthing maneuver distribution of class IV ships, the data set of Port A did not fit any distribution, and there was insufficient data from Port B and C for statistical analysis.
+Conclusions
+In this study, the time used as a reference for “ship arrival time” is very important for the interarrival time distributions of ships. In some data sets, “POB” times were referenced, while others used “NOR”
+
+times as the ship arrival time. As a result, no suitable distribution was found for the data sets in which the POB value was taken as a reference. The POB times are based on constraints such as the berthing permission of ship, the availability of a maritime pilot, and the time for a maritime pilot to reach the ship. The NOR times were unaffected by the above-mentioned constraints, which indicates the randomness of ship arrivals in a port area.
+The literature examination showed that an Exponential distribution was most suitable for the interarrival times of ships. On the other hand, in the port data sets used in this study, a Gamma distribution was found to be suitable for the interarrival times
+
+78
+
+Scientific Journals of the Maritime University of Szczecin 62 (134)
+
+Statistical analysis for modeling ship operation processes in ports
+
+of tanker ships. In some studies, in which real port data were analyzed, a Gamma distribution was suitable for interarrival times of container ships (Esmer, Yildiz & Tuna, 2013) and general cargo ships (Layaa & Dullaert, 2014).
+According to the results analysis, heavy-tailed distributions such as the Inverse Weibull, Inverse Gaussian, Log-Logistic, and Log-normal were suitable for service processes. While it is almost impossible to use such distributions in queuing theory models, these distributions can be easily used in simulation models. In addition, if there are outliers in the data sets, a boxplot can be used to decide whether to include these values.
+Nearly no statistical distribution was found to be suitable for describing the data of the berthing maneuver and unberthing maneuver processes of ships. Frequency distributions of these data were examined, and it was determined that the berthing and unberthing times contained excessively high frequencies at certain values. It is thought that this problem arose due to the recording of minutes in multiples of 5 for ease of calculation in the timesheets of ship operations. In addition, in the timesheets used for recording ship operations, the decimal values of the clock were entered for ease of calculation. To incorporate a data set that does not fit a certain theoretical distribution into the simulation program, frequency distributions of data collected from the field – i.e. empirical distributions – can be used.
+References
+1. Agerschou, H. (2004) Facilities Requirements. In: Agerschou, H. (ed.) Planning and Design of Ports and Marine Terminals (pp. 5–20). 2nd Edition. London: Thomas Telford.
+2. Bugaric, U. & Petrovic, D. (2007) Increasing the Capacity of Terminal for Bulk Cargo Unloading. Simulation Modelling Practice and Theory 15(10), pp. 1366–1381.
+3. Demirci, E. (2003) Simulation Modelling and Analysis of a Port Investment. Simulation 79(2), pp. 94–105.
+4. Dragovic, B., Park, N.K. & Radmilovic, Z. (2006) ShipBerth Link Performance Evaluation: Simulation and Analytical Approaches. Maritime Policy & Management 33(3), pp. 281–299.
+5. Esmer, S., Yildiz, G. & Tuna, O. (2013) A New Simulation Modelling Approach to Continuous Berth Allocation. International Journal of Logistics Research and Applications 16(5), pp. 398–409.
+6. Groenveld, R. & Wanders, S. (1999) Computer simulation model international container terminal Tanjung Perak, Surabaya, Indonesia. The International Workshop on Harbour, Maritime & Industrial Logistics Modelling and Simulation (HMS 1999), 16–18 September 1999, Genoa, Italy.
+7. Huang, S.Y., Hsu, W.J., Chen, C., Ye, R. & Nautiyal, S. (2008) Capacity Analysis of Container Terminals Using Simulation Techniques. International Journal of Computer Applications in Technology 32(4), pp. 246–253.
+
+8. Imai, A., Sun, X., Nishimura, E. & Papadimitriou, S. (2005) Berth Allocation in a Container Port: Using a Continuous Location Space Approach. Transportation Research Part B 39(3), pp. 199–221.
+9. Kia, M., Shayan, E. & Ghotb, F. (2002) Investigation of Port Capacity Under A New Approach by Computer Simulation. Computers & Industrial Engineering 42(2–4), pp. 533–540.
+10. Kuo, T.C., Huang, W.C., Wu, S.C. & Cheng, P.L. (2006) A Case Study of Inter-Arrival Time Distributions of Container Ships. Journal of Marine Science and Technology 14(3), pp. 155–164.
+11. Lai, K.K. & Shih, K. (1992) A Study of Container Berth Allocation. Journal of Advanced Transportation 26(1), pp. 45–60.
+12. Layaa, J. & Dullaert, W. (2014) Measuring and Analysing Terminal Capacity in East Africa: The Case of the Seaport of Dar es Salaam. Maritime Economics & Logistics 16(2), pp. 141–164.
+13. Lee, T.W., Park, N.K. & Lee, D.W. (2003) A Simulation Study for the Logistics Planning of A Container Terminal in view of SCM. Maritime Policy & Management 30(3), pp. 243–254.
+14. Lin, J., Gao, B. & Zhang, C. (2014) Simulation-based Investment Planning for Humen Port. Simulation Modelling Practice and Theory 40, pp. 161–175.
+15. Nas, S. (2013) Teknik Seyir Hizmetlerinde Kaynakların Simülasyon Modellemesi Yöntemiyle Optimizasyonu: Römorkör Park Yeri Seçimi. Dokuz Eylül Üniversitesi Denizcilik Fakültesi Dergisi 5(2), pp. 57–81.
+16. Nas, S., Özkan, E.D. & Uçan, E. (2016) Römorkörcülük Hizmeti Yetki Sahalarında Römorkör Sayısının Simülasyon Modellemesi Yöntemiyle Tespiti. Journal of ETA Maritime Science 4(1), pp. 91–99.
+17. Olba, X.B., Daamen, W., Vellinga, T. & Hoogendoorn, S.P. (2018) State-of-the-art of Port Simulation Models for Risk and Capacity Assessment based on the Vessel Navigational Behaviour Through the Nautical Infrastructure. Journal of Traffic and Transportation Engineering (English Edition) 5(5), pp. 335–347.
+18. Ports regulation (2012) Official Gazette of the Republic of Turkey. Number: 28453, Date: 31.10.2012.
+19. Shabayek, A.A. & Yeung, W.W. (2001) Effect of Seasonal Factors on Performance of Container Terminals. Journal of Waterway, Port, Coastal, and Ocean Engineering 127(3), pp. 135–140.
+20. Tang, G., Guo, Z., Yu, X., Song, X. & Du, P. (2014) SPAC to Improve Port Performance for Seaports with Very Long One-Way Entrance Channels. Journal of Waterway, Port, Coastal, and Ocean Engineering 140(4), 04014011.
+21. Tang, G., Wang, W., Song, X., Guo, Z., Yu, X. & Qiao, F. (2016) Effect of Entrance Channel Dimensions on Berth Occupancy of Container Terminals. Ocean Engineering 117, pp. 174–187.
+22. Uğurlu, Ö., Yüksekyildiz, E. & Köse, E. (2014) Simulation Model on Determining of Port Capacity and Queue Size: A Case Study for BOTAS Ceyhan Marine Terminal. The International Journal on Marine Navigation and Safety of Sea Transportation 8(1), pp. 143–150.
+23. Zhou, P.-F., Guo, Z.-J. & Song, X.-Q. (2006) Simulation Study on Container Terminal Performance. Proceedings of 2006 International Conference on Management Science & Engineering ICMSE’06 (13th), 5–7 October 2006, Lille, France.
+
+Zeszyty Naukowe Akademii Morskiej w Szczecinie 62 (134)
+
+79
+

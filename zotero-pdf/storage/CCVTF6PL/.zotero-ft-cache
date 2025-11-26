@@ -1,0 +1,564 @@
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+1
+
+Impacts of COVID-19 on Ship Behaviours in Port Area: An AIS Data-Based Pattern Recognition Approach
+Chunlin Wang, Guoyuan Li , Senior Member, IEEE, Peihua Han , Member, IEEE, Ottar Osen, and Houxiang Zhang , Senior Member, IEEE
+
+Abstract— The advent of the COVID-19 pandemic disrupted global commercial activities and the tourism industry heavily. Impacts on maritime transportation were huge, as seaborne trade represents over 80% of global merchandise trade. Investigating how COVID-19 has affected ship behaviours is signiﬁcant for economic condition evaluation, port management. This paper develops an analysis method to mine knowledge from raw Automation Identiﬁcation System (AIS) data. First, berths are identiﬁed by improved density-based spatial clustering of applications with noise by Pythagoras distance (PD-DBSCAN). Data features, such as ship deadweight, arrival time, dwelling time, ship types, etc., can then be extracted using information matching and statistical analysis. Next, the dynamic time warping method is employed to analyse abnormal ship behaviour patterns and quantify the impacts of COVID-19. After that, a signiﬁcance test is employed to determine an impact threshold through year-onyear analysis on ship ﬂow, daily throughout and berthing time of quays. Finally, statistical analysis is used for the short-term impact analysis. This research examines a case study based on four-year AIS data in the Oslo port area. The results show that the proposed method can identify abnormal patterns caused by COVID-19 and estimate its impacts. Passenger ships are inﬂuenced heavily compared with cargo ships. The variation of passenger ships’ ﬂow is over 90% during 2020, larger than the average variation before 2020. The discovered knowledge could be used for future decision-making and preplanning in the next health crisis.
+Index Terms— COVID-19, PD-DBSCAN, dynamic time warping, signiﬁcance test, statistical analysis, AIS data.
+I. INTRODUCTION
+C ORONAVIRUS disease (COVID-19) has been raging in almost every country around the world since March 2020, leading to containment measures worldwide. These
+Manuscript received September 10, 2021; revised December 6, 2021; accepted January 19, 2022. This work was supported in part by IKTPLUSS Project “Remote Control Centre for Autonomous Ship Support” under Project 309323 and in part by Centre for Research Based Innovation “SFI Marine Operation in Virtual Environment (SFI-MOVE)” under Project 237929 from Research Council of Norway. The work of Chunlin Wang was supported by the Chinese Scholarship Council through the Norwegian University of Science and Technology. The Associate Editor for this article was S.-Y. Chen. (Corresponding authors: Guoyuan Li; Houxiang Zhang.)
+Chunlin Wang, Guoyuan Li, Peihua Han, and Houxiang Zhang are with the Department of Ocean Operations and Civil Engineering, Norwegian University of Science and Technology, 6009 Ålesund, Norway (e-mail: chunliw@ntnu.no; guoyuan.li@ntnu.no; peihua.han@ntnu.no; hozh@ ntnu.no).
+Ottar Osen is with the Department of ICT and Natural Sciences, Norwegian University of Science and Technology, 6009 Ålesund, Norway (e-mail: ottar.osen@ntnu.no).
+Digital Object Identiﬁer 10.1109/TITS.2022.3147377
+
+restrictions, while effective in slowing the spread of the virus, have had impacts on global trade and economy [1]. Ports play a pivotal role in the development of the regional economy as maritime trade accounts for over 80% of global merchandise trade by volume [2]. Hence, it is signiﬁcant to investigate the impacts of COVID-19 on ship behaviours in the port area during the pandemic, which can be used to estimate the inﬂuence of COVID-19 on the regional economy, and logistic activities of the port indirectly.
+VHF Data Exchange System (VDES) and Automatic Identiﬁcation System (AIS) are two leading technologies to broadcast communication in which vessels periodically report their position, course and speed. VDES is on its way to becoming a standard of the International Telecommunication Union. It can implement a more efﬁcient high-speed data exchange between ships, satellites and shore and protect the AIS from future overload [3]. However, VDES does not have a high penetration now as it is not made mandatory by national authorities and requires a high-cost entry terminal [4]. Therefore, in this study, AIS data is selected to analyze ship behaviours. It includes rich ship motion information, and it is common to use it as ﬁeld data for ship trafﬁc analysis, trajectories analysis, collision avoidance, etc. [5]–[7].
+Recently, researchers have taken advantage of AIS data to study how COVID-19 interacts with ship activities, port management, and economic conditions [8], [9]. Through the analysis of ship trafﬁc density over months, COVID-19 impacts could be observed. Nevertheless, these analyses can not quantify the impact of COVID-19 on ship behaviours and port operations. In addition, since economic conditions and other factors affect ship activities, it is hard to distinguish whether the pandemic is the sole cause of variation in ship trafﬁc volume in analyses that only use one-year historical AIS data as a reference. Missing information in AIS data, such as ship type, berth’s position, ship arrival time, departure time, also pose challenges. These gaps in knowledge motivate the current analysis of the impacts of COVID-19 on the behaviours of different ships and port operations. Furthermore, such analysis can be used to provide insights for port stakeholders to make tactical decisions.
+This paper proposes an analysis method to identify abnormal ship behaviour patterns and quantify the impacts of COVID-19 in the Oslo port area. The discovered knowledge could be used to provide decision supports for stakeholders,
+
+1558-0016 © 2022 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+2
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+such as shipping companies, port managers, and policymakers, in the next health emergency crisis. The main contributions are as follows: 1) applying improved density-based spatial clustering of applications with noise by Pythagoras distance (PD-DBSCAN) to identify berths in the Oslo port; 2) employing dynamic time warping (DTW) to analyse ship ﬂow, daily throughout and dwelling time of quays from yearon-year respects, and using signiﬁcance interval to estimate a COVID-19 impact threshold; 3) performing a short-term impact analysis by combining DTW with statistical analysis from the month-on-month perspective.
+The rest of this paper is structured as follows: the next section describes related works on AIS data analysis. Section III details the procedure of knowledge discovery from raw AIS, including data pre-processing, feature extraction, knowledge discovery. Section IV presents the results of three experiments, including berth identiﬁcation, year-on-year DTW analysis, and month-on-month DTW analysis. Conclusion is given ﬁnally.
+II. RELATED WORK
+AIS data has been used in maritime transportation for several decades. With the help of satellites, a huge amount of data generated in the process of direct ship-to-ship, ship-to-coast, or coast-to-ship AIS communication can be transmitted to onboard AIS transceivers over long distance. In addition, AIS data contains abundant information, including time-stamp for each recorded data point and the ship’s Maritime Mobile Service Identity (MMSI), deadweight (DWT), speed over ground (SOG), ship length. This information gives decision-makers extensive knowledge about a ship’s behaviour and its surroundings. Because it offers rich information in real time, AIS data is widely applied for navigation safety, collision avoidance, trajectory analysis [10].
+AIS also has the potential to improve operators’ maritime situational awareness (MSA) and thereby improve navigational safety. Ship trajectories were analysed from AIS data with the help of statistical methods [11]. It contributes to unveiling ship behaviours for abnormal route detection. Wen et al. integrated DBSCAN and Artiﬁcial Neural Network to automatically extract ship routes between two ports, and the different routes according to different ships will be designed automatically [12]. For collision avoidance, Gao and Shi proposed a multi-step sub-trajectory clustering analysis method to recognize a unique ship-handling behaviour pattern [13]; Shi and Liu employed a double-gated recurrent unit neural network to learn the collision avoidance pattern hidden in AIS data [14]. It is able to make appropriate collision-avoidance decisions for different maritime navigation statuses in an automatic way. In addition, there are many extended applications of AIS data, such as ﬁshing activities and ship behaviours analysis in restricted waters. For example, Sheng et al. constructed a classiﬁcation model using a logistic regression technology [15]. It is capable of addressing the classiﬁcation problem of ﬁshing boats and cargo ships based on their AIS trajectories. Zhang et al. analysed marine trafﬁc hot-spots, and the spatial-temporal dynamics of ship trafﬁc in port waters using AIS data [5]. The
+
+analysis could be used for decision-making supports of port operations.
+The use of AIS data has broadened in scope, meeting the increasing practical demands, such as trade analysis, port performance evaluation. Zhang et al. proposed an analysis framework to analyse oil trade based on big AIS data [5]. Jia et al. estimated the payloads of vessels using AIS draught data [16]. It is useful to assess vessel utilization, ﬂeet productivity, and subsequent supply and demand conditions in shipping markets. The U.S. Department of Transportation Bureau of Transportation Statistics took advantage of AIS data to analyse the relations between dwell time, vessel size, and container volume [17]. Analysis results made for intelligent port management. Recently, Wang et al. applied ST-DBSCAN to trace ship infection risk and provide a decision support mechanism to prevent and control overseas imported COVID19 cases from international shipping [18]. March et al. used the AIS dataset and SENTINEL 5 data to investigate the effects of the COVID-19 pandemic on marine trafﬁc patterns within the area and any corresponding changes in the air quality [19]. AIS data was also applied to analyse impacts of COVID-19 pandemic on global trade [20], cruise industry [21], marine trafﬁc volume reduction [19], container ports [8], transmission path tracking [22], etc. These analyses focus on either the macroscopic trend of the number of different ship types or only one type of ship behaviour literally. They fall short of discovering sufﬁcient knowledge from AIS data for decision making.
+Inspired by the aforementioned studies and considering their limitations, this study proposes an analysis method that is able to identify abnormal patterns and quantify impacts caused by COVID-19 based on AIS data. It is not only suitable for analysing the variation of ship ﬂow but also is generalized to study the variation of daily throughout and dwelling time of ports.
+III. SYSTEM STRUCTURE
+This section outlines the impacts analysis of COVID-19 on ship behaviours and port operations. The whole analysis procedure is mainly divided into three parts, as shown in Fig. 1. The ﬁrst part is data preprocessing, including ship information matching. The second one introduces how several useful features are extracted from raw AIS data. Knowledge discovery process is described in the last part. The analysis results could be used for the decision support of port management and preplanning in the next health emergency crisis.
+A. Data Preprocessing
+AIS technology could broadcast static ship information and dynamic information at a regular time interval. Onboard transceiver, satellite, and terrestrial base stations exchange information in a real-time way over a long distance. All voyage information of worldwide ships that are equipped with AIS can be tracked and downloaded from marine trafﬁc,1 marinecadastre.2 In this study, AIS data in the area of Oslo
+1 https://www.marinetrafﬁc.com/ 2 https://marinecadastre.gov/ais/
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+WANG et al.: IMPACTS OF COVID-19 ON SHIP BEHAVIOURS IN PORT AREA
+
+3
+
+Fig. 1. The workﬂow of impacts analysis of COVID-19 on ship behaviours based on AIS data.
+
+in Norway was picked up from 2017 to 2020. The general description of AIS data can be found in [23]. This study focuses on the following attributes: MMSI, longitude, latitude, SOG. Other important information needs to be extracted from AIS data by statistical analysis.
+Ship type, deadweight, ship destination, arrival time, and berthing time are extremely important for the analysis of the impact of COVID-19 on ship behaviours. Sea-web,3 marine trafﬁc,1 and myshiptracking4 is accessed to match ship type and deadweight information based on MMSI. In the next step, ship types need to be changed into numerical values for the sake of the convenience of data analysis. Numbers from ‘1’ to ‘6’ were assigned to ‘Cargo,’ ‘Carrier,’ ‘Container,’ ‘Tanker,’ ‘Cruise,’ ‘Ferry,’ respectively. Other ship types, such as yacht and ﬁshing vessels, are excluded in this study.
+B. Feature Extraction
+To obtain the ship arrival time and its berthing time, it is necessary to pinpoint the ship’s destination, i.e. berth. To this end, position points (Latitude, Longitude) with ‘SOG = 0’ are selected. ‘SOG = 0’ means ship is mooring. However, ships may moor at a position at the outside of a berth. In order to address this problem, a clustering approach is introduced to identify real berths. DBSCAN has the ability to determine clusters by grouping together points that are closer. Unlike K-means, which require predeﬁned k clusters, DBSCAN can
+3https://maritime.ihs.com/ 4https://www.myshiptracking.com/vessels
+
+identify the number of clusters automatically [24], [25]. There-
+
+fore, DBSCAN is selected to identify berths in this study.
+
+Studies using DBSCAN generally employ Euclidean dis-
+
+tance to compute the distance between data points. Never-
+
+theless, it does not work very well for distance computation
+
+of AIS data points because of the scale of geographical
+
+coordinates. Speciﬁcally, the numerical precision of latitude
+
+and longitude is six digits after the decimal point. Although
+
+a ship is far away from another one in the real world,
+
+their Euclidean distance computed by coordinates is quite
+
+close to zero, such as 0.0001. This leads to the intractable
+
+selection of a proper distance threshold () according to the
+
+true distance among berths. In other words, the selection
+
+of  is time-consuming. Therefore, this study proposed an
+
+improved clustering algorithm (PD-DBSCAN) that replaces
+
+Euclidean distance with Pythagoras distance. It is able to
+
+transfer coordinate system distance to geographic distance. It is
+
+convenient to determine a proper  based on the actual distance
+
+between berths. For example, if two berths are as far away as
+
+400 meters,  is supposed to be selected as 200 meters half of
+
+the berths’ distance. The Pythagoras formula is shown in (1).
+
+⎧
+
+
+
+⎨⎨⎨⎨ di st = (lat)2 + (long)2
+
+lat = R × (lat2 − lat1) ⎨⎨⎨⎩ long = R × cos(centr al_long × 2π )
+
+(1)
+
+360
+
+where R is the maximum circumference of the Earth
+
+(40075000 m); (lat1, long1) and (lat2, long2) are geograph-
+
+ical coordinate of two data points. di st is distance (m).
+
+centr al_long denotes the longitude at which Olso locates.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+4
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+Fig. 2. The schematic diagram of identifying arrival time, departure time, and dwelling time of a ship.
+
+Algorithm 1 PD-DBSCAN Algorithm
+
+Input: D: Data
+
+Input: , minPts, Pythagoras_distance, label
+
+1 for point p in D do
+
+2 if label(p) is undeﬁned then
+
+3
+
+neighbours N ← RangeQuery(D,
+
+Pythagoras_distance, p, )
+
+4 if |N| < minPts then
+
+5
+
+label(p) = Noise
+
+6 l ← next cluster label
+
+7 label(p) ← l
+
+8 Seed set S ← N ∪ { p}
+
+9 for q in S do
+
+10
+
+if label(q) is Noise then
+
+11
+
+label(q) ← l
+
+12 if label(q) is undeﬁned then
+
+13
+
+neighbours N ← RangeQuery(D,
+
+Pythagoras_distance, q, ) label(q) ← l
+
+14 if |N| ≥ minPts then
+
+15
+
+S←S∪N
+
+16 Function RangeQuery(D, dist, Q, ):
+
+17 neighbours = empty list if point p in D then
+
+18
+
+if dist(Q, p) ≤  then
+
+19
+
+neighbours = neighbours ∪ { p}
+
+20 return neighbours
+
+The pseudocode of PD-DBSCAN is shown in Algorithm 1. This algorithm is mainly made up of three parts: 1) ﬁnding neighbours of each point and identifying core points; 2) adding
+
+neighbouring core points into clusters and ignoring non-core points; 3) assigning each non-core point to a nearby cluster if the cluster is a neighbour, otherwise assigning it to noise. There are two important parameters that need to be predeﬁned. They are distance threshold () and density threshold (minPts). Therein,  is used to ﬁnd neighbours of each point; minPts is used for judging whether this cluster has more than minPts points. As a consequence, the selection of  and minPts affects the accuracy of clustering results directly. A more detailed introduction can be found in [25].
+After berth identiﬁcation, to reduce the complexity of data analysis, all berths are grouped into different quays based on their position and functions. Next, the arrival time and dwelling time of a ship need to be determined. The time identiﬁcation of ships is carried out one after the other. Fig. 2 shows the schematic diagram regarding how to compute the arrival time, departure time, and dwelling time of a ship. Owing to a ship calling the quays several times a year, multiple time tables are obtained from AIS data. Therein, ‘AD,’ ‘ AH ,’ ‘D D,’ and ‘D H ’ denotes ‘arrival date,’ ‘arrival hour,’ ‘departure date,’ and ‘departure hour’ separately. Iteration is performed to ﬁnd the ﬁrst data point with ‘S OG < 0.1.’ If this point is inside the berth area, the current time-stamp is recorded as ‘ A Di , A Hi .’ Next, the data point moves to the next one until its ‘S OG ≥ 0.2.’ Meanwhile, the time stamp is recorded as ‘D Di , D Hi .’ In the following step, the ship’s dwelling time is calculated by ‘24 × (D Di − A Di ) + (D Hi − A Hi).’ After that, a new time table could be derived from original time tables. Next, time calibration is used to check whether the current dwelling time could be merged with the last one. For example, if ‘D Di = A Di+1’ and ‘D Hi < D Hi+1,’ i th and (i + 1)th dwelling time should be added up together. (i + 1)th arrival time is substituted by i th arrival time while i th record is removed. This process is repeated until the last data point
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+WANG et al.: IMPACTS OF COVID-19 ON SHIP BEHAVIOURS IN PORT AREA
+
+5
+
+of this ship. Finally, all features are extracted from AIS data for further analysis.
+
+C. Knowledge Discovery
+This section aims to discover knowledge from processed AIS data. To this end, a similarity measuring method is selected to carry out abnormal pattern recognition. Next, it is combined with statistical analysis to analyse behaviour patterns of ships under COVID-19 effects. The impact analysis is mainly composed of long-term analysis and short-term analysis. The long-term impact analysis aims to investigate the year-on-year difference caused by COVID-19 and derive an impact threshold for the following short-term analysis. The short-term impact analysis estimates the variation of monthon-month impact and explores the trend based on historical knowledge.
+In order to demonstrate the ability of the proposed method to discover abnormal patterns caused by COVID-19, Oxford Stringency Index (OSI) is introduced [26]. This is a composite index by recording policies on a scale to reﬂect the extent of government action. The OSI ranges from 0 to 100 and increases over time if more stringent mitigation policies are implemented or decrease if policies are rescinded. Four-year historical AIS data from 2017 to 2020 is used to make a comparison of ship ﬂow. If some abnormal patterns could be detected and coincide with OSI trend, that shows the proposed method holds for impacts analysis of COVID-19 on ship behaviours. Then it is used for long-term and shorttime trend analysis of ship ﬂow volume. For long-term impact analysis, a signiﬁcance interval test is used to determine an impact threshold for the following analysis. If the impact is larger than the threshold, it is regarded as a severe impact caused by the pandemic. The short-term analysis is employed to study the varying trend of ship ﬂow volume over each month against the past several months. Such analysis makes it possible for stakeholders to observe the short-term variations and estimate the future trend. The obtained knowledge could be used for intelligent port management and preplanning in the next pandemic crisis.
+This study is mainly to compare the ship ﬂow in different years to quantify the impacts of the COVID-19 pandemic. The extracted frequency of ships accessing a port is a time-varying variable. Compared with other time-series data with high sampling frequency like electroencephalography [27], trafﬁc ﬂow of car [28], it has a feature of sparseness, as its timestamp is ‘day.’ Therefore, machine learning and deep learning are not suitable for this case as they require a remarkably large data set. Since ship ﬂow variation could be treated as a time-series sequence, the similarity of different years’ sequences could be counted as the impact of COVID-19. If the similarity is lower, the impact is greater, and vice versa. The most straightforward similarity measure for time series is L p-norms such as L1 (Manhattan), L2 (Euclidean). However, since the mapping requires data points to be one-to-one correspondence, they are sensitive to misalignments and length of the sequence in time and are incapable of handling local time-shifting [29]. As a consequence, it is necessary to introduce a similarity measure
+
+Fig. 3. The number of clusters obtained from AIS data based on different minPts (number) and  (m).
+
+method to measure the similarity of ship ﬂow variation in
+
+different years, such as DTW.
+
+The objective of DTW is to compare time-dependent
+
+sequences X = (x1, x2, . . . , xn) and Y = (y1, y2, . . . , ym). Warping path information is contained in a n × m distance
+
+matrix:
+
+⎛
+
+⎞
+
+d (x1, y1) d (x1, y2) · · · d (x1, ym )
+
+D
+
+=
+
+⎜⎜⎜⎝d
+
+(x2, ...
+
+y1)
+
+d (x2, y2) ...
+
+··· ···
+
+d
+
+(x2, ...
+
+ym
+
+)⎟⎟⎟⎠
+
+(2)
+
+d (xn, y1) d (xn, y2) · · · d (xn, ym)
+
+where d is a distance measure function. DTW aims to ﬁnd
+
+out the warping path W = {w1, w2, . . . , wk, . . . wK } by
+
+minimizing the following function:
+
+⎧ ⎨⎨⎨
+
+D
+
+T
+
+W
+
+(X
+
+,
+
+Y
+
+)
+
+=
+
+mi
+
+n
+
+(K
+
+d
+
+(wk
+
+))
+
+⎨⎨⎩
+
+d(wk )
+
+=
+
+d (i ,
+
+j)
+
+=
+
+k=1
+d(xi, y j )
+
+(3)
+
+Given wk = (i, j ) and wk−1 = (i , j ). The optimal warping path is subject to the following three conditions: (i ) Boundary condition: w1 = (1, 1) and wK = (n, m); (ii ) Monotonicity condition: i − i  ≤ 1 and j − j  ≤ 1; (iii ) Step size condition: wk − wk−1 ∈ {(1, 0), (0, 1), (1, 1)} for k ∈ [1, K − 1]. The smaller DT W (X, Y ) represents the larger similarity of X and Y.
+In order to solve (3), dynamic programming is introduced
+with a computational complexity of O(nm). By this method, a cumulative distance matrix γ of the same dimension as the D, is created using (4). A more detailed introduction can be referred to [30].
+
+γ (i, j ) = mi n{γ (i − 1, j − 1), γ (i − 1, j ), γ (i, j − 1)} + d(xi , y j ) (4)
+
+After DTW quantiﬁes the year-on-year variation of all variables, mathematical expectation (μ) of total impacts is used as a threshold to detect whether the variation of ship ﬂow, for example, is within the normal range. However, this
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+6
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+Fig. 4. The distribution of berths in the Oslo port.
+
+on ship behaviours. The ﬁrst one is how to select proper parameters for clustering. The second is to verify the feasibility of DTW to ﬁnd abnormal patterns. Next, DTW is used to carry out year-on-year analysis in terms of ship ﬂow, daily throughout and average berthing time of quays. The last one is to analyse the short-term variation trend of ship’s ﬂow. After that, a discussion will be carried out to analyse how COVID-19 interacts with ship behaviours and port operations.
+
+Fig. 5. The ship ﬂow into different quays of Oslo port in 2019.
+
+raises a problem due to statistical errors. Hence, signiﬁcance
+
+interval estimation is introduced to improve the signiﬁcance
+
+of statistic μ. Due to both parameters like μ and variance (σ 2) being unknown, (5) is applied to estimate the signiﬁcance
+
+interval if the population is normally distributed [31]. The
+
+calculated conﬁdence interval with conﬁdence level ‘1 − α’
+
+is
+
+[ Z¯
+
+−
+
+√S N
+
+tα/2 ( N
+
+−
+
+1),
+
+Z¯
+
++
+
+√S N
+
+tα/2 ( N
+
+−
+
+1)].
+
+P
+
+{
+
+Z¯
+
+− √
+
+μ
+
+S/ N
+
+<
+
+tα/2 ( N
+
+− 1)}
+
+=
+
+1−
+
+α
+
+(5)
+
+where P is a probability distribution function; Z¯ is the mean value of random samples [Z1, Z2, Z3, . . . , Zn]; S is the sample variance; N is the size of samples; t represents student distribution; α is a signiﬁcance level.
+
+IV. CASE STUDY
+This section introduces three experiments regarding how to employ AIS data in Oslo to analyse the impacts of COVID-19
+
+A. Berth Identiﬁcation
+This study uses four years of historical AIS data from 2017 to 2020, in the Oslo area. The data with ‘SOG > 0’ is removed. The total remaining data volume is over twenty million. It is impossible to employ all data to cluster berths. As a consequence, the data needs re-sampling to reduce the training cost. Speciﬁcally, each vessel is re-sampled by ten samples for each year. There are 11170 samples in total. minPts is selected from the interval [20, 100].  is in the interval [100, 500]. Their physical meanings are the minimum number of ships in a berth and the short distance between berths.
+Fig. 3 shows the clustering results based on different combinations of minPts and . Through the analysis of clustering results, all berths could be identiﬁed correctly when the number of clusters reaches around 30. If the number is less than 30, that indicates some berths are merged together. As long as the clusters are within [20, 30], the analysis is not inﬂuenced because all berths are grouped into different quays based on their position and functionality. In order to display the berths in detail, the value of (30, 200) is picked up as the parameters’ value of (minPts, ) separately as shown in the annotation of Fig. 3.
+For the convenience of investigating port operations, the identiﬁed berths are grouped into different quays. As shown
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+WANG et al.: IMPACTS OF COVID-19 ON SHIP BEHAVIOURS IN PORT AREA
+
+7
+
+Fig. 6. The comparison of DTW and LCSS in terms of ferry’s ﬂow during COVID-19.
+
+Fig. 7. DTW analysis of general cargo’s ﬂow during COVID-19.
+in Fig. 4, the left subﬁgure is all identiﬁed positions in Oslo port using PD-DBSCAN. The right three subﬁgures represent zoom-in areas in the left subﬁgure. Quays are partitioned based on berths’ position and functionality as labelled by the number from 1 to 7. Fig. 5 shows the ﬂow of different ship types to all quays. Therein, quay 2 is a ferry and cruise area; quay 5 is a container area; tankers stop in quay 6; other quays have different ship types.
+After berth identiﬁcation, arrival time and departure time could be identiﬁed. Next, all information is merged together, including MMSI, ship types, ship deadweight, berthing time, arrival time, quay, etc. In this study, features like frequency, deadweight, and berthing time will be used for knowledge discovery.
+
+B. Year-on-Year Impact Analysis
+This part aims to verify the superiority of DTW to analyse abnormal patterns against other well-known classic similarity measuring methods. Besides DTW, longest common subsequence (LCSS), edit distance with real penalty (ERP), and edit distance on real sequences (EDR) could provide a better match with another time series. They are able to compare different time sequences that are of different lengths and out of phase in time [32]. However, EDR and EPR are not suitable for large time-shifting sequences. Hence, in this study, DTW and LCSS are selected to ﬁnd the period of abnormal patterns and evaluate the similarity of different time-
+
+Fig. 8. DTW analysis of ferry’s ﬂow before COVID-19.
+series sequences. The similarity measuring function of DTW is selected as Manhattan. Then, it is used to analyse the variation of ship ﬂow, daily throughout, and berthing time of quays yearon-year. On the one hand, the discovered knowledge could support stakeholders’ decisions in the next crisis. On the other hand, it could be used to ﬁnd out an impact threshold for the short-term impact analysis with the help of signiﬁcance interval estimation.
+Table I lists the total frequency of different ships during four years. From this table, it can be seen that business ﬂeets
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+8
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+Fig. 9. DTW analysis of general cargo’s ﬂow before COVID-19.
+TABLE I THE FREQUENCY OF DIFFERENT SHIPS IN FOUR YEARS
+like cargo, carrier, container, and tanker have small variations before and during COVID-19, while cruise and ferry have a large variation. It shows that the inﬂuence of the global pandemic on passenger ships aligns with the general drop in leisure travel.
+Fig. 6(a)∼Fig. 6(c) shows the DTW and LCSS analysis results of comparing the ferry ﬂow in 2020 with the ﬂow in 2017, 2018, 2019. The color bar represents the value of OSI, which increased from the beginning of March and reached a peak at the end of March. Then it remained stable until the end of April. It went to a low level in June and stayed relatively ﬂat until the middle of November. At that point, it rose again. The blue dotted line denotes there is no difference regarding the ferry’s ﬂow between two years. In other words, the ferry’s ﬂow of each day in different years are the same. Black curves represent the difference in different years. As two sequences do not vary synchronously, that leads to a position deviation against the diagonal line when DTW and LCSS are matching the most similar positions. The horizontal line appears in the path, which indicates a drastic variation in the corresponding period. Results show DTW is more sensitive to capture the ferry’s ﬂow difference as soon as the COVID pandemic started in the beginning of March. Therefore, DTW is leveraged to analyse the impacts of COVID-19 in the following experiments.
+Fig. 8 shows almost identical, varying trends of ferries ﬂow in separate comparisons of 2017 with 2018, 2017 with 2019, and 2018 with 2019. As ship ﬂows in different years are not synchronized completely, it is unsurprising that these sequences have some differences. In Fig. 6(a)∼Fig. 6(c), the
+
+big change appears from March to July as a result of the number of ferries decreasing drastically. After July, with the increasing number of ferry, the difference becomes lower gradually. This trend is in line with the change of OSI. The result shows DTW is capable of identifying abnormal ship behaviour patterns. Other than abnormal pattern identiﬁcation, DTW could tell us which ship types have stronger resilience to the onset of the global pandemic as well. For example, Fig. 7(a)∼Fig. 7(c) and Fig. 9 show the comparison of general cargo’s ﬂow among four years. There is no evident change in the DTW path, which means the inﬂuence COVID-19 is small.
+DTW path only reveals the relative trend change between two time-series sequences. In order to better analyse the impacts of COVID-19 to ship ﬂow and port operations, DTW distance computed by (3) is leveraged to quantify impacts. As discussed above, even though in years without COVID19, the difference of ship ﬂow still exists due to uncertain factors. Therefore, average variation of ship ﬂow, throughout, and berthing time is regarded as a benchmark value before 2020. The variation during 2020 deducting average value is seen as an impact caused by COVID-19.
+DTW analysis results are shown in Table II. The units of DTW distance with respect to ship’s ﬂow, daily throughout of quays, and berthing time are the number of times, 10000 tons, and 100 hours separately. ‘Average variation’ is the average value of the former three-year variations. ‘ VS Y’20’ denotes ‘2017 vs. 2020,’ ‘2018 vs. 2020,’ ‘2019 vs. 2020.’ ‘(%)’ denotes the increasing percentage of current value against the benchmark. For example, 2.4% represents the variation between 2017 and 2020 rises by 2.4% against the average variation. That also means the impact caused by COVID-19 is about 2.4%. On the other hand, −9.7% means the variation caused by COVID-19 is less than the average variation. In other words, COVID-19 does not inﬂuence its behaviours.
+The mined knowledge is shown as follows:
+• The drastic variation appears in the ﬂow of cruise and ferry as a result of the big decrease of ship frequencies.
+• Cargo ships are inﬂuenced slightly. • Most of port operations are not affected heavily. • Quay 3 has a signiﬁcant change with respect to daily
+throughout and berthing time before and during the pandemic.
+The ﬁrst point indicates that passenger ships are sensitive to the global pandemic. That brings revelations to policy-makers that service industries are supposed to gain more ﬁnancial supports. The second point implies port managers should guarantee the sufﬁcient cargo handling capability of quays to speed up logistics. The third point tells us that few ships were stopping this berth during COVID-19. This is a rational outcome, possibly because quay 3 is close to ferry berths and at Oslo port centre. Therefore cargo ships are moved to other cargo quays. There are some abnormal patterns that are not caused by COVID-19. For example, the variation of carrier’s ﬂow is quite large (81.6%) between 2019 and 2020. That mainly results from the decrease of carrier’s frequency in 2019 as shown in Table I.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+WANG et al.: IMPACTS OF COVID-19 ON SHIP BEHAVIOURS IN PORT AREA
+
+9
+
+TABLE II DTW DISTANCE OF SHIP FLOW, QUAY’S DAILY THROUGHOUT, AND QUAY’S AVERAGE BERTHING TIME IN DIFFERENT YEARS
+
+A signiﬁcance interval test is introduced to estimate the threshold of impacts caused by COVID-19 based on the analysis results above. Although these three features represent different physical meanings, throughout and dwelling time, in essence, results from the variation of ship ﬂow. Hence, it is reasonable to use the average changing rate of impacts as a threshold that represents the severity of impacts. In this study, α is set as 0.05. As the p-value of Shapiro test is 5.1 × 10−8 far less than 0.05, data are normally distributed. Therefore, (5) can be leveraged to estimate the interval, and the result is [10.1, 39.7]. In this study, the upper signiﬁcance interval is selected as a threshold. That means, if the impact caused by COVID-19 is larger than 39.7, it is regarded as a severe impact of which stakeholders should be cautious.
+C. Month-on-Month Impact Analysis
+DTW is capable of ﬁnding abnormal patterns and quantifying impacts caused by COVID-19. Based on year-on-year comparison with respect to ship ﬂow, daily throughout, and average berthing time, the expectation value of all impact’s rate of increase is selected as a threshold that is used for short-term inﬂuence analysis. The ﬂow of ferries and cargo are used as examples to demonstrate how to apply DTW to do short-term impact prediction.
+In order to analyse the short-term trend of ship’s ﬂow variation, ﬁrst of all, January 2019 is selected as a referenced month. And then, the ﬂuctuation of the ship’s ﬂow between January and February is counted as a normal vibration. In other words, it is a benchmark value that equals zero. If the variation is larger than zero, the ship ﬂow varies abnormally in the current time period. The window time is 15 days. Some are 14 or 16 days, depending on the month. The blue bar shows
+
+the increasing rate of change in the remaining months against the benchmark scatters in Fig. 10. The boxes represent the percentile value of the ship’s ﬂow variation in the past three months. At the bottom of Fig. 10, green bars mean that the current variation is less than the average variation of the past three months; orange bars indicate that it is a bit larger; red bars show that its variation is over 39.7, reaching a serious level. For example, due to COVID-19, the drastic variation takes place from the middle of March 2020. It starts to recover to the normal level from the middle of June. Fig. 11 shows the short term impact analysis on cargo’s ﬂow. The abnormal patterns occurred in late December 2020. Observing the variation trend can assist stakeholders in making short-term decisions based on different risk levels.
+To sum up, the case study exhibits that the proposed method is able to ﬁnd abnormal patterns caused by COVID-19 and quantify its impacts. The discovered knowledge could be used for port management and preplanning in the next emergency crisis. In addition, it is capable of providing supports to stakeholders for short-term decisions through month-on-month impact analysis.
+D. Discussion
+This study proposed an AIS data-based analysis method to investigate the impacts of COVID-19 on ship behaviours in the Oslo port from the year-on-year and month-on-month perspectives. However, the limitations of this analysis might come from the following two aspects.
+A limitation lies in the data quality. The AIS data is vulnerable to data loss and environmental noises. It could lead to the estimating errors of ship ﬂow and dwelling time. However, this research focuses on the method to qualify the
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+10
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+Fig. 10. The short-term impact analysis on ferry’s ﬂow using DTW.
+
+Fig. 11. The short-term impact analysis on cargo’s ﬂow using DTW.
+
+COVID-19 impacts rather than the accurate COVID-19 impact estimation. From our case studies, the proposed method is efﬁcient to analyze the impacts of COVID-19 to ship activities. In addition, the OSI is a composite index to reﬂect the inﬂuence of COVID-19 and its variation is not identical to the variation of ship activities completely. For example, as shown in Fig. 6(a), the risk level rose slightly again since November while the ferry’s ﬂow did not have a signiﬁcant decrease. As a whole, results show the abnormal pattern discovered by DTW can match the variation of OSI well.
+Another one arises from the subjectivity of the clustering analysis. The identiﬁcation of berths is based on PD-DBSCAN and its number is chosen subjectively. In this study, 32 berths are identiﬁed by PD-DBSCAN as shown in Fig. 3. It is reasonable that the number of berths is within [20, 32] because adjacent berths are merged. In addition, as berths are grouped into different quays based on their positions as shown in Fig. 5, therefore, the analysis of port operational efﬁciency is
+
+inﬂuenced by way of quay grouping to some extent. For real applications, users can adjust the partition of quays according to practical demands.
+In a word, case studies veriﬁed that the proposed approach could analyze the impacts of COVID-19 to ship behaviours and port operations efﬁciently.
+V. CONCLUSION
+This paper proposed an analysis approach to estimate COVID-19 impacts on ship activities. In order to verify the feasibility of the proposed method, AIS data in the Oslo area is taken as an example. Improved DBSCAN (PD-DBSCAN) is leveraged to identify berths. Based on the identiﬁed berths, ship arrival time and berthing time can be determined. After features are extracted from raw AIS data, DTW is compared with LCSS to verify its performance in terms of abnormal pattern recognition. Next, DTW is employed to detect abnormal patterns and quantify the impacts of COVID-19. After that,
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+WANG et al.: IMPACTS OF COVID-19 ON SHIP BEHAVIOURS IN PORT AREA
+
+11
+
+signiﬁcance interval estimation is selected to ﬁnd a threshold for the short-term analysis of COVID-19 inﬂuences.
+The proposed method can be used to carry out COVID-19 impacts analysis in two respects: year-on-year and month-onmonth. Through year-on-year comparisons, different patterns are discovered in terms of ship ﬂow and quays’ operations. For example, the passenger ships are inﬂuenced by COVID-19 heavily while cargo ships are not. The mined knowledge could be used for economic policy-making and port management if extreme quarantine measures are required in the next health crisis. Month-on-month impact analysis is mainly to observe the short-term variation trend combined with different risk levels. Based on the historical trend, it is beneﬁcial to provide supports for short-term decision-making.
+Due to limited data points, machine learning and regression analysis do not work well in constructing an accurate impact prediction model. In future work, sufﬁcient data to support accurate model construction should be collected.
+REFERENCES
+[1] D. Depellegrin, M. Bastianini, A. Fadini, and S. Menegon, “The effects of COVID-19 induced lockdown measures on maritime settings of a coastal region,” Sci. Total Environ., vol. 740, Oct. 2020, Art. no. 140123.
+[2] L. M. Milleﬁori, D. Zissis, L. Cazzanti, and G. Arcieri, “A distributed approach to estimating sea port operational regions from lots of AIS data,” in Proc. IEEE Int. Conf. Big Data (Big Data), Dec. 2016, pp. 1627–1632.
+[3] J. Šafár, C. Hargreaves, and N. Ward, “The VHF data exchange system,” in Antennas, Propagation & RF Technology for Transport and Autonomous Platforms. Edison, NJ, USA: IET, 2017, pp. 1–8.
+[4] F. Lazaro, R. Raulefs, W. Wang, F. Clazzer, and S. Plass, “VHF data exchange system (VDES): An enabling technology for maritime communications,” CEAS Space J., vol. 11, no. 1, pp. 55–63, Jul. 2018.
+[5] L. Zhang, Q. Meng, and T. Fang Fwa, “Big AIS data based spatialtemporal analyses of ship trafﬁc in Singapore port waters,” Transp. Res. E, Logistics Transp. Rev., vol. 129, pp. 287–304, Sep. 2019.
+[6] V. F. Arguedas, G. Pallotta, and M. Vespe, “Maritime trafﬁc networks: From historical positioning data to unsupervised maritime trafﬁc monitoring,” IEEE Trans. Intell. Transp. Syst., vol. 19, no. 3, pp. 722–732, Mar. 2018.
+[7] L. Li, W. Lu, J. Niu, J. Liu, and D. Liu, “AIS data-based decision model for navigation risk in sea areas,” J. Navigat., vol. 71, no. 3, pp. 664–678, May 2018.
+[8] J. Zhu, W. Qiu, and W. Jian, “Evaluating impacts of the COVID-19 pandemic on China’s container ports based on AIS big data,” J. Phys., Conf., vol. 1624, no. 3, Oct. 2020, Art. no. 032050, doi: 10.1088/17426596/1624/3/032050.
+[9] M. Menhat, I. M. M. Zaideen, Y. Yusuf, N. H. M. Salleh, M. A. Zamri, and J. Jeevan, “The impact of COVID-19 pandemic: A review on maritime sectors in Malaysia,” Ocean Coastal Manage., vol. 209, Aug. 2021, Art. no. 105638.
+[10] D. Yang, L. Wu, S. Wang, H. Jia, and K. X. Li, “How big data enriches maritime research—A critical review of automatic identiﬁcation system (AIS) data applications,” Transp. Rev., vol. 39, no. 6, pp. 755–773, Nov. 2019.
+[11] J. Wang, C. Zhu, Y. Zhou, and W. Zhang, “Vessel spatio-temporal knowledge discovery with AIS trajectories using co-clustering,” J. Navigat., vol. 70, no. 6, p. 1383, 2017.
+[12] Y. Wen et al., “Automatic ship route design between two ports: A datadriven method,” Appl. Ocean Res., vol. 96, Mar. 2020, Art. no. 102049.
+[13] M. Gao and G.-Y. Shi, “Ship-handling behavior pattern recognition using AIS sub-trajectory clustering analysis based on the T-SNE and spectral clustering algorithms,” Ocean Eng., vol. 205, Jun. 2020, Art. no. 106919.
+[14] J.-H. Shi and Z.-J. Liu, “Deep learning in unmanned surface vehicles collision-avoidance pattern based on AIS big data with double GRURNN,” J. Mar. Sci. Eng., vol. 8, no. 9, p. 682, Sep. 2020. [Online]. Available: https://www.mdpi.com/2077-1312/8/9/682
+
+[15] K. Sheng, Z. Liu, D. Zhou, A. He, and C. Feng, “Research on ship classiﬁcation based on trajectory features,” J. Navigat., vol. 71, no. 1, pp. 100–116, Jan. 2018.
+[16] H. Jia, V. Prakash, and T. Smith, “Estimating vessel payloads in bulk shipping using ais data,” Int. J. Shipping Transp. Logistics, vol. 11, no. 1, pp. 25–40, 2019.
+[17] M. Chambers et al., “Port performance freight statistics program: Annual report to congress 2017,” Bur. Transp. Statist., Ofﬁce Assistant Secretary Res. Technol., U.S. Dept. Transp., Washington, DC, USA, Tech. Rep. 2, 2018.
+[18] Z. Wang, M. Yao, C. Meng, and C. Claramunt, “Risk assessment of the overseas imported COVID-19 of ocean-going ships based on AIS and infection data,” ISPRS Int. J. Geo-Inf., vol. 9, no. 6, p. 351, May 2020.
+[19] D. March, K. Metcalfe, J. Tintoré, and B. J. Godley, “Tracking the global reduction of marine trafﬁc during the COVID-19 pandemic,” Nature Commun., vol. 12, no. 1, pp. 1–12, Dec. 2021.
+[20] J. Verschuur, E. E. Koks, and J. W. Hall, “Observed impacts of the COVID-19 pandemic on global trade,” Nature Hum. Behaviour, vol. 5, no. 3, pp. 305–307, Mar. 2021.
+[21] H. Ito, S. Hanaoka, and T. Kawasaki, “The cruise industry and the COVID-19 outbreak,” Transp. Res. Interdiscipl. Perspect., vol. 5, May 2020, Art. no. 100136.
+[22] H. Zheng, Q. Hu, C. Yang, J. Chen, and Q. Mei, “Transmission path tracking of maritime COVID-19 pandemic via ship sailing pattern mining,” Sustainability, vol. 13, no. 3, p. 1089, Jan. 2021.
+[23] H. Hua-Zhi, “AIS operation for effective bridge lookout,” Ph.D. thesis, Dept. Sci., School Earth, Ocean Environ. Sci., Univ. Plymouth, Plymouth, U.K., 2008.
+[24] G. C. Pamuji and H. Rongtao, “A comparison study of DBScan and K-means clustering in Jakarta rainfall based on the tropical rainfall measuring mission (TRMM) 1998–2007,” IOP Conf. Mater. Sci. Eng., vol. 879, no. 1, Jul. 2020, Art. no. 012057.
+[25] S. Erich et al., “DBSCAN revisited, revisited: Why and how you should (still) use DBSCAN,” ACM Trans. Database Syst., vol. 42, no. 3, pp. 1–21, 2017.
+[26] J. A. Fuller et al., “Mitigation policies and COVID-19–associated mortality-37 European countries, Jan. 23–june 30, 2020,” Morbidity Mortality Weekly Rep., vol. 70, no. 2, p. 58, 2021.
+[27] D. Yun-Mei et al., “The abnormal detection of electroencephalogram with three-dimensional deep convolutional neural networks,” IEEE Access, vol. 8, pp. 64646–64652, 2020.
+[28] D. Liu, P. Xu, and L. Ren, “TPFlow: Progressive partition and multidimensional pattern extraction for large-scale spatio-temporal data analysis,” IEEE Trans. Vis. Comput. Graphics, vol. 25, no. 1, pp. 1–11, Jan. 2018.
+[29] H. Ding, G. Trajcevski, P. Scheuermann, X. Wang, and E. Keogh, “Querying and mining of time series data: Experimental comparison of representations and distance measures,” Proc. VLDB Endowment, vol. 1, no. 2, pp. 1542–1552, 2008.
+[30] C. Cassisi, P. Montalto, M. Aliotta, A. Cannata, and A. Pulvirenti, “Similarity measures and dimensionality reduction techniques for time series data mining,” in Advances in Data Mining Knowledge Discovery and Applications’(InTech). Rijeka, Croatia: IntechOpen, 2012, pp. 71–96, 2012.
+[31] L. Shen and Z. Wen, “Research on anomaly detection of network security situation based on interval estimation,” J. Comput. Methods Sci. Eng., vol. 20, no. 1, pp. 13–24, Apr. 2020.
+[32] H.-R. Choi and T. Kim, “Modiﬁed dynamic time warping based on direction similarity for fast gesture recognition,” Math. Problems Eng., vol. 2018, pp. 1–9, Jan. 2018.
+Chunlin Wang received the M.Sc. degree in computer science and technology from the Tianjin University of Technology (TJUT), Tianjin, China, in 2020. He is currently pursuing the Ph.D. degree with the Norwegian University of Science and Technology (NTNU), Aalesund, Norway, as a part of the Intelligent Systems Laboratory, Department of Ocean Operations and Civil Engineering. His research interests include ship behavior analysis, uncertainty analysis, and machine learning.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+
+This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+12
+
+IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS
+
+Guoyuan Li (Senior Member, IEEE) received the Ph.D. degree in computer science from the Department of Informatics, Institute of Technical Aspects of Multimodal Systems, University of Hamburg, Hamburg, Germany, in 2013. In 2014, he joined the Department of Ocean Operations and Civil Engineering, Intelligent Systems Laboratory, Norwegian University of Science and Technology (NTNU), Ålesund, Norway. He is currently a Professor of ship intelligence with NTNU. He has published more than 70 articles in the areas of his research. His research interests include modeling and simulation of ship motion, autonomous navigation, intelligent control, optimization algorithms, and locomotion control of bioinspired robots.
+
+Ottar Osen received the M.Sc. degree in engineering cybernetics from the Norwegian Institute of Technology in 1991 (NTH) (now the Norwegian University of Science and Technology (NTNU)). He serves as an Associate Professor for NTNU, Ålesund, and a Senior Advisor of research and development at Seaonics A/S. In addition to 13 years in academia, he has worked for 15 years as a Consultant in the maritime and offshore industry both in Norway and internationally. He has taken part in the engineering phase on several of the large offshore projects on the Norwegian continental shelf. He has broad experience in subsea control systems and SCADA systems in general. His research interests include artiﬁcial intelligence, cybernetics, instrumentation, real-time systems, industrial control systems, mechatronics, and modeling and simulation.
+
+Peihua Han (Member, IEEE) received the bachelor’s and master’s degrees from the Department of Architecture and Civil Engineering, Zhejiang University, China, in 2019. He is currently pursuing the Ph.D. degree with the Norwegian University of Science and Technology (NTNU), Aalesund, Norway, as a part of the Intelligent Systems Laboratory, Department of Ocean Operations and Civil Engineering. His current research interests include data mining, machine learning, pattern recognition, and uncertainty qualiﬁcation.
+
+Houxiang Zhang (Senior Member, IEEE) received the Ph.D. degree in mechanical and electronic engineering in 2003 and the Habilitation degree in informatics from the University of Hamburg in February 2011.
+Since 2004, he has been a Post-Doctoral Fellow and a Senior Researcher with the Institute of Technical Aspects of Multimodal Systems (TAMS), Department of Informatics, Faculty of Mathematics, Informatics and Natural Sciences, University of Hamburg, Germany. He joined the NTNU, Norway, in April 2011, where he is a Professor in mechatronics. He is currently a Full Professor with the Department of Ocean Operations and Civil Engineering, Faculty of Engineering, Norwegian University of Science and Technology (NTNU). From 2011 to 2016, he also hold a Norwegian National GIFT Professorship on product and system design funded by the Norwegian Maritime Centre of Expertise. He has applied for and coordinated more than 30 projects supported by Norwegian Research Council (NFR), German Research Council (DFG), EU, and industry. In these areas, he has published over 200 journals and conference papers as the author or coauthor. He has engaged into two main research areas, including control, optimization, and AI application, especially on autonomous vehicle, marine automation, digitalization, and ship intelligence. In 2019, he has been elected as a member of the Norwegian Academy of Technological Sciences. He has received four best paper awards and ﬁve ﬁnalist awards for best conference paper at International Conference on Robotics and Automation.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 03:02:35 UTC from IEEE Xplore. Restrictions apply.
+

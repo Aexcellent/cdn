@@ -1,0 +1,16 @@
+Title:          Travel Time Prediction in a Multimodal Freight Transport Relation Using Machine Learning Algorithms
+Subject:        Accurate travel time prediction is of high value for freight transports, as it allows supply chain participants to increase their logistics quality and efficiency. It requires both sufficient input data, which can be generated, e.g., by mobile sensors, and adequate prediction methods. Machine Learning (ML) algorithms are well suited to solve non-linear and complex relationships in the collected tracking data. Despite that, only a minority of recent publications use ML for travel time prediction in multimodal transports. We apply the ML algorithms extremely randomized trees (ExtraTrees), adaptive boosting (AdaBoost), and support vector regression (SVR) to this problem because of their ability to deal with low data volumes and their low processing times. Using different combinations of features derived from the data, we have built several models for travel time prediction. Tracking data from a real-world multimodal container transport relation from Germany to the USA are used for evaluation of the established models. We show that SVR provides the best prediction accuracy, with a mean absolute error of 17 h for a transport time of up to 30 days. We also show that our model performs better than average-based approaches.
+Keywords:       logistics; supply chain management; multimodal freight transports; travel time prediction; machine learning
+Author:         Nikolaos Servos, Xiaodi Liu, Michael Teucke and Michael Freitag
+Creator:        LaTeX with hyperref package
+Producer:       pdfTeX-1.40.18
+CreationDate:   12/25/19 16:13:02
+ModDate:        12/25/19 16:13:02
+Tagged:         no
+Form:           none
+Pages:          22
+Encrypted:      no
+Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
+File size:      4833357 bytes
+Optimized:      no
+PDF version:    1.5

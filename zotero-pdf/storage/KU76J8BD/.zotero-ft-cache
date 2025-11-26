@@ -1,0 +1,275 @@
+Systematic Review on Fully Homomorphic Encryption Scheme and Its Application
+Hana Yousuf , Michael Lahzi , Said A. Salloum , and Khaled Shaalan
+
+Abstract Security and efﬁciency of transferred data is the main concern in big data and cloud computing service. Fully Homomorphic Encryption is one of the most recent solutions that ensure the security and conﬁdently. This paper expected to lead precise writing on the subject of Fully Homomorphic Encryption and its Application. The primary point of the audit is to pick up knowledge of the Fully Homomorphic Encryption and to locate the best way to deal with executing it. First, Fully Homomorphic Encryption Algorithms were discovered since 2009. After this year, different approaches were followed in order to enhance the scheme such as Fully Homomorphic Encryption based on Integer (DGHV) Scheme, Fully Homomorphic Encryption based on BGV schemes, Multi-key Fully Homomorphic Encryption Scheme and Fully Homomorphic Encryption based on GSW. This paper uses a systematic review of Fully Homomorphic Encryption technologies. The technique is performed to lead this methodical writing included utilizing the examination inquiries or research questions to determine keywords which were then used to search for bits of peer-reviewed papers, articles or book at scholastic directories. Through introductory hunts, 250 papers and scholarly works were found and with the assistance of choice criteria and PRISMA methodology, the number of papers reviewed decreased to 24. Jadad scale used to measure the quality of selected publications. Most of the papers developed new schemes on Fully Homomorphic Encryption to enhance efﬁciency and reduce noise. Other papers developed a new algorithm to improve the security of the transferred data. Last Thematic modeling analysis presented in this paper to ensure that all the articles were related to Fully Homomorphic Encryption and cloud computing.
+Keywords Fully homomorphic encryption · Lattices · Integer · LWE · Cloud
+computing
+
+H. Yousuf · M. Lahzi · S. A. Salloum (B) · K. Shaalan
+Faculty of Engineering and IT, The British University in Dubai, Dubai, UAE e-mail: ssalloum@sharjah.ac.ae
+S. A. Salloum Research Institute of Sciences and Engineering, University of Sharjah, Sharjah, UAE
+
+© Springer Nature Switzerland AG 2021
+
+537
+
+M. Al-Emran et al. (eds.), Recent Advances in Intelligent Systems
+
+and Smart Applications, Studies in Systems, Decision and Control 295,
+
+https://doi.org/10.1007/978-3-030-47411-9_29
+
+538
+Fig. 1 The three types of fully homomorphic encryption
+
+H. Yousuf et al.
+
+1 Introduction
+Governments and organizations cannot trust any translation service provider unless the service is fully owned by them [1]. Moreover, many technologies popped up, such as cloud computing and big data, make the dataset difﬁcult to capture, manage and analyze using typical data analysis tools [2–4]. Consequently, these key issues led to guide experts and developers to work toward solutions, which is compliant with this trend of technologies [5, 6]. Homomorphic Encryption is a modern cryptographic technique proposed by Gentry [7] based on lattices. It was the ﬁrst encryption to add and multiply ciphertexts without decrypting. Fully Homomorphic Encryption is divided into three types. The ﬁrst type is based on the lattice which constructs a Somewhat Homomorphic Encryption (SWHE) on the ideal of various rings, then compresses the decryption circuit to reduce polynomials, and ﬁnally complete the Fully Homomorphic encryption under the assumption of cyclic security through bootstrapping technology [8]. The second type is Fully Homomorphic Encryption based on Integer. The third is Fully Homomorphic Encryption based on Learning With Error (LWE) or Learning With Errors over Ring (RLWE). This Encryption uses a non-linearization encryption scheme such as BGV. Figure 1 illustrates the three types of Fully Homomorphic Encryption.
+2 Literature Review
+Cloud computing considered a Quantum leap in the ﬁeld of Information Technology. Cloud computing brings great challenges in the ﬁeld of data security and privacy protection [9].
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+539
+
+Zhao and Geng [8] explained that the Fully Homomorphic Encryption algorithm refers to an encryption algorithm that has the characteristics of additive homomorphism and multiplicative homomorphism and can perform any multiple addition and multiplication operations.
+The ﬁrst time the data security problem addressed with a multiplication homomorphism solution was in 1977 by the creators of the RSA system it is called Pre-Fully Homomorphic Encryption. Gentry [7] proved the principle of encryption (Homomorphic Encryption) with some limitations in decryption. To solve the decryption limitations Gentry founded the bootstrapping method (Fully Homomorphic Encryption) which led to the increment of ciphertexts weight. In 2010, Coron and Mandal made the public key of the Fully Homomorphic Encryption system shorter, they reduce the public key size of the Homomorphic scheme from O (λ10) down to O (λ7). Brakerski and Vaikuntanathan [10] develop Fully Homomorphic Encryption system without bootstrapping, with this optimization, the per-gate computation of FHE schemes that follow the blueprint from O(λ6) down to O(λ3), but it is still inefﬁcient [9].
+Several studies addressed the Fully Homomorphic Encryption different application. For example, Wang et al. [11] concerns were to provide data security and privacy protection in big data. So they chose Fully Homomorphic Encryption to fulﬁll their requirements. In their article, they proposed to use Somewhat Homomorphic Encryption with shorter public keys based on DGHV scheme by encrypting pseudo-random number generator using a cubic form instead of linear form. Gentry [7] proposal is to design a system model for Fully Homomorphic Encryption scheme in big data to allow the user to encrypt private data and connect it with the real value of the data at the same time.
+
+3 Fully Homomorphic Encryption Algorithms
+3.1 The Early Lattice-Based Cryptosystems
+Gentry constructed an encryption scheme using ideal lattices. Lattice-based cryptosystems typically have decryption algorithms with low circuit complexity, often dominated by an inner product computation that is in NC1 (Nick’s Class, it is class of language which all Boolean functions use circuits of linear depth). Also, ideal lattices provide both additive and multiplicative homomorphisms [7]. The encryption scheme can be broken down into three steps: (1) construct the encryption that handles low order polynomial while maintaining its homomorphisms, (2) Apply a technique to squash the decryption circuit that reduces the complexity of decryption scheme, and (3). Bootstrap the result by a process to cipher the text for the decryption circuits and their extended circuit in order to obtain the Fully Homomorphic Encryption scheme. The security of the scheme is based on the computational difﬁculty of
+
+540
+
+H. Yousuf et al.
+
+bounded distance coding on ideal lattices and the computational difﬁculty of sparse subsets [8].
+
+3.2 Fully Homomorphic Encryption Based on Integer (DGHV) Scheme
+In [12], the author proposed a new algorithm for the Fully Homomorphic Encryption scheme based on Gentry’s 2009 scheme. The scheme uses an integrated operation. It constructs a Fully Homomorphic scheme from boots trappable by using addition and multiplication over the integers (Symmetric/asymmetric encryption scheme) instead of using ideal lattices over a polynomial ring. The main disadvantage of this scheme is that the public key is long and cannot be implemented on any system. This algorithm is used particularly in optimization schemes.
+
+3.3 Fully Homomorphic Encryption Based on BGV Schemes
+The research by Alhashmi et al. [6] and Zhao and Geng [9] proposed two Fully Homomorphic Encryption schemes based on the hardness of Learning with Error (LWE). LWE encrypts large integer into a single ciphertext. Both encryption schemes differ in the switching phase. BGV considered a ﬁrst scheme to be practical in reallife applications. The disadvantage of this scheme that the linearization and switching techniques need to be shared between the data owner and the service provider.
+
+3.4 Multi-key Fully Homomorphic Encryption Scheme
+López-Alt et al. [13] Proposed a multi-key encryption scheme based on NTRU (Nth degree Truncated polynomial Ring Units) cryptosystem. This scheme is used to perform multiple Homomorphic calculations with multiple public keys by using relineralization and modulo reduction techniques. NTRU is a cryptosystem based on the polynomial ring. The safety of this scheme relies on the shortest vector question (SVP). Relative to the open secret system such as discrete logarithm or decomposition of large numbers, it has many advantages [14].
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+541
+
+3.5 Fully Homomorphic Encryption Based on GSW
+
+Gentry et al. [15] improved BGV scheme by building a Fully Homomorphic Encryption scheme using an approximate eigenvalue method. This scheme provides no evaluation key which was necessary for pervious schemes to obtain a Homomorphic evaluator. All the operations are done by Homomorphic evaluator with no need to know the user’s public key which reduces the length of the public key and improves the space efﬁciency. The disadvantage is this scheme is not as efﬁcient in computing as the schemes based on RLWE.
+
+4 Advances and Application of Fully Homomorphic Encryption
+Most of the reviewed studies and papers that discussed Fully Homomorphic Encryption were within cloud security, big data, and health care applications. Zhao et al. [16] established a privacy-preserving service for cloud systems that can be used in election services. They used Fully Homomorphic Encryption for QoS (Quality-ofService) Encryption to ensure security and enhance the performance; they proposed the MapReduce model for parallel execution. Martins and Sousa [17] Proposed an automatic and methodical technique to approximate a wide range of functions Homomorphically. They proposed two ways in representation: stochastic and ﬁxed-point approaches.
+A unique establishment of levelled Fully Homomorphic signature scheme is proposed by Luo et al. [18]. The scheme needs to call the signing algorithm twice for generating signatures for all messages in a dataset into two matrices. Luo et al. [18] proved that their construction is secure against fully adaptive chosen-message attacks under the standard small integer solution (SIS) assumption.
+A new scheme for Fully Homomorphic Encryption was proposed by Kim et al. [19]. They proposed a new encryption scheme for Fully Homomorphic Encryption over integer which enables scale-invariant multiplication and all evaluation over encrypted messages can be performed with partial information.
+For example, it can be public that the message space M is a set of positive Integers less than some integer g, but the exact value of g will be provably hidden from all public information under a reasonable assumption. This property called informally message space hid-ability. Message space hid-ability has an immediate and interesting application, namely, Homomorphic commitment to large integers [19].
+Patil et al. [20] proposed system that avoids the loss of conﬁdential data. The system’s data are kept to be encrypted before transmitting over the network. The arithmetic computation is carried out as server-side without the need for decryption [20]. The state-of-art is driven by Xu et al. [21] and used to construct Fully Homomorphic Encryption using based Merkle Tree (FHMT) which is a novel technique
+
+542
+
+H. Yousuf et al.
+
+for streaming authenticated data structures (SADS) to achieve the streaming veriﬁable computation. Xu et al. [21] presented in their paper dynamic FHMT (DFHMT) and divided the achieved algorithm into ﬁve phases: initialization, insertion, tree expansion, query, and veriﬁcation. Xu et al. [21] chose dynamic FHMT instead of static to remove the drawbacks of the static FHMT. The result from this encryption showed that DFHMT balanced the performance between the client and server which considered an advantage for lightweight devices.
+
+4.1 Cloud Computing
+Cloud computing provides a new way to shift computing and storage capabilities to external service providers with on-demand provisioning of software and hardware at any level of granularity. In recent years, the privacy of cloud data and the computations thereon has emerged as an important research area in the domain of cloud computing and applied cryptographic research [22].
+The other application of Fully Homomorphic Encryption is the ﬁeld of cloud computing. Gai et al. [23] Stated that the Fully Homomorphic Encryption in cloud computing is an effective scheme to protect the data in the cloud system. However, they highlighted that Fully Homomorphic Encryption is not yet utilized to meet the practical demand because of inaccuracy rate or insufferable latency time. To solve the inaccuracy rate and inefﬁciency time, Gai et al. [23] developed a new scheme designed for operating real numbers named Fully Homomorphic Encryption over Real Numbers (FHE-RN). They proved by experimental evaluations that their scheme has an outstanding performance in both accuracy and efﬁciency. Oppermann et al. [24] presented in their paper a developed communication protocol to ensure authenticity, integrity, and privacy of measurement data across a distributed measuring system within the cloud computing architecture [24].
+Umadevi and Gopalan [25] developed a new way to keep the data private and secure with limitation of access based on the data owner preferences called Fully Homomorphic Encryption using Qnp Matrices with Enhanced Access Control (SFHEACC). This scheme transformed the data into a square matrix, the encryption and decryption are performed based on the symmetric key (Smith Normal Form). The developed scheme enhances the security, conﬁdentiality and access control.
+
+5 Research Methodology
+The principle of research methodology is developed based on a systematic review methodology. “A Systematic reviews have foremost been developed within medical science as a way to synthesize research ﬁndings in a systematic, transparent, and reproducible way and has been referred to as the gold standard among reviews” [26].
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+543
+
+“A systematic review aims to identify all empirical evidence that ﬁts the prespeciﬁed inclusion criteria to answer a particular research question or hypothesis. By using explicit and systematic methods when reviewing articles and all available evidence, bias can be minimized, thus providing reliable ﬁndings from which conclusions can be drawn and decisions made” [27].
+The reason for selecting the systematic review for Fully Homomorphic Encryption scheme that no systematic review focuses on Fully Homomorphic Encryption scheme, algorithm, and applications. Moreover, this methodology able us to collect, evaluate, analyze and summarize the most current knowledge level, algorithm, and applications of Fully Homomorphic Encryption. This study follows the systematic review procedures provided by Kitchenham and Charters [28] and other systematic reviews [29–32]. The systematic review methodology accomplished by following the ﬁve steps listed below: Step 1: Problem statement formation: The problem statement in our research was that there was no systematic review that clearly addresses the development and progress of the Fully Homomorphic Encryption scheme. Step 2: Identiﬁcation of relevant work and search for studies via multiple subsequent databases. The most relevant research articles for our subject were collected using keywords that contained Fully Homomorphic Encryption combined with algorithms, schemes, technology, and application. The search for these studies was on October 2019. Step 3: Assessment of collected the research articles. The critical appraisal and quality assessment are required and revised in every step of systematic review: the research articles that are collected multiple subsequent databases revised and the quality of each paper assed based on our research criteria. Step 4: Data synthesis and usage of statistical methods to explore the differences between the research articles and combine their effects (meta-analysis). Step 5: The results (Interpreting the ﬁndings). All the ﬁndings that satisfy the research objective presented in the results section.
+
+5.1 PRISMA Framework
+In 1999 a group of international people developed a guideline called QUOROM which stands for (Quality of Reporting of Meta-analyses). QUOROM focused on the reporting of meta-analyses of randomized controlled trials. By 2009, the QUOROM framework was updated to include conceptual and practical advances in the science of systematic reviews and renamed as PRISMA (Preferred Reporting Items of Systematic reviews and Meta-Analyses) [27]. PRISMA deﬁned as an evidencebased framework utilized for systematic reviews and meta-analyses. PRISMA framework provides researchers the ability to conduct a critical appraisal for the published articles. In our research the framework of PRISMA was applied as follow:
+
+544
+
+H. Yousuf et al.
+
+• The PRISMA checklist was downloaded from PRISMA ofﬁcial site and ﬁlled up based on Fully Homomorphic Encryption articles, see Fig. 2.
+• The search strategies for Fully Homomorphic Encryption articles were performed by searching in the subsequent database using keywords added up with Boolean operators (AND) and (OR). The search results retrieved 250 articles using the research keywords.
+• Eliminating the duplicated articles: After retrieving 250 articles, it was evaluated and ﬁltered out in terms of duplication in algorithms, schemes, technology, and application. Twenty-ﬁve articles were founded as duplicated items and ﬁltered out.
+• Screening the titles and abstracts of the remaining 24 articles using the inclusion and exclusion criteria in order to identify the most relevant articles for our systematic review.
+
+Fig. 2 Article review framework used in the study
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+545
+
+Table 1 Inclusion and exclusion criteria Inclusion criteria Articles published in peer-reviewed journals and subsequent databases such as IEEE, ScienceDirect, Springer, and Google Scholar Articles published in 2015 and afterword
+Articles should be written in English
+Articles contain Fully Homomorphic Encryption AND (algorithm) AND (Schemes) OR (Cloud Computing) OR (Technology) OR (Application)
+
+Exclusion criteria Articles are written in another language
+Includes Homomorphic encryption scheme in general The articles keywords include Fully Homomorphic Encryption without considering it in their research paper
+
+5.2 Inclusion and Exclusion Criterion
+The Inclusion and exclusion criterion for our systematic review in Fully Homomorphic Encryption is simple and straightforward, as described in Table 1.
+
+5.3 Data Search and Extraction
+As mentioned previously the articles search was conducted via subsequent databases, peer-reviewed journals and periodicals using the keywords and Boolean operators “AND” and “OR”. Accordingly, an initial review was observed, which are related to the Fully Homomorphic Encryption and are associated with new algorithms, cloud computing, and applications of the scheme. For the mentioned reason, the keywords for the search were constructed around (Fully Homomorphic Encryption) AND (algorithm) AND (Schemes) OR (Cloud Computing) OR (Technology) OR (Application).
+The research articles were narrowed to be for articles published in 2015 and afterward. Most of the papers retrieved from the Institute of Electrical and Electronics Engineering (IEEE) journals, ScienceDirect and Springer. Figure 2 illustrates steps that have been used for ﬁltering the research articles using the PRISMA framework. Firstly, we performed the search on the subsequent database and the number of articles includes the keywords recorded. Secondly, removed the duplicated articles. Thirdly, the remaining articles were screened based on the PRISMA checklist by excluding the articles that miss any item. Finally, the remaining articles were fully evaluated and sorted based on its contribution to our systematic review of Fully Homomorphic Encryption.
+
+546
+6 Discussion
+
+H. Yousuf et al.
+
+Out of 250 retrieved articles, 24 of them met the inclusion-exclusion criteria with prioritization of Fully Homomorphic Encryption string in publication title and content. 25 articles included in the systematic review, 10 articles were from ScienceDirect, and Google Scholar and the rest retrieved from IEEE journals. The IEEE articles publication was as follows: 15 articles presented in different IEEE conferences. Figure 3 summarizes the leading countries of Fully Homomorphic Encryption publication, most of the authors’ articles were from China and India with a total number of six and ﬁve numbers of publications. There is no surprise that China and India are leading the publication of security and cryptography subjects. Figure 3. The peak year for Fully Homomorphic Encryption articles is the year 2017, which should be normally since all the security issues are important topics, whereas all the data were transferred via the cloud and wirelessly and easy to be threatened by others. The theoretical development of Fully Homomorphic Encryption was by Gentry in 2009. However, the ﬁrst function of the encryption was in 2011. Fully Homomorphic Encryption is an efﬁcient encryption scheme in cloud computing, provides high conﬁdentiality, which was the main issue discussed in those articles with different solutions for handling the noise (Fig. 4).
+El-Yahyaoui and Ech-Chrif El Kettani [33] presented a new way they called it a Veriﬁable Fully Homomorphic Encryption scheme (VFHE). The scheme considered to be a free-noise fully Homomorphic encryption scheme without the usage of any noise management technique. The scheme does an inﬁnity number of operations on the same ciphertext with no noise growing during the operation. VFHE considered to be faster than FHE but it suffers from security issues as this scheme is cryptanalysis.
+
+8 7 6 5 4 3 2 1 0
+
+Fig. 3 Distribution of studies by countries
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+Fig. 4 Distribution of
+
+articles published between
+
+2015 and 2019
+
+20%
+
+28%
+
+12% 12%
+28%
+
+547
+2015 2016 2017 2018 2019
+
+Another scheme was approved theoretically to solve efﬁciency and privacy concerns proposed by Gai and Qiu [34] called An Optimal Fully Homomorphic Encryption (O-FHE) “this scheme can achieve non-noise computations over the cipher-texts and retrieve the plain-text results from the decryption within an adaptive execution time period. The proposed approach is designed to achieve Homomorphic mathematical computations, including multiplications and additions, which utilizes the law of the Kronecker Product (KP). The solution can be applied in either a vector space or a real number ﬁeld” [34].
+From Fig. 5, it is noted that the most articles resources from IEEE conferences which included different novel approaches to increase the efﬁciency and/or security of Fully Homomorphic Encryption Scheme in cloud computing and big data. The quality measurement of retrieved articles is done based Oxford Quality Scoring System (Jadad Scale) which we used it to measure the quality of the articles. Jadad scale uses three features to capture the quality: randomization, masking, withdrawal, and dropout. The quality average of the selected articles using the Jadad scale is 72%. The highest score of the measured features was the publication of Fully Homomorphic Encryption from China followed by India. From 2009 with Gentry’s proposal of FHE, the rapid development of the scheme and its application occurs with different algorithm approaches in order to enhance cloud computing and big data security.
+
+6.1 Thematic Analysis
+Thematic analysis is a qualitative research approach that identiﬁes and interprets the theme within the selected data. For our systematic review, we built a word cloud with the most common words used among the articles of Fully Homomorphic Encryption. Figure 6 represents the most common appearance is encryption around 1770 times, followed by Homomorphic (1690), data (1676), Scheme (1246) and Encrypted
+
+548
+
+H. Yousuf et al.
+
+DistribuƟon of publicaƟon Resources categories
+
+IEEE TransacƟons on Services CompuƟng
+
+InternaƟonal Advance CompuƟng Conference (IACC)
+
+InternaƟonal Conference on Big Data Analysis
+
+Chinese Journal of Electronics
+
+Knowledge-Based Systems Journal
+
+Computers & Security Journal
+
+TheoreƟcal Computer Science Journal
+
+Journal of InformaƟon Security and ApplicaƟons
+
+Journal of Network and Computer ApplicaƟons
+
+InformaƟon Sciences journal
+
+Future GeneraƟon Computer Systems journal
+
+Cyber Security in Networking Conference (CSNet)
+
+InternaƟonal Congress of InformaƟon and CommunicaƟon Technology
+InternaƟonal Conference on InvenƟve Research in CompuƟng ApplicaƟons (ICIRCA 2018)
+InternaƟonal Conference on Wireless Networks and Mobile CommunicaƟons (WINCOM)
+InternaƟonal Conference on Big Data Security on Cloud
+InternaƟonal Conference on Applied and TheoreƟcal CompuƟng and CommunicaƟon Technology (iCATccT)
+InternaƟonal Conference on InformaƟon Fusion
+
+InternaƟonal Conference on Smart CompuƟng (SMARTCOMP)
+
+InternaƟonal Conference on Control System and Computer Science
+
+InternaƟonal Conference on New Technologies, Mobility and Security (NTMS)
+
+0
+
+1
+
+2
+
+3
+
+4
+
+Fig. 5 Distribution of publication resources
+
+(1073). Fully Homomorphic Encryption has been rising with added algorithms to enhance the efﬁciency and security of the scheme [19–24].
+
+7 Conclusion and Future Work
+In conclusion, this paper aimed to conduct a systematic literature review on the topic of Fully Homomorphic Encryption and its application. The main aim of the review is to gain insight into the Fully Homomorphic Encryption Schemes and to ﬁnd the best and latest approaches to implement it. Fully Homomorphic Encryption Algorithms founded in 2009 by Gentry. After this year, different approaches were followed in
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+549
+
+Fig. 6 Thematic modelling for fully homomorphic encryption articles
+order to enhance the scheme such as Fully Homomorphic Encryption based on Integer (DGHV) Scheme, Fully Homomorphic Encryption based on BGV schemes, Multikey Fully Homomorphic Encryption Scheme and Fully Homomorphic Encryption based on GSW. The research question derived for the purposes of the literature review were encompassing the applications of Fully Homomorphic Encryption Schemes, their advantages, and disadvantages, as well as the best implementation approach for them. The procedure done to conduct this systematic literature review included using the research questions to derive keywords which were then used to look for pieces of peer-reviewed works on academic directories. Through initial searches, 250 papers and academic works were found and with the help of selection criteria and PRISMA procedure, the number of papers reviewed in this paper was reduced to 24. Each of the 24 papers was categorized by their contribution to each research question and they were analyzed. All the selected research papers underwent a quality assessment using the Jadad scale tool in order to capture the quality of the publication selected in the systematic review. Finally, a thematic analysis conducted for Fully Homomorphic Encryption reviewed articles.
+Acknowledgements This work is a part of a project undertaken at the British University in Dubai.
+
+550
+References
+
+H. Yousuf et al.
+
+1. Gaid, M.L.: Secure translation using fully homomorphic encryption and sequence-to-sequence neural networks, Oct, pp. 1–4 (2018)
+2. Al-Emran, M., Arpaci, I., Salloum, S.A.: An empirical examination of continuous intention to use m-learning: an integrated model. Educ. Inf. Technol. (2020)
+3. Salloum, S.A., Al-Emran, M.: Factors affecting the adoption of E-payment systems by university students: extending the TAM with trust. Int. J. Electron. Bus. 14(4), 371–390 (2018)
+4. Al Kurdi, B., Alshurideh, M., Salloum, S.A., Obeidat, Z.M., Al-dweeri, R.M.: An empirical investigation into examination of factors inﬂuencing university students’ behavior towards E-learning acceptance using SEM approach. Int. J. Interact. Mob. Technol. 14(02), 19–41 (2020)
+5. Alhashmi, S.F.S., Salloum, S.A., Abdallah, S.: Critical success factors for implementing artiﬁcial intelligence (AI) projects in Dubai Government United Arab Emirates (UAE) health sector: applying the extended technology acceptance model (TAM). In: International Conference on Advanced Intelligent Systems and Informatics, pp. 393–405 (2019)
+6. Alhashmi, S.F.S., Salloum, S.A., Mhamdi, C.: Implementing artiﬁcial intelligence in the United Arab Emirates healthcare sector: an extended technology acceptance model. Int. J. Inf. Technol. Lang. Stud. 3(3) (2019)
+7. Gentry, C.: Fully homomorphic encryption using ideal lattices. Proc. Annu. ACM Symp. Theory Comput. 169–178 (2009)
+8. Zhao, E.M., Geng, Y.: Homomorphic encryption technology for cloud computing. Procedia Comput. Sci. 154, 73–83 (2019)
+9. Song, X., Wang, Y.: Homomorphic cloud computing scheme based on hybrid homomorphic encryption. In: 2017 3rd IEEE International Conference on Computer and Communications ICCC 2017, vol. 2018-Janua, pp. 2450–2453 (2018)
+10. Brakerski, Z., Vaikuntanathan, V.: Efﬁcient fully homomorphic encryption from (standard) lwe. SIAM J. Comput. 43(2), 831–871 (2014)
+11. Wang, D., Guo, B., Shen, Y., Cheng, S.J., Lin, Y.H.: A faster fully homomorphic encryption scheme in big data. In: 2017 IEEE 2nd International Conference on Big Data Analysis, ICBDA 2017, pp. 345–349 (2017)
+12. Van Dijk, M., Gentry, C.: Advances in cryptology—EUROCRYPT 2010. Advances in Cryptology—EUROCRYPT 2010, vol. 6110, pp. 24–43 (2010)
+13. López-Alt, A., Tromer, E., Vaikuntanathan, V.: On-the-ﬂy multiparty computation on the cloud via multikey fully homomorphic encryption. In: Proceedings of the Forty-Fourth Annual ACM Symposium on Theory of Computing, pp. 1219–1234 (2012)
+14. Liu, J., Han, J.L., Wang, Z.L.: Searchable encryption scheme on the cloud via fully homomorphic encryption. In: 2016 Sixth International Conference on Instrumentation & Measurement, Computer, Communication and Control, IMCCC 2016, pp. 108–111 (2016)
+15. Gentry, C., Sahai, A., Waters, B.: Homomorphic encryption from learning with errors: conceptually-simpler, asymptotically-faster, attribute-based. Lecture Notes in Computer Science (LNCS), including its subseries Lecture Notes in Artiﬁcial Intelligence (LNAI) and Lecture Notes in Bioinformatics (LNBI), vol. 8042 LNCS, no. PART 1, pp. 75–92 (2013)
+16. Zhao, F., Li, C., Liu, C.F.: A cloud computing security solution based on fully homomorphic encryption. In: 16th International Conference on Advanced Communication Technology, ICACT, pp. 485–488 (2014)
+17. Martins, P., Sousa, L.: A methodical FHE-based cloud computing model. Futur. Gener. Comput. Syst. 95, 639–648 (2019)
+18. Luo, F., Wang, F., Wang, K., Chen, K.: A more efﬁcient leveled strongly-unforgeable fully homomorphic signature scheme. Inf. Sci. (NY) 480(2318), 70–89 (2019)
+19. Kim, J., Kim, S., Seo, J.H.: A new scale-invariant homomorphic encryption scheme. Inf. Sci. (Ny) 422, 177–187 (2018)
+
+Systematic Review on Fully Homomorphic Encryption Scheme …
+
+551
+
+20. Patil, T.B., Patnaik, G.K., Bhole, A.T.: Big data privacy using fully homomorphic nondeterministic encryption. In: 2017 IEEE 7th International Advance Computing Conference, IACC 2017, pp. 138–143 (2017)
+21. Xu, J., Wei, L., Zhang, Y., Wang, A., Zhou, F., Zhi Gao, C.: Dynamic fully homomorphic encryption-based Merkle Tree for lightweight streaming authenticated data structures. J. Netw. Comput. Appl. 107, 113–124 (2018)
+22. Slamanig, D., Rass, S.: Cryptography for Security and Privacy in Cloud Computing. Artech House Publishers, Norwood (2013)
+23. Gai, K., Qiu, M., Li, Y., Liu, X.Y.: Advanced fully homomorphic encryption scheme over real numbers. In: 2017 IEEE 4th International Conference on Cyber Security and Cloud Computing, CSCloud 2017 3rd IEEE International Conference on Cyber Security and Cloud, SSC 2017, pp. 64–69 (2017)
+24. Oppermann, A., Grasso-Toro, F., Yurchenko, A., Seifert, J.P.: Secure cloud computing: communication protocol for multithreaded fully homomorphic encryption for remote data processing. In: 2017 IEEE International Symposium on Parallel and Distributed Processing with Applications and 2017 IEEE International Conference on Ubiquitous Computing and Communications (ISPA/IUCC), pp. 503–510 (2018)
+25. Umadevi, C.N., Gopalan, N.P.: Matrices with enhanced access control. In: 2018 International Conference on Inventory Research Computer Applications, no. Icirca, pp. 328–332 (2018)
+26. Davis, J., Mengersen, K., Bennett, S., Mazerolle, L.: Viewing systematic reviews and metaanalysis in social research through different lenses. Springerplus 3(1), 1–9 (2014)
+27. Moher, D., et al.: Preferred reporting items for systematic reviews and meta-analyses: the PRISMA statement. PLoS Med. (2009)
+28. Kitchenham, B., Charters, S.: Guidelines for performing systematic literature reviews in software engineering. In: Software Engineering Group, School of Computer Science and Mathematics, Keele University, pp. 1–57 (2007)
+29. Al-Saedi, K., Al-Emran, M., Abusham, E., El-Rahman, S.A.: Mobile payment adoption: a systematic review of the UTAUT model. In: International Conference on Fourth Industrial Revolution (2019)
+30. Saa, A.A., Al-Emran, M., Shaalan, K.: Factors affecting students’ performance in higher education: a systematic review of predictive data mining techniques. Technol. Knowl. Learn. (2019)
+31. Al-Qaysi, N., Mohamad-Nordin, N., Al-Emran, M.: A systematic review of social media acceptance from the perspective of educational and information systems theories and models. J. Educ. Comput. Res. 57(8), 2085–2109 (2020)
+32. Al-Emran, M., Mezhuyev, V., Kamaludin, A., Shaalan, K.: The impact of knowledge management processes on information systems: a systematic review. Int. J. Inf. Manag. 43, 173–187 (2018)
+33. El-Yahyaoui, A., Ech-Chrif El Kettani, M.D.: A veriﬁable fully homomorphic encryption scheme to secure big data in cloud computing. In: Proceedings of 2017 International Conference on Wireless Networks and Mobile Communications, WINCOM 2017 (2017)
+34. Gai, K., Qiu, M.: An optimal fully homomorphic encryption scheme. In: Proceedings of 3rd 2017 IEEE 3rd International Conference on Big Data Security on Cloud (Bigdatasecurity), IEEE International Conference on High Performance and Smart Computing (HPSC), and 2nd IEEE International Conference on Intelligent Data and Security (IDS), pp. 101–106 (2017)
+

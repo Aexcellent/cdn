@@ -1,0 +1,16 @@
+Title:          Forecasting the Walking Assistance Rehabilitation Level of Stroke Patients Using Artificial Intelligence
+Subject:        Cerebrovascular accidents (CVA) cause a range of impairments in coordination, such as a spectrum of walking impairments ranging from mild gait imbalance to complete loss of mobility. Patients with CVA need personalized approaches tailored to their degree of walking impairment for effective rehabilitation. This paper aims to evaluate the validity of using various machine learning (ML) and deep learning (DL) classification models (support vector machine, Decision Tree, Perceptron, Light Gradient Boosting Machine, AutoGluon, SuperTML, and TabNet) for automated classification of walking assistant devices for CVA patients. We reviewed a total of 383 CVA patients' (1623 observations) prescription data for eight different walking assistant devices from five hospitals. Among the classification models, the advanced tree-based classification models (LightGBM and tree models in AutoGluon) achieved classification results of over 90% accuracy, recall, precision, and F1-score. In particular, AutoGluon not only presented the highest predictive performance (almost 92% in accuracy, recall, precision, and F1-score, and 86.8% in balanced accuracy) but also demonstrated that the classification performances of the tree-based models were higher than that of the other models on its leaderboard. Therefore, we believe that tree-based classification models have potential as practical diagnosis tools for medical rehabilitation.
+Keywords:       machine learning; deep learning; classification; stroke rehabilitation; walking assistance device; automated diagnostics; diagnostic reasoning; medical decision making
+Author:         Kanghyeon Seo, Bokjin Chung, Hamsa Priya Panchaseelan, Taewoo Kim, Hyejeong Park, Byungmo Oh, Minho Chun, Sunjae Won, Donkyu Kim, Jaewon Beom, Doyoung Jeon and Jihoon Yang
+Creator:        LaTeX with hyperref
+Producer:       MiKTeX pdfTeX-1.40.21
+CreationDate:   06/23/21 13:36:06
+ModDate:        06/23/21 13:38:51
+Tagged:         no
+Form:           none
+Pages:          17
+Encrypted:      no
+Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
+File size:      431884 bytes
+Optimized:      no
+PDF version:    1.7

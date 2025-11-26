@@ -1,0 +1,432 @@
+2020 IEEE International Conference on Systems, Man, and Cybernetics (SMC) October 11-14, 2020. Toronto, Canada
+Container Terminal Liner Berthing Time Prediction with Computational Logistics and Deep Learning
+
+Bin Li School of Transportation Fujian University of Technology
+Fuzhou, China 0000-0001-9322-1723
+
+Yuqing He School of Transportation Fujian University of Technology
+Fuzhou, China heyuqing011@163.com
+
+Abstract—The quayside running conditions play a key role in container terminal logistics systems, and the terminal liner berthing time (LBT) is the central index of quayside service efficiency that is also the important evidence and guidance to task scheduling and resource allocation at container terminals. The computational logistics and deep learning are combined to discuss the prediction of LBT by the generalization, unification and integration of the essence and connotation of computation. It is supposed to integrate the deep neural networks learning computation and logistics generalized computation for container terminals (LGC-CT) cross the boundaries between information space and physical world. A deep learning model is designed and executed to predict and evaluate LBT at a typical container terminal in China based on its LBT data for the past four years, which is also intended to lay a good foundation for the configuration, deployment and execution of LGC-CT. The deep neural networks are designed and implemented by the fusion of long short-term memory network, gated recurrent unit one, Gaussian noise one and dense one with TensorFlow 2.3, which demonstrates the feasibility and credibility of the proposed compound computing architecture and paradigms preliminarily.
+Keywords—container terminal, logistics generalized computation, liner berthing time, computational logistics, deep learning, deep neural network
+I. INTRODUCTION
+As the typical logistics warehousing hubs, container terminals keep playing a considerable leading role for the international hierarchical and multistage logistics network. The job planning, task scheduling, resource allocation and collaborative decision in container terminal logistics systems (CTLS), which is referred to simply as PSAD, is the classical problem of the non-deterministic polynomial complete (NPC) [1]. The PSAD has not been well solved whether in theory or practice because CTLS is provided with the strong nonlinearity, processor heterogeneity, dynamic reconfigurability, sheer complexity, cosmically parallelism, high density, sensitive timeliness and tight coupling, which is abbreviated to NHRC-PDTC. Hence the PSAD of CTLS has been very difficult, and even become more and more complicated than ever with the development and evolvement of modern logistics industry [2].
+Currently, many scholars have conducted a lot of studies in regards to the operation the CTLS at every level. The
+
+operational programming, formal modeling, system simulation, intelligent optimization, simulation-based optimization, multi-criteria decision analysis etc. have been applied into the operation of CTLS widely, and have got a series of splendid achievements with widespread industry influences. However, a mass of thorny issues still remain to be resolved in CTLS, moreover, the new problems are constantly springing up with the rapid development of the supply chain management, electronic commerce and the Industry 4.0. That makes the existing approaches and solutions to struggle to deal with the situations. Hence, the new theoretical methodology and the related engineering solution is supposed to proposed to smooth the NHRC-PDTC, eliminate operation bottlenecks, and improve the working performance of CTLS.
+For this purpose, this paper tries to integrate computational logistics and deep learning to probe into the operation of CTLS by the generalization, unification and integration of the essence and connotation of computation (GUI-ECC), which is obviously different from the traditional research approach and available engineering solution. It is really meant that the deep learning intelligent engine with deep neural networks computation is designed and implemented to determine and drive the configuration, deployment and execution of logistics generalized computation for container terminals (LGC-CT) which occurs in the physical world. It is a problem-oriented evaluation, exploration and exploitation for GUI-ECC in the domain of complex logistics service systems initially.
+II. LITERATURE REVIEW AND RELATED WORKS
+A. Computational Logistics for Container Terminals
+Over the past decade, we have been working on the modeling and optimization the working of CTLS by the combination of computational thinking and computational experiments. In December 2015, we made a preliminary definition of computational logistics on the IEEE 54th Annual Conference on Decision and Control (CDC 2015) [3].
+The proposed idea of computational logistics is a brief and refined summary and review of the exploration from 2006 to 2015 for our investigations. It is obvious that computational logistics provides a new theory, methodology and solution to PSAD in CTLS by the problem-oriented abstraction, design, construction, automation, execution, evaluation and tuning. As the typical complex logistics service hubs, container terminals have been the central carrier of computational logistics
+
+Research supported by the Humanities and Social Science Programming Foundation of Ministry of Education in China Grant 19YJA630031 and the Traffic Science and Technology Project of Shandong Province in China Grant 2016B35.
+
+978-1-7281-8526-2/20/$31.00 ©2020 IEEE
+
+2417
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+research. Besides the initial definition of computational logistics, some of the milestones have already been achieved originally since 2015, and part of the recent works can be listed as follows.
+For one thing, the running mechanisms in computational architecture, operating system and virtual machine are transferred and customized with computational logistics, such as the gang scheduling, processor affinity and load balancing [4, 5]. For another, we generalized, migrated, and localized the classical computational complexity theory into CTLS, and proposed the container terminal-oriented logistics generalized computational complexity [6]. It’s no doubt that the above work is closely focused on the exploration of GUI-ECC.
+Notwithstanding, the existing discussion by computational logistics are only a preliminary exploitation. There is plenty of work to be done, furthermore, the new issues continually spring up under the current logistics industry backgrounds that the constraint conditions and optimization objectives both increasingly complicated than ever. In any case, the computational logistics is supposed to provide a new insight, perspective, methodology and solution to the PSAD of CLS.
+B. Quayside Operations at Container Terminals
+The quayside including berths is the core area of operation at container terminals. The calling vessels are the central service objects for quayside running. The berth and quay crane (QC) are the core operating resources on quayside, preferably the former. The related research mainly focuses on vessel, berth and QC naturally, and the berth allocation problem (BAP) lies at the centre of the terminal quayside operation dynamic management and real-time scheduling.
+Yu et al. [7] applied data mining approaches to predict ship arrivals and evaluated the value of ship arrival prediction on daily operation planning. Iris et al. [8] addressed the strategic berth template problem, and it was transformed to a set packing problem. Xi et al. [9] focused on economic performance and customer satisfaction to formulate the BAP with the consideration of uncertainty factors. Dulebenets [10] proposed a novel evolutionary algorithm to assist with berth scheduling at marine container terminals that applied a parameter control strategy. Besides, Agra et al. [11] considered an integrated BAP, quay crane assignment problem (QCAP) and quay crane scheduling problem (QCSP) in which heterogeneous set of cranes was involved, and a rolling horizon metaheuristic was introduced to solve hard instances.
+C. Deep Learning for Scheduling Decisions
+As an emerging area of machine learning, deep learning is derived from the evolution and development of artificial neural network (ANN) and deep neural networks (DNN) [12]. Meanwhile, deep learning is also an inevitable product of a virtuous circle among big data set, algorithm training progress and high-performance computing hardware. Whether in theory or in practice, lots of research progress and landmark achievements have been acquired by deep learning in recent years, especially in terms of classification and prediction [13].
+Deep learning is also called unsupervised feature learning, and it means the feature extraction and pattern recognition is not designed and implemented artificially, and the connotative characteristics are learned from data. Some of the most
+
+successful areas of deep learning include computer vision tasks [14], speech identification [15], natural language processing [16], and so on. In addition, deep learning has been tentatively explored in the new fields such as drug discovery [17], machine health monitoring [18], object detection [19], and intelligent transportation systems [20].
+Nevertheless, there are few researches on deep learning in terms of the task scheduling and resource allocation in the physical world, let alone CLS. At the same time, the logistics service process data is recorded in more and more details with the development and application of cyber-physical systems. Considering that the PSAD for CLS usually possesses the characteristics of NPC, deep learning is supposed to provide a new insight, engine and solution to the running of CLS within the conceptual framework of computational logistics. Specific to CTLS, the deep learning with DNN offers another way to overcome NHRC-PDTC at least partly.
+III. TERMINAL QUAYSIDE LOGISTICS GENERALIZED COMPUTATIONAL AUTOMATION AND INTELLIGENTIZATION
+A. Generalization of Computation for Container Terminals
+Under the conceptual framework of computational logistics, the container terminal oriented generalization of computation based on the nature of computation is a critical step. The nature of computation has been constantly evolving with the growing recognition of computation, and the generalized nature of computation is just about the transformation process of the target objects so far.
+CTLS provides the logistics services for the calling liners and the collecting & distributing containers substantially. It is nothing else than the LGC-CT because CTLS implements and executes the transmission and transshipment process of the given container set in the physical dimensions of time and space. As a matter of fact, a wide variety of containers are the very the generalized symbols, and we have made a definition of logistics generalized computation alphabet (LGCA) for CTLS in our previous research [6]. The positioning, accessing, mapping, handling, switching, transferring, routing, shifting and relocation of container logistics unit (PAM-HST-RSR) are the core operations of LGC-CT, and their scheduling and decision are the main themes of the CTLS as well. In other words, the PSAD of CTLS can be abstracted as the control and decision of LGC-CT, and it is designed to achieve the automation of PAM-HST-RSR orderly and efficiently.
+B. Master-Slave Logistics Generalized Computing Pattern
+Based on the above LGCA and LGC-CT, we design and construct the container terminal logistics generalized computation architecture pattern (CT-LGC-AP) to abstract and map the operation of CTLS according to the idea of the computing architecture and software engineering. In fact, LGC-CT can be further divided into the logistics generalized computation for vessels (LGC-V) and the logistics generalized computation for containers (LGC-C) on a more granular level. The former includes the container ships of piloting, towing, berthing and unberthing specifically. The latter involves the loading, unloading, stacking, transferring, relocation, transition, devanning, consolidation, collection and distribution for containers. There is a physical buffer to connect and switch the LGC-V and the LGC-C, and that is just
+
+2418
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+the quay side including berth which is also the most precious resource at container terminals. The LGC-V and the LGC-C provide the abstraction, automation and analysis bridge for the operation of container terminals, and only there's just a difference in the granularity of the computed service objects.
+In terms of the heterogeneous computing architecture, the software architecture pattern and invocation style, the LGC-V and the LGC-C construct a typical master-slave LGC-CT architecture pattern for container logistics in practice. The container ship is the central service target of LGC-CT, and it is the core objectives of LGC-V to achieve the full and efficient implementation of container shipping schedules and the vessel stowage plans. In fact, those are also the main objectives of operations management at container terminals. Thereupon the LGC-V are the master computing process of
+
+CTLS. On another face, to guarantee the accomplishment of the above central goal of LGC-V, the LGC-C must perform the container collection and distribution plan scheduling and the relevant working instructions with completeness, robustness, accuracy and efficiency. Hence, the LGC-C is the slave computing process of CTLS accordingly. At the same time, the container is really the point of focus for the shipper. According to the idea of hierarchical abstraction in computational logistics, LGC-C must provide a favorable and friendly container accessing, routing and switching interface (CARSI) for the shipper because the consolidation and expansion of container source is the fundamentals of terminals operation. Then, the CT-LGC-AP can be illustrated by Fig. 1 explicitly, and it is also a preliminary sketch to delineate the abstraction and automation of LGC-V and LGC-C from the visual angle of process synergy services.
+
+A Container Ship
+
+Container Shipping Schedule
+
+Dependent Handling Container Set
+
+Vessel Stowage Plan
+
+Calling Container Ship Set in a Certain Time Window
+
+Piloting
+
+Towing
+
+LGC-V (Master Computing Process)
+
+Dependent Container Set in a Certain Time Window
+
+Berthing
+
+Unberthing
+
+Container Terminal Quay Side Including Berths (A Heterogeneous Physical Buffer To Connect LGC-V and LGC-C)
+
+LGC-C Ⅰ for Import Full Containers (Slave Computing Process)
+
+Loading Transferring Discharging
+
+Stacking Relocation Transition
+
+Loading Transferring Discharging
+
+Stacking Relocation Transition
+
+LGC-C Ⅱ for Export Full Containers (Slave Computing Process)
+
+LGC-C Ⅲ for Import Empty Containers (Slave Computing Process)
+
+Loading Transferring Discharging
+
+Stacking Relocation Transition
+
+Loading Transferring Discharging
+
+Container Terminal Storage Yard (A Physical Buffer Array among LGC-C)
+LGC-C Ⅴ for Container Unit Accessing, Routing and Switching Interface (Slave Computing Process)
+
+Stacking Relocation Transition
+
+LGC-C Ⅳ for Export Empty Containers (Slave Computing Process)
+
+Devanning
+
+Consolidation
+
+Collection
+
+Distribution
+
+Fig. 1. Container terminal master-slave logistics generalized computation architecture pattern
+
+C. Logistics Generalized Computational Critical Activities
+The above CT-LGC-AP provides an abstract LGC-CT automated running perspective substantially. The LGC-V is at the center of CT-LGC-AP, and the most critical activity in LGC-V is berthing, and the most important activity in LGC-C is handling that mainly covers loading and discharging. Accordingly, the berth is the most precious service resource in LGC-V, and the QC is the most important equipment in LGCC. The former is similar to the primary memory in computer systems, and the latter is equivalent to the central processing unit (CPU) in position and function. Meanwhile, both of berth and QC are deployed along quayside, and the operating behaviors attaching to the both possess the typical parallelism and heterogeneity. In addition, the running of quayside is of the reconfigurability and asynchrony to some extent.
+
+Consequently The kernel of CTLS is just about a parallel, heterogeneous, asynchronous and reconfigurable LGC-CT cell array and serial storage architecture.
+By computational logistics, every calling vessel can be abstracted as an LGC-CT job. The LGC-CT job turns into the physical service program in CTLS, and the loaded and unloaded containers accompanying with the liner are the concrete data set while the container ship moors the berth. Since the berth is the main memory of CTLS, the cabin space of vessel is the cache, and the storage yard is the auxiliary memory. It is obvious that the collected and distributed containers must be loaded into the cache and the auxiliary memory before the ship is deployed to the designated berth.
+
+2419
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+As a result, for one thing, the liner berthing time (LBT) is equivalent to the program storage time in the main memory. For another, the actual running time (ART) of liner is equated with the task latency in computer systems, and the gross handling time (GHT) of QCs is identified with the total transaction processing time executed by QC farm. The performance of LBT, ART and GHT determines the response level, service capability, and job throughput of CTLS to a large extent. Among the three, the LBT is the most critical for the scarcity, and it is the focus of carriers and terminals as well.
+D. Deep Learning for Logistics Generalized Computation
+From the top, the evaluation and prediction of LBT is of great significance for the quayside operation scheduling decisions. It is supposed to construct a terminal deep learning
+
+compound intelligence engine (TDL-CIE) to drive the running of LGC-CT on quayside in physical world and improve the terminal performance that is showed in Fig. 2.
+The TDL-CIE plays a very important role in intelligent scheduling decision of CTLS. The core of TDL-CIE includes three components. One is the container terminal oriented deep neural networks customized computational model (CTODNN-CCM), and it includes that a series of tailorable, portable and debugging DNN deep learning models for the given terminal, operating environments and working load, which is the kernel of TDL-CIE. Another is optimizer to optimize the CTO-DNN-CCM to improve the efficiency and quality of deep learning. The last one is loss evaluator, and it is applied to estimate the impacts of knowledge from deep learning.
+
+Determining and Driving the Deployment and Execution of LGC-CT
+
+Optimizer Online Job Scheduling and Resource Allocation
+
+Berth k Container Liner i
+Container Storage bay 1 Container Storage bay 2 Container Storage bay 3 Container Storage bay Container Storage bay j
+
+Unloading
+
+Loading
+
+Deep Neural Networks
+Loss Evaluator
+
+Optimization Objectives
+
+Quay Crane m
+
+Quay Crane Quay Crane 4
+
+Quay Crane 3 Quay Crane 2
+
+Quay Crane 1
+
+Liner Berthing Time
+
+Terminal Deep Learning Compound Intelligence Engine in Cyberspace
+
+Terminal Quayside Logistics Generalized Computation for Container Terminals in Physical World
+LGC-CT Running Data Cleaning
+
+Panoramic Logging
+
+Actual Running Time of Liner
+
+Gross Handling Time of QCs
+
+Key Performance Indicators for Quayside Working Logistics Generalized Computation PAM-HST-RSR Activity Data in Cyberspace
+
+Fig. 2. Terminal deep learning compound intelligence engine and LGC-CT
+
+The combination of the above three need be struggled to try, calibrate and tune whether in theory or in practice. Moreover, the model, optimizer, evaluator and their combination are usually dynamic, fragile, context-sensitive, and not unique for the specific terminal and load. However, TDL-CIE is still the unsupervised feature and characteristic hierarchy learning and pattern recognition engine to construct knowledge map of LGCCT intelligent optimization.
+The operation of LGC-CT occurs in the physical world, but its executions are logged into the cyberspace with a panoramic view. The sedimentary running data provide the giant valuable fuels for the TDL-CIE to evaluate, explore and exploit the analytical, abstract and automatic LGC-CT paradigm, pattern, and principle, which is abbreviated to 3EAP. The design, implementation and execution of 3EAP is intended to obtain the agile, efficient and robust solutions to PSAD in CTLS.
+IV. DEEP LEARNING MODEL FOR LINER BERTHING TIME
+A. Relevant Decisive Factors of Liner Berthing Time
+The LBT is a comprehensive reflection of LGC-CT ability in CTLS because the LBT is the central index of LGC-V and it is vitally important to the operation of CTLS. Specifically speaking, the relevant decisive factors (RDF) of LBT are primarily concerned with the length of liners, service route,
+
+shipping company, handling duration, total running time of QCs, total handling volume of container units, total handling volume of twenty feet equivalent unit (TEU), shifting quantity of hatch cover, vessel rate by container units, vessel rate by TEU, gross crane rate by container units, gross crane rate by TEU, and so on in practice. Further from the fundamental points, the LBT is also related with quantity configuration of QCs, quantity configuration of inner yard trailers, quantity configuration of yard cranes, import voyage, export voyage, and so forth. Even in terms of oceanic tide, it does have an impact on the LBT.
+From the foregoing, we can find that the prediction of LBT is extremely difficult and intricate. However, the evaluation of LBT is of the essence for PSAD at container terminals, especially under the uncertain dynamic operating environments. In our discussion, the RDF is ranked by importance based on some algorithm before applying the deep learning model, such as random forest algorithms.
+B. Data Set Characteristics of Liner Berthing Time
+There are many reasons why the deep learning has not been widely used in PSAD so far. One of them is that the process data, phased data and statistical data in the various production and service industries all are difficult to obtain. Even when captured, the data is local, incomplete, inconsistent, fragmented and short-
+
+2420
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+term, even wrong in many cases. This is especially true for CTLS because of the poor management in practice.
+Although the calling of container liner has certain periodicity and regularity, it also has great randomness and uncertainty in reality. Meanwhile, the berthing and handling records of some ships are usually lacking or inaccurate, even wrong given the mediocre management level at the container terminal. All makes the deep learning to be difficult to apply to production scheduling and process control. Nevertheless, the low-density mine of knowledge is the terminal operation practice urgently needs, which at least points the way to improvement.
+Accordingly, we expect to combine computational logistics and deep learning to overcome the defects and deficiencies in data set, and propose the valuable schedule, suggestions and solutions to improve the LGC-CT efficiency and capacity.
+C. Deep Learning Model Core Computing Architecture
+Although there are all kinds of difficulties in applying deep learning in CTLS, we still struggle to propose a deep learning model core computing architecture (DLM-CCA) to predict, evaluate and optimize the LBT, which is showed in Fig. 3. On the one hand, the DLM-CCA can be regarded as the module of
+
+TDL-CIE to execute the prediction of LBT. On the other hand, the DLM-CCA also may be considered as the prototype framework of TDL-CIE, and it can be dynamically adapted, modified and extended with the flexibility and robustness according to the requirements of the diverse applications on CTLS, especially for decision support at the tactical level.
+Focusing on the deep learning prediction engine of LBT, the DLM-CCA is designed, implemented and executed by five main components. Those are engine preheating, data preprocessing, deep learning model, DNN model evaluation and predicting outcomes for decision support. Both of deep learning model and DNN model evaluation are the kernel of the DLM-CCA, and the interaction, incentive and feedback between the two construct the self-organizing, self-learning and self-adaptive mechanism and mode of deep learning model. Nevertheless, the data preprocessing is a crucial step before the execution of deep learning model. In particular, it is very important to transform the liner calling time series into supervised training data. We create the customized data frame according to the terminal quayside running historical conditions, and specify rules for the input serializations and forecasting sequences, and aggregate data eventually to form pure fuel for the TDL-CIE.
+
+Deep Learning Prediction Engine of Liner Berthing Time
+
+Engine Preheating
+
+Data Preprocessing
+
+Deep Learning Model
+
+DNN Model Evaluation
+
+Predicting Outcomes for Decision Support
+
+Output Actual Values
+Export Predictive Values
+Reliability Analysis of Predicted Values
+Evaluation on Testing Data Set
+
+Training Graph of Loss Computation
+Model Training and Evolution Tracking
+Building DNN Model
+Dataset Partition Converted to
+Supervision Sequence Numerical
+Normalization Non-numerical Label
+Digitization Check Data Status
+Delete NaN value
+Import LGC-CT Job Data Set
+Multiple Random Seed Setting
+Import TensorFlow Package
+
+Comparison the Predicted Value with
+the Actual Value
+Loss Computation on Testing Data Set
+
+Prediction and Evaluation Loss index: MAE/MSE/RMSE
+
+Define Batch Size Define Epoch
+Optimizer Function
+
+Function Parameter Debugging
+
+Activation Function
+
+Define DNN Architecture
+
+Data Conversion
+Predicted Step Size Debugging
+Define Conversion Function
+Data Standardization through Label Encoder
+Function
+Imaging Data Set
+View Unique Values for Each Key Attribute
+
+Evaluate Fitness Capability
+Inverse Normalization of Prediction Values
+Acquire Prediction Results
+
+Adam/SGD/RMSprop/ Adagrad/Adadelta/ Adamax/Nadam
+Self-defining Function
+Relu Variants
+
+Relu Sigmod
+
+Tanh
+
+Gaussian Noise Layer Dense Network
+
+GRU Network
+LSTM Network
+Aggregate Data Specify Rules for Forecasting Sequences Specify Rules For Input
+Serializations Create DataFrame
+
+Fig. 3. Deep learning model core computing architecture
+The key of DLM-CCA is making a definition of DNN architecture, activation function including its parameters, optimizer function, and loss evaluation function. According to the characteristics of terminal operation, the four of long shortterm memory (LSTM) network, gated recurrent unit (GRU) network, Gaussian noise network and dense network are integrated to constitute the core components of the compound DNN deep learning model. The other key elements are the selection of activation function, optimizer one, and loss
+
+evaluator one, especially the first. On the one hand, the activation function includes Sigmoid, rectified linear unit (ReLU) and Tanh because the single activation function is proved to be difficult to meet the prediction requirements by lots of computational experiments. The synergy among DNN architecture, activation functions and loss functions are critical values for the performance, which is highly non-linear, intensive coupling, parameter distributed, indefinite and complex. Furthermore, some activation functions have the multiple
+
+2421 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+variants and their parameters are adjustable, and both have a great influence on the performance of DLM-CCA. One the other hand, the optimizer function usually adopts the adaptive moment estimation to acquire rather good effect in the application of LBT, and the loss evaluator function choose the mean absolute error (MAE) and R-Square to undertake the mission, which have been verified and accredited by the computational experiments.
+V. COMPUTATIONAL EXPERIMENTS
+A. Case Scenario and Experimental Platform
+A regional terminal hub on the eastern coastal area of China is selected to discuss the combination of TDL-CIE and LGCCT. This section probes into the function from the perspective of LGC-V and LGC-C at terminal quayside because it is the fulfilling body of CTLS both in theory and in practice. The annual container throughput of terminal is about two million TEU. There are five berths lined up terminal quayside, and 12 QCs are deployed along quayside. The working efficiency of QC is about 25–35 handling moves per hour if it does not shift the berth along the quayside. About eighty percent of the calling liners serve domestic trade routes in China, and the other vessels are for international trade routes. It is a very typical large-scale Chinese container terminal.
+The above DLM-CCA is a lightweight single target architecture that has high self-learning computation efficiency. Moreover, it does not require much for the hardware experimental platform through practice. The hardware of experimental platform is listed below: the central processing unit (CPU) is the Intel Core Intel i7-9750H, the graphics processing unit (GPU) is the NVIDIA GeForce GTX 1660 Ti whose computing capability is 7.5 for compute unified device architecture (CUDA), the main memory is 16 GB, and the video memory is 6 GB. The software platform is based on the TensorFlow 2.3 for GPU, and the DLM-CCA is designed, implemented and executed by Python 3.7.3.
+
+span of four years, there are 6597 job records of calling liners after data cleaning, which are considered as the basis of deep learning named origin data set for LBT (ODS-LBT). Obviously, the above calling container liners are no other than the job set of LGC-CT. The operation record is the comprehensive embodiment of the NHRC-PDTC at container terminals. Meanwhile, the time series data of LGC-CT is discontinuous and incomplete, and the data set is small sample for deep learning, but it is in line with the current situations of information management of quayside loading and discharging field in China. That makes the design and implementation of TDL-CIE to be a huge challenge, nevertheless it is full of theoretical significances and practical values.
+C. Liner Berthing Time Evaluation and Prediction
+The LBT is of great importance whether for the terminal or the carrier. Furthermore, the LBT is also the most important measure that the LGC-V and LGC-C has the smooth connection. Above all, we perform the coarse-grained evaluation of LBT by using the idea of the quantitative random job testing in the LGCCT for reference, which has been elaborated in our previous work. The preliminary sketch of LBT can be showed by Fig. 4 and Table I roughly. it is concluded that the operation records of LBT is clearly incomplete and is highly volatile and stochastic. Those make the prediction of LBT to be much more difficult. However, one feature stands out. It is that the vast majority of LBT stays within 24 hours, which comes up to 6485 ones and accounts for over 98.3 percent of all records. The rest of the LGC-CT log is 112 items, which gives a certain perturbation to the prediction of LBT. At the same time, an obvious gap between the two subsets also make forecasting to be more difficult to improve effectiveness and accuracy.
+
+B. Logistics Generalized Computing Job Set
+It is a positive, flexible and pragmatic policy to promote stable development by spurring domestic demand and upgrading consumption level in China. As a result, we select domestic routes container liners to fulfill and execute the TDL-CIE, which has a more important role than the ones in international service for the working of CTLS in China.
+
+We go to the container terminal for field research and data collection in a long term. It is almost impossible to go more than 36 hours for the LBT of domestic trade routes in practice. In the
+
+Fig. 4. Distribution preliminary sketch of visiting liners berthing time
+
+TABLE I.
+
+DISTRIBUTION CHARACTERISTIC VALUE OF LBT (UNIT: HOURS)
+
+Year Encoding
+YA YB YC YD
+
+Quantity of Calling Liners
+1422 1264 1350 2561
+
+Minimum of LBT 0.667 0.750 0.750 1.000
+
+Maximum of LBT 34.750 34.833 32.750 34.000
+
+Mean of LBT 10.196 9.624 10.221 12.135
+
+Median of LBT 9.500 9.083 9.417 11.667
+
+Mode of LBT 8.500 7.000 8.667 7.833
+
+Standard Deviation of LBT
+4.820 4.764 4.952 5.559
+
+Variance of LBT 23.233
+22.691 24.521
+30.898
+
+Now, we design and execute the cluster analysis of ODSLBT by K-Means, which is appropriate for the large data set, to further evaluate the characteristics of the LGC-CT job set. The
+
+selected cluster variables mainly include calling liner number, service route number, shipping company encoding, length of calling vessel, berthing time span, handling duration of vessel,
+
+2422 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+total running time of QCs, total handling volume by container units, total handling volume by TEUs, shifting quantity of hatch cover, vessel rate by container units, vessel rate by TEUs, gross crane rate by container units and gross crane rate by TEUs.
+All the significances of cluster variables are 0.000 in the analysis of variance, and it indicates that they are extremely significant, which means that the selection of cluster variables is
+
+sound, valid and effective. The final cluster centers are shown in Table II. The job set is divided into five categories whose number is 158, 340, 2673, 953 and 2473 in sequence. Even all for the domestic container liners, the differences of LBT among them are still very strong because the clustering centers are far apart distinctly. It demonstrates the difficulty level of LBT prediction from another visual angle. In consideration of the above reasons, we introduce the TDL-CIE to predict the LBT.
+
+TABLE II.
+Cluster Variables Calling Liner Encoding Service Route Encoding Shipping Company Encoding Length of Calling Vessel
+Liner Berthing Time Handling Duration of Vessel Total Running Time of QCs Total Handling Volume by Container Units Total Handling Volume by TEUs Shifting Quantity of Hatch Cover Vessel Rate by Container Units
+Vessel Rate by TEUs Gross Crane Rate by Container Units
+Gross Crane Rate by TEUs
+
+FINAL CLUSTER CENTERS OF LGC-CT JOB SET
+
+Cluster 1 170 21 5
+247.742 22.471 20.895 63.861 1742 1906.366
+36 85.663 93.678 28.085 30.819
+
+Cluster 2 168 24 6
+223.304 18.276 16.811 38.074
+979 1100.483
+25 60.607 68.151 26.749 30.091
+
+Cluster 3 78 17 7
+98.494 7.049 5.395 4.642 112 157.483
+8 22.098 32.125 28.155 41.280
+
+Cluster 4 176 18 4
+154.922 14.846 13.407 22.131
+516 635.164
+19 40.777 50.320 24.801 30.913
+
+Cluster 5 140 18 6
+113.929 11.640 10.220 11.979
+284 366.182
+14 29.857 38.838 25.874 33.879
+
+D. Liner Berthing Time Prediction
+Now, we design and perform the prediction of LBT with deep learning to drive the configuration, deployment and execution of LGC-CT along terminal quayside. The whole data set is divided into three parts that are train set, validation one and test one, and the proportion of the three are 80%, 17% and 3% respectively. As a result, the LBT of 198 visiting liners are going to be predicted that are about a month's worth of calling container ships for domestic trade routes. Namely, the TDL-CIE can make a decision support for the logistics service program of a month in this case, especially for berth allocation plan. The monthly berth allocation plan is a very important basis and reference for PSAD at container terminals.
+Accordingly, the DLM-CCA is defined a four-layer DNN architecture. A fully connected layer of dense network is set as the output layer, and the other three layers are the combination of LSTM network, GRU one and Gaussian noise one. Moreover, the number of artificial neural cell in each layer is different. Meanwhile, the step size of the supervisory sequence is one, the training epoch of model is 60, and the batch size is 32. We set the different random number seeds, and execute 100 times of the model, and the consuming time of each test all is between three minutes and four ones. The MAE of the train set is between 0.087 and 0.092, and the MAE of the validation set is about 0.115, and the R-Square of the test set is approximately 0.276. The comparison of typical LBT prediction results with real values can be showed in Fig. 5, and they provide a reference of LBT by a relatively smooth pattern that shows good follow-up and credibility. It is a baseline to the operating of terminal quayside for consideration too. In the meantime, the prediction deviation profile of LBT with deep learning is illustrated by
+
+Table III, which presents an initial overview for the deep learning DNN model architecture and parameters.
+Fig. 5. A comparison of typical LBT prediction results with real values
+From the above, it is concluded that the prediction of LBT is positive and valuable for PSAD in CTLS. In practice, the standard deviation of LBT is between 4.600 and 5.600. In our model, one third of results is less than 2 hours, almost half of outcomes is less than 3.0 ones, and the nearly three quarters of predicting result error is less than five ones. This is not a particularly good result, but it is enough to give the dispatcher and supervisors a big clue to improve the LGC-CT efficiency and capacity because the running of CTLS has the strong characters of NHRC-PDTC. More often than not, the managers at all levels only need an LBT sketch to formulate and evaluate the strategy, tactics, algorithm and parameters of PSAD. The now available DLM-CCA offer an option that allows CTLS to obtain deep learning ability to implement the intelligent decision support with the low computational expense and time cost.
+
+2423 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+
+VI. CONCLUSION
+A container terminal conceptual framework for PSAD is presented by the combination and integration of computational logistics and deep learning, and is also applied into LBT prediction to improve the operation and function of CTLS. The idea seems to be similar to digital twin and cyber-physical system, but there are differences substantially among the three. In our vision, the GUI-ECC is taken full advantage of to form a compound computation architecture stretching across intelligent evolutionary computation and physical service implementation, which utilizes DNN deep learning ability to drive and improve the configuration, deployment and execution of LGC-CT in
+
+physical world by the soft real-time mode approximately. Obviously, our work is at a very early stage, and there are a lot of challenges ahead. Even there are some deficiencies in the demonstration of LBT prediction case, we still have infinite faith in the idea of GUI-ECC because it provides a favorable insight, perspective, methodology and solution to cross the NHRCPDTC with the receptive and agile computation cost based on a very limited data set during the operation of complex logistics service systems, especially for warehouse hub, such as CTLS. The synergy between computational logistics and deep learning is supposed to explore and exploit the intension, extension and application of GUI-ECC in the domain of CLS.
+
+TABLE III. PREDICTION DEVIATION PROFILE OF LINER BERTHING TIME WITH DEEP LEARNING
+
+Prediction Deviation Range (Hours)
+[0, 0.5] (0.5, 1] (1, 1.5] (1.5, 2] (2, 2.5] (2.5, 3] (3, 3.5] (3.5, 4] (4, 4.5] (4.5, 5] (5,+∞]
+
+Minimum of Calling Liners 9 8 8 6 7 6 6 5 4 4 45
+
+Maximum of Calling
+Liners 30 27 25 24 24 25 23 20 19 22 57
+
+Mean of Calling Liners 18.380 16.890 16.530 14.840 14.930 14.110 13.200 12.090 12.250 11.360 53.420
+
+Median of Calling Liners 19 17 17 14 15 14 13 12 12.5 11 54
+
+Mode of Calling Liners
+19 16 20 14 15 13 12 11 10 13 55
+
+Standard Deviation of Calling Liners
+3.651 3.733 3.460 3.570 3.261 3.396 3.660 3.095 3.497 3.356 2.875
+
+Variance of Calling
+Liners 13.329 13.937 11.969 12.742 10.631 11.533 13.394 9.578 12.230 11.263 8.266
+
+Quantitative Proportion of Calling Liners
+9.283% 8.530% 8.349% 7.495% 7.540% 7.126% 6.667% 6.106% 6.187% 5.737% 26.980%
+
+REFERENCES
+[1] Teodor Gabriel Crainic, GuidoPerboli, Mariangela Rosano, “Simulation of intermodal freight transportation systems: a taxonomy,” European Journal of Operational Research, vol. 270, pp. 401-418, October 2018.
+[2] Nam Kyu Park and Sang Cheol Suh. “Tendency toward Mega Containerships and the Constraints of Container Terminals,” Journal of Marine Science and Engineering, vol. 7, pp. 131-143, May 2019.
+[3] Bin Li, “Container terminal logistics scheduling and decision-making within the conceptual framework of computational thinking,” in Proceedings of the IEEE 54th Annual Conference on Decision and Control (CDC 2015), Osaka, Japan, December, 2015, pp. 330-337.
+[4] Bin Li and Weiming Shen, “A gang scheduling computational paradigm for container terminal logistics with processor affinity,” in Proceedings of 2015 IEEE International Conference on Systems, Man, and Cybernetics (SMC 2015), Kowloon, China, October 2015, pp. 1357-1362.
+[5] Bin Li, “Hierarchical, parallel, heterogeneous and reconfigurable comutation model of container terminal handling system,” Journal of Traffic and Transportation Engineering, vol. 19, pp. 136-155, April 2019.
+[6] Bin Li, Bing Sun, Wei Yao, Yuqing He and Guanggang Song, “Container terminal oriented logistics generalized computational complexity,” IEEE Access, vol. 7, pp. 94737–94756, July 2019.
+[7] Jingjing Yu, Guolei Tang, Xiangqun Song, Xuhui Yu, Yue Qi, Da Li, Yong Zhang, “Ship arrival prediction and its value on daily container terminal operation,” Ocean Engineering, vol. 157, pp. 73-86, June 2018.
+[8] Çağatay Iris, Eduardo Lalla-Ruiz, Jasmine Siu Lee Lam, Stefan Voß, “Mathematical programming formulations for the strategic berth template problem,” Computers & Industrial Engineering, vol. 124, pp. 167-179, October 2018.
+[9] Xiang Xi, Liu Changchun, Miao Lixin, “A bi-objective robust model for berth allocation scheduling under uncertainty,” Transportation Research Part E: Logistics and Transportation Review, vol. 106, pp. 294-319, October 2017.
+[10] Maxim A. Dulebenets, “Application of evolutionary computation for berth scheduling at marine container terminals: parameter tuning versus
+
+parameter control,” IEEE Transactions on Intelligent Transportation Systems, vol. 19, no. 1, pp. 25-37, January 2018.
+[11] A. Agra, Maryse Oliveira, “MIP approaches for the integrated berth allocation and quay crane assignment and scheduling problem,” European Journal of Operational Research, vol.264, pp. 138-148, January 2018.
+[12] Jürgen Schmidhuber, “Deep learning in neural networks: an overview,” Neural Networks, vol. 61, pp. 85-117, Januray 2015.
+[13] Ajay Shrestha, Ausif Mahmood, “Review of deep learning algorithms and architectures,” IEEE Access, vol. 7, pp. 53040-53065, April 2019.
+[14] Thierry Bouwmans, Sajid Javed, Maryam Sultana, Soon KiJung, “Deep neural network concepts for background subtraction: a systematic review and comparative evaluation,” Neural Networks, vol.117, pp. 8-66, September 2019.
+[15] DeLiang Wang, Jitong Chen, “Supervised speech separation based on deep learning: an overview,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 26, no. 10, pp. 1702-1726, October 2018.
+[16] Som Gupta, S. KGupta, “Abstractive summarization: an overview of the state of the art,” Expert Systems with Applications, vol. 121, pp. 49-65, May 2019.
+[17] Antonio Lavecchia, “Deep learning in drug discovery: opportunities, challenges and future prospects,” Drug Discovery Today, vol. 24, no. 10, pp. 2017-2032, October 2019.
+[18] Rui Zhao, Ruqiang Yan, Zhenghua Chen, Kezhi Mao, Peng Wang, Robert X.Gao, “Deep learning and its applications to machine health monitoring,” Mechanical Systems and Signal Processing, vol. 115, pp. 213-237, January 2019.
+[19] Zhong-Qiu Zhao, Peng Zheng, Shou-Tao Xu, Xindong Wu, “Object detection with deep learning: a review” IEEE Transactions on Neural Networks and Learning Systems, vol. 30, no. 11, pp. 3212-3232, November 2019.
+[20] Yuan Wang, Dongxiang Zhang, Ying Liu, Bo Dai, Loo Hay Lee, “Enhancing transportation systems via deep learning: a survey,” Transportation Research Part C: Emerging Technologies, vol. 99, pp. 144163, February 2019.
+
+2424 Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on May 07,2022 at 08:13:54 UTC from IEEE Xplore. Restrictions apply.
+

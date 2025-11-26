@@ -1,0 +1,690 @@
+Proceedings of the Ninth International Conference on Machine Learning and Cybernetics, Qingdao, 11-14 July 2010
+SAMPLE SELECTION BASED ON MAXIMUM ENTROPY FOR SUPPORT VECTOR MACHINES
+RAN WANG, SAM KWONG Department of Computer Science, City University of Hong Kong, Kowloon Tong, Kowloon, Hong Kong
+E-MAIL: ranwang3@student.cityu.edu.hk, CSSAMK@cityu.edu.hk
+
+Abstract:
+It is always true that in the classification problems, unlabeled data is abundant while the cost for labeling data is expensive. In addition, large data sets often contain redundancy hence degrade the performance of the classifiers. In order to guarantee the generalization capability of the classifiers, a certain number of suitable unlabeled samples need to be selected out and labeled. This process is referred to as sample selection. In this paper, we propose an active learning model of sample selection for support vector machines based on the measurement of neighborhood entropy. In order to evaluate the capability of the generated SVMs, experiments have been conducted on several benchmark data sets. Comparisons between our proposed method and the random selecting method have also been conducted.
+Keywords:
+Neighborhood entropy; Sample selection; SVM; Active learning
+1. Introduction
+In classification problems, sample selection refers to a process that selects out some data from a data set and further puts them into the training set. The reason for doing sample selection can be concluded from the following two aspects: (1) the dataset used in machine learning often has a large size. It has been investigated that the complexity of the current machine learning algorithms are at least linear growing with the increasing of the data size. In addition, data redundancy and inconsistency which are contained in the data set will result in the degradation of the generalization performance of the classifiers. (2) In some classification situations, the number of unlabeled data is much larger than the labeled data which are not enough for being trained. While labeling all the data is time consuming and also produces inconveniences for the users. A method which allows us to select out a certain number of samples while without reducing the performance of the classifiers is highly required.
+So far, the existing sample selection algorithms can be briefly summarized into the following items:
+
+(1) Condensed Nearest Neighbor Rule (CNN Rule) was seen as the first sample selection method. In 1967, based on the hypothesis of “data with same class gather together”, Cover [1] proposed the Nearest Neighbor Rule (NN Rule). This is a supervised learning method which made the sample has the same label with its nearest neighbor. And the Condensed Nearest Neighbor Rule was proposed by Hart [2] in 1968. More properties of CNN have been listed by Wilson [3]. CNN algorithm considers the sample near the boundary containing larger amount of information, thus need to be reserved. It starts from randomly choosing one sample from each class and add them to the reserved set. Afterwards, according to NN method, once a sample in the training set is classified correctly, it will be discarded. The ones that are wrongly classified will be added to the reserved set. This procedure aims to guarantee all the samples in the training set can be classified correctly by using the NN method, while at the same time the number of samples in the reserved set is minimized. CNN algorithm tends to find out the samples that approximate the class boundary, while the ones that deeply go into the classes will be discarded during the compressing process.
+(2) Active learning is a kind of semi-supervised learning method. Initially, there exists a labeled dataset and an unlabeled dataset. The algorithm first trains a classifier with the labeled set. Several unlabeled samples will be selected out for labeling according to certain criteria set by the experts. Afterwards, it will be added to the labeled set. The classifier is then re-trained with the updated labeled set and the next loop of sample selection begins. This process will continue until it reaches to a predefined condition [5], [6], [7], [8].
+(3) Instance-base Learning, which was originally proposed by Aha and Kibler in 1991, is a supervised learning method. It uses some specific instances to generate the classifier and aims to solving an incremental learning task [16], [17].
+In this paper, we propose a new active learning model of sample selection for support vector machines based on the introduced measurement of neighborhood entropy. Support
+
+978-1-4244-6527-9/10/$26.00 ©2010 IEEE
+
+1390
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:38:08 UTC from IEEE Xplore. Restrictions apply.
+
+Proceedings of the Ninth International Conference on Machine Learning and Cybernetics, Qingdao, 11-14 July 2010
+
+vector machines (SVMs) are famous classification techniques on the basis of statistical learning theory. Dataset used for training SVM classifiers often has a large size. Thus the procedure of sample selection for the training set is required and can promote the generalization capability of the classifiers. This paper is organized as follows: the technique of SVM and the computational costs of SVM algorithms are introduced in Section 2. The important concept of neighborhood entropy and the active learning model for sample selecting will be proposed in Section 3. Some experiment results and comparisons will be given in Section 4. Finally, we give some concluding remarks.
+
+2. Computational complexity of SVM algorithm
+
+Support vector machines (SVMs) are referred to as a set of supervised learning methods for classification. Considering a binary classification problem, the main idea is to form an optimal hyper-plane which can maximize the margin between the two classes. SVMs are powerful technique and have been applied in many areas. Improved techniques such as one-class support vector machines, cost-sensitive support vector machines and nested support vector machines have also been proposed. In this section, we briefly give a review on the binary SVMs and analyze the complexity of the algorithm.
+Suppose we have a binary classification problem on the data set < xi , yi > which contains two classes, if yi = +1
+then xi belongs to the positive class, if yi = −1 then xi
+belongs to the negative class. Let S = {< x1, y1 >, < x2 , y2 >,......, < xn , yn >} ⊂ Rl as
+our training set. If S is linear separable in the input space, there should exist a hyper-plane which is defined as wxi + b = 0 such that:
+
+wT xi + b ≥ +1 , yi = +1
+
+wT xi + b ≤ −1 , yi = −1
+
+(1)
+
+It can be calculated that the margin between the two classes is 2 . Since we want to maximize the margin which
+|| w ||
+equals to minimize|| w ||, the SVM problem can be concluded
+as:
+
+°­
+
+Minimize 1 wT w
+
+®
+
+2
+
+(2)
+
+°¯s.t. yi ((wT xi ) + b) ≥ 1 , i = 1,2,..., n
+
+Using Lagrangian method, the above formulas can be transferred into a quadratic programming optimization
+
+problem to construct the optimal hyper-plane:
+
+¦ °­Maximize
+®
+
+L(w, b, β ) = 1 || w ||2 − 2
+
+nα
+i =1
+
+i
+
+[
+
+yi
+
+(
+
+w
+
+T
+
+xi
+
++ b) − 1]
+
+(3)
+
+°¯
+
+¦ s.t.
+
+α y n
+i=1 i i
+
+=
+
+0
+
+,
+
+αi ≥ 0
+
+,
+
+i = 1,2,......, n
+
+By solving the above optimization problem, the two
+
+parameters of the formula w and b are given by:
+
+¦ ¦ w =
+
+n i =1
+
+yiα
+
+i
+
+xi
+
+,
+
+b = yi − (xi ⋅
+
+nα
+j =1
+
+j
+
+y
+
+j
+
+x
+
+j
+
+)
+
+.
+
+So
+
+our
+
+optimal
+
+hyper-plane can be expressed as:
+
+¦ f (x) =
+
+n i=1
+
+yiα
+
+i
+
+(
+
+xi
+
+,
+
+x)
+
++
+
+b
+
+(4)
+
+And the classifier is sign( f (x)) . For a given testing data x, if
+sign( f (x)) is positive, the data belongs to the positive class,
+else it belongs to the negative class. In case that the data are nonlinearly separable in the
+input space, we have two approaches to handle the situation.
+A slack variableξi is introduced for each of the training data,
+thus the QP optimization of the SVM hyper-plane is obtained by:
+
+¦ Minimize 1 wT w + C 2
+
+ξ n
+i=1 i
+
+s.t. yi ((wT xi ) + b) ≥ 1 − ξi , i = 1,2,..., n
+
+(5)
+
+ξi ≥ 0 for i = 1,2,..., n
+
+Where, C is a constant value that controls the trade-off between the maximum margin and the minimum training error.
+Another method for handling the nonlinear classification problem is to map the data from the input space into a higher dimensional feature space which made them linearly separable. The input patterns {xi} are first mapped into the feature space by a mapping function ĭ: x-> ĭ(x). Without any operations in the feature space, we can obtain the optimal hyper-plane using a kernel trick [13] which is expressed by the inner product of the input space: < Φ(xi ), Φ(x j ) >= K (xi , x j ) . Where K (xi , x j ) is called a
+kernel function which satisfies the Mercer’s Theorem [14], [15]. The QP optimization problem can be expresses in the following dual form for the convenience of kernel trick:
+
+¦ ¦ °­Maximize L =
+®
+
+α n
+i=1 i
+
+−
+
+1 2
+
+n i,
+
+j
+
+=1
+
+yi
+
+y
+
+j
+
+α
+
+iα
+
+j
+
+(
+
+xi
+
+x
+
+j
+
+)
+
+(6)
+
+¦ °¯ s.t.
+
+α y n
+i=1 i i
+
+=0
+
+,
+
+αi ≥ 0
+
+,
+
+i = 1,2,......, n
+
+It is worth noting that when we use SVM technique to generate a classifier, the complexity for determine the optimal hyper-plane is mainly focusing on solving the quadratic programming problem. With the size of training set increasing, the spatial complexity and time complexity are all
+
+1391
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:38:08 UTC from IEEE Xplore. Restrictions apply.
+
+Proceedings of the Ninth International Conference on Machine Learning and Cybernetics, Qingdao, 11-14 July 2010
+
+increasing at least linearly. While when the training set reaches to a certain size, solving the QP problem is highly time consuming, data redundancy also appears thus degenerate the generalization capability of the classifier. It is also worth noting that the optimal hyper-plane is just determined by the samples that are lying beside it which are the so called support vectors. Samples far away from the hyper-plane have no effect on the result but increase the time and spatial complexity. It is desirable to generate a compact dataset by removing the useless and harmful samples. A method which allows us to select out the most valuable samples from the original dataset is required.
+
+2-class condition, the definition of neighborhood entropy of sample x can be expressed as:
+
+Entropy(x) = −( p+ log2 p+ + p− log2 p− )
+
+(9)
+
+Where p+ represents the proportion of positive labeled samples which locate in the neighborhood of x, and prepresents the proportion of negative samples.
+Let us give a more detailed explanation of neighborhood entropy. We make a comparison between two samples m and n as shown in Figure 1.
+
+3. Sample selection for SVM based on neighborhood entropy
+
+bm
+
+3.1. Information entropy
+
+a
+
+c
+
+d
+
+Information entropy is proposed by Shannon [11] in
+
+n
+
+1948 which is used for depicting the information uncertainty
+
+[12]:
+
+¦ H (x) = −
+
+n i=1
+
+p(xi ) log2
+
+p(xi )
+
+(7)
+
+Where x represents an information data, xi is the ith possible value of x and p(xi) is the probability of xi.
+Entropy is also a measurement for the purity rate of any sample set. Let S be a sample set with k classes, the entropy of S is defined as:
+
+¦ Entropy(S) = −
+
+k i=1
+
+pi
+
+log 2
+
+pi
+
+(8)
+
+Where pi is the proportion of class i in S. It is well known that a larger value of entropy represents
+a higher rate of uncertainty and impurity. This is the most important property of entropy, and based on this idea, many application instances have been discovered and realized.
+This paper applies the above idea into active learning. On the basis of the labeled samples, a concept of neighborhood entropy is introduced and used for analyzing the uncertainty of the unlabeled ones. The samples near the class boundary are regarded as having the greatest uncertainty, thus will be submitted to domain expert to label and further added to the labeled set to be trained. This model improves the classification capability of the generated SVM classifier.
+
+3.2. Neighborhood Entropy
+
+We introduce a new concept called Neighborhood Entropy (NE) in this paper. It uses the class entropy of several labeled samples, which locate in the neighborhood of this unlabeled sample, to measure its uncertainty. Consider a
+
+Figure 1. Sample selection
+
+Suppose a binary classification problem with the negative and positive classes roughly lying in the left and right region of a vertical line. Unlabeled samples are abundant while just a, b, c and d have been labeled by experts. Sample m is closer to the class boundary than sample n. Take m and n as the centers, two equirotal circles have been drawn representing their neighborhood areas. The labeled ones which locate in the neighborhood area are treated as the neighbors of the central sample. There exits one positive point ‘c’ and one negative point ‘b’ in the neighborhood of m, while just two positive points ‘c’ and ‘d’ locate in the neighborhood of n. Thus we can calculate the neighborhood entropy of m and n as:
+
+Entropy(m)
+
+=
+
+−( 1 2
+
+log2
+
+1 2
+
++
+
+1 2
+
+log2
+
+1) 2
+
+=1
+
+Entropy(n) = −1× log2 1 = 0
+
+(10)
+
+Some conclusions can be made here. The entropy values of deep-class samples will be approximated equal to zero since the labeled ones in their neighborhood are singular, while the samples with a larger neighborhood entropy value will be closer to the class boundary. It is obvious that with regard to a sample, the closer it is to the boundary, the larger neighborhood entropy it has, thus the higher rate of uncertainty it obtains [9]. This result corresponds to the above mentioned point of information entropy that larger entropy value leads to higher rate of uncertainty. Our algorithm aims
+
+1392
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:38:08 UTC from IEEE Xplore. Restrictions apply.
+
+Proceedings of the Ninth International Conference on Machine Learning and Cybernetics, Qingdao, 11-14 July 2010
+
+to select out the unlabeled sample with the maximum neighborhood entropy and label it by experts. Finally, it will be further added to the labeled set. This method reduces the uncertainty of partial areas.
+We use the averaged distance of each two samples in set X as the radius of the neighborhood area. Euclidean distance is used where:
+
+X = {x1,..., xn}, xi ∈ Rd
+
+¦ ¦ avg
+
+_
+
+dis(
+
+X
+
+)
+
+=
+
+1 Cn2
+
+n i=1
+
+n ||
+j >i
+
+xi ,
+
+xj
+
+||
+
+(11)
+
+It is worth noting that in the process of searching for neighbors, too small an area will lead to a local searching. Thus fail to find the border point, while too large an area will reduce the difference between the unlabeled samples. In order to improve the searching effect, a scale factor r is introduced as an adjustable parameter, and the neighborhood area is computed as avg _ dis(X ) × r .
+
+3.3. Active learning based on maximum entropy
+In this paper, we aim to apply neighborhood entropy as a measurement of samples’ uncertainty, which means that the unlabeled ones closer to the boundary will have higher rate of uncertainty and larger value of neighborhood entropy. Labeling these samples as training data helps improving the capability of classifier. As in Figure 1, we tend to choose e better than f.
+Based on the idea of uncertainty active learning, we propose an algorithm that can find out the samples with the biggest uncertainty and then labeled by experts in order to improve the capability of the current SVM classifier. Neighborhood entropy is used to measure the uncertainty of samples which calculated by the class entropy of their neighbors. Analyzing from the results, the unlabeled samples with the maximum entropy are always locating in the confusion area which is always the class boundary region.
+Active learning algorithm of sample selection for SVM base on neighborhood entropy:
+
+3. Repeat (a)~(c) until the number of queried samples
+
+reaches to the threshold n×q where n is the initialized number
+
+of unlabeled samples, and q is an adjustable parameter
+
+representing the query proportion. r is another adjustable
+
+parameter that manages the size of search area.
+
+(a). For each xi ∈ X , search a subset Si' on S subject to:
+
+S
+
+' i
+
+= {x
+
+|
+
+x∈
+
+S , ||
+
+x,
+
+xi
+
+||<
+
+avg
+
+_
+
+dis( X
+
+) × r}
+
+,
+
+and
+
+calculate the neighborhood entropy of xi .
+
+V (xi ) = Entropy(Si' ) where V (xi ) represents the
+
+uncertainty of xi .
+
+(b). Select the sample x with the maximum entropy:
+
+x = arg max xi∈X V (xi ) and label it.
+
+(c). Put x into S and delete it from X.
+
+4. Return S and train the SVM classifier on S.
+
+4. Experiments and comparison
+
+4.1. Experiment result on artificial dataset
+
+This part of experiment aims to give an intuitive demonstration of the sample selecting result. It is well known to us that the optimal hyper-plane of SVM is just determined by the so-called support vectors which are locating near the two support hyper-planes. The points that are lying far away from the margins have no contribution to the classifying result but increase the complexity for solving the problem. Thus the near-boundary samples are the most valuable ones which will affect the performance. We want to see the distribution of the selecting result of our proposed method and the random selecting method. By making a comparison, it will tell us whether our method is effective to extract more useful information or not.
+Our dataset contains 200 randomly generated points on a plane unit. The curve y = 0.5×sin π x + 0.2, x ∈[0,1] is
+chosen to separate the points into two classes where the above ones belong to positive class and the underlying ones belong to negative class. It is worth noting that other curves can also been chosen to be the separating curves, while we just randomly generate one to see the effect here. The circled points are the finally selected samples as shown in Figure 2.
+
+Input: Unlabeled set X = {x1,..., xn}, xi ∈ Rd with k
+classes. Output: Labeled set S. 1. Calculate the average distance avg _ dis( X ) of X.
+2. Initialize S: randomly select a subset S0 from X and let experts label them, add them to labeled set S, thus S=S0, X=X-S0.
+
+1393
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:38:08 UTC from IEEE Xplore. Restrictions apply.
+
+Proceedings of the Ninth International Conference on Machine Learning and Cybernetics, Qingdao, 11-14 July 2010
+
+1
+
+0.9
+
+0.8
+
+0.7
+
+0.6
+
+0.5
+
+0.4
+
+0.3
+
+0.2
+
+0.1
+
+0
+
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+
+1
+
+Figure 2(a). Sample selecting using NE
+
+1
+
+0.9
+
+0.8
+
+0.7
+
+0.6
+
+0.5
+
+0.4
+
+0.3
+
+0.2
+
+0.1
+
+0
+
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+
+1
+
+Figure 2(b). Sample selecting using random selecting method Figure 2. Sample selecting using two different methods
+
+Due to the above figures, we can see that for the NE algorithm, selected samples are near the class boundary, while for the random selecting algorithm, selected samples are distributing randomly on the plane. Obviously, the NE method can select out the more valuable data.
+
+4.2. Experiment result on actual dataset
+
+A number of datasets selected from UCI are used in this part as in Table 1.
+
+TABLE 1. OUR SELECTED DATASETS
+
+Dataset
+Pima Haber man
+wdbc bupa Breastcancer
+
+Num. Samples
+768 306 569 345 683
+
+Num. Features
+8 3 30 6 10
+
+Num. Classes
+2 2 2 2 2
+
+Ionosphere
+
+351
+
+34
+
+2
+
+In our experiment, we compare the accuracy and time complexity between the SVMs generated by the proposed method and the random selecting method. The SVMs generated on raw training data have also been conducted in order to give a more overall evaluation. Datasets have been divided into two parts according to the ratio of 7:3 which are used for training and testing. First we need to set up the parameters for sample selecting. The neighborhood radius r=1, the proportion of initial labeled set S0 in X is set up as 10%, and the size of queries samples q=0.3. This means we randomly choose 10% samples from the original training set as the initial labeled set, and in all we want to label 30% samples, thus the final training set has 21% data. The q values of our method and random selecting method are set up as the same. Two sets of experiments have been done based on Gaussian kernel and polynomial kernel. The kernel parameters are set up as in Table 2.
+
+TABLE 2. THE PARAMETERS USED IN SVM
+
+Dataset C
+Pima 2000 Haber man 3000
+wdbc 2000 bupa 2000 Breastcancer 2000 Ionosphere 3000
+
+Gaussian Ker Sigma 2 2 1 3 3 2
+
+Poly Ker Degree
+2 2 2 1 1 3
+
+It is easy to see from Table 3 and Table 4 that, with a similar time complexity, SVMs based on our proposed NE algorithm obtains a higher accuracy on almost all the datasets than the random selecting method. And compared with the classifier on the raw training data, the accuracy of our method is a little bit lower, while the training time has been reduced much. In addition, we always consider that the cost for labeling samples is much more expensive than the other procedures, hence the total time complexity can be further reduced. Thus we can say that our algorithm greatly improves the efficiency of the SVMs without reducing the accuracy much.
+
+5. Concluding remarks
+
+The main motivation of active learning is to gain a higher classifying performance by using a minimized number of samples. According to the idea of uncertainty sample selection, we proposed an active learning model based on neighborhood entropy. Samples with larger entropy values
+
+1394
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:38:08 UTC from IEEE Xplore. Restrictions apply.
+
+Proceedings of the Ninth International Conference on Machine Learning and Cybernetics, Qingdao, 11-14 July 2010
+
+are the ones whose class marks are most difficult to confirm, thus labeling these samples can improve the capability of the generated SVM classifier. Experiments show that our new scheme reduces the time complexity much and obtains a higher performance compared with the random selecting method.
+
+TABLE 3. ACCURACY COMPARISON BETWEEN TWO SAMPLE SELECTION METHODS FOR SVM BASED ON GAUSSIAN KERNEL
+
+neighborhood
+
+Dataset
+
+entropy
+
+time Acc
+
+Pima 0.098 0.745
+
+Haber man 0.047 0.794 wdbc 0.032 0.965 bupa 0.047 0.731
+
+Breastcancer 0.047 0.951
+
+Ionosphere 0.016 0.953
+
+Random Selecting
+
+time Acc
+
+0.078 0.717
+
+0.031 0.016 0.031
+
+0.739 0.930 0.673
+
+0.016 0.917
+
+0.016 0.877
+
+Raw training data
+
+time Acc
+
+3.500 0.771
+
+0.219 0.182 0.344
+
+0.750 1.000 0.808
+
+0.436 0.981
+
+0.125 1.000
+
+TABLE 4. ACCURACY COMPARISON BETWEEN TWO SAMPLE SELECTION METHODS FOR SVM BASED ON POLY KERNEL
+
+neighborhood
+
+Dataset
+
+entropy
+
+time Acc
+
+Pima 0.063 0.684
+
+Haber man 0.031 0.804 wdbc 0.031 0.965 bupa 0.031 0.731
+
+Breastcancer 0.016 0.966
+
+Ionosphere 0.016 0.915
+
+Random Selecting
+
+time Acc
+
+0.078 0.719
+
+0.016 0.016 0.031
+
+0.728 0.930 0.644
+
+0.016 0.937
+
+0.016 0.868
+
+Raw training data
+
+time Acc
+
+7.281 0.771
+
+0.297 0.172 0.422
+
+0.750 1.000 0.702
+
+0.563 0.981
+
+0.156 1.000
+
+Acknowledgements
+This paper is supported by City University of Hong Kong, the Machine Learning Centre of the Hebei University, and the IEEE Systems, Man and Cybernetics Society.
+References
+[1] T. Cover, P. Hart, “Nearest neighbor pattern classification”, IEEE Transaction on Information Theory. 1967, 13(1):21-27.
+[2] P. E. Hart, “The Condensed Nearest Neighbor Rule”, IEEE Transactions on Information Theory. 1968, Vol 14, No. 3, pp. 515-516.
+[3] Wilson D. L., “Asymptotic Properties of Nearest Neighbor Rules Using Edited Data”, IEEE Transaction on Systems, Man, and Cybernetic, 1972, 2-3, 408-421.
+[4] L. G. Valiant. “A theory of the learnable”,
+
+Communications of the ACM, 1984, 27(11):1134-1142. [5] H. S. Seung, M. Opper, H. Sompolinsky, “Query by
+committee”, Annual Workshop on Computational Learning Theory, Pittsburgh, Pennsylvania, United States, 1992. [6] Y. Freund, H. S. Seung, E. Shamir, et al. “Selective sampling using the query by committee algorithm”, Machine Learning, 1997, 28(2-3): 133-16. [7] G. Schohn, D. Cohn, “Less is more: Active learning with support vector machines[C]”, Proceeding of the 17th International Conference on Machine Learning. San Francisco, Morgan Kaufmann, 2000. [8] N. Roy, A. McCallum, “Toward optimal active learning through sampling estimation of error”, The 18th International Conference on Machine Learning, San Francisco, CA, 2001. [9] D Lewis, J Catlett, “Heterogeneous uncertainty sampling for supervised learning”, Proceedings of the International Conference on Machine Learning (ICML), 1994, pages148–156, Morgan Kaufmann. [10] Y. Freund, H S. Seung, E. Shamir, et al. “Selective sampling using the query by committee algorithm”, Machine Learning, 1997, 28(2-3): 133-16. [11] C E. Shannon, “A mathematical theory of communication”, Bell System Tech, 1948, vol27, pp. 379-433, 623-656. [12] T. M. Michell, Machine Learning, McGrawHill, 1997. [13] D. Angluin, “Queries and concept learning”, Mach. Learn, Vol. 2(4):319–342, 1988. [14] S. Tong, D. Koller, “Active learning for parameter estimation in Bayesian networks”, Proc. of Advances in Neural Information Processing Systems, Cambridge, MA, 647- 653, 2000. [15] Chen D, He Q, Wang X (2007), “On linear separability of data sets in feature space”, Neurocomputing, 70(13-15): 2441-2448. [16] David W. Aha, Dennis Kibler, Marck Albert, “Instance-Based Learning Algorithms”, Machine Learning, 1991, 6:37~66. [17] Guo Mao-Zu, Su Xiao-Hong and Wang Ya-Dong, “Research of Index and Retrieval Mechanism Based on IBL Algorithm in CBR System”, Computer engineering and applications. 2001,5: 67-69.
+
+1395
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:38:08 UTC from IEEE Xplore. Restrictions apply.
+

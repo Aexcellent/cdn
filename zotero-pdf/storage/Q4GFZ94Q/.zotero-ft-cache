@@ -1,0 +1,122 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy. 
+Accept & Close 
+Loading [MathJax]/extensions/MathZoom.js 
+ 
+Skip to Main Content 
+ 
+    IEEE.org 
+    IEEE Xplore 
+    IEEE-SA 
+    IEEE Spectrum 
+    More Sites  
+ 
+SUBSCRIBE 
+ 
+    Cart  
+    Create Account 
+    Personal Sign In 
+ 
+IEEE Xplore logo - Link to home 
+ 
+    Browse 
+    My Settings 
+    Help 
+ 
+Institutional Sign In 
+IEEE logo - Link to IEEE main site homepage 
+ADVANCED SEARCH 
+Journals & Magazines > IEEE Wireless Communications > Volume: 27 Issue: 2 
+Federated-Learning-Enabled Intelligent Fog Radio Access Networks: Fundamental Theory, Key Techniques, and Future Trends 
+Publisher: IEEE 
+Cite This 
+PDF 
+Zhongyuan Zhao ; Chenyuan Feng ; Howard H. Yang ; Xueting Luo 
+All Authors 
+31 
+Paper 
+Citations 
+1939 
+Full 
+Text Views 
+ 
+    Alerts 
+ 
+Abstract 
+Document Sections 
+ 
+    Introduction 
+    Network Edge Intelligence in F-RANs: Federated Learning Paradigms 
+    Fundamental Theory of Federated Learning in F-RANs 
+    Key Techniques of Federated-Learning-Enabled Intelligent F-RANs 
+    Future Trends: Potential Applications and Open Issues 
+ 
+Show Full Outline 
+Authors 
+Figures 
+References 
+Citations 
+Keywords 
+Metrics 
+Footnotes 
+Abstract: 
+The rise of big data and AI boosts the development of future wireless networks. However, due to the high cost of data offloading and model training, it is challenging to implement network intelligence based on the existing centralized learning strategies, especially at the edge of networks. To provide a feasible solution, a paradigm of federated learning- enabled intelligent F-RANs is proposed, which can take full advantage of fog computing and AI. The fundamental theory with respect to the accuracy loss correction and the model compression is studied, which can provide some insights into the design of federated learning in F-RANs. To support the implementation of federated learning, some key techniques are introduced to fully integrate the communication, computation, and storage capability of F-RANs. Moreover, future trends of federated learning-enabled intelligent F-RANs, such as potential applications and open issues, are discussed. 
+Published in: IEEE Wireless Communications ( Volume: 27 , Issue: 2 , April 2020 ) 
+Page(s): 22 - 28 
+Date of Publication: 13 May 2020 
+ISSN Information: 
+INSPEC Accession Number: 19590610 
+DOI: 10.1109/MWC.001.1900370 
+Publisher: IEEE 
+Introduction 
+ 
+To satisfy the diverse multi-dimensional requirements of quality of service (QoS), such as enhanced broadband, ultra-reliability and low latency, and massive connections, a paradigm of fog radio access networks (F-RANs) has been proposed as a promising evolution path for the future wireless network architecture [1]. By integrating fog computing into wireless networks, some service requests can be fulfilled locally, which provides great flexibility to satisfy the QoS requirements of various application scenarios. Due to this great potential, F-RAN has become a research hotspot and draws a lot of attention from both academia and industry. 
+Sign in to Continue Reading 
+Authors 
+Figures 
+References 
+Citations 
+Keywords 
+Metrics 
+Footnotes 
+More Like This 
+TACT: A Transfer Actor-Critic Learning Framework for Energy Saving in Cellular Radio Access Networks 
+ 
+IEEE Transactions on Wireless Communications 
+ 
+Published: 2014 
+Machine-Learning Approach for User Association and Content Placement in Fog Radio Access Networks 
+ 
+IEEE Internet of Things Journal 
+ 
+Published: 2020 
+Show More 
+References 
+References is not available for this document. 
+IEEE Personal Account 
+ 
+    Change username/password  
+ 
+Purchase Details 
+ 
+    Payment Options 
+    View Purchased Documents  
+ 
+Profile Information 
+ 
+    Communications Preferences 
+    Profession and Education 
+    Technical interests  
+ 
+Need Help? 
+ 
+    US & Canada: +1 800 678 4333 
+    Worldwide: +1 732 981 0060 
+    Contact & Support  
+ 
+Follow 
+ 
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | Privacy & Opting Out of Cookies 
+ 
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity. 
+ 
+© Copyright 2022 IEEE - All rights reserved. 

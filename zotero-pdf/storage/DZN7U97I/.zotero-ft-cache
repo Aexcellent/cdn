@@ -1,0 +1,607 @@
+Ding Journal of Cloud Computing: Advances, Systems and Applications (2020) 9:11
+https://doi.org/10.1186/s13677-020-0153-8
+
+Journal of Cloud Computing: Advances, Systems and Applications
+
+RESEARCH
+
+Open Access
+
+Multimodal transport information sharing platform with mixed time window constraints based on big data
+Liqun Ding1,2
+
+Abstract
+The primary consideration in the top-level design of multimodal transport systems is the matching degree and coordination degree of port facilities and transport information platforms. In the process of container transportation, there exists a mixed time window consisting of a hard time window and a soft time window. This study focuses on the coordination of transport organization considering the scale effect under the constraint of a mixed time window. It is necessary to consider the influence of the mixed time window on transport efficiency. Highway transportation is relatively flexible and can be regarded as without time window constraints. Railway transportation and waterway transportation have relatively fixed delivery and operation times, reflecting hard time windows. Alternatively, the time interval of a consignee receiving goods is relatively free, reflecting a soft time window. The process of container transportation involves a mixed time window consisting of a hard time window and a soft time window. The scale effect of transportation is the result of a combination of internal and external factors. This paper will discuss the functions and operational statuses of the relatively independent information system of railways and ports and establish an electronic platform suitable for information interconnection and the interoperability of multimodal transport stations in combination with the traditional information exchange mode.
+Keywords: Information system, Collaborative operation, Minimizing time costs, Gathering and dispatching logistical nodes, Multimodal transport information
+
+Introduction With the globalization of international trade, which is the origin of demand, the operation level and service capacity of international logistics, as derivative demands, are facing considerable challenges. Ports are no longer the ends of transport routes but are nodes in the international logistics chain and transit stations for container collection and distribution.
+Containers are used to transport a batch of goods from origin O to destination D. Considering the freight charges of ordinary goods, this problem seldom involves air cargo transportation. The characteristics of transportation modes and facilities determine the flexibility of the transportation service time. Highway transportation
+Correspondence: dinglq@whtcc.edu.cn 1School of Transportation, Wuhan University of Technology, Wuhan, Hubei, China 2Logistics College, Wuhan Technical College of Communications, Wuhan, Hubei, China
+
+is associated with a soft time window. The service time of other transportation modes, except pipeline transportation, has extensive constraints, reflecting a hard time window. For a consignee, such as through express delivery, a time interval can be planned, which has certain mixed time window characteristics. Therefore, the combined transport of containers via railways and waterways has the service characteristics of mixed time windows composed of hard time windows and soft time windows.
+It is assumed that the properties of container-fitted goods do not change under general transport conditions. Considering the objective of minimizing transport costs, it is assumed that the volume of transport is sufficient and the carrying and loading capacities are high enough to achieve the scale effect of container railway and waterway combined transport.
+Therefore, the concept of integrated transport is generally accepted. Accordingly, the service facilities and capabilities of various logistics networks in the whole
+
+© The Author(s). 2020 Open Access This article is distributed under the terms of the Creative Commons Attribution 4.0 International License (http://creativecommons.org/licenses/by/4.0/), which permits unrestricted use, distribution, and reproduction in any medium, provided you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons license, and indicate if changes were made.
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 2 of 11
+
+international transportation system need to be continuously improved. The matching demand between the processing links of assembly and other circulation tasks is important to consider.
+At present, the transport facilities and equipment for various modes of multimodal transport in developed countries are all integrated by design. A logistics public information platform was designed and has been continuously improved according to the actual operation level of logistics infrastructure equipment and the operational dispatching ability. The goal is to continuously improve matching within the whole system of multimodal transport and to create a complete transport chain or transport network. A network will include the buyer, seller, logistics companies, shipping companies, freight forwarders, multimodal operators, actual carriers, customs, financial services and other institutions that use information sharing platforms; these entities combine for unified management in the baseline scenario, participate in electronic data exchange, and perform business transactions [1].
+The railway and water transport information system is relatively independent, but the development of multimodal transport modes has lagged in effectiveness, and the platform construction approach for the exchange and sharing of logistical information among railway and waterway participants is relatively backward [2]. The EDI message transmission system for international container transport is used in China’s waterway and highway networks, and the independent railway transport document system is used by China’s railway departments. The lack of scientific and reasonable forecasting methods to predict the multimodal transport volume and the lack of top-level designed operation plans, container type standards, cargo classification standards, technical equipment standards, electronic document standards and charging standards for railways and waterways currently in use in China are major issues. However, the standard for waterway containers is high, but the standard for railway containers is low and does not fully meet the international general container loading standard. Railway containers are generally not allowed to go to sea, which has resulted in resistance to multimodal transport.
+In research by the Container Transport Information Platform and Transport Organization, Reference 1, the architectural design of the information platform for hot metal multimodal transportation based on Soa and DDD is studied. In the third part, the scheduling model and solution strategy for multimodal transportation are studied from the point of view of the logistics cloud platform. Lu Xuewei and others mainly considered mixed time window constraints and studied optimal route selection in multimodal transportation. Liang Xiaokang studied the optimization of railway container multimodal transportation routes based on the
+
+scheme and transportation time limits. Li Bin developed an algorithm with a logistics container terminal distribution virtual machine architecture and performed simulation research. Yang Yi-jia et al. studied the integrated scheduling of hot metal container handling operations at multimodal terminals from the perspective of energy efficiency. Saeed Fazayeli et al. studied location routing in time windows and multimodal transport networks with requirements, and a two-part genetic algorithm was proposed [3–6].
+All of the above papers focused on the optimization of transportation organizations and transportation routes in container multimodal transport from different perspectives, thus providing a certain reference value for this paper. This paper focuses on the container railway and waterway intermodal transportation system, assesses the coordination of transportation organizations under the restriction of a mixed time window considering the scale effect, and expounds the functions and operation statuses of the information system, which includes relatively independent railways and ports. Combined with the traditional information exchange mode, this paper tries to build an electronic platform suitable for the intercommunication of multimodal transportation information.
+Proposed method
+Constructing an information exchange platform for ports and railways Based on the relatively independent operational status of China's port and railway systems, this paper tries to establish a special network based on electronic data exchange technology to publish information from buyers, sellers, logistics companies, shipping companies, freight forwarders, multimodal transport operators, actual carriers, customs, financial services and other institutions in this information platform for unified management. Logistical information platforms can not only exchange information between railway management systems and port management systems but also query and track business information; additionally, the links where goods are processed are considered in real time in the process of customer business management to different extents, which strengthens the cooperative operation ability among the main bodies of the multimodal transport network [7–9].The railway production information system serves port branches and subsidiaries of various ports. From functional requirement analysis, the main service systems and port departments provide external data exchange and query services.
+(1) The main functions of the production business management system are to assist the ports in managing production scheduling plans and suppliers, to establish and improve customer relationship management, to complete various statistical analyses and to coordinate the daily work
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 3 of 11
+
+of the subordinate loading and unloading operation companies and each auxiliary business unit. (2) The main modules of the system include warehouse management, operation management, automobile and barge operation management, operation management, business management, and billing management. In addition, statistical analyses and summaries of business data related to daily, monthly and annual statistical data are performed for the next round of production planning.
+The Yangtze River Economic Belt is characterised by the following features.
+(1) The main functions of the production business management system are to assist ports in managing production scheduling plans and suppliers, to establish and improve customer relationship management, to complete various statistical analyses and to coordinate the daily work of subordinate loading and unloading operation companies and each auxiliary business unit.
+(2) The main modules of the system include warehouse management, operation management, automobile barge operation management, operation management, business management, and billing management. Additionally, statistical analyses and summaries of business data related to daily, monthly and annual statistical data are performed for the next round of production planning.
+Cause analysis of information sharing platform construction for ports and stations At present, railway departments and ports have a large number of information systems, and the construction of hot metal transport information platforms needs to consider many factors, especially the platform type and security, to improve the ability to carry out tasks. There are several main reasons for this analysis. First, the language and data formats of railway systems and port systems are different. Second, the railway and port departments have large quantities of information, and the information is complex. When building a shared information platform, we should consider its stability and security and keep important data confidential [3, 10]. Third, an information sharing platform should satisfy the daily business management and real-time business information needs of users for querying and tracking. In the process of building the information platform, the following issues need to be considered.
+The first consideration is reuse. At present, railways and ports exist in the information system but may be abandoned, which is a serious waste of resources. We should improve and reuse the existing system design and perform debugging.
+
+The second consideration is transparency. In the process of information platform construction, to improve the work efficiency, the specific functions of the security operation platform are hidden.
+Third, the platform must be easy to expand. The business scale and difficulty level fluctuate dramatically. The architecture of the information platform needs to be expanded to accommodate certain processes and system dynamics.
+Fourth, the system is easy to maintain. Because the hot metal transport platform involves the sale of goods among railway departments, logistics companies, multiple participants and online users and the platform is operated 24 h a day, the key technology for system maintenance should be improved, and the maintenance cost should be reduced.
+The fifth consideration is security. The Container Transportation Information Sharing Platform involves a large number of railways, ports, suppliers and customers to prevent intrusion detection and the loss of system data. Therefore, the design and maintenance of an information sharing platform should be strengthened in the process to ensure the confidentiality and integrity of the data.
+The sixth consideration is to ensure operational efficiency. Efficiency is a key indicator of the execution efficiency of an information system, and matching the response time and capability is the main measure of system efficiency. Considering the limitation of the railway transport capacity and the forecasts of the arrival times of ships, many multimodal transport information sharing platforms need to coordinate among various departments. The design of multimodal transport information platforms should consider the problems related to data access, the data conversion capacity and the information transmission speed.
+Construction mechanism of the information sharing platform for ports and stations With the development of multimodal transport information sharing platforms, the actual operation level of logistics infrastructure equipment, operational scheduling ability, network technology innovation level and other factors have continued to improve. The goal of an information sharing platform is to continuously improve matching among the system services of multimodal transport and to achieve the integrated service goal of the whole transport chain or transport network. For example, the Capstan Company of the United States invested in the establishment of a logistics information sharing platform that unifies the information from buyers, sellers, logistics companies, shipping companies, freight forwarders, multimodal operators, actual carriers, customs, financial services and other institutions and performs unified management in the background. The participants perform business transactions through
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 4 of 11
+
+electronic data exchange [4, 11]. The degree of matching and coordination of transport facilities and equipment, the transport organization and management levels, and the platform used have become the primary considerations in the design of multimodal transport information sharing platforms for multimodal transport.
+
+Railway departments should announce the cargo situation to the ports and other customers in real time to facilitate participation in the supply chain and the establishment of production plans.
+7) Sharing data
+
+Business needs of multimodal transport railways and ports Port data requirements for railway departments
+1) Predictive information
+
+Excluding the respective commercial proprietary information and technical core data involved, information railway and port departments should share useful logistical information, which will help both sides optimize production organization and management [12].
+
+The railway provides its own forecasting information, which can be queried by users in real time. In the commissioning stage, the use of port resources should be known in real time, and the relevant information related to port and internal dispatching should not be duplicated.
+2) Easy-to-arrange vehicles
+After a port submits an application for vehicle card requirements, the relevant railway departments must examine the application and arrange the vehicle in accordance with the requirements [4]. In this process, the timely exchange of information between port and railway departments will help port enterprises quickly manage production plans, operators and other loading and unloading equipment and allocate resources.
+3) Providing train formation information
+
+Data requirements of railway departments for ports
+1) Providing basic port information
+The port should provide the railway department with the port production plan, the logistical capacity of the dock yard, the train demand information, the port loading and unloading machinery capacities, the port loading and unloading efficiencies, etc.
+2) Providing a schedule
+Because the railway departure plan matches the schedule requirements, the port department should provide the railway department with information regarding the time of ship departure, the number of ships, the types of cargo and containers, the loading capacity, the expected arrival time at the destination port, etc.
+
+Railway departments need to provide real-time train formation information to the ports so that the port operation system does not need to duplicate information or input data; this approach facilitates production organization and improves the efficiency of port production operations.
+4) Inform ports of the shipping plan
+Railway departments should inform the ports of their transport plans, which mainly include the vehicle number, vehicle type, load, safety performance and operation status.
+5) Optimize the class arrangement
+Generally, the schedules formulated by shipping companies are strictly implemented, so to match the railway departure plan and the relevant scheduling requirements, it is best to inform all shipping companies of schedule or date changes through the railway production and operation system.
+6) Providing Railway Freight Information
+
+3) Providing the current collection and distribution situation at the port.
+The port should inform the railway department of the collection and dispatching situation at the port on that day to avoid a long queuing time for trains entering the port area.
+4) Sharing data
+Like the railway department, the port should share useful logistical information, which is helpful for both sides to optimize production organization and management.
+Experiments The Container Railway and Waterway Transport Organization Model is a form of the free combination of transport participants and transport elements to achieve customer satisfaction. This transport organization model is based on the customer demand, which reflects the overall goal of the rational allocation of resources in a large transportation environment and full and free competition among market participants.
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 5 of 11
+
+Model construction The service time of transportation modes other than pipeline transportation has extensive constraints, resulting in a hard time window. For a consignee, such as through express delivery, a time interval can be planned, which has certain mixed time window characteristics. Therefore, the combined transport of container railways and waterways has the service characteristics of mixed time windows composed of hard time windows and soft time windows. The transport proportions are shown in Fig. 1.
+Multimodal transport covers a wide range of areas and requires WANs to exchange data. The dynamic information in the system involves all aspects of the multimodal transport system, such as container information tracking, empty container status information, empty container return information, vehicle adjustments, ship departure and transportation requirements, and the availability information for various types of operating equipment.
+In the scope of transport vehicles, the supply of electricity and water is directly related to railway transport management information. Moreover, customs need customs clearance information, and railway and port departments need to calculate their resource consumption. Additionally, small and medium-sized enterprises and commodity owners need timely information related to inquiry positioning, train information inquiries, freight quotation inquiries, door-todoor services, and voice consultation services. The information sharing platform links the information subsystem of container management with the elements of suitable container goods, container elements, loading and unloading machinery elements, carrier elements,
+
+yard subsystems and operation line subsystems; then,
+
+feedback and dynamic information are received from
+
+each subsystem in real time, which provides informa-
+
+tion guarantees for decision support subsystems and
+
+operational management [13].
+
+It is assumed that the properties of container-fitted
+
+goods do not change under general transport conditions.
+
+Considering the objective of minimizing the transport
+
+costs, it is assumed that the volume of transport is suffi-
+
+cient and the carrying and loading capacities are satisfac-
+
+tory for achieving the scale effect of container railway
+
+and waterway combined transport.
+
+The collaborative process of container railway and water-
+
+way combined transport can be interpreted as minimizing
+
+the total time cost of cargo transportation from the depart-
+
+ure port to the destination port while maximizing the oper-
+
+ational efficiency of cargo transportation from the departure
+
+port to the destination port. The model can be defined as:
+
+!
+
+XXX
+
+X
+
+Min
+
+PdCT ijydij þ PdK d
+
+ð1Þ
+
+i∈N j∈N d∈D
+
+d
+
+The constraints are as follows:
+
+X ydij ¼ 1; ∀i∈Sd; d ¼ D
+j∈N
+
+X
+
+ydij
+
+¼
+
+X
+
+ydji
+
+;
+
+∀i∈N
+
+À ≠T
+
+d
+
+;
+
+Sd
+
+Á ;
+
+d∈D
+
+j∈N
+
+j∈N
+
+X ydij ¼ −1; ∀i∈T d;d∈D
+j∈N
+
+Fig. 1 The proportions of the combined transport of container railways and waterways in China and other countries around the world
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 6 of 11
+
+xij ¼ ydij; ∀i; j∈T d; d∈D
+
+X xij ¼ 1; ∀i∈N
+
+i∈N
+X xij ¼ 1; ∀ j∈N
+
+j∈N
+
+XX xij ≥ 1; ∀R⊂N
+
+i∈R j∈R
+
+XX n
+
+o
+
+Kd ¼
+
+f XK iydji
+
+i∈NXj∈NX n
+
+o
+
+þ
+
+f j MK iydij ; ∀d∈D
+
+i∈N j∈N
+
+xij∈f0; 1g; ∀i; j∈N
+
+ydji∈f0; 1g; ∀i; j∈N; d∈D
+
+This process involves container railway and waterway
+
+joint transport freight port stations and container rail-
+
+way and waterway combined transport section collec-
+
+tion, where.
+
+N- Transportation time cost from freight intermodal
+
+station to freight intermodal station;
+
+D- Functional expression of the logistical efficiency of
+
+the freight volume at an intermodal port;
+
+CTij-The departure and destination stations of the
+transport section; fj{a}-The freight volume of the transport section; Sd, Td-The total time cost of the transport section is
+
+handled by intermodal port stations. Pd-The total freight volume at the departure port. Kd-The total freight volume at the terminal. XKi-If a vehicle or ship sails from a harbour station to
+
+a harbour station, otherwise; MKi-If the transport section arrives directly from the
+
+port station, otherwise;
+
+If the vehicle and ship sail from port station i to port
+
+station j, xij = 1; otherwise, xij = 0.
+
+If section d is directly from port i to port j, section ydji
+
+¼ 1; otherwise, section ydji ¼ 0.
+
+XXX
+
+The objective function Minð
+
+PdCT ijydij
+
+X
+
+i∈N j∈N d∈D
+
+þ PdK dÞ seeks to minimize the weight of the trans-
+
+d
+portation cost and minimize the total operation time of
+
+container railway and waterway combined transporta-
+
+tion, including the total transportation time and the total
+
+station stay time.
+
+Algorithm design The railway information system basically covers the main business sectors of the railway industry.
+
+Transportation organization, passenger and freight marketing, operation and management, infrastructure, information integration platforms and user interfaces are the basic elements of railway information systems, which provide the objective conditions for the establishment of physical networks and virtual networks. Efficiency is a key index used to measure the efficiency of information systems. The execution level, response time and matching ability are the main indicators used to measure system efficiency. For the multimodal transport information sharing platform, we should take into account the actual railway capacity constraint and, ship arrival time predictions and coordinate among decentralised departments. Traffic organization, passenger and cargo marketing, and middle-level management are the main components of the information system for railways [14, 15]. Each application module contains several submodules, and each module needs business support related to information. The functions of the railway information system are as follows.
+(1) Infrastructure: Infrastructure includes the network structure inside the railway system and the external network structure.
+(2) Information integration platform: The shared transmission standard is the main platform for railway information transmission.
+(3) User Interface: The interface provides interactive functions for users of the system.
+Containers are used to transport goods from origin O to destination D. OD passes through multiple logistical hubs to form aggregate N. Each hub has an integrated transport infrastructure. Considering the freight charges of ordinary goods, this paper seldom involves air cargo transportation. Thus, railway, waterway, highway and multimodal transport can be used to determine aggregate K and at each hub. Hubs such as New York can convert between modes of transport or direct transport. The characteristics of transportation means and facilities determine the flexibility of the transportation service time. Notably, highway transportation is associated with a soft time window.
+Assuming that the logistical efficiency between container railways and waterway combined transport terminals is similar, the transportation time is much longer than the stay time at the terminals, and the d weights of the transportation volume in each transport section are assumed to be the same; thus, the model can be simplified to the following similar integer programming problem. The solution process is as follows:
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 7 of 11
+
+XX
+
+Min
+
+CT ijxij
+
+ð2Þ
+
+i∈N j∈N
+
+Constraint function: X xij ¼ 1; ∀i∈N
+j∈N
+X xij ¼ 1; ∀ j∈N
+i∈N
+XX xij ≥ 1; ∀R⊂N
+i∈R j∉R
+
+xij∈f0; 1g; ∀i; j∈N
+
+The above problem is the travelling salesman problem
+
+(TSP).
+
+XX
+
+The objective function Min
+
+CT ijxij seeks to
+
+i∈N j∈N
+
+minimize the total time cost of the transportation of
+
+goods from the departure port to the destination port
+
+and to maximize the operational efficiency of transporta-
+
+tion from the departure port to the destination port.
+
+Railway transportation management information sub-
+
+systems mainly include those for freight information
+
+management, vehicle scheduling management, and
+
+freight station management, as well as other subsystems.
+
+The goal is to establish a global network to connect the
+
+relevant equipment at the main railway stations and
+
+achieve real-time tracking management based on trucks,
+
+containers and goods. The system can track and locate
+
+any container or cargo in real time in any truck. At the
+
+same time, the system can display dynamic changes in
+
+traffic flows and the situations at inspection stations at
+
+any time to provide information needed for relevant
+
+personnel decision making and to assist employees in
+
+completing the overall distribution schedule and arran-
+
+ging the route.
+
+logistical nodes between the O and D points in container railway and waterway combined transportation. The cargo will form pheromones at each transhipment node, and the comprehensive pheromones will ultimately determine the transport path in container railway and waterway combined transport. Each feasible path is searched by an ant, and the corresponding pheromones are updated. After several iterations, the optimal solution is obtained. The solution is divided into 10 steps as follows [12, 15].
+(1) Parameter setting. We assume that the total ant colony is θ, the time starting point is t, the maximum iteration number is Dc, the heuristic information is λθij and the initial pheromone is μθij. Additionally, the information scope of the ant search is set k, which includes container railway and waterway combined transport hub information, transport line information, vehicle and loading vehicle information, freight forwarding or direct arrival information, train and ship arrival information for railway freight stations and ports, time information, and other auxiliary information.
+(2) Iteration. When the number of iterations reaches the maximum Dc, that is, Dc = Dc + 1, the iteration is completed.
+(3) Tabu table Dc is established to mark all the O and D points of container rail and waterway combined transportation searched by ants.
+(4) The ant search nodes are optimized, and the feasible container railway and waterway joint transportation nodes of ant i are recorded.
+(5) The feasible container rail and waterway joint transport nodes of ant θ are added to table dθ.
+(6) The expression for the selection of the logistical nodes of container railway and waterway combined transportation by ants is determined.
+
+Algorithm procedures According to the network flow and influence dimension index of container railway and waterway combined transport organization, it is particularly important to achieve coordination between transport organization and transport route selection. Therefore, a model of transport organization coordination considering the scale effect under the constraint of a mixed time window is proposed; this approach regards the coordination of container railway and waterway combined transport as an optimal path selection problem and adopts the ant colony algorithm.
+The ant colony algorithm is a simulated evolutionary algorithm with distributed and heuristic characteristics. The ant colony algorithm is used to solve the problem formulated in this study. It is assumed that there are n
+
+K
+
+θ ij
+
+ðtÞ
+
+¼
+
+f
+
+XμαijðtμÞλαijβiðjtÞλβij ; j∈allowedθ
+
+ð3Þ
+
+i∈allowedθ
+
+0; j∉allowdθ
+
+in the formula,
+
+1)
+
+K
+
+θ ij
+
+ðtÞ
+
+denotes
+
+the
+
+probability
+
+of
+
+establishing
+
+a
+
+logistic node for the combined transport of railway
+
+and waterway from i to j at t.
+
+2) λij denotes the heuristic function, which represents the expected value of ant logistical nodes for the
+
+combined transportation of railway and waterway
+
+containers from i to j.
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 8 of 11
+
+3) μθij (t) represents the total concentration of pheromones at time t for the logistics nodes of container railway and waterway combined transportation from i to j.
+4) α is the heuristic factor, which indicates the amount of information acquired by ants in the search process used to choose the next feasible logistical node for container railway and waterway combined transportation.
+5) β represents the expected heuristic factor, which reflects the influence of heuristic information on the ant search results.
+(7) Update pheromone μθij as follows:
+
+μijðt þ nÞ ¼ ð1−ρÞμijðtÞ þ Δμijðt; t þ nÞ
+
+ð4Þ
+
+X m
+
+Δμijðt; t þ nÞ ¼ Δμθijðt; t þ nÞ
+
+ð5Þ
+
+k¼1
+
+In these formulas,
+
+1) μij(t + n) reflects the factors the influence the choice of combined transport routes between container railways and waterways by ants.
+
+2) Δμij(t, t + n) indicates that after (t, t + n) steps of ant colony searching, the information remains unknown.
+3) ρ represents the volatilization coefficient of pheromones.
+4) 1 − ρ is the coefficient of pheromone residue. (8) Choose the ant with the lowest total cost in the
+search. (9) Update the pheromones of container railway and
+waterway combined transportation according to the information obtained from optimal ant labelling. (10)The iteration process is completed when all the logistical nodes of container railway and waterway combined transport are searched by ants and labelled as feasible. The maximum number of iterations is Dc.
+Algorithm hypothesis According to the size of cargo, the directions of cargo inflows and outflows, the variety of cargo, the differences in cargo handling processes, the actual operation level and the operation dispatching ability, the public information platform is designed to continuously improve the matching level with the services of the whole multimodal transport system to achieve the integration of the transport chain or transport network services and to
+
+Fig. 2 Distribution of transport demand nodes
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 9 of 11
+
+establish an electronic data exchange system. Logistical information platforms can exchange information among railway management systems and port management systems, and goods can be managed [16].
+In the comprehensive transportation system of Hubei Province, highway, railway and water transportation are the most important. Highway transportation is the most important mode of transportation in the province. Railways and waterways account for a large share of freight turnover. From the perspective of freight transportation, the average distance of highway transportation is 200 km. A large amount of
+
+short-distance freight transportation occurs via highways, and the average distance of railway transportation is approximately 1000 km. The average distance of waterway transportation is approximately 600 km. Highway transportation is relatively flexible and has no time window constraint. Railways and waterways both use hard time windows. The relative positions of the channels are shown in Fig. 2.
+Hypothesis 1: The existing 2000 t of general cargo is transported from logistical hub O to logistical hub D using a standard (20 ft) C container. Optional single modes of transport include roads,
+
+Fig. 3 Sensitivity analysis of container transport mode share ratio. Container railway and waterway combined transport promotes the collaborative operation among waterway, railway and highway modes in conscious and unconscious behavior
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 10 of 11
+
+Table 1 Transport time parameters of each node
+
+Method of transportation OA1 OA3 A1A2 A3A4 A3A2
+
+Highway
+
+4
+
+3
+
+–
+
+–
+
+2
+
+Railway
+
+5
+
+5
+
+4
+
+2
+
+–
+
+Waterway
+
+9
+
+–
+
+6
+
+4
+
+–
+
+railways and waterways. Container multimodal transport can also be utilized. There are four logistical nodes through which goods are recorded: A, B, C and E.
+Hypothesis 2: The delivery time of ordinary goods is 5–7 days. Delivery from the place of departure to the destination within the stipulated time is considered to meet the needs of the consignee.
+Hypothesis 3: Set the transport unit price of different modes of transportation as follows: highway 0.2 = yuan/ (t ⋅ km), railway = 0.15 yuan/ (t ⋅ km), and waterway = 0.03 yuan/ (t ⋅ km).
+Results and discussion Railway transportation management information systems mainly include freight information management, vehicle scheduling management, freight station management and other subsystems. The purpose is to establish a global network to connect the relevant equipment from the main railway stations and achieve real-time tracking management based on trucks, containers and other goods. The railway production information system serves port branches and subsidiaries of various ports. From functional requirements analysis, the main service systems, namely, port departments, provide external data exchange and query capabilities [17].
+From the perspective of information collaboration, by analysing the data information platform for railways and ports in a multimodal transport system, the process of data exchange between multimodal transport railways and ports is described, and the information sharing platform model of multimodal transport is established.
+Some types of transportation are uniform, and considering the mixed time window constraint, the unit transport cost per unit transport distance is converted into the unit transport time cost, which is 8 yuan/ (t ⋅ h) for railways, 10 yuan/ (t ⋅ h) for highways and 0.4 yuan / (t ⋅ h) for waterways. The transport time parameters of each logistical node are shown in Table 1.
+
+Table 2 Operation data for the optimal path constrained by a mixed time window
+
+Method of transportation
+
+Highway
+
+Railway
+
+Waterway
+
+Time (h)
+
+0
+
+4
+
+16
+
+Cost (yuan)
+
+0
+
+410
+
+55
+
+The algorithm parameters are set as follows: initial pheromone level is 0.1, heuristic factor is 2, expected heuristic factor is 5, pheromone volatilization coefficient is 0.05, total ant colony size is 18, and maximum number of iterations is 200.
+According to the ant algorithm and steps, the optimal path is O-A3-A4-D. The modes of transportation are railway-waterway transportation. The operation data of the optimal path under the mixed time window constraint are shown in Table 1, and the operation data for each mode of transport are shown in Table 2.
+Focusing on port and station and sharing information platforms, this paper studies the collaborative mode of multimodal transport. In the aspect of port and station construction, first, the concept, structure and layout characteristics of multimodal transport hubs are given. According to system theory and coordination theory, the macro-, meso- and microcoordination models of a multimodal transport hub system are proposed. Taking the core hub layout of the multimodal transport line in the Chebanzhou Port Area of Huangshi New Port as an example, the systemic coordination of the multimodal transport hub is analysed objectively. From the perspective of information collaboration, by analysing the data information platform for railways and ports in a multimodal transport system, the process of data exchange between multimodal transport railways and ports is described, and an information sharing platform model of multimodal transport is established.
+Conclusions Container railway and waterway combined transport promotes collaborative operation among waterway, railway and highway modes from multiple behavioural perspectives. According to the distance, freight, cargo volume, safety and geographical transportation environment characteristics of various modes of transport, the division of labour among various modes of transport can be clearly determined. Through the gradual improvement of government macrocontrol and market behaviour, the degree of coordinated operation of container transport ports will be improved, and port enterprises, logistical enterprises, shipping companies, freight forwarding companies and even regional economic delivery will be strengthened. Transport management departments and other participants fully compete with each other, with one port driving multiple ports along the line and multiple ports driving multiple regions, thus breaking various barriers hindering the combined transport of container railways and waterways, which is conducive to the development of the regional economy and regional transportation.
+
+Ding Journal of Cloud Computing: Advances, Systems and Applications
+
+(2020) 9:11
+
+Page 11 of 11
+
+Acknowledgements The authors thank the editor and anonymous reviewers for their helpful comments and valuable suggestions. I would like to acknowledge all our team members.
+About the Authors Ding Liqun, Ph. D. in Transportation Planning and Management, School of Communications, Wuhan University of Technology, is also a lecturer in Logistics College, Wuhan Vocational College of Transportation. Her research fields are: Transportation System Planning, Logistics Engineering and Supply Chain Management. He has been engaged in transportation system planning research for many years and has published dozens of professional academic papers. He has been engaged in the teaching of logistics management specialty for decades, and has systematically taught specialized courses such as Logistics Operation Management and Logistics Customer Service, which are well recognized by students and colleagues.
+
+14. Bing-bing L, Li-bo S, Yu-gang YU (2017) Recent advances on researches of warehousing, logistics and supply chain management[J]. J Univ Sci Technol China 47(2):176–187 (inChinese)
+15. Fan W, Jin-jia H, Zuo-yi L (2017) Port management and operations: emerging research topics and progress[J]. J Manage Sci China 20(5):111–126 (in Chinese)
+16. Yi-jia Y, Xiao-ning Z, Bai-cheng Y et al (2018) Integrated scheduling of rail-water containers handling operations in intermodal terminals considering energyefficiency[J]. J Transport Syst Eng Inform Technol 18(6):215–221 (in Chinese)
+17. Yi-mei C, Xiao-ning Z, Li W (2019) Review on integrated scheduling of container terminal[J]. J Traffic Transport Eng 19(02):136
+Publisher’s Note
+Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+
+Author’s contribution The author takes part in the discussion of the work described in this paper. The author read and approved the final manuscript.
+
+Funding Not applicable.
+
+Availability of data and materials We can provide the data.
+
+Competing interests These no potential competing interests in our paper. And all authors have seen the manuscript and approved to submit to your journal. We confirm that the content of the manuscript has not been published or submitted for publication elsewhere.
+Received: 7 September 2019 Accepted: 9 January 2020
+
+References 1. Qiang H, Wang W, Quan SS (2013) Architecture Design of Information
+Platform for hot metal intermodal transport based on SOA and DDD [J]. Comput Appl Softw 6:124–126 2. Xiaojiao Z (2014) Design of Multimodal Transport Information Service [D]. Beijing Jiaotong University, Beijing 3. Chunlei Z, Mengya LJ et al (2018) Multimodal transport schedule model and solution strategy based on logistics cloud platform [J]. J Railway 40(1):1–8 4. Qi S et al (2016) Logistics distribution system integration optimization based on variable neighborhood search algorithm [J]. Ind Technol Econ 8:46–55 5. Heng-ying Z, Xiang-chun Q, Lang-ya Z (2016) Inspiration of American railway intermodal transport development [J]. Railway Transp Econ 38(12):69–72 6. Yun L, Shuai-hui T (2012) Logistics cloud service: innovation model of logistics service oriented to supply chain [J]. Appl Res Comput 29(1):224–228 7. Juncheng T, Pan L, Yeping C (2016) Research on the reconstruction of urban and rural logistics network in the big data era [J]. China Circ Econ 30(11):22–32 8. Wang X (2016) Big data and intelligent logistics [M]. Beijing Jiaotong University Press, Tsinghua University Press, Beijing, pp 16–17 9. Lu X, Bin Y, Zhendong H (2018) Optimal Route Selection of Multimodal Transport under Mixed Time Window Constraints [J]. Railway Transp Econ 40(8):28–33 10. Liang X (2017) Research on the optimization of railway container multimodal transport route based on fuzzy transportation time limit [J]. Railway Transport Econ 39(12):55–60 11. Bin L (2018) Collection and distribution virtual machines architecture of container terminal based on computational logistics and its simulation analysis[J]. Comput Integr Manuf Syst 24(1):245–263 (inChinese) 12. Bin L, Yun-fei W, Bing S (2018) Container terminal logistics computation performance evaluation with great principles of computing and case study[C]∥IEEE. Proceedings of the 2018 Chinese Automation Congress(CAC 2018). IEEE, New York, pp 934–939 13. Shuai L, Bo-ming T, Jian C (2017) Multi-mode competitiveness game model in regional comprehensive passenger transportation corridor[J]. J Traffic and Transport Eng 17(03):136
+

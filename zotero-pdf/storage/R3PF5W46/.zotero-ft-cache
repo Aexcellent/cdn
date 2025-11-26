@@ -1,0 +1,4682 @@
+CrypTFlow2: Practical 2-Party Secure Inference
+
+arXiv:2010.06457v1 [cs.CR] 13 Oct 2020
+
+Deevashwer Rathee
+Microsoft Research t-dee@microsoft.com
+
+Mayank Rathee
+Microsoft Research t-may@microsoft.com
+
+Nishant Kumar
+Microsoft Research nishant.kr10@gmail.com
+
+Nishanth Chandran
+Microsoft Research nichandr@microsoft.com
+
+Divya Gupta
+Microsoft Research divya.gupta@microsoft.com
+
+Aseem Rastogi
+Microsoft Research aseemr@microsoft.com
+
+Rahul Sharma
+Microsoft Research rahsha@microsoft.com
+
+ABSTRACT
+We present CrypTFlow2, a cryptographic framework for secure inference over realistic Deep Neural Networks (DNNs) using secure 2-party computation. CrypTFlow2 protocols are both correct – i.e., their outputs are bitwise equivalent to the cleartext execution – and efficient – they outperform the state-of-the-art protocols in both latency and scale. At the core of CrypTFlow2, we have new 2PC protocols for secure comparison and division, designed carefully to balance round and communication complexity for secure inference tasks. Using CrypTFlow2, we present the first secure inference over ImageNet-scale DNNs like ResNet50 and DenseNet121. These DNNs are at least an order of magnitude larger than those considered in the prior work of 2-party DNN inference. Even on the benchmarks considered by prior work, CrypTFlow2 requires an order of magnitude less communication and 20×-30× less time than the state-of-the-art.
+KEYWORDS
+Privacy-preserving inference; deep neural networks; secure twoparty computation
+
+Secure inference is an instance of secure 2-party computation (2PC) and cryptographically secure general protocols for 2PC have been known for decades [32, 64]. However, secure inference for practical ML tasks, e.g., ImageNet scale prediction [24], is challenging for two reasons: a) realistic DNNs use ReLU activations1 that are expensive to compute securely; and b) preserving inference accuracy requires a faithful implementation of secure fixed-point arithmetic. All prior works [6, 31, 43, 48, 49, 51] fail to provide efficient implementation of ReLUs. Although ReLUs can be replaced with approximations that are more tractable for 2PC [22, 31, 49], this approach results in significant accuracy losses that can degrade user experience. The only known approaches to evaluate ReLUs efficiently require sacrificing security by making the untenable assumption that a non-colluding third party takes part in the protocol [7, 45, 50, 57, 62] or by leaking activations [12]. Moreover, some prior works [45, 49–51, 62] even sacrifice correctness of their fixedpoint implementations and the result of their secure execution can sometimes diverge from the expected result, i.e. cleartext execution, in random and unpredictable ways. Thus, correct and efficient 2PC protocols for secure inference over realistic DNNs remain elusive.
+
+1.1 Our Contributions
+
+1 INTRODUCTION
+The problem of privacy preserving machine learning has become increasingly important. Recently, there have been many works that have made rapid strides towards realizing secure inference [4, 6, 13, 17, 19, 22, 31, 43, 48, 49, 51, 56, 58]. Consider a server that holds the weights 𝑤 of a publicly known deep neural network (DNN), 𝐹 , that has been trained on private data. A client holds a private input 𝑥; in a standard machine learning (ML) inference task, the goal is for the client to learn the prediction 𝐹 (𝑥, 𝑤) of the server’s model on the input 𝑥. In secure inference, the inference is performed with the guarantee that the server learns nothing about 𝑥 and the client learns nothing about the server’s model 𝑤 beyond what can be deduced from 𝐹 (𝑥, 𝑤) and 𝑥.
+A solution for secure inference that scales to practical ML tasks would open a plethora of applications based on MLaaS (ML as a Service). Users can obtain value from ML services without worrying about the loss of their private data, while model owners can effectively monetize their services with no fear of breaches of client data (they never observe private client data in the clear). Perhaps the most important emerging applications for secure inference are in healthcare where prior work [4, 45, 56] has explored secure inference services for privacy preserving medical diagnosis of chest diseases, diabetic retinopathy, malaria, and so on.
+
+In this work, we address the above two challenges and build new semi-honest secure 2-party cryptographic protocols for secure computation of DNN inference. Our new efficient protocols enable the first secure implementations of ImageNet scale inference that complete in under a minute! We make three main contributions:
+First, we give new protocols for millionaires’ and DReLU2 that enable us to securely and efficiently evaluate the non-linear layers of DNNs such as ReLU, Maxpool and Argmax. Second, we provide new protocols for division. Together with new theorems that we prove on fixed-point arithmetic over shares, we show how to evaluate linear layers, such as convolutions, average pool and fully connected layers, faithfully. Finally, by providing protocols that can work on a variety of input domains, we build a system3 CrypTFlow2 that supports two different types of Secure and Correct Inference (SCI) protocols where linear layers can be evaluated using either homomorphic encryption (SCIHE) or through oblivious transfer (SCIOT).
+We now provide more details of our main contributions.
+1ReLU(𝑥) is defined as max(𝑥, 0). 2DReLU is the derivative of ReLU, i.e., DReLU(𝑥) is 1 if 𝑥 ≥ 0 and 0 otherwise. 3Implementation is available at https://github.com/mpc-msri/EzPC.
+
+1
+
+New millionaires’ and DReLU protocols. Our first main technical contribution is a novel protocol for the well-known millionaires’ problem [64], where parties 𝑃0 and 𝑃1 hold ℓ−bit integers 𝑥 and 𝑦, respectively, and want to securely compute 𝑥 < 𝑦 (or, secret shares of 𝑥 < 𝑦). The theoretical communication complexity of our protocol is ≈ 3× better than the most communication efficient prior millionaires’ protocol [21, 29, 32, 63, 64]. In terms of round complexity, our protocol executes in log ℓ rounds (e.g. 5 rounds for ℓ = 32 bits); see Table 1 for a detailed comparison and [21] for a detailed overview of the costs of other comparison protocols.
+Using our protocol for millionaires’ problem, we build new and efficient protocols for computing DReLU for both ℓ−bit integers (i.e., Z𝐿, 𝐿 = 2ℓ ) and general rings Z𝑛. Our protocol for DReLU serves as one of the main building blocks for non-linear activations such as ReLU and Maxpool, as well as division over both input domains. Providing support for ℓ−bit integers Z𝐿 as well as arbitrary rings Z𝑛, allows us to securely evaluate the linear layers (such as matrix multiplication and convolutions) using the approaches of Oblivious Transfer (OT) [8, 51] as well as Homomorphic Encryption (HE) [30, 43, 49], respectively. This provides our protocols great flexibility when executing over different network configurations. Since all prior work [43, 48, 49, 51] for securely computing these activations rely on Yao’s garbled circuits [64], our protocols are much more efficient in both settings. Asymptotically, our ReLU protocol over Z𝐿 and Z𝑛 communicate ≈ 8× and ≈ 12× less bits than prior works [43, 48, 49, 51, 63, 64] (see Table 2 for a detailed comparison). Experimentally, our protocols are at least an order of magnitude more performant than prior protocols when computing ReLU activations at the scale of ML applications.
+Fixed-point arithmetic. The ML models used by all prior works on secure inference are expressed using fixed-point arithmetic; such models can be obtained from [39, 42, 45, 52]. A faithful implementation of fixed-point arithmetic is quintessential to ensure that the secure computation is correct, i.e., it is equivalent to the cleartext computation for all possible inputs. Given a secure inference task 𝐹 (𝑥, 𝑤), some prior works [45, 49–51, 62] give up on correctness when implementing division operations and instead compute an approximation 𝐹 ′(𝑥, 𝑤). In fixed-point arithmetic, each multiplication requires a division by a power-of-2 and multiplications are used pervasively in linear-layers of DNNs. Moreover, layers like average-pool require division for computing means. Loss in correctness is worrisome as the errors can accumulate and 𝐹 ′(𝑥, 𝑤) can be arbitrarily far from 𝐹 (𝑥, 𝑤). Recent work [49] has shown that even in practice the approximations can lead to significant losses in classification accuracy.
+As our next contribution, we provide novel protocols to compute division by power-of-2 as well as division by arbitrary integers that are both correct and efficient. The inputs to these protocols can be encoded over both ℓ−bit integers Z𝐿 as well as Z𝑛, for arbitrary 𝑛. To the best of our knowledge, the only known approach to compute division correctly is via garbled circuits which we compare with in Table 3. While garbled circuits based protocols require communication which is quadratic in ℓ or log 𝑛, our protocols are asymptotically better and incur only linear communication. Concretely, for average pool with 7 × 7 filters and 32-bit integers, our protocols have ≈ 54× less communication.
+
+Scaling to practical DNNs. These efficient protocols, help us securely evaluate practical DNNs like SqueezeNet on ImageNet scale classification tasks in under a minute. In sharp contrast, all prior works on secure 2-party inference ([4, 6, 13, 17, 19, 22, 31, 43, 48, 49, 51, 56, 58]) has been limited to small DNNs on tiny datasets like MNIST and CIFAR. While MNIST deals with the task of classifying black and white handwritten digits given as 28 × 28 images into the classes 0 to 9, ImageNet tasks are much more complex: typically 224 × 224 colored images need to be classified into thousand classes (e.g., agaric, gyromitra, ptarmigan, etc.) that even humans can find challenging . Additionally, our work is the first to securely evaluate practical convolutional neural networks (CNNs) like ResNet50 and DenseNet121; these DNNs are at least an order of magnitude larger than the DNNs considered in prior work, provide over 90% Top-5 accuracy on ImageNet, and have also been shown to predict lung diseases from chest X-ray images [45, 66]. Thus, our work provides the first implementations of practical ML inference tasks running securely. Even on the smaller CIFAR scale DNNs, our protocols require an order of magnitude less communication and 20×-30× less time than the state-of-the-art [49] (see Section 7.2).
+OT vs HE. Through our evaluation, we also resolve the OT vs HE conundrum: although the initial works on secure inference [48, 51] used OT-based protocols for evaluating convolutions, the state-ofthe-art protocols [43, 49], which currently provide the best published inference latency, use HE-based convolutions. HE-based secure inference has much less communication than OT but HE requires more computation. Hence, at the onset of this work, it was not clear to us whether HE-based convolutions would provide us the best latency for ImageNet-scale benchmarks.
+To resolve this empirical question, we implement two classes of protocols, SCIOT and SCIHE, in CrypTFlow2. In SCIOT, inputs are in Z𝐿 (𝐿 = 2ℓ , for a suitable choice of ℓ). Linear layers such as matrix multiplication and convolution are performed using OT-based techniques [8, 51], while the activations such as ReLU, Maxpool and Avgpool are implemented using our new protocols over Z𝐿. In SCIHE, inputs are encoded in an appropriate prime field Z𝑛 (similar to [43, 49]). Here, we compute linear layers using homomorphic encryption and the activations using our protocols over Z𝑛. In both SCIOT and SCIHE faithful divisions after linear layers are performed using our new protocols over corresponding rings. Next, we evaluate ImageNet-scale inference tasks with both SCIOT and SCIHE . We observe that in a WAN setting, where communication is a bottleneck, HE-based inference is always faster and in a LAN setting OT and HE are incomparable.
+1.2 Our Techniques
+Millionaires’. Our protocol for securely computing the millionaires’ problem (the bit 𝑥 < 𝑦) is based on the following observation (first made in [29]). Let 𝑥 = 𝑥1||𝑥0 and 𝑦 = 𝑦1||𝑦0 (where || denotes concatenation and 𝑥1, 𝑦1 are strings of the same length). Then,
+4Here we state the communication numbers for GMW [32] for a depth-optimized circuit. The circuit that would give the best communication would still have a complexity of > 2𝜆ℓ and would additionally pay an inordinate cost in terms of rounds, namely ℓ. 5Couteau [21] presented multiple protocols; we pick the one that has the best communication complexity.
+
+2
+
+Layer
+
+Protocol
+
+Comm. (bits) Rounds
+
+Millionaires’ on {0, 1}ℓ
+
+GC [63, 64] GMW4/GSV [29, 32]
+SC35[21]
+This work (𝑚 = 4)
+
+4𝜆ℓ ≈ 6𝜆ℓ > 3𝜆ℓ < 𝜆ℓ + 14ℓ
+
+2
+log ℓ + 3 ≈ 4 log∗ 𝜆
+log ℓ
+
+GC [63, 64]
+
+16384
+
+2
+
+Millionaires’ GMW/GSV [29, 32]
+
+23140
+
+8
+
+example
+
+SC3 [21]
+
+13016
+
+15
+
+ℓ = 32
+
+This work (𝑚 = 7)
+
+2930
+
+5
+
+This work (𝑚 = 4)
+
+3844
+
+5
+
+Table 1: Comparison of communication with prior work for
+
+millionaires’ problem. For our protocol, 𝑚 is a parameter. For concrete bits of communication we use 𝜆 = 128.
+
+OT protocols for leaf comparisons and equality, multiple 1-outof-2𝑚 OT instances can be combined to reduce communication. Next, recursing up from the leaves to the root, requires securely computing the AND functionality6 that uses Beaver bit triples [8]. We observe that the same secret value is used in 2 AND instances. Hence, we construct correlated pairs of bit triples using 1-out-of-8 OT protocols [44] to reduce this cost to 𝜆 + 8 bits (amortized) per triple, where 𝜆 is the security parameter and typically 128. Some more work is needed for the above technique to work efficiently for the general case when 𝑚 does not divide ℓ or ℓ/𝑚 is not a power of 2. Finally, by picking 𝑚 appropriately, we obtain a protocol for millionaires’ whose concrete communication (in bits) is nearly 5 times better than prior work.
+
+Layer
+
+Protocol
+
+Comm. (bits) Rounds
+
+ReLU for
+Z2ℓ ReLU for general Z𝑛
+ReLU for Z2ℓ , ℓ = 32 ReLU for Z𝑛, 𝜂 = 32
+
+GC [63, 64] This work GC [63, 64] This work
+GC [63, 64] This work GC [63, 64] This work
+
+8𝜆ℓ − 4𝜆
+
+< 𝜆ℓ + 18ℓ
+
+18𝜆𝜂 − 6𝜆
+
+<
+
+3 2
+
+𝜆
+
+(𝜂
+
++ 1)
+
++ 31𝜂
+
+32256
+
+3298
+
+72960
+
+5288
+
+2 log ℓ + 2
+2 log 𝜂 + 4
+2 7 2 9
+
+Table 2: Comparison of communication with garbled cir-
+cuits for ReLU. We define 𝜂 = ⌈log 𝑛⌉. For concrete bits of communication we use 𝜆 = 128.
+
+Layer
+
+Protocol
+
+Comm. (bits)
+
+Rounds
+
+Avgpool𝑑
+Z2ℓ Avgpool𝑑
+Z𝑛
+Avgpool49 Z2ℓ , ℓ = 32 Avgpool49 Z𝑛, 𝜂 = 32
+
+GC [63, 64] This work GC [63, 64] This work
+GC [63, 64] This work GC [63, 64] This work
+
+2𝜆(ℓ2 + 5ℓ − 3)
+
+< (𝜆 + 21) · (ℓ + 3𝛿)
+
+2𝜆(𝜂2 + 9𝜂 − 3)
+
+<
+
+(
+
+3 2
+
+𝜆
+
++
+
+34)
+
+·
+
+(𝜂
+
++
+
+2𝛿 )
+
+302336
+
+5570
+
+335104
+
+7796
+
+2 log(ℓ𝛿) + 4
+2 log(𝜂𝛿) + 6
+2 10 2 14
+
+Table 3: Comparison of communication with garbled cir-
+cuits for Avgpool𝑑 . We define 𝜂 = ⌈log 𝑛⌉ and 𝛿 = ⌈log(6 · 𝑑)⌉. For concrete bits of communication we use 𝜆 = 128. Choice of 𝑑 = 49 corresponds to average pool filter of size 7 × 7.
+
+𝑥 < 𝑦 is the same as checking if either 𝑥1 < 𝑦1 or 𝑥1 = 𝑦1 and 𝑥0 < 𝑦0. Now, the original problem is reduced to computing two millionaires’ instances over smaller length strings (𝑥1 < 𝑦1 and 𝑥0 < 𝑦0) and one equality test (𝑥1 = 𝑦1). By continuing recursively, one could build a tree all the way where the leaves are individual bits, at which point one could use 1-out-of-2 OT-based protocols to perform the comparison/equality. However, the communication complexity of this protocol is still quite large. We make several important modifications to this approach. First, we modify the tree so that the recursion is done log(ℓ/𝑚) times to obtain leaves with strings of size 𝑚, for a parameter 𝑚. We then use 1-out-of-2𝑚 OT to compute the comparison/equality at the leaves, employing the lookup-table based approach of [25]. Second, we observe that by carefully setting up the receiver’s and sender’s messages in the
+
+DReLU. Let 𝑎 be additively secret shared as 𝑎0, 𝑎1 over the appropriate ring. DReLU(𝑎) is 1 if 𝑎 ≥ 0 and 0 otherwise; note that 𝑎 ≥ 0 is defined differently for ℓ−bit integers and general rings. Over Z𝐿, where values are encoded using 2’s complement notation, DReLU(𝑎) = 1 ⊕ MSB(𝑎), where MSB(𝑎) is the most significant bit of 𝑎. Moreover, MSB(𝑎) = MSB(𝑎0) ⊕ MSB(𝑎1) ⊕ carry. Here, carry = 1 if 𝑎0′ + 𝑎1′ ≥ 2ℓ−1, where 𝑎0′, 𝑎1′ denotes the integer represented by the lower ℓ − 1 bits of 𝑎0, 𝑎1. We compute this carry bit using a call to our millionaires’ protocol. Over Z𝑛, DReLU(𝑎) = 1 if 𝑎 ∈ [0, ⌈𝑛/2⌉). Given the secret shares 𝑎0, 𝑎1, this is equivalent to (𝑎0 + 𝑎1) ∈ [0, ⌈𝑛/2⌉) ∪ [𝑛, ⌈3𝑛/2⌉) over integers. While this can be naïvely computed by making 3 calls to the millionaires’ protocol, we show that by carefully selecting the inputs to the millionaires’ protocol, one can do this with only 2 calls. Finally, we set things up so that the two calls to millionaires’ have correlated inputs that reduces the overall cost to ≈ 1.5 instances of millionaires’ over Z𝑛.
+Division and Truncation. As a technical result, we provide a correct decomposition of division of a secret ring element in Z𝐿 or Z𝑛 by a public integer into division of secret shares by the same public integer and correction terms (Theorem 4.1). These correction terms consist of multiple inequalities on secret values. As a corollary, we also get a much simpler expression for the special case of truncation, i.e., dividing ℓ-bit integers by a power-of-2 (Corollary 4.2). We believe that the general theorem as well as the corollary can be of independent interest. Next, we give efficient protocols for both general division (used for Avgpool, Table 3) as well as division by a power-of-2 (used for multiplication in fixed-point arithmetic). The inequalities in the correction term are computed using our new protocol for millionaires’ and the division of shares can be done locally by the respective parties. Our technical theorem is the key to obtaining secure implementation of DNN inference tasks that are bitwise equivalent to cleartext fixed-point execution.
+1.3 Other Related Work
+Perhaps the first work to consider the secure computation of machine learning inference algorithms was that of [14]. SecureML [51] was the first to consider secure neural network inference and training. Apart from the works mentioned earlier, other works include those that considered malicious adversaries [20, 36, 65] (for simpler
+6This functionality takes as input shares of bits 𝑥, 𝑦 from the two parties and outputs shares of 𝑥 AND 𝑦 to both parties.
+
+3
+
+ML models like linear models, regression, and polynomials) as well as specialized DNNs with 1 or 2 bit weights [4, 56, 58]. Recently, [26] gave protocols for faithful truncation (but not division) over ℓ-bit integers and prime fields in various adversarial settings. For 2-party semi-honest setting, our protocols have up to 20× less communication for the truncations required in our evaluation. [55] proposed an HE-based triple generation protocol over Z2ℓ , which requires less communication than generating triples using OT.
+1.4 Organisation
+We begin with the details on security and cryptographic primitives used in Section 2 on preliminaries. In Section 3 we provide our protocols for millionaires’ (Section 3.1) and DReLU (Section 3.2, 3.3), over both Z𝐿 and general ring Z𝑛. In Section 4, we present our protocols for division and truncation. We describe the various components of DNN inference in Section 5 and show how to construct secure protocols for all these components given our protocols from Sections 3 and 4. We present our implementation details in Section 6 and our experiments in Section 7. Finally, we conclude and discuss future work in Section 8.
+2 PRELIMINARIES
+Notation. For a set W, 𝑤 ←$ W denotes sampling an element 𝑤, uniformly at random from W. [ℓ] denotes the set of integers {0, · · · , ℓ − 1}. Let 1{𝑏} denote the indicator function that is 1 when 𝑏 is true and 0 when 𝑏 is false.
+2.1 Threat Model and Security
+
+⟨𝑥⟩0𝐿 + ⟨𝑥⟩1𝐿 = 𝑥 (where + denotes addition in Z𝐿). Additive secret sharing schemes are perfectly hiding, i.e., given a share ⟨𝑥⟩0𝐿 or ⟨𝑥⟩1𝐿, the value 𝑥 is completely hidden. The reconstruction algorithm
+Reconst𝐿 (⟨𝑥⟩0𝐿, ⟨𝑥⟩1𝐿) takes as input the two shares and outputs 𝑥 = ⟨𝑥⟩0𝐿 + ⟨𝑥⟩1𝐿. Shares (along with their corresponding Share () and Reconst () algorithms) are defined in a similar manner for Z2 and Z𝑛 with superscripts 𝐵 and 𝑛, respectively. We sometimes refer
+to shares over Z𝐿 and Z𝑛 as arithmetic shares and shares over Z2 as boolean shares.
+
+2.2.2
+
+Oblivious Transfer. Let
+
+𝑘 1
+
+-OTℓ denote the 1-out-of-𝑘 Obliv-
+
+ious Transfer (OT) functionality [16] (which generalizes 1-out-of-2
+
+OT [27, 54]). The sender’s inputs to the functionality are the 𝑘
+
+strings 𝑚0, · · · , 𝑚𝑘−1, each of length ℓ and the receiver’s input is a value 𝑖 ∈ [𝑘]. The receiver obtains 𝑚𝑖 from the functionality
+
+and the sender receives no output. We use the protocols from [44],
+
+which are an optimized and generalized version of the OT exten-
+
+sion framework proposed in [9, 41]. This framework allows the
+
+sender and receiver, to “reduce” 𝜆𝑐 number of oblivious transfers
+
+to 𝜆 “base” OTs. We also use the notion of correlated 1-out-of-2
+
+OT [5], denoted by
+
+2 1
+
+-COTℓ .
+
+In
+
+our
+
+context,
+
+this
+
+is
+
+a
+
+functionality
+
+where the sender’s input is a ring element 𝑥 and the receiver’s
+
+input is a choice bit 𝑏. The sender receives a random ring element
+
+𝑟 as output and the receiver obtains either 𝑟 or 𝑥 + 𝑟 as output
+
+depending on 𝑏. The protocols for
+
+𝑘 1
+
+-OTℓ
+
+[44] and
+
+2 1
+
+-COTℓ
+
+[5]
+
+execute in 2 rounds and have total communication7 of 2𝜆 + 𝑘ℓ and
+
+𝜆 + ℓ, respectively. Moreover, simpler
+
+2 1
+
+-OTℓ
+
+has a
+
+communication
+
+of 𝜆 + 2ℓ bits [5, 41].
+
+We provide security in the simulation paradigm [18, 32, 47] against a static semi-honest probabilistic polynomial time (PPT) adversary A. That is, a computationally bounded adversary A corrupts either 𝑃0 or 𝑃1 at the beginning of the protocol and follows the protocol specification honestly. Security is modeled by defining two interactions: a real interaction where 𝑃0 and 𝑃1 execute the protocol in the presence of A and the environment Z and an ideal interaction where the parties send their inputs to a trusted functionality that performs the computation faithfully. Security requires that for every adversary A in the real interaction, there is an adversary S (called the simulator) in the ideal interaction, such that no environment Z can distinguish between real and ideal interactions. Many of our protocols invoke multiple sub-protocols
+
+2.2.3 Multiplexer and B2A conversion. The functionality FM𝑛UX takes as input arithmetic shares of 𝑎 over 𝑛 and boolean shares of
+
+choice bit 𝑐 from 𝑃0, 𝑃1, and returns shares of 𝑎 if 𝑐 = 1, else returns
+
+shares of 0 over the same ring. A protocol for FM𝑛UX can easily be im-
+
+plemented by 2 simultaneous calls to
+
+2 1
+
+-OT𝜂
+
+and
+
+communication
+
+complexity is 2(𝜆 + 2𝜂), where 𝜂 = ⌈log 𝑛⌉.
+
+The functionality FB𝑛2A (for boolean to arithmetic conversion) takes boolean (i.e., over Z2) shares as input and gives out arithmetic
+
+(i.e., over Z𝑛) shares of the same value as output. It can be realized
+
+via one call to
+
+2 1
+
+-COT𝜂
+
+and
+
+hence,
+
+its
+
+communication
+
+is 𝜆
+
++ 𝜂.
+
+For
+
+completeness, we provide the protocols realizing FM𝑛UX as well as
+
+FB𝑛2A formally in Appendix A.3 and Appendix A.4, respectively.
+
+and we describe these using the hybrid model. This is similar to a real interaction, except that sub-protocols are replaced by the invocations of instances of corresponding functionalities. A protocol invoking a functionality F is said to be in “F -hybrid model.”
+
+2.2.4 Homomorphic Encryption. A homomorphic encryption of 𝑥 allows computing encryption of 𝑓 (𝑥) without the knowledge of the decryption key. In this work, we require an additively homomorphic encryption scheme that supports addition and scalar multiplication,
+
+2.2 Cryptographic Primitives
+
+i.e. multiplication of a ciphertext with a plaintext. We use the additively homomorphic scheme of BFV [15, 28] (the scheme used in the
+
+2.2.1 Secret Sharing Schemes. Throughout this work, we use 2-out- recent works of Gazelle [43] and Delphi [49]) and use the optimized
+
+of-2 additive secret sharing schemes over different rings [11, 60]. algorithms of Gazelle for homomorphic matrix-vector products and
+
+The 3 specific rings that we consider are the field Z2, the ring Z𝐿, where 𝐿 = 2ℓ (ℓ = 32, typically), and the ring Z𝑛, for a positive
+
+homomorphic convolutions. The BFV scheme uses the batching optimization [46, 61] that enables operation on plaintext vectors
+
+integer 𝑛 (this last ring includes the special case of prime fields used
+
+over the field Z𝑛, where 𝑛 is a prime plaintext modulus of the form
+
+in the works of [43, 49]). We let Share𝐿 (𝑥) denote the algorithm
+
+that takes as input an element 𝑥 in Z𝐿 and outputs shares over
+Z𝐿, denoted by ⟨𝑥⟩0𝐿 and ⟨𝑥⟩1𝐿. Shares are generated by sampling random ring elements ⟨𝑥⟩0𝐿 and ⟨𝑥⟩1𝐿, with the only constraint that
+
+7The protocol of
+
+𝑘 1
+
+-OTℓ [44] incurs a communication cost of 𝜆 + 𝑘ℓ. However, to
+
+achieve the same level of security, their security parameter needs to be twice that of
+
+2 1
+
+-COTℓ .
+
+In
+
+concrete
+
+terms,
+
+therefore,
+
+we
+
+write
+
+the
+
+cost
+
+as
+
+2𝜆
+
++ 𝑘ℓ.
+
+4
+
+2𝐾𝑁 + 1, 𝐾 is some positive integer and 𝑁 is scheme parameter that is a power-of-2.
+3 MILLIONAIRES’ AND DReLU PROTOCOLS
+
+Algorithm 1 Millionaires’, ΠℓM,𝑚ILL:
+Input: 𝑃0, 𝑃1 hold 𝑥 ∈ {0, 1}ℓ and 𝑦 ∈ {0, 1}ℓ , respectively. Output: 𝑃0, 𝑃1 learn ⟨1{𝑥 < 𝑦}⟩0𝐵 and ⟨1{𝑥 < 𝑦}⟩1𝐵, respectively.
+
+In this section, we provide our protocols for millionaires’ problem and DReLU(𝑎) when the inputs are ℓ bit signed integers as well as
+elements in general rings of the form Z𝑛 (including prime fields). Our protocol for millionaires’ problem invokes instances of FAND that take as input boolean shares of values 𝑥, 𝑦 ∈ {0, 1} and returns boolean shares of 𝑥 ∧ 𝑦. We discuss efficient protocols for FAND in Appendix A.1 and A.2.
+
+3.1 Protocol for Millionaires’
+In the Yao millionaires’ problem, party 𝑃0 holds 𝑥 and party 𝑃1 holds 𝑦 and they wish to learn boolean shares of 1{𝑥 < 𝑦}. Here, 𝑥 and 𝑦 are ℓ-bit unsigned integers. We denote this functionality by FMℓ ILL. Our protocol for FMℓ ILL builds on the following observation that was also used in [29].
+1{𝑥 < 𝑦} = 1{𝑥1 < 𝑦1} ⊕ (1{𝑥1 = 𝑦1} ∧ 1{𝑥0 < 𝑦0}) , (1)
+where, 𝑥 = 𝑥1||𝑥0 and 𝑦 = 𝑦1||𝑦0.
+
+Intuition. Let 𝑚 be a parameter and 𝑀 = 2𝑚. First, for ease of
+
+exposition, we consider the special case when 𝑚 divides ℓ and
+
+𝑞 = ℓ/𝑚 is a power of 2. We describe our protocol for millionaires’
+
+problem in this setting formally in Algorithm 1. We use Equa-
+
+tion 1 above, recursively log 𝑞 times to obtain 𝑞 leaves of size 𝑚 bits.
+
+That is, let 𝑥 = 𝑥𝑞−1|| . . . ||𝑥0 and 𝑦 = 𝑦𝑞−1|| . . . ||𝑦0 (where every 𝑥𝑖, 𝑦𝑖 ∈ {0, 1}𝑚). Now, we compute the shares of the inequalities
+
+and equalities of strings at the leaf level using
+
+𝑀 1
+
+-OT1 (steps 9 and
+
+10, resp.). Next, we compute the shares of the inequalities (steps 14
+
+& 15) and equalities (step 16) at each internal node upwards from
+
+the leaf using Equation 1. Value of inequality at the root gives the
+
+final output.
+
+Correctness and security. Correctness is shown by induction on
+
+the depth of the tree starting at the leaves. First, by correctness
+
+of
+
+𝑀 1
+
+-OT1
+
+in step
+
+9,
+
+⟨lt0,𝑗 ⟩1𝐵
+
+=
+
+⟨lt0,𝑗 ⟩0𝐵
+
+⊕ 1{𝑥 𝑗
+
+< 𝑦𝑗 }. Similarly,
+
+⟨eq0,𝑗 ⟩1𝐵 = ⟨eq0,𝑗 ⟩0𝐵 ⊕ 1{𝑥 𝑗 = 𝑦𝑗 }. This proves the base case.
+
+Let 𝑞𝑖 = 𝑞/2𝑖 . Also, for level 𝑖 of the tree, parse 𝑥 = 𝑥 (𝑖) =
+
+(𝑖
+𝑥
+𝑞𝑖
+
+) −1
+
+|
+
+|
+
+.
+
+.
+
+.
+
+𝑥
+
+(𝑖) 0
+
+and 𝑦
+
+= 𝑦 (𝑖)
+
+=
+
+(𝑖
+𝑦
+𝑞𝑖
+
+) −1
+
+|
+
+|
+
+.
+
+.
+
+.
+
+(𝑖
+𝑦0
+
+)
+
+.
+
+Assume
+
+that
+
+for
+
+𝑖 it holds that lt𝑖,𝑗
+
+=
+
+⟨lt𝑖,𝑗 ⟩0𝐵 ⊕ ⟨lt𝑖,𝑗 ⟩1𝐵
+
+=
+
+1{𝑥 (𝑖)
+𝑗
+
+<
+
+𝑦 (𝑖) } and
+𝑗
+
+⟨eq𝑖,𝑗 ⟩0𝐵
+
+⊕ ⟨eq𝑖,𝑗 ⟩1𝐵
+
+=
+
+1{𝑥 (𝑖)
+𝑗
+
+=
+
+𝑦 (𝑖) } for all
+𝑗
+
+𝑗
+
+∈
+
+{0, . . . , 𝑞𝑖 − 1}.
+
+Then, we prove the same for 𝑖 + 1 as follows: By correctness of
+
+FAND, for 𝑗 ∈ {0, . . . , 𝑞𝑖+1 − 1}, ⟨lt𝑖+1,𝑗 ⟩0𝐵 ⊕ ⟨lt𝑖+1,𝑗 ⟩1𝐵 = lt𝑖,2𝑗+1 ⊕
+
+( lt𝑖 ,2 𝑗
+
+∧ eq𝑖,2𝑗+1)
+
+=
+
+1{𝑥2(𝑖𝑗)+1
+
+<
+
+(𝑖)
+𝑦2 𝑗 +1
+
+}
+
+⊕
+
+(1{𝑥2(𝑖𝑗)
+
+<
+
+(𝑖)
+𝑦2𝑗
+
+}
+
+∧
+
+1{𝑥2(𝑖𝑗)+1
+
+=
+
+(𝑖)
+𝑦2 𝑗 +1
+
+})
+
+=
+
+1{𝑥 (𝑖+1)
+𝑗
+
+< 𝑦 (𝑖+1) } (using Equation 1). The induction
+𝑗
+
+step for eq𝑖+1,𝑗 holds in a similar manner, thus proving correctness.
+
+Given uniformity of ⟨lt0,𝑗 ⟩0𝐵, ⟨eq0,𝑗 ⟩0𝐵 for all 𝑗 ∈ {0, . . . , 𝑞 − 1}, se-
+
+curity follows easily in the
+
+(
+
+𝑀 1
+
+-OT1, FAND)-hybrid.
+
+General case. When 𝑚 does not divide ℓ and 𝑞 = ⌈ℓ/𝑚⌉ is not a power of 2, we make the following modifications to the protocol.
+
+1: 𝑃0 parses its input as 𝑥 = 𝑥𝑞−1|| . . . ||𝑥0 and 𝑃1 parses its input
+
+as 𝑦 = 𝑦𝑞−1|| . . . ||𝑦0, where 𝑥𝑖, 𝑦𝑖 ∈ {0, 1}𝑚, 𝑞 = ℓ/𝑚.
+
+2: Let 𝑀 = 2𝑚.
+
+3: for 𝑗 = {0, . . . , 𝑞 − 1} do
+
+4: 𝑃0 samples ⟨lt0,𝑗 ⟩0𝐵, ⟨eq0,𝑗 ⟩0𝐵 ←$ {0, 1}. 5: for 𝑘 = {0, . . . , 𝑀 − 1} do
+
+6:
+
+𝑃0 sets 𝑠 𝑗,𝑘 = ⟨lt0,𝑗 ⟩0𝐵 ⊕ 1{𝑥 𝑗 < 𝑘 }.
+
+7:
+
+𝑃0 sets 𝑡 𝑗,𝑘 = ⟨eq0,𝑗 ⟩0𝐵 ⊕ 1{𝑥 𝑗 = 𝑘 }.
+
+8: end for
+
+9:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+𝑀 1
+
+-OT1
+
+where
+
+𝑃0
+
+is
+
+the
+
+sender with inputs {𝑠 𝑗,𝑘 }𝑘 and 𝑃1 is the receiver with input 𝑦𝑗 .
+
+𝑃1 sets its output as ⟨lt0,𝑗 ⟩1𝐵.
+
+10:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+𝑀 1
+
+-OT1
+
+where
+
+𝑃0
+
+is
+
+the
+
+sender with inputs {𝑡 𝑗,𝑘 }𝑘 and 𝑃1 is the receiver with input 𝑦𝑗 .
+
+𝑃1 sets its output as ⟨eq0,𝑗 ⟩1𝐵.
+
+11: end for
+
+12: for 𝑖 = {1, . . . , log 𝑞} do
+
+13: for 𝑗 = {0, . . . , (𝑞/2𝑖 ) − 1} do
+
+14:
+
+For
+
+𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+invokes
+
+FAND
+
+with
+
+inputs
+
+⟨lt𝑖 −1,2 𝑗
+
+⟩𝐵
+𝑏
+
+and
+
+⟨eq𝑖 −1,2 𝑗 +1 ⟩𝑏𝐵
+
+to
+
+learn
+
+output
+
+⟨temp⟩𝐵 .
+𝑏
+
+15:
+
+𝑃𝑏
+
+sets
+
+⟨lt𝑖,𝑗 ⟩𝐵
+𝑏
+
+=
+
+⟨lt𝑖
+
+−1,2 𝑗
+
++1
+
+⟩𝐵
+𝑏
+
+⊕
+
+⟨temp⟩𝐵 .
+𝑏
+
+16:
+
+For 𝑏
+
+∈
+
+{0, 1},
+
+𝑃𝑏
+
+invokes
+
+FAND
+
+with
+
+inputs
+
+⟨eq𝑖 −1,2 𝑗
+
+⟩𝐵
+𝑏
+
+and
+
+⟨eq𝑖 −1,2 𝑗 +1 ⟩𝑏𝐵
+
+to
+
+learn
+
+output
+
+⟨eq𝑖,
+
+𝑗
+
+⟩𝐵
+𝑏
+
+.
+
+17: end for
+
+18: end for 19: For 𝑏 ∈ {0, 1}, 𝑃𝑏 outputs ⟨ltlog 𝑞,0⟩𝑏𝐵 .
+
+Since 𝑚 does not divide ℓ, 𝑥𝑞−1 ∈ {0, 1}𝑟 , where 𝑟 = ℓ mod 𝑚.8
+
+When doing the compute for 𝑥𝑞−1 and 𝑦𝑞−1, we perform a small
+
+optimization and use
+
+𝑅 1
+
+-OT1
+
+in steps
+
+9
+
+and 10, where 𝑅
+
+=
+
+2𝑟 .
+
+Second, since 𝑞 is not a power of 2, we do not have a perfect binary
+
+tree of recursion and we need to slightly change our recursion/tree
+
+traversal. In the general case, we construct maximal possible perfect
+
+binary trees and connect the roots of the same using the relation in Equation 1. Let 𝛼 be such that 2𝛼 < 𝑞 ≤ 2𝛼+1. Now, our tree has
+
+a perfect binary sub-tree with 2𝛼 leaves and we have remaining 𝑞′ = 𝑞 − 2𝛼 leaves. We recurse on 𝑞′. In the last step, we obtain our
+
+tree with 𝑞 leaves by combining the roots of perfect binary tree
+
+with
+
+2𝛼
+
+leaves
+
+and
+
+tree
+
+with
+
+′
+𝑞
+
+leaves
+
+using
+
+Equation
+
+1.
+
+Note
+
+that
+
+value at the root is computed using ⌈log 𝑞⌉ sequential steps starting
+
+from the leaves.
+
+3.1.1 Optimizations. We reduce the concrete communication complexity of our protocol using the following optimizations that are applicable to both the special and the general case.
+
+Combining two
+
+𝑀 1
+
+-OT1
+
+calls
+
+into
+
+one
+
+𝑀 1
+
+-OT2:
+
+Since
+
+the
+
+input of 𝑃1 (OT receiver) to
+
+𝑀 1
+
+-OT1 in steps 9 and 10 is same,
+
+i.e. 𝑦𝑗 , we can collapse these steps into a single call to
+
+𝑀 1
+
+-OT2
+
+8Note that 𝑟 = 𝑚 when 𝑚 divides ℓ.
+
+5
+
+where 𝑃0 and 𝑃1 input {(𝑠 𝑗,𝑘 ||𝑡 𝑗,𝑘 )}𝑘 and 𝑦𝑗 , respectively. 𝑃1
+
+sets its output as (⟨lt0,𝑗 ⟩1𝐵 ||⟨eq0,𝑗 ⟩1𝐵). This reduces the cost from 2(2𝜆 + 𝑀) to (2𝜆 + 2𝑀).
+
+Realizing FAND efficiently: It is well-known that FAND can be realized using Beaver bit triples [8]. For our protocol, we
+
+observe that the 2 calls to FAND in steps 14 and 16 have a
+
+common input, ⟨eq𝑖−1,2𝑗+1⟩𝑏𝐵. Hence, we optimize communi-
+
+cation of these steps by generating correlated bit triples (⟨𝑑⟩𝐵,
+
+𝑏
+
+⟨𝑒⟩𝐵, ⟨𝑓 ⟩𝐵) and (⟨𝑑 ′⟩𝐵, ⟨𝑒⟩𝐵, ⟨𝑓 ′⟩𝐵), for 𝑏 ∈ {0, 1}, such that
+
+𝑏𝑏
+
+𝑏𝑏
+
+𝑏
+
+𝑑 ∧ 𝑒 = 𝑓 and 𝑑 ′ ∧ 𝑒 = 𝑓 ′. Next, we use
+
+8 1
+
+-OT2
+
+to
+
+generate
+
+one such correlated bit triple (Appendix A.2) with communi-
+
+cation 2𝜆 + 16 bits, giving the amortized cost of 𝜆 + 8 bits per
+
+triple. Given correlated bit triples, we need 6 additional bits
+
+to compute both FAND calls. Removing unnecessary equality computations: As observed
+
+in [29], the equalities computed on lowest significant bits are
+
+never used. Concretely, we can skip computing the values
+
+eq𝑖,0 for 𝑖 ∈ {0, . . . , log 𝑞}. Once we do this optimization, we
+
+only need a single call to FAND instead of 2 correlated calls
+
+for the leftmost branch of the tree. We use the
+
+16 1
+
+-OT2
+
+→
+
+2×
+
+4 1
+
+-OT1
+
+reduction
+
+to
+
+generate
+
+2
+
+regular
+
+bit
+
+triples
+
+from
+
+[25] (Appendix A.1) with communication of 2𝜆 + 32 bits. This
+
+gives us amortized communication of 𝜆 + 16 bits per triple
+
+and we need 4 additional bits to realize FAND. Overall, we get a reduction in total communication by 𝑀 (for the leaf) plus
+
+(𝜆 + 2) · ⌈log 𝑞⌉ (for leftmost branch) bits.
+
+3.1.2 Communication Complexity. In our protocol, we communi-
+
+cate in protocols for OT (steps 9&10) and FAND (steps 14&16). With
+
+above optimizations, we need 1 call to
+
+𝑀 1
+
+-OT1,
+
+(𝑞
+
+− 2)
+
+calls
+
+to
+
+𝑀 1
+
+-OT2
+
+and 1 call to
+
+𝑅 1
+
+-OT2
+
+which cost
+
+(2𝜆 + 𝑀),
+
+(𝑞 − 2) · (2𝜆 +
+
+2𝑀) and (2𝜆 + 2𝑅) bits, respectively. In addition, we have ⌈log 𝑞⌉
+
+invocations of FAND and (𝑞 − 1 − ⌈log 𝑞⌉) invocations of correlated FAND. These require communication of (𝜆 + 20) · ⌈log 𝑞⌉ and (2𝜆 + 22) · (𝑞 − 1 − ⌈log 𝑞⌉) bits. This gives us total communication of
+
+𝜆(4𝑞 − ⌈log 𝑞⌉ − 2) + 𝑀 (2𝑞 − 3) + 2𝑅 + 22(𝑞 − 1) − 2⌈log 𝑞⌉ bits. Using
+
+this expression for ℓ = 32 we get least communication for 𝑚 = 7
+
+(Table 1). We note that there is a trade-off between communication
+
+and computational cost of OTs used and we discuss our choice of
+
+𝑚 for our experiments in Section 6.
+
+3.2 Protocol for DReLU for ℓ-bit integers
+In Algorithm 2, we describe our protocol for FDinRte,ℓLU that takes as input arithmetic shares of 𝑎 and returns boolean shares of DReLU(𝑎). Note that DReLU(𝑎) = (1⊕MSB(𝑎)), where MSB(𝑎) is the most significant bit of 𝑎. Let arithmetic shares of 𝑎 ∈ Z𝐿 be ⟨𝑎⟩0𝐿 = msb0||𝑥0 and ⟨𝑎⟩1𝐿 = msb1||𝑥1 such that msb0, msb1 ∈ {0, 1}. We compute the boolean shares of MSB(𝑎) as follows: Let carry = 1{(𝑥0 + 𝑥1) > 2ℓ−1 − 1}. Then, MSB(𝑎) = msb0 ⊕ msb1 ⊕ carry. We compute boolean shares of carry by invoking an instance of FMℓ−IL1L.
+Correctness and security. By correctness of FMℓ−IL1L, Reconst𝐵 (⟨carry⟩0𝐵, ⟨carry⟩1𝐵) = 1{(2ℓ−1 − 1 −𝑥0) < 𝑥1} = 1{(𝑥0 +𝑥1) > 2ℓ−1 − 1}. Also, Reconst𝐵 (⟨DReLU⟩0𝐵, ⟨DReLU⟩1𝐵) = msb0 ⊕ msb1 ⊕ carry ⊕ 1 =
+6
+
+Algorithm 2 ℓ-bit integer DReLU, ΠiDnRt,eℓLU:
+
+Input: 𝑃0, 𝑃1 hold ⟨𝑎⟩0𝐿 and ⟨𝑎⟩1𝐿, respectively. Output: 𝑃0, 𝑃1 get ⟨DReLU(𝑎)⟩0𝐵 and ⟨DReLU(𝑎)⟩1𝐵.
+
+1: 𝑃0 parses its input as ⟨𝑎⟩0𝐿 = msb0||𝑥0 and 𝑃1 parses its input as ⟨𝑎⟩1𝐿 = msb1||𝑥1, s.t. 𝑏 ∈ {0, 1}, msb𝑏 ∈ {0, 1}, 𝑥𝑏 ∈ {0, 1}ℓ−1.
+2: 𝑃0 & 𝑃1 invoke an instance of FMℓ−IL1L, where 𝑃0’s input is 2ℓ−1 −
+
+1
+
+−
+
+𝑥0
+
+and
+
+𝑃1’s
+
+input
+
+is
+
+𝑥1.
+
+For 𝑏
+
+∈
+
+{0, 1},
+
+𝑃𝑏
+
+learns
+
+⟨carry⟩𝐵 .
+𝑏
+
+3:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+sets ⟨DReLU⟩𝐵
+𝑏
+
+= msb𝑏
+
+⊕ ⟨carry⟩𝐵
+𝑏
+
+⊕ 𝑏.
+
+Algorithm 3 Simple Integer ring DReLU, ΠrDinRge,L𝑛Usimple :
+
+Input: 𝑃0, 𝑃1 hold ⟨𝑎⟩0𝑛 and ⟨𝑎⟩1𝑛, respectively, where 𝑎 ∈ Z𝑛. Output: 𝑃0, 𝑃1 get ⟨DReLU(𝑎)⟩0𝐵 and ⟨DReLU(𝑎)⟩1𝐵.
+
+1: 𝑃0 & 𝑃1 invoke an instance of FM𝜂ILL with 𝜂 = ⌈log 𝑛⌉, where
+
+𝑃0’s input is 𝑛 − 1 − ⟨𝑎⟩0𝑛 and 𝑃1’s input is ⟨𝑎⟩1𝑛. For 𝑏 ∈ {0, 1},
+
+𝑃𝑏
+
+learns
+
+⟨wrap⟩𝐵
+𝑏
+
+as
+
+output.
+
+2: 𝑃0 & 𝑃1 invoke an instance of FM𝜂+IL1L, where 𝑃0’s input is
+
+𝑛 − 1 − ⟨𝑎⟩0𝑛 and 𝑃1’s input is (𝑛 − 1)/2 + ⟨𝑎⟩1𝑛 . For 𝑏 ∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+learns
+
+⟨lt⟩𝐵
+𝑏
+
+as
+
+output.
+
+3: 𝑃0 & 𝑃1 invoke an instance of FM𝜂+IL1L, where 𝑃0’s input is
+
+𝑛 + (𝑛 − 1)/2 − ⟨𝑎⟩0𝑛 and 𝑃1’s input is ⟨𝑎⟩1𝑛. For 𝑏 ∈ {0, 1},
+
+𝑃𝑏
+
+learns
+
+⟨rt⟩𝐵
+𝑏
+
+as
+
+output.
+
+4: For 𝑏 ∈ {0, 1}, 𝑃𝑏 invokes FM2 UX with input
+
+⟨lt⟩𝐵 ⊕ ⟨rt⟩𝐵
+
+𝑏
+
+𝑏
+
+and
+
+choice ⟨wrap⟩𝐵 to learn ⟨𝑧⟩𝐵.
+
+𝑏
+
+𝑏
+
+5:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+outputs ⟨𝑧⟩𝐵
+𝑏
+
+⊕ ⟨lt⟩𝐵
+𝑏
+
+⊕ 𝑏.
+
+MSB(𝑎) ⊕ 1. Security follows trivially in the FMℓ−IL1L hybrid.
+Communication complexity In Algorithm 2, we communicate the same as in ΠℓM−I1LL, that is < (𝜆 + 14) (ℓ − 1) by using 𝑚 = 4.
+
+3.3 Protocol for DReLU for general Z𝑛
+We describe a protocol for FDriRnegL,𝑛U that takes arithmetic shares of 𝑎 over Z𝑛 as input and returns boolean shares of DReLU(𝑎). For integer rings Z𝑛, DReLU(𝑎) = 1 if 𝑎 < ⌈𝑛/2⌉ and 0 otherwise. Note that this includes the case of prime fields considered in the works of [43, 49]. Below, we formally discuss the case of rings of odd number of elements and omit the analogous case of even rings. We first describe a (simplified) protocol for DReLU over Z𝑛 in Algorithm 3 with protocol logic as follows: Let arithmetic shares of 𝑎 ∈ Z𝑛 be ⟨𝑎⟩0𝑛 and ⟨𝑎⟩1𝑛. Define wrap = 1{⟨𝑎⟩0𝑛 + ⟨𝑎⟩1𝑛 > 𝑛 − 1}, lt = 1{⟨𝑎⟩0𝑛 + ⟨𝑎⟩1𝑛 > (𝑛 − 1)/2} and rt = 1{⟨𝑎⟩0𝑛 + ⟨𝑎⟩1𝑛 > 𝑛 + (𝑛 − 1)/2}. Then, DReLU(𝑎) is (1 ⊕ lt) if wrap = 0, else it is (1 ⊕ rt). In Algorithm 3, steps 1,2,3, compute these three comparisons using FMILL. Final output can be computed using an invocation of FM2 UX. Optimizations. We describe an optimized protocol for FDriRnegL,𝑛U in Algorithm 4 that reduces the number of calls to FMILL to 2. First,
+
+Algorithm 4 Optimized Integer ring DReLU, ΠrDinRge,L𝑛U:
+
+Input: 𝑃0, 𝑃1 hold ⟨𝑎⟩0𝑛 and ⟨𝑎⟩1𝑛, respectively, where 𝑎 ∈ Z𝑛. Let 𝜂 = ⌈log 𝑛⌉.
+Output: 𝑃0, 𝑃1 get ⟨DReLU(𝑎)⟩0𝐵 and ⟨DReLU(𝑎)⟩1𝐵.
+
+1: 𝑃0 & 𝑃1 invoke an instance of FM𝜂+IL1L, where 𝑃0’s input is
+
+3(𝑛 − 1)/2 − ⟨𝑎⟩0𝑛 and 𝑃1’s input is (𝑛 − 1)/2 + ⟨𝑎⟩1𝑛. For
+
+𝑏
+
+∈
+
+{0, 1},
+
+𝑃𝑏
+
+learns
+
+⟨wrap⟩𝐵
+𝑏
+
+as
+
+output.
+
+2: 𝑃0 sets 𝑥 = 2𝑛 − 1 − ⟨𝑎⟩0𝑛 if ⟨𝑎⟩0𝑛 > (𝑛 − 1)/2, else 𝑥 =
+
+𝑛 − 1 − ⟨𝑎⟩0𝑛 . 3: 𝑃0 & 𝑃1 invoke an instance of FM𝜂+IL1L, where 𝑃0’s input is 𝑥 and
+
+𝑃1’s input is
+
+(𝑛 − 1)/2 + ⟨𝑎⟩1𝑛
+
+. For 𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+learns
+
+⟨xt⟩𝐵
+𝑏
+
+as output.
+
+4: 𝑃0 samples ⟨𝑧⟩0𝐵 ←$ {0, 1}. 5: for 𝑗 = {00, 01, 10, 11} do
+
+6: 𝑃0 parses 𝑗 as 𝑗0|| 𝑗1 and sets 𝑡 𝑗 = 1 ⊕ ⟨xt⟩0𝐵 ⊕ 𝑗0.
+
+7: if ⟨𝑎⟩0𝑛 > (𝑛 − 1)/2 then
+
+8:
+
+𝑃0
+
+sets
+
+𝑠′
+𝑗
+
+=
+
+𝑡𝑗
+
+∧
+
+( ⟨wrap⟩0𝐵
+
+⊕
+
+𝑗1).
+
+9: else
+
+10:
+
+𝑃0
+
+sets
+
+𝑠′
+𝑗
+
+=
+
+𝑡𝑗
+
+⊕
+
+((1
+
+⊕
+
+𝑡𝑗)
+
+∧
+
+( ⟨wrap⟩0𝐵
+
+⊕
+
+𝑗1))
+
+11: end if
+
+12:
+
+𝑃0
+
+sets 𝑠 𝑗
+
+=
+
+𝑠′
+𝑗
+
+⊕
+
+⟨𝑧⟩0𝐵
+
+13: end for
+
+14: 𝑃0 & 𝑃1 invoke an instance of
+
+4 1
+
+-OT1
+
+where
+
+𝑃0
+
+is
+
+the
+
+sender with inputs {𝑠 𝑗 }𝑗 and 𝑃1 is the receiver with input
+
+⟨xt⟩1𝐵 ||⟨wrap⟩1𝐵. 𝑃1 sets its output as ⟨𝑧⟩1𝐵.
+
+15:
+
+For 𝑏
+
+∈ {0, 1}, 𝑃𝑏
+
+outputs ⟨𝑧⟩𝐵.
+𝑏
+
+we observe that if the input of 𝑃1 is identical in all three invo-
+
+cations, then the invocations of OT in Algorithm 1 (steps 9&10)
+
+can be done together for the three comparisons. This reduces the
+
+communication for each leaf OT invocation in steps 9&10 by an
+
+additive factor of 4𝜆. To enable this, 𝑃0, 𝑃1 add (𝑛 − 1)/2 to their inputs to FM𝜂+IL1L in steps 1,3 (𝜂 = ⌈log 𝑛⌉). Hence, 𝑃1’s input to FM𝜂+IL1L is (𝑛 − 1)/2 + ⟨𝑎⟩1𝑛 in all invocations and 𝑃0’s inputs are
+
+3(𝑛 − 1)/2 − ⟨𝑎⟩0𝑛 , 𝑛 − 1 − ⟨𝑎⟩0𝑛 , 2𝑛 − 1 − ⟨𝑎⟩0𝑛 in steps 1,2,3,
+
+respectively.
+
+Next, we observe that one of the comparisons in step 2 or step 3
+
+is redundant. For instance, if ⟨𝑎⟩0𝑛 > (𝑛 − 1)/2, then the result of the comparison lt = ⟨𝑎⟩0𝑛 + ⟨𝑎⟩1𝑛 > (𝑛 − 1)/2 done in step 2 is always 1. Similarly, if ⟨𝑎⟩0𝑛 ≤ (𝑛 − 1)/2, then the result of the comparison rt = 1{⟨𝑎⟩0𝑛 + ⟨𝑎⟩1𝑛 > 𝑛 + (𝑛 − 1)/2} done in step 3 is always 0. Moreover, 𝑃0 knows based on her input ⟨𝑎⟩0𝑛 which of the two comparisons is redundant. Hence, in the optimized protocol,
+
+𝑃0 and 𝑃1 always run the comparison to compute shares of wrap and one of the other two comparisons. Note that the choice of
+
+which comparison is omitted by 𝑃0 need not be communicated to
+
+𝑃1, since 𝑃1’s input is same in all invocations of FMILL. Moreover,
+
+this omission does not reveal any additional information to 𝑃1 by
+
+security of FMILL. Finally, 𝑃0 and 𝑃1 can run a
+
+4 1
+
+-OT1
+
+to
+
+learn
+
+the
+
+shares of DReLU(𝑎). Here, 𝑃1 is the receiver and her choice bits
+
+are the shares learnt in the two comparisons. 𝑃0 is the sender who sets the 4 OT messages based on her input share, and two shares learnt from the comparison protocol. We elaborate on this in the correctness proof below.
+
+Correctness and Security. First, by correctness of FM𝜂+IL1L (step 1),
+
+wrap = Reconst𝐵 (⟨wrap⟩0𝐵, ⟨wrap⟩1𝐵) = 1{⟨𝑎⟩0𝐿 + ⟨𝑎⟩1𝐿 > 𝑛 − 1}. Let 𝑗∗ = ⟨xt⟩1𝐵 ||⟨wrap⟩1𝐵. Then, 𝑡 𝑗∗ = 1 ⊕ xt. We will show
+
+that
+
+𝑠
+
+′ 𝑗∗
+
+=
+
+DReLU(𝑎),
+
+and
+
+hence,
+
+by
+
+correctness
+
+of
+
+4 1
+
+-OT1,
+
+𝑧
+
+=
+
+Reconst𝐵 (⟨𝑧⟩0𝐵, ⟨𝑧⟩1𝐵) = DReLU(𝑎). We have the following two cases.
+
+When ⟨𝑎⟩0𝐿 > (𝑛 − 1)/2, lt = 1, and DReLU(𝑎) = wrap ∧ (1 ⊕ rt).
+
+Here, by correctness of FM𝜂+IL1L (step 3), xt = Reconst𝐵 (⟨xt⟩0𝐵, ⟨xt⟩1𝐵) =
+
+rt.
+
+Hence,
+
+′
+𝑠𝑗∗
+
+=
+
+𝑡𝑗∗
+
+∧
+
+( ⟨wrap⟩0𝐵
+
+⊕
+
+𝑗1∗)
+
+=
+
+(1
+
+⊕
+
+rt)
+
+∧
+
+wrap.
+
+When ⟨𝑎⟩0𝐿 ≤ (𝑛 − 1)/2, rt = 0, DReLU(𝑎) is 1 ⊕ lt if wrap = 0,
+
+else 1. It can be written as (1 ⊕ lt) ⊕ (lt ∧ wrap). In this case, by cor-
+
+rectness of FM𝜂+IL1L (step 3), xt = Reconst𝐵 (⟨xt⟩0𝐵, ⟨xt⟩1𝐵) = lt. Hence,
+
+′
+𝑠𝑗∗
+
+=
+
+𝑡𝑗∗
+
+⊕ ((1 ⊕𝑡 𝑗∗ ) ∧ (⟨wrap⟩0𝐵
+
+⊕
+
+𝑗1∗))
+
+=
+
+(1 ⊕ lt) ⊕ (lt∧wrap). Since
+
+⟨𝑧⟩0𝐵 is uniform, security follows in the (FM𝜂+IL1L,
+
+4 1
+
+-OT1)-hybrid.
+
+Communication complexity. With the above optimization, the over-
+
+all communication complexity of our protocol for DReLU in Z𝑛
+
+is equivalent to 2 calls to Π𝜂M+I1LL where 𝑃1 has same input plus
+
+2𝜆 + 4 (for protocol for
+
+4 1
+
+-OT1).
+
+Two
+
+calls
+
+to
+
+Π𝜂M+I1LL
+
+in
+
+this
+
+case
+
+(using 𝑚
+
+=
+
+4) cost
+
+<
+
+3 2
+
+𝜆
+
+(𝜂
+
++ 1)
+
++ 28(𝜂
+
++ 1)
+
+bits. Hence, total com-
+
+munication is <
+
+3 2
+
+𝜆
+
+(𝜂
+
++ 1) + 28(𝜂
+
++ 1)
+
++ 2𝜆 + 4. We note that the
+
+communication complexity of simplified protocol in Algorithm 3 is
+
+approximately 3 independent calls to Π𝜂MILL, which cost 3(𝜆𝜂 + 14𝜂) bits, plus 2𝜆 + 4 bits for FM2 UX. Thus, our optimization gives almost 2× improvement.
+
+4 DIVISION AND TRUNCATION
+We present our results on secure implementations of division in the ring by a positive integer and truncation (division by powerof-2) that are bitwise equivalent to the corresponding cleartext computation. We begin with closed form expressions for each of these followed by secure protocols that use them.
+
+4.1 Expressing general division and truncation
+using arithmetic over secret shares
+Let idiv : Z × Z → Z denote signed integer division, where the quotient is rounded towards −∞ and the sign of the remainder is the same as that of divisor. We denote division of a ring element by a positive integer using rdiv : Z𝑛 × Z → Z𝑛 defined as
+rdiv(𝑎, 𝑑) ≜ idiv(𝑎𝑢 − 1{𝑎𝑢 ≥ ⌈𝑛/2⌉} · 𝑛, 𝑑) mod 𝑛, (2)
+where the integer 𝑎𝑢 ∈ {0, 1, . . . , 𝑛 − 1} is the unsigned representation of 𝑎 ∈ Z𝑛 lifted to integers and 0 < 𝑑 < 𝑛. For brevity, we use 𝑥 =𝑛 𝑦 to denote 𝑥 mod 𝑛 = 𝑦 mod 𝑛.
+Theorem 4.1. (Division of ring element by positive integer). Let the shares of 𝑎 ∈ Z𝑛 be ⟨𝑎⟩0𝑛, ⟨𝑎⟩1𝑛 ∈ Z𝑛, for some 𝑛 = 𝑛1 · 𝑑 + 𝑛0 ∈ Z, where 𝑛0, 𝑛1, 𝑑 ∈ Z and 0 ≤ 𝑛0 < 𝑑 < 𝑛.
+
+7
+
+Let the unsigned representation of 𝑎, ⟨𝑎⟩0𝑛, ⟨𝑎⟩1𝑛 in Z𝑛 lifted to integers be 𝑎𝑢, 𝑎0, 𝑎1 ∈ {0, 1, . . . , 𝑛 − 1}, respectively, such that 𝑎0 = 𝑎10 · 𝑑 + 𝑎00 and 𝑎1 = 𝑎11 · 𝑑 + 𝑎01, where 𝑎10, 𝑎00, 𝑎11, 𝑎01 ∈ Z and 0 ≤ 𝑎00, 𝑎01 < 𝑑. Let 𝑛′ = ⌈𝑛/2⌉ ∈ Z. Define corr, 𝐴, 𝐵, 𝐶 ∈ Z as follows:
+
+ 
+
+−1
+
+(𝑎𝑢 ≥ 𝑛′) ∧ (𝑎0 < 𝑛′) ∧ (𝑎1 < 𝑛′)
+
+ corr = 1
+
+(𝑎𝑢 < 𝑛′) ∧ (𝑎0 ≥ 𝑛′) ∧ (𝑎1 ≥ 𝑛′) ,
+
+ 
+
+0
+
+otherwise
+
+
+
+𝐴
+
+=
+
+𝑎00
+
++
+
+𝑎01
+
+−
+
+(1{𝑎0
+
+≥
+
+𝑛′}
+
++
+
+1{𝑎1
+
+≥
+
+′
+𝑛
+
+}
+
+−
+
+corr)
+
+· 𝑛0.
+
+𝐵 = idiv(𝑎00 − 1{𝑎0 ≥ 𝑛′} · 𝑛0, 𝑑) + idiv(𝑎01 − 1{𝑎1 ≥ 𝑛′} · 𝑛0, 𝑑)
+
+𝐶 = 1{𝐴 < 𝑑 } + 1{𝐴 < 0} + 1{𝐴 < −𝑑 }
+
+Then, we have: rdiv(⟨𝑎⟩0𝑛, 𝑑) + rdiv(⟨𝑎⟩1𝑛, 𝑑) + (corr · 𝑛1 + 1 − 𝐶 − 𝐵) =𝑛 rdiv(𝑎, 𝑑).
+The proof of the above theorem is presented in Appendix C.
+
+4.1.1 Special Case of truncation for ℓ bit integers. The expression above can be simplified for the special case of division by 2𝑠 of ℓ-bit integers, i.e., arithmetic right shift with 𝑠 (≫ 𝑠), as follows:
+
+Corollary 4.2. (Truncation for ℓ-bit integers). Let the shares of 𝑎 ∈ Z𝐿 be ⟨𝑎⟩0𝐿, ⟨𝑎⟩1𝐿 ∈ Z𝐿. Let the unsigned representation of 𝑎, ⟨𝑎⟩0𝐿, ⟨𝑎⟩1𝐿 in Z𝐿 lifted to integers be 𝑎𝑢, 𝑎0, 𝑎1 ∈ {0, 1, . . . , 2ℓ − 1}, respectively, such that 𝑎0 = 𝑎10 · 2𝑠 + 𝑎00 and 𝑎1 = 𝑎11 · 2𝑠 + 𝑎01, where 𝑎10, 𝑎00, 𝑎11, 𝑎01 ∈ Z and 0 ≤ 𝑎00, 𝑎01 < 2𝑠 . Let corr ∈ Z be defined as in Theorem 4.1. Then, we have:
+(𝑎0 ≫ 𝑠) + (𝑎1 ≫ 𝑠) + corr · 2ℓ−𝑠 + 1{𝑎00 + 𝑎01 ≥ 2𝑠 } =𝐿 (𝑎 ≫ 𝑠).
+
+Proof. The corollary follows directly from Theorem 4.1 as fol-
+
+lows: First, (𝑎 ≫ 𝑠) = rdiv(𝑎, 2𝑠 ). Next, 𝑛 = 2ℓ , 𝑛1 = 2ℓ−𝑠 , and
+
+𝑛0 = 0. Using these, we get 𝐴 = 𝑎00 + 𝑎01, 𝐵 = 0 and 𝐶 = 1{𝐴 < 2𝑠 } =
+
+1{𝑎00 + 𝑎01 < 2𝑠 }.
+
+□
+
+4.2 Protocols for division
+
+In this section, we describe our protocols for division in different settings. We first describe a protocol for the simplest case of truncation for ℓ-bit integers followed by a protocol for general division in Z𝑛 by a positive integer (Section 4.2.2). Finally, we discuss another simpler case of truncation, which allows us to do better than general division for rings with a special structure (Section 4.2.3).
+
+4.2.1 Protocol for truncation of ℓ-bit integer. Let FTirnut,nℓc,𝑠 be the functionality that takes arithmetic shares of 𝑎 as input and
+
+returns arithmetic shares of 𝑎 ≫ 𝑠 as output. In this work, we
+
+give a protocol (Algorithm 5) that realizes the functionality FTirnut,nℓc,𝑠 correctly building on Corollary 4.2.
+
+Intuition. Parties 𝑃0 & 𝑃1 first invoke an instance of FDinRte,ℓLU (where one party locally flips its share of DReLU(𝑎)) to get boolean shares
+
+⟨𝑚⟩𝐵 of MSB(𝑎). Using these shares, they use a
+𝑏
+
+4 1
+
+-OTℓ
+
+for
+
+calcu-
+
+lating ⟨corr⟩𝐿, i.e., arithmetic shares of corr term in Corollary 4.2.
+𝑏
+Next, they use an instance of FM𝑠 ILL to compute boolean shares of 𝑐 = 1{𝑎00 + 𝑎01 ≥ 2𝑠 }. Finally, they compute arithmetic shares of 𝑐 using a call to FB𝐿2A (Algorithm 7).
+
+Algorithm 5 Truncation, ΠiTnrtu,ℓn,𝑠c:
+
+Input:
+
+For 𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+holds
+
+⟨𝑎⟩𝐿 ,
+𝑏
+
+where
+
+𝑎
+
+∈
+
+Z𝐿 .
+
+Output:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+learns ⟨𝑧⟩𝐿
+𝑏
+
+s.t. 𝑧
+
+=𝑎
+
+≫ 𝑠.
+
+1:
+
+For 𝑏
+
+∈
+
+{0,
+
+1},
+
+let
+
+𝑎𝑏
+
+,
+
+𝑎0
+𝑏
+
+,
+
+𝑎1
+𝑏
+
+∈ Z be as defined in Corollary 4.2.
+
+2:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+invokes
+
+FDinRte,ℓLU
+
+with
+
+input
+
+⟨𝑎⟩𝐿
+𝑏
+
+to learn
+
+output
+
+⟨𝛼 ⟩𝐵 .
+𝑏
+
+Party
+
+𝑃𝑏
+
+sets
+
+⟨𝑚⟩𝐵
+𝑏
+
+=
+
+⟨𝛼 ⟩𝐵
+𝑏
+
+⊕
+
+𝑏.
+
+3:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+sets 𝑥𝑏
+
+= MSB(⟨𝑎⟩𝐿).
+𝑏
+
+4: 𝑃0 samples ⟨corr⟩0𝐿 ←$ Z2ℓ .
+
+5: for 𝑗 = {00, 01, 10, 11} do
+
+6: 𝑃0 computes 𝑡 𝑗 = (⟨𝑚⟩0𝐵 ⊕ 𝑗0 ⊕ 𝑥0) ∧ (⟨𝑚⟩0𝐵 ⊕ 𝑗0 ⊕ 𝑗1) s.t. 𝑗 = (𝑗0||𝑗1).
+
+7: if 𝑡 𝑗 ∧ 1{𝑥0 = 0} then
+
+8:
+
+𝑃0 sets 𝑠 𝑗 =𝐿 −⟨corr⟩0𝐿 − 1.
+
+9: else if 𝑡 𝑗 ∧ 1{𝑥0 = 1} then
+
+10:
+
+𝑃0 sets 𝑠 𝑗 =𝐿 −⟨corr⟩0𝐿 + 1.
+
+11: else
+
+12:
+
+𝑃0 sets 𝑠 𝑗 =𝐿 −⟨corr⟩0𝐿.
+
+13: end if
+
+14: end for
+
+15:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+4 1
+
+-OTℓ ,
+
+where
+
+𝑃0
+
+is
+
+the
+
+sender
+
+with inputs {𝑠 𝑗 }𝑗 and 𝑃1 is the receiver with input ⟨𝑚⟩1𝐵 ||𝑥1
+
+and learns ⟨corr⟩1𝐿.
+
+16: 𝑃0 & 𝑃1 invoke an instance of FM𝑠 ILL with 𝑃0’s input as 2𝑠 −1−𝑎00
+
+and
+
+𝑃1’s
+
+input
+
+as
+
+𝑎01.
+
+For 𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+learns
+
+⟨𝑐 ⟩𝐵 .
+𝑏
+
+17: For 𝑏 ∈ {0, 1}, 𝑃𝑏 invokes an instance of FB𝐿2A (𝐿 = 2ℓ ) with
+
+input ⟨𝑐⟩𝐵 and learns ⟨𝑑⟩𝐿.
+
+𝑏
+
+𝑏
+
+18:
+
+𝑃𝑏
+
+outputs ⟨𝑧⟩𝐿
+𝑏
+
+= (⟨𝑎⟩𝐿
+𝑏
+
+≫ 𝑠) + ⟨corr⟩𝐿 · 2ℓ−𝑠 + ⟨𝑑⟩𝐿, 𝑏
+
+𝑏
+
+𝑏
+
+∈ {0, 1}.
+
+Correctness and Security. For any 𝑧 ∈ Z𝐿, MSB(𝑧) = 1{𝑧𝑢 ≥ 2ℓ−1},
+
+where 𝑧𝑢 is unsigned representation of 𝑧 lifted to integers. First, note
+
+that Reconst𝐵 (⟨𝑚⟩0𝐵, ⟨𝑚⟩1𝐵) = 1⊕Reconst𝐵 (⟨𝛼⟩0𝐵, ⟨𝛼⟩1𝐵) = MSB(𝑎) by correctness of FDinRte,ℓLU. Next, we show that Reconst𝐿 (⟨corr⟩0𝐿,
+
+⟨corr⟩1𝐿 )
+
+=
+
+corr,
+
+as
+
+defined
+
+in
+
+Corollary
+
+4.2. Let 𝑥𝑏
+
+=
+
+MSB ( ⟨𝑎⟩𝐿 )
+𝑏
+
+for
+
+𝑏
+
+∈
+
+{0, 1},
+
+and
+
+let
+
+∗
+𝑗
+
+=
+
+(⟨𝑚⟩1𝐵 ||𝑥1).
+
+Then,
+
+𝑡𝑗∗
+
+=
+
+( ⟨𝑚⟩0𝐵
+
+⊕
+
+⟨𝑚⟩1𝐵
+
+⊕
+
+𝑥0) ∧ (⟨𝑚⟩0𝐵 ⊕ ⟨𝑚⟩1𝐵 ⊕ 𝑥1) = (MSB(𝑎) ⊕ 𝑥0) ∧ (MSB(𝑎) ⊕ 𝑥1). Now, 𝑡 𝑗∗ = 1 implies that we are in one of the first two cases of expression
+
+for corr – which case we are in can be checked using 𝑥0 (steps 7
+
+& 9). Now it is easy to see that 𝑠 𝑗∗ = −⟨corr⟩0𝐿 + corr = ⟨corr⟩1𝐿.
+
+Next, by correctness of FM𝑠 ILL, 𝑐 = Reconst𝐵 (⟨𝑐⟩0𝐵, ⟨𝑐⟩1𝐵) = ⟨𝑐⟩0𝐵 ⊕ ⟨𝑐⟩1𝐵 = 1{𝑎00 + 𝑎01 ≥ 2𝑠 }. Given boolean shares of 𝑐, step 17, cre-
+
+ates arithmetic shares of the same using an instance of FB𝐿2A. Since
+
+⟨corr⟩0𝐿 is uniformly random, security of our protocol is easy to see
+
+in (FDinRte,ℓLU,
+
+4 1
+
+-OTℓ ,
+
+FM𝑠 ILL,
+
+FB𝐿2A)-hybrid.
+
+Communication complexity. ΠiTnrtu,ℓn,c𝑠 involves a single call each to
+
+FDinRte,ℓLU,
+
+4 1
+
+-OTℓ , FB𝐿2A and FM𝑠 ILL. Hence, communication required
+
+is < 𝜆ℓ + 2𝜆 + 19ℓ+ communication for FM𝑠 ILL that depends on
+
+parameter 𝑠. For ℓ = 32 and 𝑠 = 12, our concrete communication is
+
+4310 bits (using 𝑚 = 7 for Π1M2ILL as well as Π3M1ILL inside ΠiDnRt,e3L2U)
+
+as opposed to 24064 bits for garbled circuits.
+
+8
+
+4.2.2 Protocol for division in ring. Let FDriInVg,𝑛,𝑑 be the functionality for division that takes arithmetic shares of 𝑎 as input and returns arithmetic shares of rdiv(𝑎, 𝑑) as output. Our protocol builds
+
+protocol, end with arithmetic shares (over the same ring) of the output of the layer. This allows us to stitch protocols for arbitrary layers sequentially to obtain a secure computation protocol for any
+
+on our closed form expression from Theorem 4.1. We note that ℓ-bit
+
+neural network comprising of these layers. Semi-honest security of
+
+integers is a special case of Z𝑛 and we use the same protocol for division of an element in Z𝐿 by a positive integer.
+Intuition. This protocol is similar to the previous protocol for truncation and uses the same logic to compute shares of corr term. Most non-trivial term to compute is 𝐶 that involves three signed comparisons over Z. We emulate these comparisons using calls to FDinRte,𝛿LU where 𝛿 is large enough to ensure that there are no overflows or underflows. It is not too hard to see that −2𝑑 + 2 ≤ 𝐴 ≤ 2𝑑 − 2 and hence, −3𝑑 + 2 ≤ 𝐴 − 𝑑, 𝐴, 𝐴 + 𝑑 ≤ 3𝑑 − 2. Hence, we set 𝛿 = ⌈log 6𝑑⌉. Now, with this value of 𝛿, the term 𝐶 can we re-written as (DReLU(𝐴 − 𝑑) ⊕ 1) + (DReLU(𝐴) ⊕ 1) + (DReLU(𝐴 + 𝑑) ⊕ 1), which can be computed using three calls to FDinRte,𝛿LU (Step 19) and FB𝑛2A (Step 20) each. Finally, note that to compute 𝐶 we need arithmetic shares of 𝐴 over the ring ZΔ, Δ = 2𝛿 . And this requires shares of corr over the same ring. Hence, we compute shares of corr over both Z𝑛 and ZΔ (Step 15). Due to space constraints, we describe the protocol formally in Appendix D along with its communication complexity. Also, Table 3 provides theoretical and concrete communication numbers for division in both Z𝐿 and Z𝑛, as well as a comparison with garbled circuits.
+
+the protocol will follow trivially from sequential composibility of individual sub-protocols [18, 32, 47]. For protocols in SCIOT, this arithmetic secret sharing is over Z𝐿; in SCIHE, the sharing is over Z𝑛, prime 𝑛. The inputs to secure inference are floating-point numbers, encoded as fixed-point integers in the ring (Z𝐿 or Z𝑛); for details see Appendix E.
+5.1 Linear Layers
+5.1.1 Fully connected layers and convolutions. A fully connected layer in a neural network is simply a product of two matrices - the matrix of weights and the matrix of activations of that layer - of appropriate dimension. At a very high level, a convolutional layer applies a filter (usually of dimension 𝑓 × 𝑓 for small integer 𝑓 ) to the input matrix by sliding across it and computing the sum of elementwise products of the filter with the input. Various parameters are associated with convolutions - e.g. stride (a stride of 1 denotes that the filter slides across the larger input matrix beginning at every row and every column) and zero-padding (which indicates whether the matrix is padded with 0s to increase its dimension before applying the filter). When performing matrix multiplication or convolutions over fixed-point values, the values of the final matrix must be scaled
+
+down appropriately so that it has the same scale as the inputs to
+
+4.2.3 Truncation in rings with special structure. It is easy to
+see that truncation by 𝑠 in general rings can be done by performing a division by 𝑑 = 2𝑠 . However, we can omit a call to FDinRte,𝛿LU and FB𝑛2A when the underlying ring and 𝑑 satisfy a relation. Specifically, if we have 2 · 𝑛0 ≤ 𝑑 = 2𝑠 , then 𝐴 is always greater than equal to −𝑑, where 𝑛0, 𝐴 ∈ Z are as defined in Theorem 4.1. Thus, the
+third comparison (𝐴 < −𝑑) in the expression of 𝐶 from Theorem 4.1
+
+the computation. Hence, to do faithful fixed-point arithmetic, we first compute the matrix multiplication or convolution over the ring (Z𝐿 or Z𝑛) followed by truncation, i.e., division-by-2𝑠 of all the values. In SCIOT, multiplication and convolutions over the ring Z𝐿 are done using oblivious transfer techniques and in SCIHE these are done over Z𝑛 using homomorphic encryption techniques that we describe next followed by our truncation method.
+
+can be omitted. Moreover, this reduces the value of 𝛿 needed and 𝛿 = ⌈log 4𝑑⌉ suffices since −2𝑑 ≤ 𝐴 − 𝑑, 𝐴 ≤ 2𝑑 − 2.
+Our homomorphic encryption scheme requires 𝑛 to be a prime of the form 2𝐾𝑁 + 1 (Section 2.2.4), where 𝐾 is a positive integer and 𝑁 ≥ 8192 is a power-of-2. Thus, we have 𝑛0 = 𝑛 mod 2𝑠 = 1 for 1 ≤ 𝑠 ≤ 14. For all our benchmarks, 𝑠 ≤ 12 and we use this optimization for truncation in SCIHE.
+5 SECURE INFERENCE
+We give an overview of all the layers that must be computed securely to realize the task of secure neural network inference. Layers can be broken into two categories - linear and non-linear. An inference algorithm simply consists of a sequence of layers of appropriate dimension connected to each other. Examples of
+
+OT based computation. The OT-based techniques for multiplica-
+
+tion are well-known [8, 23, 51] and we describe them briefly for com-
+
+pleteness. First consider the simple case of secure multiplication of 𝑎
+
+and 𝑏 in Z𝐿 where 𝑃0 knows 𝑎 and 𝑃0 and 𝑃1 hold arithmetic shares
+
+of 𝑏. This can be done by invoking
+
+2 1
+
+-COT𝑖
+
+for 𝑖
+
+∈
+
+{1, . . . , ℓ }
+
+re-
+
+quiring communication equivalent to ℓ instances of
+
+2 1
+
+-COT ℓ+1 . 2
+
+Using
+
+this, multiplying two
+
+matrices 𝐴
+
+∈
+
+𝑀,𝑁
+Z𝐿
+
+and 𝐵
+
+∈
+
+𝑁 ,𝐾
+Z𝐿
+
+such that 𝑃0 knows 𝐴 and 𝐵 is arithmetically secret shared re-
+
+quires 𝑀𝑁 𝐾ℓ instances of
+
+2 1
+
+-COT ℓ+1 . 2
+
+This
+
+can
+
+be
+
+optimized
+
+with
+
+structured multiplications inside a matrix multiplication by com-
+
+bining all the COT sender messages when multiplying with the
+
+same element, reducing the complexity to that of 𝑁 𝐾ℓ instances of
+
+2 1
+
+-COT 𝑀 (ℓ+1)
+
+.
+
+Finally,
+
+we
+
+reduce
+
+the
+
+task
+
+of
+
+secure
+
+convolutions
+
+2
+
+to secure matrix multiplication similar to [45, 50, 62].
+
+linear layers include matrix multiplication, convolutions, Avgpool
+
+and batch normalization, while non-linear layers include ReLU, Maxpool, and Argmax.
+
+HE based computation. SCIHE uses techniques from Gazelle [43] and Delphi [49] to compute matrix multiplications and convolu-
+
+We are in the setting of secure inference where the model owner,
+say 𝑃0, holds the weights. When securely realizing each of these layers, we maintain the following invariant: Parties 𝑃0 and 𝑃1 begin with arithmetic shares of the input to the layer and after the
+
+tions over a field Z𝑛 (prime 𝑛), of appropriate size. At a high level, first, 𝑃1 sends an encryption of its arithmetic share to 𝑃0. Then, 𝑃0 homomorphically computes on this ciphertext using weights of the model (known to 𝑃0) to compute an encryption of the arithmetic
+
+9
+
+share of the result and sends this back to 𝑃1. Hence, the communication only depends on the input and output size of the linear layer and is independent of the number of multiplications being performed. Homomorphic operations can have significantly high computational cost - to mitigate this, we build upon the output rotations method from [43] for performing convolutions, and reduce its number of homomorphic rotations. At a very high level, after performing convolutions homomorphically, ciphertexts are grouped, rotated in order to be correctly aligned, and then packed using addition. In our work, we divide the groups further into subgroups that are misaligned by the same offset. Hence the ciphertexts within a subgroup can first be added and the resulting ciphertext can then be aligned using a single rotation as opposed to subgroup-size many rotations in [43]. We refer the reader to Appendix F for details.
+
+Faithful truncation. To correctly emulate fixed-point arithmetic, the value encoded in the shares obtained from the above methods needs to be divided-by-2𝑠 , where 𝑠 is the scale used. For this we invoke FTirnut,nℓc,𝑠 in SCIOT and FDriInVg,𝑛,2𝑠 in SCIHE for each value of the resulting matrix. With this, result of secure implementation of fixed-point multiplication and convolutions is bitwise equal to the corresponding cleartext execution. In contrast, many prior works on 2PC [49, 51] and 3PC [45, 50, 62] used a local truncation method for approximate truncation based on a result from [51]. Here, the result can be arbitrarily wrong with a (small) probability 𝑝 and with probability 1 − 𝑝 the result can be wrong in the last bit. Since 𝑝 grows with the number of truncations, these probabilistic errors are problematic for large DNNs. Moreover, even if 𝑝 is small, 1bit errors can accumulate and the results of cleartext execution and secure execution can diverge; this is undesirable as it breaks correctness of 2PC.
+
+5.1.2 Avgpool𝑑 . The function Avgpool𝑑 (𝑎1, · · · , 𝑎𝑑 ) over a pool of 𝑑 elements 𝑎1, · · · , 𝑎𝑑 is defined to be the arithmetic mean of these 𝑑 values. The protocol to compute this function works as
+
+follows: 𝑃0 and 𝑃1 begin with arithmetic shares (e.g. over Z𝐿 in SCIOT) of 𝑎𝑖 , for all 𝑖 ∈ [𝑑]. They perform local addition to obtain
+
+shares of 𝑤 =
+
+𝑑
+𝑖=1 𝑎𝑖
+
+(i.e.,
+
+𝑃𝑏
+
+computes
+
+⟨𝑤 ⟩𝐿
+𝑏
+
+=
+
+𝑑 𝑖 =1
+
+⟨𝑎𝑖
+
+⟩𝐿 ).
+𝑏
+
+Then,
+
+parties
+
+invoke
+
+FDriInVg,𝐿,𝑑
+
+on
+
+inputs
+
+⟨𝑤 ⟩𝐿
+𝑏
+
+to
+
+obtain
+
+the
+
+desired
+
+output.
+
+Correctness and security follow in the FDriInVg,𝐿,𝑑 −hybrid model.
+
+Here too, unlike [49], our secure execution of average pool is bitwise
+
+equal to the cleartext version.
+
+5.2 Nonlinear Layers
+5.2.1 ReLU. Note that ReLU(𝑎) = 𝑎 if 𝑎 ≥ 0, and 0 otherwise. Equivalently, ReLU(𝑎) = DReLU(𝑎) · 𝑎. For Z𝐿, first we compute the boolean shares of DReLU(𝑎) using a call to FDinRte,ℓLU and then we compute shares of ReLU(𝑎) using a call to multiplexer FM𝐿UX (Section 2.2.3). We describe the protocol for ReLU(𝑎) over Z𝐿 formally in Algorithm 8, Appendix B (the case of Z𝑛 follows in a similar manner). For communication complexity, refer to Table 2 for comparison with garbled circuits and Appendix B for details.
+5.2.2 Maxpool𝑑 and Argmax𝑑 . The function Maxpool𝑑 (𝑎1, · · · , 𝑎𝑑 ) over 𝑑 elements 𝑎1, · · · , 𝑎𝑑 is defined in the following way. Define gt(𝑥, 𝑦) = 𝑧, where 𝑤 = 𝑥 −𝑦 and 𝑧 = 𝑥, if 𝑤 > 0 and 𝑧 = 𝑦, if 𝑤 ≤ 0.
+
+Define 𝑧1 = 𝑎1 and 𝑧𝑖 = gt(𝑎𝑖, 𝑧𝑖−1), recursively for all 2 ≤ 𝑖 ≤ 𝑑. Now, Maxpool𝑑 (𝑎1, · · · , 𝑎𝑑 ) = 𝑧𝑑 .
+We now describe a protocol such that parties begin with arith-
+
+metic shares (over Z𝐿) of 𝑎𝑖 , for all 𝑖 ∈ [𝑑] and end the protocol with
+
+arithmetic shares (over Z𝐿) of Maxpool𝑑 (𝑎1, · · · , 𝑎𝑑 ). For simplicity, we describe how 𝑃0 and 𝑃1 can compute shares of 𝑧 = gt(𝑥, 𝑦)
+
+(beginning with the shares of 𝑥 and 𝑦). It is easy to see then how
+
+they can compute Maxpool𝑑 . First, parties locally compute shares
+
+of
+
+𝑤
+
+=
+
+𝑥
+
+−𝑦
+
+(i.e.,
+
+𝑃𝑏
+
+computes
+
+⟨𝑤 ⟩𝐿
+𝑏
+
+=
+
+⟨𝑥 ⟩𝐿
+𝑏
+
+−
+
+⟨𝑦 ⟩𝐿 ,
+𝑏
+
+for
+
+𝑏
+
+∈
+
+{0,
+
+1}).
+
+Next,
+
+they
+
+invoke
+
+FDinRte,ℓLU
+
+with
+
+input
+
+⟨𝑤 ⟩𝐿
+𝑏
+
+to
+
+learn
+
+output
+
+⟨𝑣 ⟩𝐵 .
+𝑏
+
+Now,
+
+they
+
+invoke
+
+FM𝐿UX
+
+with
+
+input
+
+⟨𝑤 ⟩𝐿
+𝑏
+
+and
+
+⟨𝑣 ⟩𝐵
+𝑏
+
+to
+
+learn
+
+output
+
+⟨𝑡⟩𝐿. Finally, parties output ⟨𝑧⟩𝐿 = ⟨𝑦⟩𝐿 + ⟨𝑡⟩𝐿. The correctness
+
+𝑏
+
+𝑏
+
+𝑏
+
+𝑏
+
+and security of the protocol follows in a straightforward manner.
+
+Computing Maxpool𝑑 is done using 𝑑 − 1 invocations of the above sub-protocol in 𝑑 − 1 sequential steps.
+
+Argmax𝑑 (𝑎1, · · · , 𝑎𝑑 ) is defined similar to Maxpool𝑑 (𝑎1, · · · , 𝑎𝑑 ), except that its output is an index 𝑖∗ s.t. 𝑎𝑖∗ = Maxpool𝑑 (𝑎1, · · · , 𝑎𝑑 ). Argmax𝑑 can be computed securely similar to Maxpool𝑑 (𝑎1, · · · , 𝑎𝑑 ).
+
+6 IMPLEMENTATION
+We implement our cryptographic protocols in a library and integrate them into the CrypTFlow framework [1, 45] as a new cryptographic backend. CrypTFlow compiles high-level TensorFlow [3] inference code to secure computation protocols using its frontend Athos, that are then executed by its cryptographic backends. We modify the truncation behavior of Athos in support of faithful fixedpoint arithmetic. We start by describing the implementation of our cryptographic library, followed by the modifications that we made to Athos.
+
+6.1 Cryptographic backend
+
+To implement our protocols, we build upon the
+
+2 1
+
+-OTℓ
+
+imple-
+
+mentation from EMP [63] and extend it to
+
+𝑘 1
+
+-OTℓ
+
+using
+
+the
+
+proto-
+
+col from [44]. Our linear-layer implementation in SCIHE is based on
+
+SEAL/Delphi [2, 59] and in SCIOT is based on EMP. All our protocol
+
+implementations are multi-threaded.
+
+Oblivious Transfer.
+
+𝑘 1
+
+-OTℓ
+
+requires
+
+a
+
+correlation
+
+robust
+
+func-
+
+tion to mask the sender’s messages in the OT extension protocol,
+
+and we use AESR25K6 (re-keyed AES with 256-bit key)9 to instantiate
+
+it as in [23, 25]. We incorporated the optimizations from [33, 34]
+
+for AES key expansion and pipelining these AESR25K6 calls. This leads to roughly 6× improvement in the performance of AESR25K6 calls,
+
+considerably improving the overall execution time of
+
+𝑘 1
+
+-OTℓ (e.g.
+
+2.7× over LAN for
+
+16 1
+
+-OT8).
+
+Millionaires’ protocol. Recall that 𝑚 is a parameter in our proto-
+
+col ΠℓM,𝑚ILL. While we discussed the dependence of communication complexity on 𝑚 in Section 3.1.2, here we discuss its influence on
+
+the computational cost. Our protocol makes ℓ/𝑚 calls to
+
+𝑀 1
+
+-OT2
+
+(after merging steps 9&10), where 𝑀 = 2𝑚. Using OT extension
+
+techniques, generating an instance of
+
+𝑀 1
+
+-OT2
+
+requires 6 AESF25K6
+
+9There are two types of AES in MPC applications - fixed-key (FK) and re-keyed (RK) [10, 35]. While the former runs key schedule only once and is more efficient, the latter generates a new key schedule for every invocation and is required in this application.
+
+10
+
+and (𝑀 +1) AESR25K6 evaluations. Thus, the computational cost grows super-polynomially with 𝑚. We note that for ℓ = 32, even though communication is minimized for 𝑚 = 7, empirically we observe that 𝑚 = 4 gives us the best performance under both LAN and WAN settings (communication in this case is about 30% more than when 𝑚 = 7 but computation is ≈ 3× lower).
+Implementing linear layers in SCIHE. To implement the linear layers in SCIHE, we build upon the Delphi implementation [2, 49], that is in turn based on the SEAL library [59]. We use the code for fully connected layers as it is from [2]. For convolution layers, we parallelize the code, employ modulus-switching [59] to reduce the ciphertext modulus (and hence ciphertext size), and implement the strided convolutions proposed in Gazelle [43]. These optimizations resulted in significant performance improvement of convolution layers. E.g. for the first convolution layer10 of ResNet50, the runtime decreased from 306s to 18s in the LAN setting and communication decreased from 204 MiB to 76 MiB.
+6.2 CrypTFlow integration
+We integrate SCIOT and SCIHE as new cryptographic backends into the CrypTFlow framework [1, 45]. Thus, as in CrypTFlow [45], we can work with unmodified TensorFlow code as input to produce our secure computation protocols. CrypTFlow’s TensorFlow frontend Athos outputs fixed-point DNNs that use 64-bit integers and sets an optimal scale using a validation set. CrypTFlow required a bitwidth of 64 to ensure that the probability of local truncation errors in its protocols is small (Section 5.1.1). Since our protocols are correct and have no such errors, we extend Athos to set both the bitwidth and the scale optimally by autotuning on the validation set. The bitwidth and scale leak information about the weights and this leakage is similar to the prior works on secure inference [43, 45, 48– 51, 62].
+Implementing faithful truncations using ΠiTnrtu,ℓn,c𝑠 requires the parties to communicate. We implement the following peephole optimizations in Athos to reduce the cost of these truncation calls. Consider a DNN having a convolution layer followed by a ReLU layer. While truncation can be done immediately after the convolution, moving the truncation call to after the ReLU layer can reduce the cost of our protocol ΠiTnrtu,ℓn,c𝑠 . Since the values after ReLU are guaranteed to be all positive, the call to FDinRte,ℓLU within it (step 2 in Algorithm 5) now becomes redundant and can be omitted. Our optimization further accounts for operations that may occur between the convolutions and ReLU, say a matrix addition. Moving the truncation call from immediately after convolution to after ReLU means the activations flowing into the addition operation are now scaled by 2𝑠, instead of the usual 𝑠. For the addition operation to then work correctly, we scale the other argument of addition by 𝑠 as well. These optimizations are fully automatic and need no manual intervention.
+7 EXPERIMENTS
+We empirically validate the following claims:
+10Layer parameters: image size 230 × 230, filter size 7 × 7, input channels 3, output channels 64, and stride size 2 × 2
+
+Improvement over GC # Layers in Our Benchmarks
+
+26 24 22 20 18 16 14 12 10
+8 6 4 2 0
+0
+
+60
+
+55
+
+n#eedLamyoeres
+
+50
+
+Z2` -LAN
+
+45
+
+Zn-LAN
+
+40
+
+Z2` -WAN
+
+35
+
+Zn-WAN
+
+30
+
+25
+
+20
+
+15
+
+10
+
+5
+
+0 2 4 6 8 10 12 14 16 18 20
+# ReLUs (in powers of 2)
+
+Figure 1: The left y-axis shows ( GC Time ). The right y-axis
+Our Time
+shows the total number of ReLU layers corresponding to each layer size in our benchmark set. The legend entries de-
+note the input domain and the network setting.
+
+• In Section 7.1, we show that our protocols for computing ReLU activations are more efficient than state-of-the-art garbled circuits-based implementations (Table 4). Additionally, our division protocols outperforms garbled circuits when computing average pool layers.
+• On the DNNs considered by prior work on secure inference, our protocols can evaluate the non-linear layers much more efficiently and decrease the total time (Table 5) as well as the online time (Table 6).
+• We show the first empirical evaluation of 2-party secure inference on ImageNet-scale benchmarks (Section 7.3). These results show the trade-offs between OT and HE-based secure DNN inference (Table 7).
+We start with a description of our experimental setup and benchmarks, followed by the results.
+
+Experimental Setup. We ran our benchmarks in two network settings, namely, a LAN setting with both machines situated in West Europe, and a transatlantic WAN setting with one of the machines in East US. The bandwidth between the machines is 377 MBps and 40 MBps in the LAN and the WAN setting respectively and the echo latency is 0.3ms and 80ms respectively. Each machine has commodity class hardware: 3.7 GHz Intel Xeon processor with 4 cores and 16 GBs of RAM.
+
+Our Benchmarks. We evaluate on the ImageNet-scale benchmarks considered by [45]: SqueezeNet [40], ResNet50 [37], and DenseNet121 [38]. To match the reported accuracies, we need 37bit fixed-point numbers for ResNet50, whereas 32 bits suffice for DenseNet121 and SqueezeNet (Appendix I). Recall that our division protocols lead to correct secure executions and there is no accuracy loss in going from cleartext inference to secure inference. Appendix G provides a brief summary of these benchmarks.
+
+11
+
+Benchmark
+SqueezeNet ResNet50 DenseNet121
+
+Garbled Circuits LAN WAN Comm
+
+26.4 265.6 136.5 1285.2 199.6 1849.3
+
+7.63 39.19 56.57
+
+(a) over Z2ℓ
+
+Our Protocols LAN WAN Comm
+3.5 33.3 1.15 16.4 69.4 5.23 24.8 118.7 8.21
+
+Benchmark
+
+Garbled Circuits
+
+Our Protocols
+
+LAN WAN Comm LAN WAN Comm
+
+SqueezeNet 51.7 525.8 16.06 ResNet50 267.5 2589.7 84.02 DenseNet121 383.5 3686.2 118.98
+
+5.6 50.4 28.0 124.0 41.9 256.0
+
+1.77 8.55 12.64
+
+(b) over Z𝑛
+
+Table 4: Performance comparison with Garbled Circuits for ReLU layers. Runtimes are in seconds and comm. in GiB.
+
+Benchmark
+
+Metric
+
+Linear
+
+Delphi
+
+Non-linear Ours Improvement
+
+MiniONN
+
+Time Comm.
+
+10.7 0.02
+
+ResNet32
+
+Time Comm.
+
+15.9 0.07
+
+30.2 1.0 3.15 0.28 52.9 2.4 5.51 0.59
+
+30.2× 12.3× 22.0× 9.3×
+
+Table 5: Performance comparison with Delphi [49] for non-
+
+linear layers. Runtimes are in seconds and comm. in GiB.
+
+Benchmark
+
+Linear
+
+Delphi
+
+Non-linear Ours Improvement
+
+MiniONN < 0.1 3.97 0.32 ResNet32 < 0.1 6.99 0.63
+
+12.40× 11.09×
+
+Table 6: Performance comparison with Delphi [49] for on-
+
+line runtime in seconds.
+
+7.1 Comparison with Garbled Circuits
+We compare with EMP-toolkit [63], the state-of-the-art library for Garbled Circuits (GC). Figure 1 shows the improvement of our ReLU protocols over GC in both LAN and WAN settings. On the xaxis, which is in log-scale, the number of ReLUs range from 20 to 220. The histogram shows, using the right y-axis, the cumulative number of layers in our benchmarks (SqueezeNet, ResNet50, DenseNet121) which require the number of ReLU activations given on the x-axis. We observe that these DNNs have layers that compute between 213 and 220 ReLUs. For such layers, we observe (on the left y-axis) that our protocols are 2×–25× faster than GC – the larger the layers the higher the speedups, and gains are larger in the WAN settings. Specifically, for WAN and > 217 ReLUs, the speedups are much higher than the LAN setting. Here, the cost of rounds is amortized over large layers and the communication cost is a large fraction of the total runtime. Note that our implementations perform loadbalancing to leverage full-duplex TCP.
+Next, we compare the time taken by GC and our protocols in computing the ReLU activations of our benchmarks in Table 4. Our protocol over Z𝐿 is up to 8× and 18× faster than GC in the LAN and WAN settings respectively, while it is ≈ 7× more communication efficient. As expected, our protocol over Z𝑛 has even better gains over GC. Specifically, it is up to 9× and 21× faster in the LAN and WAN settings respectively, and has ≈ 9× less communication.
+We also performed a similar comparison of our protocols with GC for the Avgpool layers of our benchmarks, and saw up to 51× reduction in runtime and 41× reduction in communication. We report the concrete performance numbers and discuss the results in more detail in Appendix H.
+7.2 Comparison with Delphi
+In this section, we compare with Delphi [49], which is the current state-of-the-art for 2-party secure DNN inference that outperforms [12, 13, 17, 19, 22, 31, 43, 48, 57] in total time as well as the time taken in online phase. It uses garbled circuits for non-linear layers, and we show that with our protocols, the time taken to evaluate the non-linear layers can be decreased significantly.
+For a fair evaluation, we demonstrate these improvements on the benchmarks of Delphi [49], i.e., the MiniONN (CIFAR-10) [48] and
+
+ResNet32 (CIFAR-100) DNNs with ReLU activations (as opposed to the ImageNet-scale benchmarks for which Delphi has not been optimized). Similar to Delphi, we perform these computations with a bitwidth of 41 in the LAN setting.
+In Table 5, we report the performance of Delphi for evaluating the linear and non-linear components of MiniONN and ResNet32 separately, along with the performance of our protocols for the same non-linear computation11. The table shows that the time to evaluate non-linear layers is the bulk of the total time and our protocols are 20×–30× faster in evaluating the non-linear layers. Also note that we reduce the communication by 12× on MiniONN, and require 9× less communication on ResNet32.
+Next, we compare the online time of our protocols with the online time of Delphi in Table 6. In the online phase, linear layers take negligible time and all the time is spent in evaluating the nonlinear layers. Here, our protocols are an order of magnitude more efficient than Delphi.
+7.3 Evaluation on practical DNNs
+With all our protocols and implementation optimizations in place, we demonstrate the scalability of CrypTFlow2 by efficiently running ImageNet-scale secure inference. Table 7 shows that both our backends, SCIOT and SCIHE, are efficient enough to evaluate SqueezeNet in under a minute and scale to ResNet50 and DenseNet121.
+In the LAN setting, for both SqueezeNet and DenseNet121, SCIOT performs better than SCIHE by at least 20% owing to the higher compute in the latter. However, the quadratic growth of communication with bitlength in the linear-layers of SCIOT can easily drown this difference if we go to higher bitlengths. Because ResNet50, requires 37-bits (compared to 32 in SqueezeNet and DenseNet121) to preserve accuracy, SCIHE outperforms SCIOT in both LAN and WAN settings. In general for WAN settings where communication becomes the major performance bottleneck, SCIHE performs better than SCIOT: 2× for SqueezeNet and DenseNet121 and 4× for ResNet50. Overall, with CrypTFlow2, we could evaluate all the 3 benchmarks within 10 minutes on LAN and 20 minutes on WAN. Since CrypTFlow2 supports both SCIOT and SCIHE, one can choose a specific backend depending on the network statistics [17, 53] to
+11Our non-linear time includes the cost of correct truncation.
+
+12
+
+Benchmark Protocol LAN WAN Comm
+
+SqueezeNet ResNet50 DenseNet121
+
+SCIOT SCIHE SCIOT SCIHE SCIOT SCIHE
+
+44.3 59.2 619.4 545.8 371.4 463.2
+
+293.6 156.6 3611.6 936.0 2257.7 1124.7
+
+26.07 5.27 370.84 32.43 217.19 35.56
+
+Table 7: Performance of CrypTFlow2 on ImageNet-scale
+
+benchmarks. Runtimes are in seconds and comm. in GiB.
+
+get the best secure inference latency. To the best of our knowledge, no prior system provides this support for OT and HE-based secure DNN inference.
+8 CONCLUSION AND FUTURE WORK
+We have presented secure, efficient, and correct implementations of practical 2-party DNN inference that outperform prior work [49] by an order of magnitude in both latency and scale. We evaluate the first secure implementations of ImageNet scale inference, a task that previously required 3PC protocols [7, 45] (which provide weaker security guarantees) or leaking intermediate computations [12]. In the future, we would like to consider ImageNet scale secure training. Even though we can run inference on commodity machines, for training we would need protocols that can leverage specialized compute and networking hardware. Like all prior work on 2PC for secure DNN inference, CrypTFlow2 only considers semi-honest adversaries. In the future, we would like to consider malicious adversaries. Another future direction is to help the server in hiding 𝐹 from the client when computing a classifier 𝐹 (𝑥, 𝑤). Like [43], SCIHE can hide some aspects of 𝐹 : the filter sizes, the strides, and whether a layer is convolutional or fully connected. Thus, SCIHE hides more information than OT-based tools [48] but reveals more information than FHE-based tools [13, 31]. We are exploring approaches to hide more information about 𝐹 while incurring minimal overhead.
+REFERENCES
+[1] 2020. CrypTFlow: An End-to-end System for Secure TensorFlow Inference. https://github.com/mpc- msri/EzPC.
+[2] 2020. Delphi: A Cryptographic Inference Service for Neural Networks. https: //github.com/mc2- project/delphi.
+[3] Martín Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen, Craig Citro, Gregory S. Corrado, Andy Davis, Jeffrey Dean, Matthieu Devin, Sanjay Ghemawat, Ian J. Goodfellow, Andrew Harp, Geoffrey Irving, Michael Isard, Yangqing Jia, Rafal Józefowicz, Lukasz Kaiser, Manjunath Kudlur, Josh Levenberg, Dan Mané, Rajat Monga, Sherry Moore, Derek Gordon Murray, Chris Olah, Mike Schuster, Jonathon Shlens, Benoit Steiner, Ilya Sutskever, Kunal Talwar, Paul A. Tucker, Vincent Vanhoucke, Vijay Vasudevan, Fernanda B. Viégas, Oriol Vinyals, Pete Warden, Martin Wattenberg, Martin Wicke, Yuan Yu, and Xiaoqiang Zheng. 2016. TensorFlow: Large-Scale Machine Learning on Heterogeneous Distributed Systems. CoRR abs/1603.04467 (2016). https://arxiv.org/abs/1603.04467
+[4] Nitin Agrawal, Ali Shahin Shamsabadi, Matt J. Kusner, and Adrià Gascón. 2019. QUOTIENT: Two-Party Secure Neural Network Training and Prediction. In Proceedings of the 2019 ACM SIGSAC Conference on Computer and Communications Security, CCS 2019, London, UK, November 11-15, 2019. 1231–1247.
+[5] Gilad Asharov, Yehuda Lindell, Thomas Schneider, and Michael Zohner. 2013. More efficient oblivious transfer and extensions for faster secure computation. In 2013 ACM SIGSAC Conference on Computer and Communications Security, CCS’13, Berlin, Germany, November 4-8, 2013, Ahmad-Reza Sadeghi, Virgil D. Gligor, and Moti Yung (Eds.). ACM, 535–548. https://doi.org/10.1145/2508859.2516738
+[6] Marshall Ball, Brent Carmer, Tal Malkin, Mike Rosulek, and Nichole Schimanski. 2019. Garbled Neural Networks are Practical. IACR Cryptology ePrint Archive 2019 (2019), 338. https://eprint.iacr.org/2019/338
+
+[7] Assi Barak, Daniel Escudero, Anders Dalskov, and Marcel Keller. 2019. Secure Evaluation of Quantized Neural Networks. Cryptology ePrint Archive, Report 2019/131. https://eprint.iacr.org/2019/131.
+[8] Donald Beaver. 1991. Efficient Multiparty Protocols Using Circuit Randomization. In Advances in Cryptology - CRYPTO ’91, 11th Annual International Cryptology Conference, Santa Barbara, California, USA, August 11-15, 1991, Proceedings. 420– 432.
+[9] Donald Beaver. 1996. Correlated Pseudorandomness and the Complexity of Private Computations. In Proceedings of the Twenty-Eighth Annual ACM Symposium on the Theory of Computing, Philadelphia, Pennsylvania, USA, May 22-24, 1996, Gary L. Miller (Ed.). ACM, 479–488. https://doi.org/10.1145/237814.237996
+[10] Mihir Bellare, Viet Tung Hoang, Sriram Keelveedhi, and Phillip Rogaway. 2013. Efficient Garbling from a Fixed-Key Blockcipher. In 2013 IEEE Symposium on Security and Privacy, SP 2013, Berkeley, CA, USA, May 19-22, 2013. IEEE Computer Society, 478–492. https://doi.org/10.1109/SP.2013.39
+[11] G. R. Blakley. 1979. Safeguarding cryptographic keys. In Managing Requirements Knowledge, International Workshop on. IEEE Computer Society, Los Alamitos, CA, USA, 313. https://doi.org/10.1109/AFIPS.1979.98
+[12] Fabian Boemer, Anamaria Costache, Rosario Cammarota, and Casimir Wierzynski. 2019. nGraph-HE2: A High-Throughput Framework for Neural Network Inference on Encrypted Data. In Proceedings of the 7th ACM Workshop on En-
+crypted Computing & Applied Homomorphic Cryptography, WAHC@CCS 2019,
+London, UK, November 11-15, 2019, Michael Brenner, Tancrède Lepoint, and Kurt Rohloff (Eds.). ACM, 45–56. https://doi.org/10.1145/3338469.3358944 [13] Fabian Boemer, Yixing Lao, Rosario Cammarota, and Casimir Wierzynski. 2019. nGraph-HE: A Graph Compiler for Deep Learning on Homomorphically Encrypted Data. In Proceedings of the 16th ACM International Conference on Computing Frontiers, CF 2019, Alghero, Italy, April 30 - May 2, 2019. 3–13. [14] Raphael Bost, Raluca Ada Popa, Stephen Tu, and Shafi Goldwasser. 2015. Machine Learning Classification over Encrypted Data. In 22nd Annual Network and
+Distributed System Security Symposium, NDSS 2015, San Diego, California, USA,
+February 8-11, 2015. The Internet Society. https://www.ndss-symposium.org/ ndss2015/machine- learning- classification- over- encrypted- data [15] Zvika Brakerski. 2012. Fully Homomorphic Encryption without Modulus Switching from Classical GapSVP. In Advances in Cryptology - CRYPTO 2012 - 32nd An-
+nual Cryptology Conference, Santa Barbara, CA, USA, August 19-23, 2012. Proceed-
+ings (Lecture Notes in Computer Science, Vol. 7417), Reihaneh Safavi-Naini and Ran Canetti (Eds.). Springer, 868–886. https://doi.org/10.1007/978-3-642-32009-5_50 [16] Gilles Brassard, Claude Crépeau, and Jean-Marc Robert. 1986. All-or-Nothing Disclosure of Secrets. In Advances in Cryptology - CRYPTO ’86, Santa Barbara, California, USA, 1986, Proceedings (Lecture Notes in Computer Science, Vol. 263), Andrew M. Odlyzko (Ed.). Springer, 234–238. https://doi.org/10.1007/3-54047721- 7_17 [17] Niklas Büscher, Daniel Demmler, Stefan Katzenbeisser, David Kretzmer, and Thomas Schneider. 2018. HyCC: Compilation of Hybrid Protocols for Practical Secure Computation. In Proceedings of the 2018 ACM SIGSAC Conference on
+Computer and Communications Security, CCS 2018, Toronto, ON, Canada, October
+15-19, 2018, David Lie, Mohammad Mannan, Michael Backes, and XiaoFeng Wang (Eds.). ACM, 847–861. https://doi.org/10.1145/3243734.3243786 [18] Ran Canetti. 2000. Security and Composition of Multiparty Cryptographic Protocols. J. Cryptology 13, 1 (2000), 143–202. [19] Nishanth Chandran, Divya Gupta, Aseem Rastogi, Rahul Sharma, and Shardul Tripathi. 2019. EzPC: Programmable and Efficient Secure Two-Party Computation for Machine Learning. In IEEE European Symposium on Security and Privacy, EuroS&P 2019, Stockholm, Sweden, June 17-19, 2019. 496–511. [20] Valerie Chen, Valerio Pastro, and Mariana Raykova. 2019. Secure Computation for Machine Learning With SPDZ. CoRR abs/1901.00329 (2019). arXiv:1901.00329 http://arxiv.org/abs/1901.00329 [21] Geoffroy Couteau. 2018. New Protocols for Secure Equality Test and Comparison. In Applied Cryptography and Network Security - 16th International Conference,
+ACNS 2018, Leuven, Belgium, July 2-4, 2018, Proceedings (Lecture Notes in Computer
+Science, Vol. 10892), Bart Preneel and Frederik Vercauteren (Eds.). Springer, 303– 320. https://doi.org/10.1007/978-3-319-93387-0_16 [22] Roshan Dathathri, Olli Saarikivi, Hao Chen, Kristin Lauter, Saeed Maleki, Madan Musuvathi, and Todd Mytkowicz. 2019. CHET: An Optimizing Compiler for Fully-Homomorphic Neural-Network Inferencing. In Proceedings of the 40th ACM
+SIGPLAN Conference on Programming Language Design and Implementation, PLDI
+2019, Phoenix, AZ, USA, June 22-26, 2019. 142–156. [23] Daniel Demmler, Thomas Schneider, and Michael Zohner. 2015. ABY - A Frame-
+work for Efficient Mixed-Protocol Secure Two-Party Computation. In 22nd An-
+nual Network and Distributed System Security Symposium, NDSS 2015, San Diego,
+California, USA, February 8-11, 2015. [24] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Fei-Fei Li. 2009. Ima-
+geNet: A large-scale hierarchical image database. In 2009 IEEE Computer Society
+Conference on Computer Vision and Pattern Recognition (CVPR 2009), 20-25 June
+2009, Miami, Florida, USA. 248–255.
+
+13
+
+[25] Ghada Dessouky, Farinaz Koushanfar, Ahmad-Reza Sadeghi, Thomas Schneider, Shaza Zeitouni, and Michael Zohner. 2017. Pushing the Communication Barrier in Secure Computation using Lookup Tables. In 24th An-
+nual Network and Distributed System Security Symposium, NDSS 2017, San
+Diego, California, USA, February 26 - March 1, 2017. The Internet Society. https://www.ndss-symposium.org/ndss2017/ndss-2017-programme/ pushing- communication- barrier- secure- computation- using- lookup- tables/ [26] Daniel Escudero, Satrajit Ghosh, Marcel Keller, Rahul Rachuri, and Peter Scholl. 2020. Improved Primitives for MPC over Mixed Arithmetic-Binary Circuits. In
+Advances in Cryptology - CRYPTO 2020 - 40th Annual International Cryptology
+Conference. [27] Shimon Even, Oded Goldreich, and Abraham Lempel. 1985. A Randomized
+Protocol for Signing Contracts. Commun. ACM 28, 6 (1985), 637–647. https: //doi.org/10.1145/3812.3818 [28] Junfeng Fan and Frederik Vercauteren. 2012. Somewhat Practical Fully Homomorphic Encryption. Cryptology ePrint Archive, Report 2012/144. http: //eprint.iacr.org/2012/144. [29] Juan A. Garay, Berry Schoenmakers, and José Villegas. 2007. Practical and Secure Solutions for Integer Comparison. In Public Key Cryptography - PKC 2007,
+10th International Conference on Practice and Theory in Public-Key Cryptography,
+Beijing, China, April 16-20, 2007, Proceedings (Lecture Notes in Computer Science,
+Vol. 4450), Tatsuaki Okamoto and Xiaoyun Wang (Eds.). Springer, 330–342. https: //doi.org/10.1007/978- 3- 540- 71677- 8_22 [30] Craig Gentry. 2009. Fully homomorphic encryption using ideal lattices. In Pro-
+ceedings of the 41st Annual ACM Symposium on Theory of Computing, STOC 2009,
+Bethesda, MD, USA, May 31 - June 2, 2009, Michael Mitzenmacher (Ed.). ACM, 169–178. https://doi.org/10.1145/1536414.1536440 [31] Ran Gilad-Bachrach, Nathan Dowlin, Kim Laine, Kristin E. Lauter, Michael Naehrig, and John Wernsing. 2016. CryptoNets: Applying Neural Networks to Encrypted Data with High Throughput and Accuracy. In Proceedings of the
+33nd International Conference on Machine Learning, ICML 2016, New York City,
+NY, USA, June 19-24, 2016. 201–210. [32] Oded Goldreich, Silvio Micali, and Avi Wigderson. 1987. How to Play any
+Mental Game or A Completeness Theorem for Protocols with Honest Majority. In Proceedings of the 19th Annual ACM Symposium on Theory of Computing, 1987, New York, New York, USA. 218–229. [33] Shay Gueron. 2016. AES-GCM-SIV implementations (128 and 256 bit). https: //github.com/Shay- Gueron/AES- GCM- SIV. [34] Shay Gueron, Yehuda Lindell, Ariel Nof, and Benny Pinkas. 2018. Fast Garbling of Circuits Under Standard Assumptions. J. Cryptol. 31, 3 (2018). https://doi.org/ 10.1007/s00145- 017- 9271- y [35] C. Guo, J. Katz, X. Wang, and Y. Yu. 2020. Efficient and Secure Multiparty Computation from Fixed-Key Block Ciphers. In 2020 IEEE Symposium on Security and Privacy (SP). IEEE Computer Society, Los Alamitos, CA, USA, 247–263. https: //doi.org/10.1109/SP.2020.00016 [36] Carmit Hazay, Yuval Ishai, Antonio Marcedone, and Muthuramakrishnan Venkitasubramaniam. 2019. LevioSA: Lightweight Secure Arithmetic Computation. In Proceedings of the 2019 ACM Conference on Computer and Communications Security, CCS 2019, London, UK, November 11-15, 2019. 327–344. [37] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep Residual Learning for Image Recognition. In 2016 IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2016, Las Vegas, NV, USA, June 27-30, 2016. 770–778. [38] Gao Huang, Zhuang Liu, Laurens van der Maaten, and Kilian Q. Weinberger. 2017. Densely Connected Convolutional Networks. In 2017 IEEE Conference on
+Computer Vision and Pattern Recognition, CVPR 2017, Honolulu, HI, USA, July
+21-26, 2017. 2261–2269. [39] Itay Hubara, Matthieu Courbariaux, Daniel Soudry, Ran El-Yaniv, and Yoshua
+Bengio. 2016. Binarized Neural Networks. In Advances in Neural Information
+Processing Systems 29: Annual Conference on Neural Information Processing Systems
+2016, December 5-10, 2016, Barcelona, Spain, Daniel D. Lee, Masashi Sugiyama, Ulrike von Luxburg, Isabelle Guyon, and Roman Garnett (Eds.). 4107–4115. [40] Forrest N. Iandola, Matthew W. Moskewicz, Khalid Ashraf, Song Han, William J. Dally, and Kurt Keutzer. 2016. SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <1MB model size. CoRR abs/1602.07360 (2016). arXiv:1602.07360 http://arxiv.org/abs/1602.07360 [41] Yuval Ishai, Joe Kilian, Kobbi Nissim, and Erez Petrank. 2003. Extending Oblivious Transfers Efficiently. In Advances in Cryptology - CRYPTO 2003, 23rd Annual
+International Cryptology Conference, Santa Barbara, California, USA, August 17-21,
+2003, Proceedings (Lecture Notes in Computer Science, Vol. 2729), Dan Boneh (Ed.). Springer, 145–161. https://doi.org/10.1007/978-3-540-45146-4_9 [42] Benoit Jacob, Skirmantas Kligys, Bo Chen, Menglong Zhu, Matthew Tang, Andrew G. Howard, Hartwig Adam, and Dmitry Kalenichenko. 2018. Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference. In 2018 IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2018, Salt Lake City, UT, USA, June 18-22, 2018. 2704–2713. [43] Chiraag Juvekar, Vinod Vaikuntanathan, and Anantha Chandrakasan. 2018. GAZELLE: A Low Latency Framework for Secure Neural Network Inference. In
+27th USENIX Security Symposium, USENIX Security 2018, Baltimore, MD, USA,
+
+August 15-17, 2018. 1651–1669. [44] Vladimir Kolesnikov and Ranjit Kumaresan. 2013. Improved OT Extension for
+Transferring Short Secrets. In Advances in Cryptology - CRYPTO 2013 - 33rd Annual
+Cryptology Conference, Santa Barbara, CA, USA, August 18-22, 2013. Proceedings,
+Part II (Lecture Notes in Computer Science, Vol. 8043), Ran Canetti and Juan A. Garay (Eds.). Springer, 54–70. https://doi.org/10.1007/978-3-642-40084-1_4 [45] Nishant Kumar, Mayank Rathee, Nishanth Chandran, Divya Gupta, Aseem Rastogi, and Rahul Sharma. 2020. CrypTFlow: Secure TensorFlow Inference. In 2020
+IEEE Symposium on Security and Privacy, S&P 2020, San Francisco, CA, USA, May
+18-20, 2020. 1521–1538. [46] Kim Laine. 2017. Simple Encrypted Arithmetic Library 2.3.1. https://www.
+microsoft.com/en- us/research/uploads/prod/2017/11/sealmanual- 2- 3- 1.pdf . [47] Yehuda Lindell. 2016. How To Simulate It - A Tutorial on the Simulation Proof
+Technique. Cryptology ePrint Archive, Report 2016/046. https://eprint.iacr.org/ 2016/046. [48] Jian Liu, Mika Juuti, Yao Lu, and N. Asokan. 2017. Oblivious Neural Network Predictions via MiniONN Transformations. In Proceedings of the 2017 ACM SIGSAC
+Conference on Computer and Communications Security, CCS 2017, Dallas, TX, USA,
+October 30 - November 03, 2017. 619–631. [49] Pratyush Mishra, Ryan Lehmkuhl, Akshayaram Srinivasan, Wenting Zheng, and
+Raluca Ada Popa. 2020. Delphi: A Cryptographic Inference Service for Neural Networks. In 29th USENIX Security Symposium, USENIX Security 20. Boston, MA. [50] Payman Mohassel and Peter Rindal. 2018. ABY3: A Mixed Protocol Framework for Machine Learning. In Proceedings of the 2018 ACM SIGSAC Conference on
+Computer and Communications Security, CCS 2018, Toronto, ON, Canada, October
+15-19, 2018. 35–52. [51] Payman Mohassel and Yupeng Zhang. 2017. SecureML: A System for Scalable
+Privacy-Preserving Machine Learning. In 2017 IEEE Symposium on Security and Privacy, S&P 2017, San Jose, CA, USA, May 22-26, 2017. 19–38. [52] Markus Nagel, Mart van Baalen, Tijmen Blankevoort, and Max Welling. 2019. Data-Free Quantization Through Weight Equalization and Bias Correction. In
+2019 IEEE/CVF International Conference on Computer Vision, ICCV 2019, Seoul,
+Korea (South), October 27 - November 2, 2019. IEEE, 1325–1334. [53] Erman Pattuk, Murat Kantarcioglu, Huseyin Ulusoy, and Bradley A. Malin. 2016.
+CheapSMC: A Framework to Minimize Secure Multiparty Computation Cost in the Cloud. In Data and Applications Security and Privacy XXX - 30th Annual
+IFIP WG 11.3 Conference, DBSec 2016, Trento, Italy, July 18-20, 2016. Proceedings
+(Lecture Notes in Computer Science, Vol. 9766), Silvio Ranise and Vipin Swarup (Eds.). Springer, 285–294. [54] Michael O. Rabin. 1981. How to exchange secrets with oblivious transfer. Technical Report TR-81, Aiken Computation Lab, Harvard University. https: //eprint.iacr.org/2005/187.pdf . [55] Deevashwer Rathee, Thomas Schneider, and K. K. Shukla. 2019. Improved Multiplication Triple Generation over Rings via RLWE-Based AHE. In Cryp-
+tology and Network Security - 18th International Conference, CANS 2019, Fuzhou,
+China, October 25-27, 2019, Proceedings (Lecture Notes in Computer Science,
+Vol. 11829), Yi Mu, Robert H. Deng, and Xinyi Huang (Eds.). Springer, 347–359. https://doi.org/10.1007/978- 3- 030- 31578- 8_19 [56] M. Sadegh Riazi, Mohammad Samragh, Hao Chen, Kim Laine, Kristin E. Lauter, and Farinaz Koushanfar. 2019. XONN: XNOR-based Oblivious Deep Neural Network Inference. In 28th USENIX Security Symposium, USENIX Security 2019, Santa Clara, CA, USA, August 14-16, 2019. 1501–1518. [57] M. Sadegh Riazi, Christian Weinert, Oleksandr Tkachenko, Ebrahim M. Songhori, Thomas Schneider, and Farinaz Koushanfar. 2018. Chameleon: A Hybrid Secure Computation Framework for Machine Learning Applications. In Proceedings of
+the 2018 on Asia Conference on Computer and Communications Security, AsiaCCS
+2018, Incheon, Republic of Korea, June 04-08, 2018. 707–721. https://doi.org/10. 1145/3196494.3196522 [58] Bita Darvish Rouhani, M. Sadegh Riazi, and Farinaz Koushanfar. 2018. Deepsecure: scalable provably-secure deep learning. In Proceedings of the 55th Annual Design Automation Conference, DAC 2018, San Francisco, CA, USA, June 24-29, 2018. ACM, 2:1–2:6. [59] SEAL 2019. Microsoft SEAL (release 3.3). https://github.com/Microsoft/SEAL. Microsoft Research, Redmond, WA. [60] Adi Shamir. 1979. How to Share a Secret. Commun. ACM 22, 11 (1979), 612–613. https://doi.org/10.1145/359168.359176 [61] N.P. Smart and F. Vercauteren. 2011. Fully Homomorphic SIMD Operations. Cryptology ePrint Archive, Report 2011/133. http://eprint.iacr.org/2011/133. [62] Sameer Wagh, Divya Gupta, and Nishanth Chandran. 2019. SecureNN: 3-Party Secure Computation for Neural Network Training. PoPETs 2019, 3 (2019), 26–49. [63] Xiao Wang, Alex J. Malozemoff, and Jonathan Katz. 2016. EMP-toolkit: Efficient MultiParty computation toolkit. https://github.com/emp-toolkit. [64] Andrew Chi-Chih Yao. 1986. How to Generate and Exchange Secrets (Extended Abstract). In 27th Annual Symposium on Foundations of Computer Science, Toronto, Canada, 27-29 October 1986. IEEE Computer Society, 162–167. https://doi.org/10. 1109/SFCS.1986.25
+
+14
+
+[65] Wenting Zheng, Raluca Ada Popa, Joseph E. Gonzalez, and Ion Stoica. 2019. Helen: Maliciously Secure Coopetitive Learning for Linear Models. In 2019 IEEE
+Symposium on Security and Privacy, S&P 2019, San Francisco, CA, USA, May 19-23,
+2019. 724–738. [66] Xiaoyong Zhu, George Iordanescu, Ilia Karmanov, and Mazen Zawaideh.
+2018. https://blogs.technet.microsoft.com/machinelearning/2018/03/07/usingmicrosoft- ai- to- build- a- lung- disease- prediction- model- using- chest- x- rayimages/
+
+A SUPPORTING PROTOCOLS
+Here, we describe supporting protocols that our main protocols rely on.
+
+A.1 Protocol for regular FAND
+
+Regular FAND can be realized using bit-triples [8], which are
+
+of the form (⟨𝑑⟩𝐵, ⟨𝑒⟩𝐵, ⟨𝑓 ⟩𝐵), where 𝑏 ∈ {0, 1} and 𝑑 ∧ 𝑒 = 𝑓 .
+
+𝑏𝑏 𝑏
+
+Using an instance of
+
+16 1
+
+-OT2,
+
+the
+
+parties
+
+can
+
+generate
+
+two
+
+bit-
+
+triples [25]. We describe this protocol for generating the first triple,
+
+and from there, it will be easy to see how to also get the second
+
+triple using the same OT instance. The parties start by sampling
+
+random
+
+shares
+
+⟨𝑑⟩𝐵, ⟨𝑒⟩𝐵
+𝑏𝑏
+
+←$
+
+{0, 1}
+
+for
+
+𝑏
+
+∈
+
+{0, 1}.
+
+𝑃1
+
+sets
+
+the
+
+first
+
+two bits of its input to
+
+16 1
+
+-OT2
+
+as
+
+⟨𝑑⟩1𝐵 ||⟨𝑒⟩1𝐵,
+
+while
+
+the
+
+other
+
+two
+
+bits are used for the second triple. 𝑃0 samples a random bit 𝑟 and
+
+sets its input messages to
+
+16 1
+
+-OT2
+
+as
+
+follows:
+
+for
+
+the
+
+𝑖-th
+
+message,
+
+where 𝑖 ∈ {0, 1}4, 𝑃0 uses the first two bits 𝑖1||𝑖2 of 𝑖 to compute
+
+𝑟 ⊕ ((𝑖1 ⊕ ⟨𝑑⟩0𝐵)∧(𝑖2 ⊕ ⟨𝑒⟩0𝐵)), and sets it as the first bit of the message,
+
+while reserving the second bit for the other triple. Finally, 𝑃0 sets
+
+⟨𝑓 ⟩0𝐵 = 𝑟 , and 𝑃1 sets the first bit of the output of
+
+16 1
+
+-OT2
+
+as
+
+⟨𝑓
+
+⟩1𝐵 .
+
+It is easy to see correctness by noting that ⟨𝑓 ⟩1𝐵 = ⟨𝑓 ⟩0𝐵 ⊕ (𝑑 ∧ 𝑒),
+
+and since ⟨𝑓 ⟩0𝐵 is uniformly random, security follows directly in
+
+the
+
+16 1
+
+-OT2-hybrid.
+
+The communication of this protocol is the same as that of
+
+16 1
+
+-OT2,
+
+which is 2𝜆 + 16 · 2 bits. Since we generate two bit-triples using this
+
+protocol, the amortized cost per triple is 𝜆 + 16 bits, which is 144
+
+for 𝜆 = 128.
+
+A.2 Protocol for correlated FAND
+
+Correlated triples are two sets of bit triples (⟨𝑑⟩𝐵, ⟨𝑒⟩𝐵, ⟨𝑓 ⟩𝐵)
+
+𝑏𝑏 𝑏
+
+and (⟨𝑑 ′⟩𝐵, ⟨𝑒 ′⟩𝐵, ⟨𝑓 ′⟩𝐵), for 𝑏 ∈ {0, 1}, such that 𝑒 = 𝑒 ′, 𝑑 ∧ 𝑒 = 𝑓 ,
+
+and
+
+𝑑′
+
+𝑏
+∧𝑒
+
+′
+
+=
+
+𝑏
+𝑓
+
+′.
+
+𝑏
+The
+
+protocol
+
+from
+
+Appendix
+
+A.1
+
+required
+
+a
+
+16 1
+
+-OT2
+
+invocation
+
+to
+
+generate
+
+bits of 𝑃1’s input were its shares
+
+two of 𝑑,
+
+regular triples, where 𝑒, 𝑑 ′, and 𝑒 ′. However,
+
+the 4 when
+
+generating correlated triples, we can instead use an instance of
+
+8 1
+
+-OT2
+
+because 𝑒
+
+=
+
+𝑒 ′,
+
+and
+
+thus,
+
+3
+
+bits
+
+suffice
+
+to
+
+represent
+
+𝑃1’s
+
+input. Correctness and security follow in a similar way as in the
+
+case of regular FAND (see Appendix A.1).
+
+The communication of this protocol is equal to that of
+
+8 1
+
+-OT2,
+
+which costs 2𝜆 +8·2 bits. Thus, we get an amortized communication
+
+of 𝜆 + 8 bits per correlated triple.
+
+Algorithm 6 Multiplexer, Π𝑛MUX:
+
+Input:
+
+For 𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+holds
+
+⟨𝑎⟩𝑛
+𝑏
+
+and
+
+⟨𝑐 ⟩𝐵 .
+𝑏
+
+Output:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+learns ⟨𝑧⟩𝑛
+𝑏
+
+s.t. 𝑧
+
+= 𝑎 if 𝑐
+
+= 1, else 𝑧
+
+= 0.
+
+1: For 𝑏 ∈ {0, 1}, 𝑃𝑏 picks 𝑟𝑏 ←$ Z𝑛.
+
+2: 𝑃0 sets 𝑠0, 𝑠1 as follows: If ⟨𝑐⟩0𝐵 = 0, (𝑠0, 𝑠1) = (−𝑟0, −𝑟0 + ⟨𝑎⟩0𝑛).
+
+Else, (𝑠0, 𝑠1) = (−𝑟0 + ⟨𝑎⟩0𝑛, −𝑟0).
+
+3:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+2 1
+
+-OT𝜂
+
+where
+
+𝑃0
+
+is
+
+the
+
+sender
+
+with inputs (𝑠0, 𝑠1) and 𝑃1 is the receiver with input ⟨𝑐⟩1𝐵. Let
+
+𝑃1’s output be 𝑥1.
+
+4: 𝑃1 sets 𝑡0, 𝑡1 as follows: If ⟨𝑐⟩1𝐵 = 0, (𝑡0, 𝑡1) = (−𝑟1, −𝑟1 + ⟨𝑎⟩1𝑛).
+
+Else, (𝑡0, 𝑡1) = (−𝑟1 + ⟨𝑎⟩1𝑛, −𝑟1).
+
+5:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+2 1
+
+-OT𝜂
+
+where
+
+𝑃1
+
+is
+
+the
+
+sender
+
+with inputs (𝑡0, 𝑡1) and 𝑃0 is the receiver with input ⟨𝑐⟩0𝐵. Let 𝑃0’s output be 𝑥0.
+
+6:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+outputs ⟨𝑧⟩𝑛
+𝑏
+
+= 𝑟𝑏
+
++ 𝑥𝑏 .
+
+Algorithm 7 Boolean to Arithmetic, Π𝑛B2A:
+
+Input: 𝑃0, 𝑃1 hold ⟨𝑐⟩0𝐵 and ⟨𝑐⟩1𝐵, respectively, where 𝑐 ∈ {0, 1}. Output: 𝑃0, 𝑃1 learn ⟨𝑑⟩0𝑛 and ⟨𝑑⟩1𝑛, respectively, s.t. 𝑑 = 𝑐.
+
+1:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+2 1
+
+-COT𝜂
+
+where
+
+𝑃0
+
+is
+
+the
+
+sender
+
+with correlation function 𝑓 (𝑥) = 𝑥 + ⟨𝑐⟩0𝐵 and 𝑃1 is the receiver
+
+with input ⟨𝑐⟩1𝐵. Party 𝑃0 learns 𝑥 and sets 𝑦0 = 𝑛 − 𝑥 and 𝑃1
+
+learns 𝑦1.
+
+2:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+computes ⟨𝑑⟩𝑛
+𝑏
+
+=
+
+⟨𝑐 ⟩𝐵
+𝑏
+
+−
+
+2
+
+·
+
+𝑦𝑏 .
+
+Algorithm 8 ℓ-bit integer ReLU, ΠiRnetL,ℓU:
+
+Input: 𝑃0, 𝑃1 hold ⟨𝑎⟩0𝐿 and ⟨𝑎⟩1𝐿, respectively. Output: 𝑃0, 𝑃1 get ⟨ReLU(𝑎)⟩0𝐿 and ⟨ReLU(𝑎)⟩1𝐿.
+
+1:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+invokes
+
+FDinRte,ℓLU
+
+with
+
+input
+
+⟨𝑎⟩𝐿
+𝑏
+
+to learn
+
+output ⟨𝑦⟩𝐵.
+𝑏
+
+2:
+
+For 𝑏
+
+∈ {0, 1}, 𝑃𝑏
+
+invokes
+
+FM𝐿UX
+
+with
+
+inputs
+
+⟨𝑎⟩𝐿
+𝑏
+
+and ⟨𝑦⟩𝐵
+𝑏
+
+to
+
+learn ⟨𝑧⟩𝐿 and sets ⟨ReLU(𝑎)⟩𝐿 = ⟨𝑧⟩𝐿.
+
+𝑏
+
+𝑏
+
+𝑏
+
+Security trivially follows in
+
+2 1
+
+-OT𝜂 -hybrid.
+
+Communication
+
+com-
+
+plexity is 2(𝜆 + 2𝜂).
+
+A.4 Protocol for B2A
+
+We describe our protocol for realizing FB𝑛2A formally in Algo-
+
+rithm 7. For correctness, we need to show that 𝑑 = Reconst𝐿 (⟨𝑑⟩0𝑛, ⟨𝑑⟩1𝑛)
+
+= ⟨𝑐⟩0𝐵 + ⟨𝑐⟩1𝐵 − 2⟨𝑐⟩0𝐵 ⟨𝑐⟩1𝐵. By correctness of
+
+2 1
+
+-COT𝜂 , 𝑦1
+
+=
+
+𝑥
+
++
+
+⟨𝑐⟩0𝐵 ⟨𝑐⟩1𝐵. Using this, ⟨𝑑⟩0𝑛 = ⟨𝑐⟩0𝐵 + 2𝑥 and ⟨𝑑⟩1𝑛 = ⟨𝑐⟩1𝐵 − 2𝑥 −
+
+2⟨𝑐⟩0𝐵 ⟨𝑐⟩1𝐵. Security follows from the security of
+
+2 1
+
+-COT𝜂
+
+and com-
+
+munication required is 𝜆 + 𝜂 bits.
+
+A.3 Protocol for Multiplexer
+
+We describe our protocol for realizing FM𝑛UX in Algorithm 6.
+
+First we argue correctness. Let 𝑐 = Reconst𝐵 (⟨𝑐⟩0𝐵, ⟨𝑐⟩1𝐵) =
+
+⟨𝑐⟩0𝐵 ⊕ ⟨𝑐⟩1𝐵. By correctness of
+
+2 1
+
+-OT𝜂 , 𝑥1
+
+=
+
+−𝑟0 +𝑐 · ⟨𝑎⟩0𝑛. Similarly,
+
+𝑥0 = −𝑟1 + 𝑐 · ⟨𝑎⟩1𝑛. Hence, Reconst𝑛 (⟨𝑧⟩0𝑛, ⟨𝑧⟩1𝑛) = 𝑧0 + 𝑧1 = 𝑐 · 𝑎.
+
+B PROTOCOL FOR ReLU
+We describe our ReLU protocol for the case where the input and output shares are over Z𝐿 in Algorithm 8, and note that the case of Z𝑛 follows similarly. It is easy to see that the correctness and
+
+15
+
+security of the protocol follow in the (FDinRte,ℓLU, FM𝐿UX)−hybrid.
+
+Communication complexity. We first look at the complexity of ΠiRnetL,ℓU,
+
+which involves a call to FDinRte,ℓLU and FM𝐿UX. FDinRte,ℓLU has the same
+
+communication
+
+as
+
+FMℓ −IL1L ,
+
+which
+
+requires
+
+𝜆(ℓ
+
+−
+
+1)
+
++
+
+13
+
+1 2
+
+(ℓ
+
+−
+
+1)
+
+−
+
+2𝜆 − 22 bits if we assume 𝑚 = 4 and 𝑚 | (ℓ − 1), and exclude
+
+optimization (3.1.1) in the general expression from Section 3.1.2.
+
+FM𝐿UX incurs a cost of 2𝜆 + 4ℓ bits, bringing the total cost to 𝜆ℓ +
+
+17
+
+1 2
+
+ℓ
+
+−
+
+𝜆
+
+−
+
+35
+
+1 2
+
+bits,
+
+which
+
+can
+
+be
+
+rewritten
+
+as
+
+<
+
+𝜆ℓ
+
++
+
+18ℓ .
+
+We
+
+get
+
+our best communication for ℓ = 32 (with all the optimizations) by
+
+taking 𝑚 = 7 for the Π3M1ILL invocation inside ΠiDnRt,e3L2U, which gives
+
+us a total communication of 3298 bits.
+
+Now, we look at the complexity of ΠrRienLgU,𝑛, which makes calls to
+
+FDriRnegL,𝑛U and FM𝑛UX. The cost of FDriRnegL,𝑛U is 2𝜆+4 bits for
+
+4 1
+
+-OT1, plus
+
+3 2
+
+𝜆
+
+(𝜂
+
++
+
+1)
+
++
+
+27(𝜂
+
++
+
+1)
+
+−
+
+4𝜆
+
+−
+
+44
+
+bits
+
+for
+
+2
+
+invocations
+
+of
+
+FM𝜂+IL1L,
+
+where
+
+𝑃1’s input is the same in both invocations and the same assumptions
+
+are made as for the expression of FMℓ−IL1L above. The cost of FM𝑛UX is
+
+2𝜆
+
++
+
+4𝜂
+
+bits,
+
+and
+
+thus,
+
+the
+
+total
+
+cost
+
+is
+
+3 2
+
+𝜆
+
+(𝜂
+
++
+
+1)
+
++
+
+31𝜂
+
+−
+
+13,
+
+which
+
+can
+
+be rewritten as
+
+<
+
+3 2
+
+𝜆
+
+(𝜂
+
++ 1)
+
++ 31𝜂. Concretely, we get the
+
+best
+
+communication for 𝜂 = 32 by taking 𝑚 = 7 for the millionaire
+
+invocations, getting a total communication of 5288 bits.
+
+C PROOF OF DIVISION THEOREM
+Here, we prove Theorem 4.1.
+
+Proof. From Equation 2, we can write rdiv(⟨𝑎⟩𝑛, 𝑑) as:
+𝑖
+
+rdiv(
+
+⟨𝑎⟩𝑛,
+𝑖
+
+𝑑
+
+)
+
+=𝑛
+
+idiv(𝑎𝑖
+
+−
+
+1{𝑎𝑖
+
+≥
+
+𝑛′}
+
+· 𝑛, 𝑑)
+
+=𝑛
+
+idiv
+
+(𝑎1
+𝑖
+
+·𝑑
+
++ 𝑎0
+𝑖
+
+− 1{𝑎𝑖
+
+≥
+
+𝑛′}
+
+·
+
+(𝑛1
+
+·𝑑
+
++ 𝑛0), 𝑑)
+
+=𝑛
+
+𝑎1
+𝑖
+
+−
+
+1{𝑎𝑖
+
+≥
+
+′
+𝑛
+
+}
+
+·
+
+𝑛1
+
++ idiv(𝑎𝑖0
+
+− 1{𝑎𝑖
+
+≥
+
+′
+𝑛
+
+}
+
+·
+
+𝑛0,
+
+𝑑
+
+),
+
+(3)
+
+for 𝑖 ∈ {0, 1}. 𝑎𝑢 can be expressed as 𝑎𝑢 = 𝑎0 + 𝑎1 − 𝑤 · 𝑛, where the wrap-bit 𝑤 = 1{𝑎0 + 𝑎1 ≥ 𝑛}. We can rewrite this as:
+
+𝑎𝑢 = 𝑎0 + 𝑎1 − 𝑤 · 𝑛 = (𝑎10 + 𝑎11 − 𝑤 · 𝑛1) · 𝑑 + (𝑎00 + 𝑎01 − 𝑤 · 𝑛0) = (𝑎10 + 𝑎11 − 𝑤 · 𝑛1 + 𝑘) · 𝑑 + (𝑎00 + 𝑎01 − 𝑤 · 𝑛0 − 𝑘 · 𝑑), (4)
+
+for some integer 𝑘 such that 0 ≤ 𝑎00 + 𝑎01 − 𝑤 · 𝑛0 − 𝑘 · 𝑑 < 𝑑. Similar to Equation 3 and from Equation 4, we can write rdiv(𝑎, 𝑑) as:
+
+rdiv(𝑎, 𝑑) =𝑛 𝑎10 + 𝑎11 − 𝑤 · 𝑛1 + 𝑘 − 1{𝑎 ≥ 𝑛′} · 𝑛1
+
++ idiv(𝑎00 + 𝑎01 − 𝑤 · 𝑛0 − 𝑘 · 𝑑 − 1{𝑎 ≥ 𝑛′} · 𝑛0, 𝑑)
+
+=𝑛
+
+𝑎10
+
++
+
+𝑎11
+
+−
+
+𝑤
+
+·
+
+𝑛1
+
+−
+
+1{𝑎
+
+≥
+
+′
+𝑛
+
+}
+
+·
+
+𝑛1
+
++ idiv(𝑎00 + 𝑎01 − 𝑤 · 𝑛0 − 1{𝑎 ≥ 𝑛′} · 𝑛0, 𝑑). (5)
+
+From Equations 3 and 5, we have the following correction term:
+
+𝑐 =𝑛 rdiv(𝑎, 𝑑) − rdiv(⟨𝑎⟩0𝑛, 𝑑) − rdiv(⟨𝑎⟩1𝑛, 𝑑)
+
+=𝑛
+
+1{𝑎0
+
+≥
+
+𝑛′}
+
++
+
+1{𝑎1
+
+≥
+
+′
+𝑛
+
+}
+
+−𝑤
+
+−
+
+1{𝑎
+
+≥
+
+𝑛′}
+
+· 𝑛1
+
++ idiv(𝑎00 + 𝑎01 − 𝑤 · 𝑛0 − 1{𝑎 ≥ 𝑛′} · 𝑛0, 𝑑)
+
+(6)
+
+− idiv(𝑎00 − 1{𝑎0 ≥ 𝑛′} · 𝑛0, 𝑑) + idiv(𝑎01 − 1{𝑎1 ≥ 𝑛′} · 𝑛0, 𝑑)
+
+=𝑛 𝑐1 · 𝑛1 + 𝑐0 − 𝐵
+
+(7)
+
+16
+
+# 1{𝑎0 ≥ 𝑛′} 1{𝑎1 ≥ 𝑛′} 1{𝑎𝑢 ≥ 𝑛′} 𝑤 𝑐1 𝑐0
+
+1
+
+0
+
+2
+
+0
+
+3
+
+0
+
+4
+
+0
+
+5
+
+1
+
+6
+
+1
+
+7
+
+1
+
+8
+
+1
+
+0 0 1 1 0 0 1 1
+
+0 1 0 1 0 1 0 1
+
+0 0 1 0 1 0 1 1
+
+0 -1 0 0 0 0 1 0
+
+𝐴𝐴01′′′ 𝐴𝐴𝐴𝐴𝐴𝐴111112′′′′′
+
+Table 8: Truth table for the correction terms 𝑐0 and 𝑐1 in the
+
+proof of division theorem (Appendix C).
+
+Let
+
+′
+𝐴
+𝑖
+
+=
+
+idiv(𝑎00
+
++
+
+𝑎01
+
+−
+
+𝑖
+
+·
+
+𝑛0,
+
+𝑑).
+
+Then
+
+the
+
+values
+
+of
+
+the
+
+correction
+
+terms 𝑐1 and 𝑐0 are as summarized in Table 8.
+
+From the table, we have 𝑐1 = corr and can rewrite the correction
+
+term as 𝑐 =𝑛 corr · 𝑛1 + 𝑐0 − 𝐵. Thus, adding corr · 𝑛1 − 𝐵 mod 𝑛 to
+
+rdiv(⟨𝑎⟩0𝑛, 𝑑) + rdiv(⟨𝑎⟩1𝑛, 𝑑) accounts for all the correction terms except 𝑐0 mod 𝑛.
+Now all that remains to be proven is that 𝑐0 = 1 − 𝐶. Let
+
+𝐶0 = 1{𝐴 < 𝑑 }, 𝐶1 = 1{𝐴 < 0}, and 𝐶2 = 1{𝐴 < −𝑑 }. Then,
+we have 𝐶 = 𝐶0 + 𝐶1 + 𝐶2. Note from the theorem statement that 𝐴 = 𝑎00 + 𝑎01 and 𝐴 = 𝑎00 + 𝑎01 − 2 · 𝑛0 for the cases corresponding to rows 1 and 8 respectively from the table, while 𝐴 = 𝑎00 + 𝑎01 − 𝑛0 for the rest of cases. Thus, it is easy to see that 𝑐0 = idiv(𝐴, 𝑑). Also note that −2 · 𝑑 + 2 ≤ 𝐴 ≤ 2 · 𝑑 − 2, implying that the range of 𝑐0 is {−2, −1, 0, 1}. Now we look at each value assumed by 𝑐0 separately
+
+as follows:
+
+• 𝑐0 = −2: In this case, we have (𝐴 < −𝑑), implying 𝐶0 = 𝐶1 = 𝐶2 = 1, and 1 − 𝐶 = −2.
+• 𝑐0 = −1: In this case, we have (−𝑑 ≤ 𝐴 < 0), implying
+
+𝐶0 = 𝐶1 = 1, 𝐶2 = 0 and 1 − 𝐶 = −1. • 𝑐0 = 0: In this case, we have (0 ≤ 𝐴 < 𝑑), implying 𝐶0 =
+1, 𝐶1 = 𝐶2 = 0 and 1 − 𝐶 = 0. • 𝑐0 = 1: In this case, we have (𝑑 ≤ 𝐴), implying 𝐶0 = 𝐶1 =
+𝐶2 = 0 and 1 − 𝐶 = 1.
+
+Thus, 𝑐 =𝑛 corr · 𝑛1 + (1 − 𝐶) − 𝐵 =𝑛 rdiv(𝑎, 𝑑) − rdiv(⟨𝑎⟩0𝑛, 𝑑) −
+
+rdiv(⟨𝑎⟩1𝑛, 𝑑).
+
+□
+
+D PROTOCOL FOR GENERAL DIVISION
+We describe our protocol for general division formally in Algorithm 9. As discussed in Section 4.2.2, our protocol builds on Theorem 4.1 and we compute the various sub-terms securely using our new protocols. Let 𝛿 = ⌈log 6𝑑⌉. We compute the shares of corr over both Z𝑛 and ZΔ (Step 15). We write the term 𝐶 as (DReLU(𝐴 − 𝑑) ⊕ 1) + (DReLU(𝐴) ⊕ 1) + (DReLU(𝐴 + 𝑑) ⊕ 1), which can be computed using three calls to FDinRte,𝛿LU (Step 19) and FB𝑛2A (Step 20) each.
+Correctness and Security. First, 𝑚 = Reconst𝐵 (⟨𝑚⟩0𝐵, ⟨𝑚⟩1𝐵) = Reconst𝐵 (⟨𝛼⟩0𝐵, ⟨𝛼⟩1𝐵) = 1{𝑎 ≥ 𝑛′}. Next, similar to Algorithm 5, Reconst𝐿 (⟨corr⟩0𝐿, ⟨corr⟩1𝐿) = corr = ReconstΔ (⟨corr⟩0Δ, ⟨corr⟩1Δ), where corr is as defined in Theorem 4.1. Given the bounds on value of 𝐴 (as discussed above), it easy to see that Steps 16&17 compute arithmetic shares of 𝐴, and 𝐴0 = (𝐴 − 𝑑), 𝐴1 = 𝐴, 𝐴2 =
+
+Algorithm 9 Integer ring division, ΠrDinIVg,𝑛,𝑑 :
+
+Input:
+
+For 𝑏
+
+∈ {0, 1}, 𝑃𝑏
+
+holds ⟨𝑎⟩𝑛, where 𝑎
+𝑏
+
+∈
+
+Z𝑛 .
+
+Output:
+
+For 𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+learns
+
+⟨𝑧⟩𝑛
+𝑏
+
+s.t.
+
+𝑧
+
+=
+
+rdiv(𝑎, 𝑑).
+
+1:
+
+For 𝑏
+
+∈
+
+{0,
+
+1},
+
+let
+
+𝑎𝑏 ,
+
+𝑎0
+𝑏
+
+,
+
+𝑎1
+𝑏
+
+∈ Z and 𝑛0, 𝑛1, 𝑛′ ∈ Z be as defined
+
+in Theorem 4.1. Let 𝜂 = ⌈log(𝑛)⌉, 𝛿 = ⌈log 6𝑑⌉, and Δ = 2𝛿 .
+
+2:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+invokes FDriRnegL,𝑛U
+
+with input
+
+⟨𝑎⟩𝑛
+𝑏
+
+to learn
+
+3:
+
+output For 𝑏 ∈
+
+⟨𝛼
+
+⟩𝐵
+𝑏
+
+.
+
+Party
+
+𝑃𝑏
+
+{0, 1}, 𝑃𝑏 sets
+
+sets 𝑥𝑏 =
+
+⟨𝑚⟩𝐵 =
+𝑏
+1{⟨𝑎⟩𝑛
+𝑏
+
+⟨𝛼⟩𝐵 ⊕ ≥ 𝑛𝑏′}.
+
+𝑏.
+
+4: 𝑃0 samples ⟨corr⟩0𝑛 ←$ Z𝑛 and ⟨corr⟩0Δ ←$ ZΔ.
+
+5: for 𝑗 = {00, 01, 10, 11} do
+
+6: 𝑃0 computes 𝑡 𝑗 = (⟨𝑚⟩0𝐵 ⊕ 𝑗0 ⊕ 𝑥0) ∧ (⟨𝑚⟩0𝐵 ⊕ 𝑗0 ⊕ 𝑗1) s.t. 𝑗 = (𝑗0||𝑗1).
+
+7: if 𝑡 𝑗 ∧ 1{𝑥0 = 0} then
+
+8:
+
+𝑃0 sets 𝑠 𝑗 =𝑛 −⟨corr⟩0𝑛 − 1 and 𝑟 𝑗 =Δ −⟨corr⟩0Δ − 1.
+
+9: else if 𝑡 𝑗 ∧ 1{𝑥0 = 1} then
+
+10:
+
+𝑃0 sets 𝑠 𝑗 =𝑛 −⟨corr⟩0𝑛 + 1 and 𝑟 𝑗 =Δ −⟨corr⟩0Δ + 1.
+
+11: else
+
+12:
+
+𝑃0 sets 𝑠 𝑗 =𝑛 −⟨corr⟩0𝑛 and 𝑟 𝑗 =Δ −⟨corr⟩0Δ.
+
+13: end if
+
+14: end for
+
+15:
+
+𝑃0 & 𝑃1 invoke an instance of
+
+4 1
+
+-OT𝜂+𝛿
+
+where 𝑃0
+
+is
+
+the sender
+
+with inputs {𝑠 𝑗 ||𝑟 𝑗 }𝑗 and 𝑃1 is the receiver with input ⟨𝑚⟩1𝐵 ||𝑥1.
+
+𝑃1 sets its output as ⟨corr⟩1𝑛 ||⟨corr⟩1Δ.
+
+16:
+
+For 𝑏
+
+∈ {0, 1}, 𝑃𝑏
+
+sets ⟨𝐴⟩Δ
+𝑏
+
+=Δ
+
+𝑎0
+𝑏
+
+−
+
+(𝑥𝑏
+
+− ⟨corr⟩Δ) · 𝑛0.
+𝑏
+
+17:
+
+For 𝑏
+
+∈
+
+{0, 1}, 𝑃𝑏
+
+sets ⟨𝐴0⟩𝑏Δ
+
+=Δ
+
+⟨𝐴⟩Δ − 𝑏
+𝑏
+
+· 𝑑, ⟨𝐴1⟩𝑏Δ
+
+=
+
+⟨𝐴⟩Δ,
+𝑏
+
+and
+
+⟨𝐴2⟩𝑏Δ
+
+=Δ
+
+⟨𝐴⟩Δ
+𝑏
+
++𝑏
+
+· 𝑑.
+
+18: for 𝑗 = {0, 1, 2} do
+
+19:
+
+For
+
+𝑏
+
+∈
+
+{0,
+
+1},
+
+𝑃𝑏
+
+invokes
+
+FDinRte,𝛿LU
+
+with
+
+input
+
+⟨𝐴
+
+𝑗
+
+⟩Δ
+𝑏
+
+to
+
+learn
+
+output
+
+⟨𝛾
+
+𝑗
+
+⟩𝐵
+𝑏
+
+.
+
+Party
+
+𝑃𝑏
+
+sets
+
+⟨𝐶 ′⟩𝐵
+𝑗𝑏
+
+=
+
+⟨𝛾
+
+𝑗
+
+⟩𝐵
+𝑏
+
+⊕
+
+𝑏.
+
+20: For 𝑏 ∈ {0, 1}, 𝑃𝑏 invokes an instance of FB𝑛2A with input
+
+⟨𝐶 ′⟩𝐵
+𝑗𝑏
+
+and
+
+learns
+
+⟨𝐶
+
+𝑗
+
+⟩𝑛
+𝑏
+
+.
+
+21: end for
+
+22:
+
+For 𝑏
+
+∈ {0, 1}, 𝑃𝑏
+
+sets ⟨𝐶⟩𝑛
+𝑏
+
+=
+
+⟨𝐶0⟩𝑏𝑛
+
++
+
+⟨𝐶1
+
+⟩𝑛
+𝑏
+
++
+
+⟨𝐶2 ⟩𝑏𝑛 .
+
+23:
+
+For 𝑏
+
+∈ {0, 1}, 𝑃𝑏
+
+sets 𝐵𝑏
+
+= idiv(𝑎0
+𝑏
+
+− 𝑥𝑏
+
+· 𝑛0, 𝑑).
+
+24:
+
+𝑃𝑏
+
+sets ⟨𝑧⟩𝑛
+𝑏
+
+=𝑛
+
+rdiv ( ⟨𝑎⟩𝑛 ,
+𝑏
+
+𝑑)
+
++
+
+⟨corr⟩𝑛
+𝑏
+
+·
+
+𝑛1
+
++
+
+𝑏
+
+−
+
+⟨𝐶 ⟩𝑛
+𝑏
+
+−
+
+𝐵𝑏
+
+,
+
+for
+
+𝑏 ∈ {0, 1}.
+
+(𝐴 + 𝑑), respectively. Now, invocation of FDinRte,𝛿LU on shares of 𝐴𝑗
+
+(Step 19) returns boolean shares of 𝛾 = (1 ⊕ MSB(𝐴𝑗 )) over 𝛿 bit
+
+integers, which is same as 1 ⊕ 1{𝐴𝑗
+
+<
+
+0}
+
+over
+
+Z.
+
+Hence,
+
+𝐶′
+𝑗
+
+=
+
+Reconst𝐵
+
+( ⟨𝐶
+
+′ 𝑗
+
+⟩0𝐵
+
+,
+
+⟨𝐶
+
+′⟩1𝐵
+
+)
+
+=
+
+1{𝐴 𝑗
+
+<
+
+0}. By correctness of FB𝑛2A,
+
+step 22 computes arithmetic shares of 𝐶 as defined in Theorem 4.1.
+
+In step 23, 𝐵0 + 𝐵1 =𝑛 𝐵 as defined. Hence, correctness holds and
+
+⟨𝑧⟩𝑛 are shares of rdiv(𝑎, 𝑑).
+𝑏
+Given that ⟨corr⟩0𝑛 and ⟨corr⟩0Δ are uniformly random, security
+
+of
+
+the
+
+protocol
+
+is
+
+easy
+
+to
+
+see
+
+in
+
+(
+
+4 1
+
+-OT𝜂+𝛿 , FDinRte,𝛿LU, FB𝑛2A)-hybrid.
+
+Communication complexity. ΠrDinIVg,𝑛,𝑑 involves a single call to FDriRnegL,𝑛U
+
+and
+
+4 1
+
+-OT𝜂+𝛿 ,
+
+and
+
+three
+
+calls
+
+each
+
+to
+
+FDinRte,𝛿LU
+
+and
+
+FB𝑛2A.
+
+From
+
+Appendix
+
+B,
+
+we
+
+have
+
+the
+
+cost
+
+of
+
+FDriRnegL,𝑛U
+
+as
+
+3 2
+
+𝜆𝜂
+
++ 27𝜂
+
+−
+
+𝜆 2
+
+−
+
+13
+
+bits.
+
+4 1
+
+-OT𝜂+𝛿
+
+and
+
+3
+
+×
+
+FB𝑛2A
+
+cost
+
+2𝜆
+
++
+
+4
+
+·
+
+(𝜂
+
++
+
+𝛿)
+
+and
+
+3𝜆
+
++
+
+3𝜂
+
+bits
+
+respectively.
+
+Since
+
+the
+
+cost
+
+of
+
+FDinRte,ℓLU
+
+is
+
+𝜆ℓ
+
++
+
+13
+
+1 2
+
+ℓ
+
+−
+
+3𝜆
+
+−
+
+35
+
+1 2
+
+bits
+
+(see
+
+Appendix
+
+B),
+
+3
+
+×
+
+FDinRte,𝛿LU
+
+requires
+
+3𝜆𝛿
+
++
+
+40
+
+1 2
+
+𝛿
+
+−
+
+9𝜆
+
+−
+
+106
+
+1 2
+
+bits
+
+of communication. Thus, the overall communication of ΠrDinIVg,𝑛,𝑑 is
+
+3 2
+
+𝜆𝜂
+
++
+
+34𝜂
+
++
+
+3𝜆𝛿
+
++
+
+44
+
+1 2
+
+𝛿
+
+−
+
+4
+
+1 2
+
+𝜆
+
+−
+
+119
+
+1 2
+
+,
+
+which
+
+can
+
+be
+
+rewritten
+
+as
+
+<
+
+(
+
+3 2
+
+𝜆
+
++
+
+34)
+
+·
+
+(𝜂
+
++
+
+2𝛿
+
+)
+
+.
+
+Concretely, we
+
+get
+
+the
+
+best communication for
+
+ΠrDinIVg,𝑛,49 (𝜂 = 32) by setting 𝑚 = 7 in all our millionaire invocations,
+
+which results in a total communication of 7796 bits.
+
+Note that for the case of ℓ-bit integers, our division protocol
+
+would require a call to FDinRte,ℓLU and
+
+4 1
+
+-OTℓ+𝛿 ,
+
+and
+
+three
+
+calls
+
+each
+
+to FDinRte,𝛿LU and FB𝐿2A. The cost of FDinRte,ℓLU and 3 × FDinRte,𝛿LU are as
+
+mentioned in the previous paragraph, and the cost of
+
+4 1
+
+-OTℓ +𝛿
+
+and FB𝐿2A are 2𝜆 + 4 · (ℓ + 𝛿) and 3𝜆 + 3ℓ bits respectively. Thus, the
+
+overall
+
+communication
+
+is
+
+𝜆ℓ
+
++
+
+3𝜆𝛿
+
++
+
+20
+
+1 2
+
+ℓ
+
++
+
+44
+
+1 2
+
+𝛿
+
+−
+
+7𝜆
+
+−
+
+142
+
+bits,
+
+which can be rewritten as < (𝜆 + 21) · (ℓ + 3𝛿). By setting 𝑚 = 8 in
+
+all our millionaire invocations, we get the best communication of 5570 bits for ΠiDnItV,32,49.
+
+E INPUT ENCODING
+Neural network inference performs computations on floatingpoint numbers, whereas the secret-sharing techniques only work for integers in a ring Z𝑛, for any 𝑛 ∈ N.12
+To represent a floating-point number 𝑥 ∈ Q in the ring Z𝑛, we encode it as a fixed-point integer 𝑎 = ⌊𝑥 · 2𝑠 ⌋ mod 𝑛 with scale 𝑠. Fixed-point arithmetic is performed on the encoded input values (in the secure domain) and the same scale 𝑠 is maintained for all the intermediate results. The ring size 𝑛 and the scale 𝑠 are chosen such that the absolute value of any intermediate result does not exceed the bound ⌊𝑛/2⌋ and there is no loss in accuracy (refer Appendix I).
+
+F IMPROVEMENT TO GAZELLE’S
+
+ALGORITHM
+
+Gazelle [43] proposed two methods for computing convolutions,
+
+namely, the input rotations and the output rotations method. The
+
+only difference between the two methods is the number of (homomorphic) rotations required13. In this section, we describe an
+
+optimization to reduce the number of rotations required by the
+
+output rotations method.
+
+Let 𝑐𝑖 and 𝑐𝑜 denote the number of input and output channels
+
+respectively, and 𝑐𝑛 denote the number of channels that can fit in
+
+a single ciphertext. At a high level, the output rotations method
+
+works as follows: after performing all the convolutions homomor-
+
+phically, we have 𝑐𝑖 · 𝑐𝑜 /𝑐𝑛 intermediate ciphertexts that are to
+
+be accumulated to form tightly packed output ciphertexts. Since
+
+most of these ciphertexts are misaligned after the convolution, they
+
+must be rotated in order to align and pack them. The intermediate
+
+ciphertexts can be grouped into 𝑐𝑜 /𝑐𝑛 groups of 𝑐𝑖 ciphertexts each,
+
+such that the ciphertexts within each group are added (after align-
+
+ment) to form a single ciphertext. In [43], the ciphertexts within
+
+each
+
+group
+
+are
+
+rotated
+
+(aligned)
+
+individually,
+
+resulting
+
+in
+
+≈
+
+𝑐𝑖
+
+·
+
+𝑐𝑜 𝑐𝑛
+
+rotations. We observe that these groups can be further divided into
+
+12Note that this includes the case of ℓ-bit integers when 𝑛 = 2ℓ . 13The number of homomorphic additions also differ, but they are relatively very cheap.
+
+17
+
+Benchmark
+
+Bitwidth
+
+Scale
+
+TF Top 1
+
+Fixed Top 1
+
+TF Top 5
+
+Fixed Top 5
+
+SqueezeNet
+
+32
+
+ResNet50
+
+37
+
+DenseNet121 32
+
+9 55.86 55.90 79.18 79.22 12 76.47 76.45 93.21 93.23 11 74.25 74.35 91.88 91.90
+
+Table 10: Summary of the accuracy achieved by fixed-point
+
+code vs input TensorFlow (TF) code.
+
+Benchmark
+SqueezeNet ResNet50 DenseNet121
+
+Garbled Circuits LAN WAN Comm
+0.2 2.0 36.02 0.4 3.9 96.97 17.2 179.4 6017.94
+(a) over Z2ℓ
+
+Our Protocol LAN WAN Comm
+0.1 0.8 1.84 0.1 0.8 2.35 0.5 3.5 158.83
+
+Benchmark
+
+Garbled Circuits
+
+Our Protocol
+
+LAN WAN Comm LAN WAN Comm
+
+SqueezeNet 0.2 2.2 39.93 0.1 ResNet50 0.4 4.2 106.22 0.1 DenseNet121 19.2 198.2 6707.94 0.6
+
+0.9 1.92 1.0 3.82 4.4 214.94
+
+(b) over Z𝑛
+
+Table 9: Performance comparison of Garbled Circuits with our protocols for computing Avgpool layers. Runtimes are in seconds and communication numbers are in MiB.
+
+𝑐𝑛 subgroups of 𝑐𝑖 /𝑐𝑛 ciphertexts each, such that ciphertexts within
+
+a subgroup are misaligned by the same offset. Doing this has the
+
+advantage that the 𝑐𝑖 /𝑐𝑛 ciphertexts within each subgroup can first
+
+be added and then the resulting ciphertext can be aligned using
+
+a single rotation. This brings down the number of rotations by a
+
+factor
+
+of
+
+𝑐𝑖 /𝑐𝑛
+
+to
+
+≈
+
+𝑐𝑛
+
+·
+
+𝑐𝑜 𝑐𝑛
+
+.
+
+With our optimization, the output rotations method is better
+
+than the input rotations method when 𝑓 2 · 𝑐𝑖 > 𝑐𝑜 , where 𝑓 2 is the
+
+filter size, which is usually the case.
+
+G COMPLEXITY OF OUR BENCHMARKS
+The complexity of the benchmarks we use in Section 7 is summarized as follows:
+• SqueezeNet: There are 26 convolution layers of maximum filter size 3 × 3 and up to 1000 output channels. The activations after linear layers are ReLUs with size of up to 200,704 elements per layer. All ReLU layers combined have a size of
+
+2,033,480. Additionally, there are 3 Maxpool layers and an Avgpool169 layer (Avgpool with pool size 169). • ResNet50: There are 53 convolution layers of maximum filter size 7 × 7 and a peak output channel count of 2048. Convolution layers are followed by batch normalization and then ReLUs. There are 49 ReLU layers totaling 9,006,592 ReLUs, where the biggest one consists of 802,816 elements. Moreover, ResNet50 also has Maxpool layers and an Avgpool49. • DenseNet121: There are 121 convolution layers with maximum filter dimension of 7 × 7 and up to 1000 output channels. Similar to ResNet50, between 2 convolution layers, there is batch normalization followed by ReLU. The biggest ReLU layer in DenseNet121 has 802,816 elements and the combined size of all ReLU layers is 15,065,344. In addition, DenseNet121 consists of a Maxpool, an Avgpool49 and 3 Avgpool4 layers.
+H GARBLED CIRCUITS VS OUR PROTOCOLS
+FOR Avgpool
+In this section, we compare our protocols with garbled circuits for evaluating the Avgpool layers of our benchmarks, and the corresponding performance numbers are given in Table 9. On DenseNet121, where a total of 176, 640 divisions are performed, we have improvements over GC of more than 32× and 45× in the LAN and the WAN setting, respectively, for both our protocols. However, on SqueezeNet and ResNet50, the improvements are smaller (2× to 7×) because these DNNs only require 1000 and 2048 divisions, respectively, which are not enough for the costs in our protocols to amortize well. On the other hand, the communication difference between our protocols and GC is huge for all three DNNs. Specifically, we have an improvement of more than 19×, 27×, and 31× on SqueezeNet, ResNet50, and DenseNet121 respectively, for both our protocols.
+I FIXED-POINT ACCURACY OF OUR
+BENCHMARKS
+In this section, we show that the accuracy achieved by the fixedpoint code matches the accuracy of the input TensorFlow code. Table 10 summarizes the bitwidths, the scales, and the corresponding TensorFlow (TF) and fixed-point accuracy for each of our benchmarks. Since our truncation and division protocols lead to faithful implementation of fixed-point arithmetic, accuracy of secure inference is the same as the fixed-point accuracy.
+
+18
+

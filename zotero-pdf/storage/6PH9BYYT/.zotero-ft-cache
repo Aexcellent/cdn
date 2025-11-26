@@ -1,0 +1,240 @@
+ 
+Your Privacy 
+ 
+We use cookies to make sure that our website works properly, as well as some ‘optional’ cookies to personalise content and advertising, provide social media features and analyse how people use our site. By accepting some or all optional cookies you give consent to the processing of your personal data, including transfer to third parties, some in countries outside of the European Economic Area that do not offer the same data protection standards as the country where you live. You can decide which optional cookies to accept by clicking on ‘Manage Settings’, where you can also find more information about how your personal data is processed. Further information can be found in our privacy policy . 
+Accept All Cookies Manage Preferences 
+Skip to main content 
+ 
+Advertisement 
+SpringerLink 
+Search 
+Go to cart 
+ 
+    Log in 
+ 
+    Published: 25 May 2019 
+ 
+A big video data transcoding service for social media over federated clouds 
+ 
+    Alfonso Panarello , 
+    Antonio Celesti   , 
+    Maria Fazio , 
+    … 
+    Antonio Puliafito & 
+    Massimo Villari   
+ 
+Multimedia Tools and Applications volume  79 ,  pages 9037–9061 ( 2020 ) Cite this article 
+ 
+    281 Accesses 
+ 
+    2 Citations 
+ 
+    Metrics details 
+ 
+Abstract 
+ 
+Nowadays, the advent of social networks have revolutionised the traditional communication media. In recent years, the number of social media providers has rapidly grown. In this context, one of the major problems is the on-demand video streaming provisioning. In fact, more and more users require to post and access in real-time videos from anywhere in a short time. Therefore, a denial of service condition can cause for social media providers a loss of users and a consequent lose of money. Commonly, videos, before to be delivered, must be transcoded in order to fits both users’ hardware/software device and network capabilities, raising a big video data processing issue. In order to address such a concern, in this paper, we propose a Cloud federation system that enables social media providers to work together so as to take the advantages of a scalable video processing service. Experimental results demonstrate how the overhead due to setup and maintenance tasks of the federated environment is negligible compared to the benefits in terms of video transcoding performance. Moreover, we also demonstrate how Cloud federation can lighten and speed up the whole video processing service, by introducing an additional parallelization level. 
+ 
+This is a preview of subscription content, access via your institution . 
+References 
+ 
+    Aazam M, Huh EN (2017) Cloud broker service-oriented resource management model. Transactions on Emerging Telecommunications Technologies 28(2):1–17 
+ 
+    Adobe Systems Software. HTTP Dynamic Streaming, https://www.adobe.com/devnet/hds.html [accessed on February 21st, 2019] 
+ 
+    Aishwarya K, Ram AA, Sreevatson M, Babu C, Prabavathy B (2013) Efficient prefetching technique for storage of heterogeneous small files in hadoop distributed file system federation. In: 2013 Fifth international conference on advanced computing (ICoAC), pp. 523–530 
+ 
+    Apple Inc. HTTP Live Streaming Overview, https://developer.apple.com/streaming [accessed on February 21st, 2019] 
+ 
+    Bonacquisto P, Modica G, Petralia G, Tomarchio O (2015) A procurement auction market to trade residual cloud computing capacity. IEEE Trans Cloud Comput 3(3):345–357 
+ 
+    Article   Google Scholar   
+ 
+    Bernstein D, Demchenko Y (2013) The ieee intercloud testbed - creating the global cloud of clouds. In: IEEE Cloudcom 2013, vol 2, pp 45–50 
+ 
+    Bisignano M, Di Modica G, Tomarchio O, Vita L (2007) P2p over manet: a comparison of cross-layer approaches. In: Proceedings - International Workshop on Database and Expert Systems Applications, DEXA, pp 814–818 
+ 
+    Celesti A, Tusa F, Villari M, Puliafito A (2010) How to enhance cloud architectures to enable cross-federation. In: IEEE 3Rd international conference on cloud computing, pp 337–345. https://doi.org/10.1109/CLOUD.2010.46 
+ 
+    Celesti A, Fazio M, Villari M (2013) Se clever: a secure message oriented middleware for cloud federation. In: IEEE Symposium on computers and communications (ISCC), pp 35–40 
+ 
+    Celesti A, Fazio M, Villari M, Puliafito a (2013) SE CLEVER: a secure message oriented middleware for cloud federation. In: IEEE Symposium on computers and Communications (ISCC 2013). Split, Croatia 
+ 
+    Celesti A, Fazio M, Villari M, Puliafito A (2016) Adding long-term availability, obfuscation, and encryption to multi-cloud storage systems. J Netw Comput Appl 59:208–218 
+ 
+    Article   Google Scholar   
+ 
+    Celesti A, Fazio M, Villari M (2017) Enabling secure xmpp communications in federated iot clouds through xep 0027 and saml/sasl sso Sensors (Switzerland) 17(2):1–21 
+ 
+    Chang Z, Jong B, Wong W, Wong M (2017) Distributed video transcoding on a heterogeneous computing platform. In: 2016 IEEE Asia pacific conference on circuits and systems, APCCAS 2016, pp 444–447 
+ 
+    Drüppel J, Grenke R, Taschik D The Dubsmash Video Tool, http://www.dubsmash.com [accessed on February 21st, 2019] 
+ 
+    Di Modica G, Tomarchio O, Vita L (2011) Resource and service discovery in soas: a p2p oriented semantic approach. Int J Appl Math Comput Sci 21(2):285–294 
+ 
+    Article   Google Scholar   
+ 
+    Díaz-Sánchez D, Sánchez-Guerrero R, Arias P, Almenarez F, Marín A (2016) A distributed transcoding and content protection system: Enabling pay per quality using the cloud. Telecommun Syst 61(1):59–76 
+ 
+    Article   Google Scholar   
+ 
+    Dong B, Qiu J, Zheng Q, Zhong X, Li J, Li Y (2010) A novel approach to improving the efficiency of storing and accessing small files on hadoop: a case study by powerpoint files. In: 2010 IEEE International conference on services computing (SCC), pp 65–72 
+ 
+    Dong B, Zheng Q, Tian F, Chao KM, Ma R, Anane R (2012) An optimized approach for storing and accessing small files on cloud storage. J Netw Comput Appl 35(6):1847–1862 
+ 
+    Article   Google Scholar   
+ 
+    Farhad S, Bappi M, Ghosh A (2017) Dynamic resource provisioning for video transcoding in iaas cloud. In: Proceedings - 18th IEEE International Conference on High Performance Computing and Communications, 14th IEEE International Conference on Smart City and 2nd IEEE International Conference on Data Science and Systems, HPCC/SmartCity/DSS 2016, pp 380–384 
+ 
+    Gao G, Wen Y, Westphal C (2016) Resource provisioning and profit maximization for transcoding in information centric networking, pp 97–102 
+ 
+    Guo J, Song B, Du X (2016) Significance evaluation of video data over media cloud based on compressed sensing. IEEE Trans Multimed 18(7):1297–1304 
+ 
+    Article   Google Scholar   
+ 
+    He Q, Liu J, Wang C, Li B (2016) Coping with heterogeneous video contributors and viewers in crowdsourced live streaming: a cloud-based approach. IEEE Trans Multimed 18(5):916–928 
+ 
+    Article   Google Scholar   
+ 
+    He Q, Zhang C, Liu J (2017) Utilizing massive viewers for video transcoding in crowdsourced live streaming. In: IEEE International conference on cloud computing, CLOUD, pp 116–123 
+ 
+    Huang JC, Wu CY, Chen JJ (2015) On high efficient cloud video transcoding. In: 2015 International symposium on intelligent signal processing and communication systems (ISPACS), pp 170–173 
+ 
+    Huang CC, Chen JJ, Tsai YH (2016) A dynamic and complexity aware cloud scheduling algorithm for video transcoding. In: 2016 IEEE International conference on multimedia expo workshops (ICMEW), pp 1–6 
+ 
+    Jiang L, Li B, Song M (2010) The optimization of hdfs based on small files. In: 2010 3Rd IEEE international conference on broadband network and multimedia technology (IC-BNMT), pp 912–915 
+ 
+    Kim M, Cui Y, Han S, Lee H (2013) Towards efficient design and implementation of a hadoop-based distributed video transcoding system in cloud computing environment. Int J Multimed Ubiq Eng 8(2):213–224 
+ 
+    Google Scholar   
+ 
+    Li X, Salehi MA, Bayoumi M (2016) High performance on-demand video transcoding using cloud services. In: 2016 16Th IEEE/ACM international symposium on cluster, cloud and grid computing (CCGrid), pp 600–603. https://doi.org/10.1109/CCGrid.2016.50 
+ 
+    Life On Air Inc. Meerkat, http://meerkatapp.co [accessed on February 21st, 2019] 
+ 
+    Microsoft. Smooth Streaming https://www.microsoft.com/silverlight/smoothstreaming [accessed on February 21st 
+ 
+    MPEG-DASH, ISO/IEC 23009, https://www.iso.org/standard/65274.html [accessed on February 21st, 2019] 
+ 
+    Panarello A, Celesti A, Fazio M, Puliafito A, Villari M (2015) Costs of a federated and hybrid cloud environment aimed at mapreduce video transcoding. In: 2015 IEEE Symposium on computers and communication (ISCC), pp 258–263 
+ 
+    RFC 3920. Extensible Messaging and Presence Protocol (XMPP), https://www.ietf.org/rfc/rfc3920.txt [accessed on February 21st, 2019] 
+ 
+    Son S, Kim M (2017) Hvts: Hadoop-based video transcoding system for media services. IEICE Transactions on Fundamentals of Electronics. Commun Comput Sci E100A(5):1248–1253 
+ 
+    Google Scholar   
+ 
+    Statista - The Statistics Portal Statistics (2016) Statistics and facts about social media usage. https://www.statista.com/topics/1164/social-networks.AccessedonFebruary24th 
+ 
+    Twitter INC. Periscope, http://www.periscope.tv [accessed on February 21st, 2019] 
+ 
+    Wang C, Li B, Wang J, Zhang H, Chen H, Xu Y, Ma Z (2017) Single-input-multiple-ouput transcoding for video streaming. In: 2016 IEEE 18Th international workshop on multimedia signal processing, MMSP 2016 
+ 
+    Wei L, Cai J, Foh C, He B (2016) Qos-aware resource allocation for video transcoding in clouds. IEEE Transactions on Circuits and Systems for Video Technology PP(99):49–61 
+ 
+    Wei L, Cai J, Foh C, He B (2017) Qos-aware resource allocation for video transcoding in clouds. IEEE Trans Circ Syst Video Technol 27(1):49–61 
+ 
+    Article   Google Scholar   
+ 
+    Zakerinasab MR, Wang M (2015) Dependency-aware distributed video transcoding in the cloud. In: 2015 IEEE 40th conference on Local computer networks (LCN), pp 245–252 
+ 
+    Zakerinasab MR, Wang M (2015) Does chunk size matter in distributed video transcoding?. In: 2015 IEEE 23Rd international symposium on quality of service (IWQos), pp 69–70 
+ 
+    Zheng Y, Wu D, Ke Y, Yang C, Chen M, Zhang G (2016) Online cloud transcoding and distribution for crowdsourced live game video streaming. IEEE Transactions on Circuits and Systems for Video Technology PP(99):1777–1789 
+ 
+Download references 
+Author information 
+Affiliations 
+ 
+    Department of Engineering, University of Messina, Messina, Italy 
+ 
+    Alfonso Panarello, Antonio Celesti, Maria Fazio, Antonio Puliafito & Massimo Villari 
+ 
+Corresponding author 
+ 
+Correspondence to Antonio Celesti . 
+Additional information 
+Publisher’s note 
+ 
+Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations. 
+Rights and permissions 
+ 
+Reprints and Permissions 
+About this article 
+Verify currency and authenticity via CrossMark 
+Cite this article 
+ 
+Panarello, A., Celesti, A., Fazio, M. et al. A big video data transcoding service for social media over federated clouds. Multimed Tools Appl 79, 9037–9061 (2020). https://doi.org/10.1007/s11042-019-07786-9 
+ 
+Download citation 
+ 
+    Received : 09 August 2018 
+ 
+    Revised : 04 April 2019 
+ 
+    Accepted : 15 May 2019 
+ 
+    Published : 25 May 2019 
+ 
+    Issue Date : April 2020 
+ 
+    DOI : https://doi.org/10.1007/s11042-019-07786-9 
+ 
+Keywords 
+ 
+    Video transcoding 
+    Social media 
+    Cloud computing 
+    Federation  
+ 
+Access options 
+Buy single article 
+ 
+Instant access to the full article PDF. 
+ 
+USD 39.95 
+ 
+Price includes VAT (USA) 
+Tax calculation will be finalised during checkout. 
+ 
+Rent this article via DeepDyve. 
+ 
+Learn more about Institutional subscriptions 
+ 
+    Sections 
+    Figures 
+    References  
+ 
+    Abstract 
+    References 
+    Author information 
+    Additional information 
+    Rights and permissions 
+    About this article  
+ 
+Advertisement 
+ 
+Over 10 million scientific documents at your fingertips 
+Switch Edition 
+ 
+    Academic Edition 
+    Corporate Edition 
+ 
+    Home 
+    Impressum 
+    Legal information 
+    Privacy statement 
+    California Privacy Statement 
+    How we use cookies 
+    Manage cookies/Do not sell my data 
+    Accessibility 
+    FAQ 
+    Contact us 
+    Affiliate program 
+ 
+Not logged in - 154.17.2.206 
+ 
+Not affiliated 
+Springer Nature 
+ 
+© 2022 Springer Nature Switzerland AG. Part of Springer Nature . 

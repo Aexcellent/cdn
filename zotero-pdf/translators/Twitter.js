@@ -3,13 +3,13 @@
 	"translatorType": 4,
 	"label": "Twitter",
 	"creator": "Bo An, Dan Stillman",
-	"target": "^https?://([^/]+\\.)?twitter\\.com/",
+	"target": "^https?://([^/]+\\.)?(twitter|x)\\.com/",
 	"minVersion": "4.0",
 	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2021-11-18 23:00:00"
+	"lastUpdated": "2024-05-24 17:20:00"
 }
 
 /*
@@ -37,11 +37,12 @@
 */
 
 
-let titleRe = /^(?:\(\d+\) )?(.+) .* Twitter: .([\S\s]+). \/ Twitter/;
+let titleRe = /^(?:\(\d+\) )?(.+) .* (?:Twitter|X): .([\S\s]+). \/ (?:Twitter|X)/;
+let domainRe = /https?:\/\/(?:www\.)?([^/]+)+/;
 
 function detectWeb(doc, url) {
 	if (url.includes('/status/')) {
-		return "blogPost";
+		return "forumPost";
 	}
 	return false;
 }
@@ -61,7 +62,10 @@ function unshortenURLs(doc, str) {
 
 function unshortenURL(doc, tCoURL) {
 	var a = doc.querySelector('a[href*="' + tCoURL + '"]');
-	return (a ? a.textContent.replace(/…$/, '') : false) || tCoURL;
+	if (!a || !domainRe.test(a.textContent)) {
+		return tCoURL;
+	}
+	return a.textContent.replace(/…$/, '');
 }
 
 function extractURLs(doc, str) {
@@ -86,7 +90,7 @@ function doWeb(doc, url) {
 }
 
 function scrape(doc, url) {
-	var item = new Zotero.Item("blogPost");
+	var item = new Zotero.Item("forumPost");
 
 	var canonicalURL = doc.querySelector('link[rel="canonical"]').href;
 	// For unclear reasons, in some cases the URL doesn't have capitalization
@@ -146,9 +150,9 @@ function scrape(doc, url) {
 	}
 
 	item.language = attr(articleEl, 'div[lang]', 'lang');
-			
+	
 	item.creators.push({
-		lastName: author,
+		lastName: `${author} [@${canonicalURL.split('/')[3]}]`,
 		fieldMode: 1,
 		creatorType: 'author'
 	});
@@ -196,9 +200,8 @@ function scrape(doc, url) {
 		}
 	}
 	
-	var urlParts = canonicalURL.split('/');
-	item.blogTitle = '@' + urlParts[3];
-	item.websiteType = "Tweet";
+	item.forumTitle = "Twitter";
+	item.postType = "Tweet";
 	item.url = canonicalURL;
 	
 	/*
@@ -246,7 +249,7 @@ function scrape(doc, url) {
 			title += " " + (i + 1);
 		}
 		// Include domain in parentheses
-		let domain = url.match(/https?:\/\/(?:www\.)?([^/]+)+/)[1];
+		let domain = url.match(domainRe)[1];
 		if (domain != 't.co') {
 			title += ` (${domain})`;
 		}
@@ -269,20 +272,20 @@ var testCases = [
 		"defer": true,
 		"items": [
 			{
-				"itemType": "blogPost",
+				"itemType": "forumPost",
 				"title": "Zotero 3.0 beta is now available with duplicate detection and tons more. Runs outside Firefox with Chrome or Safari! http://zotero.org/blog/announcing-zotero-3-0-beta-release/",
 				"creators": [
 					{
-						"lastName": "Zotero",
+						"lastName": "Zotero [@zotero]",
 						"fieldMode": 1,
 						"creatorType": "author"
 					}
 				],
 				"date": "2011-08-22T11:52Z",
-				"blogTitle": "@zotero",
+				"forumTitle": "Twitter",
 				"language": "en",
+				"postType": "Tweet",
 				"url": "https://twitter.com/zotero/status/105608278976905216",
-				"websiteType": "Tweet",
 				"attachments": [
 					{
 						"title": "Snapshot",
@@ -306,20 +309,20 @@ var testCases = [
 		"defer": true,
 		"items": [
 			{
-				"itemType": "blogPost",
+				"itemType": "forumPost",
 				"title": "Zotero, Mendeley, EndNote. You have a lot of choices for managing your research. Here’s why we think you should choose Zotero. https://t.co/Qu2g5cGBGu",
 				"creators": [
 					{
-						"lastName": "Zotero",
+						"lastName": "Zotero [@zotero]",
 						"fieldMode": 1,
 						"creatorType": "author"
 					}
 				],
 				"date": "2018-09-05T18:30Z",
-				"blogTitle": "@zotero",
+				"forumTitle": "Twitter",
 				"language": "en",
+				"postType": "Tweet",
 				"url": "https://twitter.com/zotero/status/1037407737154596864",
-				"websiteType": "Tweet",
 				"attachments": [
 					{
 						"title": "Snapshot",
@@ -343,20 +346,20 @@ var testCases = [
 		"defer": true,
 		"items": [
 			{
-				"itemType": "blogPost",
+				"itemType": "forumPost",
 				"title": "You don’t have to send students to a site that will spam them with ads or try to charge them money just to build a bibliography. Instead, tell them about ZoteroBib, the free, open-source, privacy-protecting bibliography generator from Zotero. https://zbib.org",
 				"creators": [
 					{
-						"lastName": "Zotero",
+						"lastName": "Zotero [@zotero]",
 						"fieldMode": 1,
 						"creatorType": "author"
 					}
 				],
 				"date": "2019-03-12T21:30Z",
-				"blogTitle": "@zotero",
+				"forumTitle": "Twitter",
 				"language": "en",
+				"postType": "Tweet",
 				"url": "https://twitter.com/zotero/status/1105581965405757440",
-				"websiteType": "Tweet",
 				"attachments": [
 					{
 						"title": "Snapshot",
@@ -380,20 +383,20 @@ var testCases = [
 		"defer": true,
 		"items": [
 			{
-				"itemType": "blogPost",
+				"itemType": "forumPost",
 				"title": "Es ist 21:00 Uhr.",
 				"creators": [
 					{
-						"lastName": "Zeitansage",
+						"lastName": "Zeitansage [@DieZeitansage]",
 						"fieldMode": 1,
 						"creatorType": "author"
 					}
 				],
 				"date": "2018-01-31T20:00Z",
-				"blogTitle": "@DieZeitansage",
+				"forumTitle": "Twitter",
 				"language": "de",
+				"postType": "Tweet",
 				"url": "https://twitter.com/DieZeitansage/status/958792005034930176",
-				"websiteType": "Tweet",
 				"attachments": [
 					{
 						"title": "Snapshot",

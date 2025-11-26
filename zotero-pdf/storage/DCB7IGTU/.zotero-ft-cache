@@ -1,0 +1,708 @@
+30
+
+8
+
+2021 8
+
+OPEＲATIONS ＲESEAＲCH AND MANAGEMENT SCIENCE
+—
+
+Vol． 30 No． 8 Aug． 2021
+
+100044
+
+。 。
+
+、 —
+
+。
+
+—
+
+。
+
+—
+
+U294
+
+A
+
+AＲIMA 1007-3221 2021 08-0133-06 doi 10． 12005 / orms． 2021． 0257
+
+Ｒailway Freight Demand ForecastingBased on Decompose-ensemble Method
+
+XU Fei ＲEN Shuang School of Computer and Information Technology Beijing Jiaotong University Beijing 100044 China
+Abstract Ｒailway freight volume is affected by many factors． Accurate forecasting can provide an important reference for the future planning of the railway industry and it can also enable the railway sector to formulate transportation policies that are in line with the current freight market． Freight volume data is non-linear and unstable． It is difficult to describe the overall characteristics using traditional single prediction models for prediction and the prediction accuracy needs to be improved． Based on the principle of decomposition-ensemble this paper uses the variational modal decomposition algorithm to decompose the freight volume into high-frequency and low-frequency modes． Based on the characteristics of each modal a prediction model is established and the obtained prediction results are added up as the forecast value of the final freight volume． The empirical results show that the decomposition-ensemble forecasting method improves the accuracy of forecasting compared with the traditional single forecasting model and can be well applied in the research of railway freight volume demand forecasting． Key words railway transportation railwayfreightvolumeforecasting decompose-ensemble variational mode decomposition AＲIMA model support vector regression
+
+0
+
+“
+
+”
+
+1。 、
+。
+2
+
+。
+
+。
+
+3
+
+X11
+
+AＲIMA
+
+。
+
+2019-12-20
+
+2018YFB1201401
+
+1996-
+
+、
+
+。
+
+1981-
+
+134
+
+4
+
+“
+
+” 。Ｒudakov 5
+
+。 Guo 6
+
+GA 。
+
+GＲNN
+
+7
+
+ＲBF
+
+。Sun 8
+
+17
+
+GＲNN
+
+。 Li 9
+
+NAＲX
+
+。
+
+10
+
+1
+
+GM 1 1
+12
+。
+14
+
+2021 30 。Wang 11
+。 BP 。
+13
+。
+
+。
+
+15
+
+。 1。
+
+、
+
+—
+1
+1． 1 Zosso
+ωk
+
+f
+
+{ min ∑‖ uk ωk k
+
+δ
+
+t
+
++j πt
+
+* uk
+
+t
+
+e ‖ －jωkt 2 2
+
+1
+
+s． t． ∑uk t = f t
+
+k
+
+uk
+
+ωk
+
+。
+
+k
+
+δt
+
+j
+
+。
+—
+
+λ
+
+VMD
+
+16
+
+ft
+
+k
+
+uk 。VMD
+
+Dragomiretskiy 。
+
+L uk ωk λ
+
+= α∑‖ k
+
+δ
+
+t
+
++
+
+j πt
+
+*
+
+uk
+
+t
+
+∑ ‖f t － uk t ‖22 + ＜ λ t k
+
+e ‖ －jωkt 2 2
+
++
+
+f t －∑uk t ＞ k 2
+
+8
+
+—
+
+135
+
+λn +1
+
+un +1 k
+
+ωn +1 k 。
+
+1． 2
+
+AＲIMA
+
+AＲIMA
+
+17 。
+
+AＲIMA
+
+pdq
+
+yt = φ1 yt － 1 + φ2 yt － 2 + … + φp yt － p +
+
+εt － θ1 εt － 1 － θ2 εt － 2 － … － θq εt － q
+
+3
+
+p
+
+d
+
+q
+
+yt
+
+εt
+
+φt 、θt
+
+yt － i εt － i
+
+。
+
+AＲIMA
+
+VMD
+
+AＲIMA
+
+。
+
+1． 3
+
+SVＲ
+
+SVＲ
+
+18
+
+SVＲ
+
+f x = wT x + b
+
+4
+
+x
+
+。w b
+
+。
+
+ＲBF
+
+ＲBF
+
+SVＲ
+
+。
+
+1． 4
+
+“— ”
+
+AＲIMA
+
+3
+
+。
+
+1
+
+“— ”
+
+2
+
+2． 1 VMD
+
+“— ”
+
+2005 4
+
+2019 5
+
+2005 6
+
+4 2018 5 2019 5 。 VMD
+
+2018 VMD
+
+“— ”
+
+1
+
+3
+
+1
+
+VMD
+
+2
+
+SVＲ
+
+8
+
+2
+
+3。
+
+2
+
+3
+
+。
+
+2
+
+VMD
+
+136
+
+2021 30
+
+2． 2 AＲIMA AＲIMA
+。 1
+
+3
+AＲIMA 3
+
+2
+
+EViews
+
+ACF PACF
+
+3
+
+pq
+
+4
+
+AIC
+
+AIC
+
+。
+
+VMD
+
+IMF1
+
+EViews
+
+2p
+
+0． 05
+
+IMF1
+
+4
+
+5
+
+VMD
+。 6 1、2、10、11、12 2 2 AＲIMA 1 2 10 11 12
+
+1、2、5 。 125 2
+
+。 MA 1 2 5 2 1 2 10 11 12
+2018 6 2019 5 7。
+2 IMF1
+
+t-Statistic
+
+Augmented Dickey-Fuller test statistic
+
+Test critical values
+
+1% level 5% level 10% level
+
+－ 1． 593205 － 3． 470679 － 2． 879155 － 2． 576241
+
+AＲIIMF1
+Prob 0． 4838
+
+4 IMF1 6
+
+5 IMF1 7 AＲIMA 1 2 5 2 1 2 10 11 12
+
+8
+
+—
+
+137
+
+2． 3 SVＲ C-C
+
+19 。 ＲBF
+
+SVＲ
+
+Cσ
+
+SVＲ
+
+Cσ
+
+。
+
+PSO
+
+SVＲ
+
+5 2． 4
+SVＲ
+
+PSO 5 。
+AＲIMA
+
+AＲIMA、SVＲ、BP、
+
+VMD-AＲIMA-SVＲ
+
+。
+
+8 9。 8 9
+
+BP SVＲ
+MAPE
+
+AＲIMA
+
+、 、ＲMSE
+
+。 、
+
+3 4。
+
+8
+VMD-AＲIMA-SVＲ AＲIMA SVＲ BP
+VMD-AＲIMA-SVＲ AＲIMA SVＲ BP
+34 SVＲ
+、ＲMSE MAPE
+
+3
+4． 038 15． 264 11． 088 14． 984 13． 114
+4
+13． 861 22． 050 22． 692 26． 409 49． 683
+
+/%
+0． 090 0． 369 0． 014 0． 968 1． 781
+/%
+9． 254 15． 335 1． 227 0． 934 0． 862
+
+VMD-AＲIMA、
+
+9
+0． 021 0． 067 0． 054 0． 083 0． 067
+0． 115 0． 249 0． 309 0． 588 1． 0137
+1 2
+
+ＲMSE
+328521． 58 989367． 04 836242． 93 1287492． 53 1008222． 04
+
+MAPE
+0． 018 0． 055 0． 046 0． 070 0． 059
+
+ＲMSE
+1601． 65 2009． 37 1891． 08 4863． 82 3226． 30
+
+MAPE
+0． 108 0． 242 0． 262 0． 376 0． 561
+
+PSO
+
+。
+
+。
+
+SVＲ 。
+
+138
+
+2021 30
+
+3
+
+—
+
+VMD
+
+AＲIMA
+
+2005 4
+
+2018 5
+
+6
+
+2019 5
+
+AＲIMA-SVＲ 。
+
+SVＲ 。
+2018
+。 VMD-
+
+。
+
+1
+
+． GM 1 1
+
+J．
+
+2019 17 2
+
+44-50．
+
+2
+
+．
+
+Holt － Winters
+
+J．
+
+2017
+
+15 2 1-5 13．
+
+3
+
+．
+
+X11-AＲIMA
+
+J．
+
+2018 48
+
+17 154-161．
+
+4
+
+．
+
+J．
+
+2014 5 128-130．
+
+5 Ｒudakov K V Strizhov V V Kashirin D O et al． Selec-
+
+ting an optimal model for forecasting the volumes of
+
+railway goods transportation J ． Automation and Ｒemote
+
+Control 2017 78 1 75-87．
+
+6 Guo Z Fu J． Prediction method of railway freight volume
+
+based on genetic algorithm improved general regression
+
+neural network J ． Journal of Intelligent Systems 2018
+
+27 2 291-302．
+
+7
+
+． ＲBF
+
+J．
+
+2017 26 1
+
+47-51．
+
+8 Sun Y Lang M Wang D et al． A PSO-GＲNN model
+
+for railway freight volume prediction empirical study
+
+from china J ． Journal of Industrial Engineering and
+
+Management 2014 7 2 413-433．
+
+9 Li X Lang M． Combination prediction of railway freight
+
+volume based on support vector machine and NAＲX
+
+neural network J ． LISS 2013．
+
+10
+
+．
+
+GM 1 1
+
+J．
+
+2017 14 11 2480-2486．
+
+11 Wang P Zhang X Han B et al． Prediction model for
+
+railway freight volume with GCA-genetic algorithm-
+
+generalized neural network empirical analysis of China
+
+J ． Cluster Computing 2019 22 3 1-10．
+
+12
+
+．
+
+GＲA—PCA—GA—BP
+
+J．
+
+2017 35 1 54-58．
+
+13
+
+．
+
+LS-SVM
+
+J．
+
+2012 34 3 1-6．
+
+14
+
+．
+
+J．
+
+2009 11 2 105-106
+
+109．
+
+15
+
+．
+
+D．
+
+2012 32 17 212-215．
+
+16 Dragomiretskiy K Zosso D． Variational mode decompo-
+
+sition J ． IEEE Transaction on Signal Processing
+
+2014 62 3 531-544．
+
+17
+
+．
+
+AＲIMA
+
+J．
+
+2019 6 112-116．
+
+18
+
+． SVＲ
+
+J．
+
+2018 18
+
+2 13-19．
+
+19
+
+．
+
+D．
+
+2017．
+

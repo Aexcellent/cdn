@@ -1,0 +1,592 @@
+Int. j. inf. tecnol. (December 2018) 10(4):495–501 https://doi.org/10.1007/s41870-018-0138-8
+ORIGINAL RESEARCH
+Recommendation system techniques and related issues: a survey
+Pushpendra Kumar1 • Ramjeevan Singh Thakur1
+
+Received: 14 November 2017 / Accepted: 2 April 2018 / Published online: 7 April 2018 Ó Bharati Vidyapeeth’s Institute of Computer Applications and Management 2018
+
+Abstract Nowadays, e-commerce websites are emerging as a new market and allow the millions of product to the user for sale. The selection of product from millions of product requires an additional tool called recommendation system. The recommendation system (RS) helps the user to ﬁnd the items they are looking for. Collaborative ﬁltering is one of the techniques used in the RSs that is widely studied and used to make recommendation. In this paper, a review of the various methods, algorithms used in the recommender system, the metrics used in RSs and the challenges of recommendation system such as Cold-start, Data sparsity, Scalability, Privacy etc. have been discussed.
+Keywords Recommendation system (RS) Á Collaborative ﬁltering (CF) Á Cold-start Á Data sparsity
+1 Introduction
+With the rapid growth of information on the Internet, it has become a pervasive problem for ﬁnding relevant information from the Internet. In this era of Internet, e-commerce has been growing rapidly and allowing millions of product for sale. E-commerce users are suffering from problems of selection of a product from millions of product. Recommendation system helps the e-commerce user to select the items from millions of items [1]. A Recommender system (RS) collects information from a customer about the items
+& Pushpendra Kumar pushpendra7589@gmail.com
+1 Department of Computer Applications, Maulana Azad National Institute of Technology, Bhopal, Madhya Pradesh, India
+
+he/she is interested in and recommends that items or products [2]. Nowadays, RS is used on almost every E-commerce websites, assisting millions of users. E-Commerce sites such as Netﬂix and Movielens [3] for moves, Amazon [4] for books, CD’s and many other products, Entree for restaurant and Jester [5] for jokes uses recommender system to assist his consumer. The result of the recommender system is used for both E-Commerce organization as well as users [6] i.e., RS not only assist the customer in getting the preferred item but also increase the revenue of the organization by selling more products. Recommendation System can be classiﬁed into three categories based on how the recommendation is performed: Content-based recommendation, Collaborative ﬁltering (CF), and Hybrid approaches. Collaborative Filtering is one of the most widely used and successful technique to recommend an item. It recommends the item to the particular user based on the rating of the other user in the system. Content based approaches perform prediction based on characteristics of the item from their past history, for example recommending a movie that has been categorized as ‘‘Action Movies’’ to a user who likes action movies. Hybrid approach is a combination of content based and collaborative ﬁltering technique in different ways. Figure 1 shows the framework of Memory based collaborative ﬁltering recommendation system. The framework shows that millions of individual users are using E-Commerce sites and their reviews regarding products are store in corresponding server. The E-Commerce organizations collect the data from server and preprocessed into require format (User Rating Matrix). The rating matrix is used to compute the similarity between users by using the different similarity algorithm such as Pearson correlation coefﬁcient, cosine similarity, adjusted cosine similarity and Jaccard’s similarity etc. then rating for a particular item that active
+
+123
+
+496
+Fig. 1 Framework of memory based collaborative ﬁltering recommendation system
+
+Int. j. inf. tecnol. (December 2018) 10(4):495–501
+
+Data Collection
+
+Data Preprocessing
+
+Server
+
+Database
+
+Processed Data
+
+Rating Matrix
+
+Recommend New User
+Top N Item
+
+Rank Items
+
+Predict Missing Rating
+
+Compute Similarity
+
+user has not yet been given is predicted and top N predicted items are recommended to the active user. The rest of paper is organized as follows. In Sect. 2 Related work is discussed. In Sect. 3 Recommendation system techniques are discussed. In Sect. 4 Issues related to Recommendation system are discussed. In Sect. 5 Evaluation metrics of Recommendation system are discussed. Finally, In Sect. 6 conclusion is given.
+2 Related work
+Rodrigues et al. [6] proposed a framework which combines the item-based collaborative ﬁltering (CF) with user demographic information in cluster weighted mechanism to solve the cold start and data sparsity issues. This system provides the good recommendation to the new users which makes the user experience great and also increases the organization revenue. Better recommendations can be provided by making the cluster based on cross domain data. For example, if a user who likes romantic songs, the system can recommend him love story movies.
+Ji et al. [7] introduced a scalable CF algorithm based on matrix factorization, performed prediction using two decision matrices: user-category and user-keyword instead of using single user-item rating matrix. The proposed algorithm is implemented on real data set and the result shows that model has good scalability for new items.
+Gu et al. [8] a simple collaborative ﬁltering suffers from data sparsity problem because of the explosive growth of users and items in e-commerce. This paper introduced a dynamic-weighted CF technique (DWCF) to resolve data sparsity and adaptive issues. In this approach similarity between user and items is found then a weight controlling method is proposed to ﬁnd the impacts of user & item
+
+similarity. So this method outperforms under various situations of data sparsity.
+Koohi et al. [9] Collaborative ﬁltering suffers from data sparsity and high dimensionality problem. In this paper, author solves these issues by ﬁnding the neighbor user using subspace clustering approach. The author constructs the different subset of a rated matrix as Interested (I), Neither Interested Nor Uninterested (NIU) and Uninterested (U). Based on these subsets three level of the tree is created for the neighbors of an active user. This method is efﬁcient in dealing with sparse data.
+Verma et al. [10] proposed a recommendation system using collaborative ﬁltering (CF) technique and fuzzy c-means (FCM) clustering algorithm. FCM clustering is used for item clustering and CF is used for rating prediction. FCM performs better than K means clustering because K means has a restriction that one item belongs to single cluster where as one item may similar to more than one group of items.
+Kumar et al. [11] proposed a hybrid collaborative ﬁltering method to resolve the issues of sparsity and scalabilities provide more personalized recommendations. The proposed method works in two phases, in the ﬁrst phase resolve the sparsity using Case based reasoning (CBR) followed average ﬁlling and in the second phase resolve the scalability using clustering into the group by Self-organizing map optimized with a Genetic algorithm.
+Koohi et al. [12] Proposed a Collaborative Filtering recommendation system using fuzzy C-means clustering algorithm, performance against the K-means and SOM clustering approaches have been evaluated. The experimental result shows that fuzzy c-means clustering outperforms another clustering in terms of accuracy, precision and recall.
+
+123
+
+Int. j. inf. tecnol. (December 2018) 10(4):495–501
+
+497
+
+Table 1 Summarized information of literature review
+
+References Author
+
+Issues name
+
+Types of ﬁltering
+
+Technique used
+
+Dataset used
+
+Advantages
+
+[6]
+
+C. M. Rodrigues, Cold start and
+
+Hybrid
+
+Item-based CF algorithm Movie Lens Save resources and time by
+
+et al.
+
+real-time
+
+collaborative combined with user
+
+predicting the relevant
+
+2016
+
+prediction problem
+
+ﬁltering
+
+demographic based CF algorithm in clusters
+
+data only
+
+weighted mechanism
+
+[7]
+
+Ke Ji, et al.
+
+Scalability
+
+Collaborative Matrix factorization
+
+Real
+
+Good scalability for new
+
+2104
+
+problem
+
+ﬁltering
+
+based approach
+
+Dataset published
+
+items
+
+by KDD
+
+CUP 2012
+
+[8]
+
+Liang Gu, et al. Data sparsity and Collaborative Dynamic-weighted
+
+Movie Lens Under various situations of
+
+2014
+
+adaptivity issues ﬁltering
+
+collaborative ﬁltering approach (DWCF)
+
+data sparsity, DWCF performs good
+
+recommendations than
+
+traditional hybrid
+
+approach
+
+[9]
+
+Hamidreza
+
+Data sparsity and Collaborative Finding neighbor user Movie lens Efﬁcient in dealing with
+
+Koohi, et al.
+
+high
+
+ﬁltering
+
+using subspace
+
+and Jester sparse data and performs
+
+2017
+
+dimensionality
+
+clustering method &
+
+better than the
+
+new similarity measure
+
+conventional method in
+
+is used to compute
+
+terms of accuracy,
+
+similarity value
+
+precision and recall.
+
+[10]
+
+S. K. Verma,
+
+Sparsity and cold Collaborative Fuzzy C means clustering Movie Lens Cold- start problem is
+
+et al.
+
+start problem
+
+ﬁltering
+
+resolve very efﬁciently
+
+2013
+
+[11]
+
+N. P. Kumar,
+
+Data sparsity and Hybrid user- For data sparsity case
+
+Movie lens Performs enhanced
+
+et al.
+
+scalability
+
+item based
+
+based reasoning and for
+
+personalized
+
+2015
+
+collaborative ﬁltering
+
+scalability self organizing map
+
+recommendations with better rating quality
+
+optimized with GA is
+
+used
+
+[12]
+
+Hamidreza
+
+Recommendation Collaborative Fuzzy C means clustering Movie lens Fuzzy C- means clustering
+
+Koohi, et al.
+
+accuracy
+
+ﬁltering
+
+algorithm produced better
+
+2016
+
+results compare to SOM and K-means clustering
+
+[13]
+
+O-Joun Lee,
+
+Data sparsity and Collaborative Markov model and fuzzy Movie lens Improves performance
+
+et al.
+
+scalability
+
+ﬁltering
+
+clustering
+
+instability
+
+2015
+
+[14]
+
+Kyoung-jae Kim, Data sparsity
+
+Case based
+
+GA K- means clustering Real-world By providing good optimal
+
+et al.
+
+reasoning
+
+data set
+
+solutions in less time,
+
+2008
+
+(CBR)
+
+from the internet
+
+efﬁciently segment the online shopping customer
+
+shopping
+
+mall
+
+[15]
+
+Yilmaz Ar, et al. Prediction error Collaborative Genetic approach
+
+2016
+
+ﬁltering
+
+Movielens
+
+Reducing the prediction error and helps in recommending better product
+
+Lee et al. [13] introduce a Predictive Clustering-based Collaborative Filtering (PCCF) that combines the Markov model and fuzzy clustering with Clustering based CF (CBCF). This method solves the issue of reduced coverage and of unstable performance by tracking the changes in
+
+user preferences and bridging the gap between the static model and dynamic model.
+Kim et al. [14] proposed a recommender system for online shopping market using GA K-means clustering. In this system, the author tries to segment the online shopping
+
+123
+
+498
+Fig. 2 Collaborative ﬁltering process
+
+Int. j. inf. tecnol. (December 2018) 10(4):495–501
+
+User/Item I1 U1 U2
+. . U3
+Un
+
+I2 ….. I3 In Rating Matrix
+
+CF Algo
+
+riu : Prediction on item ‘i’ for the user ‘u’
+Recommends Top N list of items for user
+
+user according to their buying behavior. GA is used to resolve the local optima problem found in K-means clustering & provide a method of ﬁnding the relevant groups more efﬁciently.
+Ar et al. [15] proposed an approach that reduces the prediction error that occurs in collaborative ﬁltering RS. The conventional CF method uses similarity values directly for the rating prediction of an item whereas in proposed approach author uses a genetic algorithm before using the prediction process to get the better result. The statical analysis performed on various similarity matrices such as Vector Cosine Similarity, Pearson’s Correlation and Extended Jaccard Coefﬁcient and result shows that evolutionary approach has reduced the prediction error. Table 1 shows the summary of the works that have done by different authors in the ﬁeld of the recommendation system.
+3 Recommendation system techniques
+
+rated item is recommended to the active user. In the modelbased technique, previous ratings are used to develop a model using machine learning technique. Once the model is developed predictions can be made for an individual user.
+3.2 Content-based ﬁltering
+Content-based (CB) approach performs recommendation of those items that are similar in characteristic to the item that the users have already used in their past. CB approach performs more analysis on the attribute of the item in order to produce recommendations. CB ﬁltering (CBF) technique is most successful in webpages, publications and news recommendation.
+CBF system automatically creates personalized proﬁles of the user based on his feedback and type of item likes. In order to generate meaningful recommendations, collected user information is compared against the characteristic of the item examine [19] as shown in the Fig. 3.
+
+3.1 Collaborative ﬁltering
+
+3.3 Hybrid ﬁltering
+
+Collaborative ﬁltering (CF) technique recommends an item to the particular user based on the rating/opinions of the other user [16, 18]. CF system performs recommendation by building a database of preferences for items by the user. The system then ﬁnds the user with similar interest and preferences by calculating similarities between the user proﬁles [17], build a group of similar user called neighborhood. A user gets the recommendation to those products that he has not rated/purchased but his neighbors are rated. Collaborative ﬁltering performs predictions or recommendations, the prediction is a numerical value and recommendation is a list of top N items that the user will like the most [17] as shown in the Fig. 2. Collaborative ﬁltering technique can be classiﬁed into two broad categories (a) Memory-based technique (b) Model-based technique [16–18]. Memory-based technique identify the similarity between an active user to all other user using similarity measures such as Pearson correlation, Cosine similarity, Jaccard coefﬁcient etc. Then missing rating of an active user is predicted and the top k
+
+Hybrid ﬁltering system achieves by a combination of two or more recommendation system in order to get better performance over collaborative ﬁltering and content-based ﬁltering. It is possible to combine CF and CBF technique in a different way to obtain hybrid ﬁltering system, which may produce several outputs. Hybridization process categorized into seven different types [17] such as (1) Weighted (2) switching (3) Mixed approach (4) Feature combination (5) feature augmentation (6) Cascade and (7) Meta-level.
+4 Issue related to recommendation system
+4.1 Limited content analysis
+Content-based ﬁltering (CBF) techniques are restricted by the characteristic that is explicitly concerned with the item that is recommended. So in order to obtain enough number of characteristic, the content must be in the form that can
+
+123
+
+Int. j. inf. tecnol. (December 2018) 10(4):495–501
+
+499
+
+User
+
+to generate the satisfactory result for a large volume of the
+
+Item
+
+dataset. Thus, it is very difﬁcult to apply recommendation
+
+technique with huge and dynamic data sets produced by
+
+item-users interaction. Scalability problem can be solved
+
+using Dimensionality reduction, Bayesian Network and
+
+Clustering etc.
+
+Build
+Recommend
+
+4.5 Privacy issue
+
+Predict items not
+
+Match
+
+experienced
+
+User
+
+Fig. 3 Content-based ﬁltering process
+
+be parsed automatically or the characteristics should be assigned manually [24]. CBF also facing another problem that is when two different items having the same characteristics are not distinguishable to the system.
+4.2 Cold-start problem
+It refers to the situation where it is difﬁcult to make recommendations for a new user and items. Because of lack of sufﬁcient rating information, it is difﬁcult to ﬁnd similarity between users and items. So, neither the taste of the new users can be predicted nor the new items be rated or purchased by the users, this situation leads to less accurate recommendations. The cold start problem can be solved in many ways such as (a) Ask the new user at the beginning to rate some items. (b) Ask to state the taste of new users explicitly. (c). Recommends items to the new user based on the collected demographic information.
+4.3 Data sparsity problem
+This is the problem that occurs when a majority of the users do not rate most of the items and consequently, the useritem matrix becomes very sparse. So, the chance of getting a set of users with the similar rating decreases. Collaborative ﬁltering uses the nearest neighbor approach to recommend items and less rating makes difﬁcult to make accurate predictions about items.
+4.4 Scalability problem
+Recommender system is facing one of the vital and foremost issues with the large real-world dataset are called scalability. If the size of dataset grows with the number of user and items the computation also grows linearly. i.e., when the dataset is small algorithm works well but unable
+
+Recommendation algorithm requires input from the user population to produce quality personalized recommendations; this may lead to issues of data privacy and security. Thus a technique required to be designed that can reasonably and carefully use the user data by assuring that information about the user-item rating can’t be freely available to the malicious users.
+4.6 Synonymy
+It is the situation which refers similar items having different names or entries. RS algorithms are unable to ﬁnd the difference between closely related items such as ‘‘comedy movie’’ and ‘‘comedy ﬁlm’’. The extreme usage of synonym words decreases the performance of collaborative ﬁltering recommendation. Synonymy problem can be solved by using these methods (a) Construction of a thesaurus (b) Singular Value Decomposition (SVD) (c) Latent Semantic Indexing.
+5 Evaluation metrics of RSs
+The quality of a recommendation system algorithm can be assessed using the different method. The type of metrics used depends on the types of ﬁltering technique. The assessment of prediction and recommendation has been considered essential so that the user can have the best experience with RSs. Evaluation metrics can be classiﬁed as follows:
+5.1 Statistical accuracy metric
+It evaluates the accuracy by comparing the predicted rating with the actual rating. The commonly used metrics are Mean Absolute Error (MAE), Root Mean Squared Error (RMSE) and Correlation.
+5.1.1 Mean absolute error
+It is an average of the absolute deviation between predicted rating and actual rating. The lower MAE value shows the better prediction [20]. Let r1, r2, r3,…., rn are the actual
+
+123
+
+500
+
+Int. j. inf. tecnol. (December 2018) 10(4):495–501
+
+ratings and the corresponding p1, p2, p3,…., pn are the
+
+predicted ratings.
+
+It is deﬁned as follows
+
+MAE
+
+¼
+
+Pn
+i¼1
+
+jri
+
+À
+
+pij
+
+:
+
+ð1Þ
+
+n
+
+5.1.2 Root mean square error
+
+It is also used for the measure of model performance.
+
+RMSE is obtained by squaring the difference between
+
+predicted rating and actual rating, adding those together,
+
+dividing that by the no of test points and then taking the
+
+square root of the result [21]
+
+RMSE ¼ sﬃPﬃﬃﬃﬃﬃniﬃ¼ﬃﬃ1ﬃﬃðﬃﬃrﬃiﬃﬃﬃÀﬃﬃﬃﬃpﬃﬃﬃiﬃÞﬃﬃ2ﬃ:
+
+ð2Þ
+
+n
+
+6 Conclusion
+Recommendation system has an ability to provide personalized information on the internet. In this era of internet, lots of RSs have been developed that are based on Contentbased ﬁltering, Collaborative ﬁltering and Hybrid system and helps to reduce the problem of information overload. In this study authors found that CF recommendation system provide better recommendation but still facing problem of scalability and sparsity. So there is a possibility to improve the quality and performance of collaborative ﬁltering based recommendation system by using the fuzzy clustering and the optimization technique.
+References
+
+5.1.3 Correlation
+
+Correlation analysis refers to the measure of the linear
+
+relationship between two variables. A higher correlation
+
+value shows more accurate rating prediction or
+
+recommendations
+
+corrðp;
+
+rÞ
+
+¼
+
+Â
+
+Pn
+
+i¼1
+
+Pn
+i¼1
+
+ð
+
+pi
+
+ð pi À
+
+p
+
+À Þ2
+
+p Þ ð ri
+
+Pn
+i¼1
+
+ð
+
+ri
+
+À À
+
+r
+
+Þ r
+
+Þ2
+
+Ã1=2
+
+:
+
+ð3Þ
+
+5.2 Classiﬁcation accuracy metrics
+
+The recommendation system makes decisions about whether an item is good or not by measuring the frequency [22]. Generally in a Recommendation system, binary rating is used that is the items are relevant to the user interest or not because rating dataset is extremely sparse compared to binary selection dataset. For this metrics, a rating dataset is transformed into the binary dataset. Three classiﬁcation accuracy metrics Precision, Recall, and F-1 score are often used to assess the relevance between recommendations and user interest [23]
+
+Pr ecision
+
+¼
+
+Relevant
+
+Item
+
+Recommended ;
+
+ð4Þ
+
+Total Item Recommended
+
+Relevant Item Recommended
+
+Recall ¼
+
+;
+
+ð5Þ
+
+Total Relevant Items
+
+F1
+
+¼
+
+2
+
+Ã Precision Ã Recall Pecision þ Recall:
+
+ð6Þ
+
+1. Deshpande M, Karypis G (2004) Item-based top-N recommendation algorithms. ACM Trans Inf Syst 22(1):143–177
+2. Sarwar B, Karypis G, Konstan J, Riedl J (2000) Analysis of recommendation algorithms for e-commerce. In: Proceedings of the 2nd ACM conference on Electronic and commerce, pp 158–167
+3. Miller BN, Albert I, Lam SK, Konstan JA, Riedl J (2003) Movie Lens unplugged: experiences with an occasionally connected recommender system. In: Proceedings of the Int’l Conf. Intelligent user interfaces, Miami, Florida, USA, pp 223–266
+4. Linden G, Smith B, York J (2003) Amazon.com recommendations: item-to-item collaborative ﬁltering. IEEE Int Comput 7:76–80
+5. Goldberg K, Roeder T, Gupta D, Perkins C (2001) Eigentaste: a constant time collaborative ﬁltering algorithm. Inf Retr J 4:133–151
+6. Rodrigues CM, Rathi S, Patil G (2016) An efﬁcient system using item and user-based CF techniques to improve recommendation. In: Proc. of International Conf. on next generation computing technologies (NGCT), pp 569–574
+7. Ji K, Shen H (2014) Using category and keyword for personalized recommendation: a scalable collaborative ﬁltering algorithm. In: Proc. of sixth international symposium on parallel architectures, algorithms and programming, Beijing, pp 197–202
+8. Gu L, Yang P, Dong Y (2014) An dynamic-weighted collaborative ﬁltering approach to address sparsity and adaptivity issues. In: 2014 IEEE Congress on Evolutionary Computation (CEC), Beijing, pp 3044–3050
+9. Koohi H, Kiani K (2017) A new method to ﬁnd neighbor users that improves the performance of collaborative ﬁltering. Expert Syst Appl 83:30–39
+10. Verma SK, Mittal N, Agarwal B (2013) Hybrid recommender system based on fuzzy clustering and collaborative ﬁltering. In: Proceedings of the 4th International Conference on Computer and Communication Technology (ICCCT), Allahabad, pp 116–120
+11. Nitin PK, Fan Z (2015) Hybrid user-item based collaborative ﬁltering. Procedia Comput Sci 60:1453–1461
+12. Koohi H, Kiani K (2016) User based Collaborative Filtering using fuzzy C-means. Measurement 91:134–139
+13. Lee OJ, Jung JJ, Eunsoon Y (2015) Predictive clustering for performance stability in collaborative ﬁltering techniques. In: Proceedings of the IEEE 2nd International Conference on Cybernetics (CYBCONF), Gdynia, 2015, pp 48–55
+
+123
+
+Int. j. inf. tecnol. (December 2018) 10(4):495–501
+
+501
+
+14. Kim K-J, Ahn H (2008) A recommender system using GA means clustering in an online shopping market. Expert Syst Appl 34(2):1200–1209
+15. Ar Y, Bostanci E (2016) A genetic algorithm solution to the collaborative ﬁltering problem. Expert Syst Appl 61:122–128
+16. Kumar B, Sharma N (2016) Approaches, issues and challenges in recommender systems: a systematic review. Ind J Sci Technol 9(47). https://doi.org/10.17485/ijst/2016/v9i47/94892
+17. Isinkaye FO, Folajimi YO, Ojokoh BA (2015) Recommendation systems: principles, methods and evaluation. Egypt Inform J 16:261–273
+18. Khusro S, Ali Z, Ullah I (2016) Recommender systems: issues, challenges, and research opportunities. In: Kim K, Joukov N (eds) Information science and applications (ICISA) 2016. Lecture Notes in Electrical Engineering, vol 376. Springer, Singapore, pp 1179–1189
+
+19. Sharma L, Gera A (2013) A survey of recommendation system: research challenges. Int J Eng Trends Technol 4(5):1989–1992
+20. Gong S (2010) A collaborative ﬁltering recommendation algorithm based on user clustering and item clustering. J Softw 5(7):745–752
+21. Chai T, Draxler RR (2014) Root mean square error (RMSE) or mean absolute error (MAE)?—arguments against avoiding RMSE in the literature. Geosci Model Dev Discuss 7:1247–1250
+22. Herlocker JL, Konstan JA, Terveen LG, Riedl JT (2004) Evaluating collaborative ﬁltering recommender systems. ACM Trans Inf Syst (TOIS) 22(1):5–53
+23. Yang Z, Wu B, Zheng K, Wang X, Lei L (2016) A survey of collaborative ﬁltering-based recommender systems for mobile internet applications. IEEE Access 4:3273–3287
+24. Adomavicius G, Tuzhilin A (2005) Toward the next generation of recommender systems: a survey of the state-of-the-art and possible extensions. IEEE Trans Knowl Data Eng 17(6):734–749
+
+123
+

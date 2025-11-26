@@ -1,0 +1,2479 @@
+Cheetah: Lean and Fast Secure Two-Party Deep Neural Network Inference (Full Version)
+
+Zhicong Huang Alibaba Group
+
+Wen-jie Lu∗ Alibaba Group
+
+Cheng Hong Alibaba Group
+
+Jiansheng Ding Alibaba Group
+
+Abstract
+Secure two-party neural network inference (2PC-NN) can offer privacy protection for both the client and the server and is a promising technique in the machine-learning-as-a-service setting. However, the large overhead of the current 2PC-NN inference systems is still being a headache, especially when applied to deep neural networks such as ResNet50. In this work, we present Cheetah, a new 2PC-NN inference system that is faster and more communication-efﬁcient than state-of-the-arts. The main contributions of Cheetah are two-fold: the ﬁrst part includes carefully designed homomorphic encryption-based protocols that can evaluate the linear layers (namely convolution, batch normalization, and fully-connection) without any expensive rotation operation. The second part includes several lean and communication-efﬁcient primitives for the non-linear functions (e.g., ReLU and truncation). Using Cheetah, we present intensive benchmarks over several large-scale deep neural networks. Take ResNet50 for an example, an endto-end execution of Cheetah under a WAN setting costs less than 2.5 minutes and 2.3 gigabytes of communication, which outperforms CrypTFlow2 (ACM CCS 2020) by about 5.6× and 12.9×, respectively.
+1 Introduction
+To alleviate some of the privacy concerns associated with the ubiquitous deployment of deep learning technologies, many works [3, 7, 11, 18, 22, 35, 41, 43] in the past few years have introduced cryptographic frameworks based on secure twoparty computation (2PC) [6] to enable privacy-preserving (deep) neural network inference. The problem they are trying to solve could be described as follows: A server holds a valuable pre-trained neural network model F. The server is willing to provide F as a service but does not want to give out F directly. A client wants to use F to predict on her data x, but she considers x as private information and does not want to reveal it to the server. 2PC protocols could solve this dilemma
+∗Wen-jie and Zhicong contribute equally in this work.
+
+and fulﬁll both parties’ requirements: The participant(s) could learn the inference result F(x) but nothing else beyond what can be derived from F(x). A possible application is privacypreserving face recognition, where the server could identify criminals from photos without viewing the photo contents.
+Unfortunately, there still exist performance gaps between the current 2PC-NN inference systems and real-world applications. Because of large computation and communication overhead, those systems have been limited to small datasets (such as MNIST and CIFAR) or simple models (e.g. with a few hundreds of parameters). Recently the system CrypTFlow2 [49] has made considerable improvements, and demonstrate, for the ﬁrst time, the ability to perform 2PC-NN inference at the scale of ImageNet. Despite their advances, there remains considerable overhead: For instance, using CrypTFlow2, the server and the client might need more than 15 minutes to run and exchange more than 30 gigabytes of messages to perform one secure inference on ResNet50. Our contribution. In this paper, we present Cheetah1, a secure and fast two-party inference system for deep neural networks (DNN). Cheetah achieves its performance via a careful co-design of DNN, lattice-based homomorphic encryption, oblivious transfer, and secret-sharing. Cheetah contributes a set of novel cryptographic protocols for the most common linear operations and non-linear operations of DNNs. Cheetah can perform secure inference on large models, e.g. ResNet, and DenseNet [29], with signiﬁcantly smaller computation and communication overheads than the state-of-the-art 2PCNN inference systems. For instance, using Cheetah, the server and the client can perform one secure inference on ResNet50 within 2.5 minutes, exchanging less than 2.3 gigabytes of messages under a wide area network setting, which improves over CrypTFlow2 by about 5.6× and 12.9×, respectively. Potential Real World Applications. In [60], the researchers train a DenseNet121 to predict lung diseases from chest Xray images.Also, [25] uses DNNs for diagnosing Diabetic Retinopathy (one of the major causes of blindness) from reti-
+1Our implementation is available from https://github.com/ Alibaba-Gemini-Lab/OpenCheetah.
+
+1
+
+nal images. A such prediction can be done securely within 3 minutes with Cheetah.
+1.1 Our Techniques
+The layers of modern DNNs consist of alternating linear and non-linear operations. To design efﬁcient 2PC-NN inference systems, multiple types of cryptographic primitives are commonly used together. For instance, DELPHI [43] and CrypTFlow2 [49] leverage homomorphic encryption (HE) to evaluate the linear functions of DNN and turn to garbled circuits (GC) or oblivious transfer (OT) to compute the nonlinear functions of DNN. Cheetah is also a hybrid system with novel insights on designing the base protocols and on the way how to coordinate different types of cryptographic primitives. We describe a high-level overview of our main techniques from three aspects.
+1.1.1 Achieving the Best in Two Worlds
+Most of the existing 2PC-NN systems [41, 43, 45, 49] suggest using the additive secret sharing technique to switch back-and-forth between different types of cryptographic primitives. There remains a question that which domain should be used for the additive sharing, a prime ﬁeld Zp or the ring Z2 ? As shown in [49], for the non-linear functions of DNNs, OT-based protocols on the ring Z2 can perform 40% − 60% better than on the prime ﬁeld Zp in terms of bandwidth consumption. Another reason to use Z2 instead of Zp is that modulo reduction in Z2 is almost free on standard CPUs.
+However state-of-the-art HE-based protocols [7, 8, 11, 22, 35] in the existing 2PC-NN systems force them to export the additive secret to the prime ﬁeld Zp but not to the more efﬁcient choice Z2 . That is because these HE-based protocols heavily utilize the homomorphic Single-Instruction-MultipleData (SIMD) technique [55] to amortize the cost of homomorphic operations. The SIMD technique in turn demands a prime plaintext modulus p due to some algebraic conditions. One can use the Chinese Remainder Theorem to accept secret shares from Z2 using a prime modulus p ≈ 2 at the cost of increasing the overhead on the HE-side by many (e.g., 3–5) times. But this would ruin the gains of the non-linear part. In fact, most of the current HE-hybrid systems work over a prime ﬁeld and tolerate the less efﬁcient non-linear protocols. This raises the question: Could we ﬁnd a way to achieve the best of both worlds? That is to enjoy amortized homomorphic operations while keeping the efﬁcient non-linear protocols on the yard without extra overheads. As we will show, the answer is yes with our new design of HE-based and SIMD-free protocols for the linear functions of DNNs.
+1.1.2 Fast and SIMD-free Linear Protocols
+Due to the spatial property of the convolution and matrixvector multiplication, it is inevitable for the prior HE-based
+
+and SIMD-tailored protocols [7, 8, 11, 22, 35] to rotate the operands many times. Note that the rotation is an expensive operation even compared to the multiplication in the realm of HE, e.g., 30× more expensive cf. [7, Table 9]. These massive homomorphic rotations have become a major obstacle to the existing 2PC-NN inference systems.
+As a comparison, the HE-based protocols in Cheetah are free of homomorphic rotation . We present three pairs of encoding functions (πiF , πwF ) that enable us to evaluate the
+linear layers F ∈ {CONV, BN, FC} of DNNs via polynomial
+arithmetic circuits. These encoding functions map the values of the input (e.g., tensor or vector) to the proper coefﬁcients of the output polynomial(s). By careful design of the coefﬁcient mappings, we not only eliminate the expensive rotations but are also able to accept secret shares from Z2 for free. For example, the secure convolution HomCONV(T, K) (given later in Figure 4) in Cheetah could be computed via just a single homomorphic multiplication between two polynomials tˆ and kˆ where tˆ = πiCONV(T) is the encoded tensor and kˆ = πwCONV(K) is the encoded kernel, respectively.
+Interestingly, our new design also helps to reduce the cost of other homomorphic operations (e.g., encryption and decryption). On one hand, the rotation-based approaches use a large lattice dimension e.g., N ≥ 8192. On the other hand, Cheetah can use a smaller dimension (i.e., N = 4096) to offer the same capability, i.e., using the same size of the plaintext modulus and evaluating the same classes of linear functions. The main reason lies in the implementation of HEs. Most of the current implementations of lattice-based HEs apply the special prime technique [21] to accelerate the costly homomorphic rotation at the cost of reducing the security level. To bring up the security level, the rotation-based approaches have to bump up the lattice dimension, and thus translate to slower homomorphic operations.
+1.1.3 Leaner Protocols for the Non-linear Functions
+With the advent of silent OT extension [10] built upon vector oblivious linear evaluation (VOLE), many communicationefﬁcient OT extensions [15, 59] are proposed, and the landscape of non-linear function evaluation demands further indepth adaptation. [10, 15, 59] suggest that general secure two-party computation can be upgraded by using VOLE-style OT extension, but it remains to be seen how to design specialpurpose primitives to fully beneﬁt from VOLE-style OT. Take the integer comparison (Millionaire) protocol, for example, straightforwardly upgrading the OT extensions with VOLEstyle OT extensions does not achieve the best performance.
+We further make improvements to the truncation protocol, which is required after each multiplication so that the ﬁxedpoint values will not overﬂow. Truncation is expensive: It contributes more than 50% of communication overhead in CrypTFlow2. Our improvements are based on two important observations: First, the truncation protocol in CrypTFlow2 is
+
+2
+
+designed to eliminate two probability errors e0 and e1 where Pr(|e0| = 1) = 0.5 and Pr(0 < |e1| < 2 ) < ε (elaborated in §2.4). With extensive empirical experiments, we observe that the harsh error e1 is indeed problematic but the mild 1-bit error e0 barely harms the inference results, even for large-scale DNNs. This motivates us to design more efﬁcient truncation protocols that eliminate e1 but keep e0 untouched. Our second observation is that sometimes the most signiﬁcant bit (MSB) is already known before the truncation. For instance we know the the MSB is 0 if the truncation protocol is executed right after a ReLU (i.e, max(0, x)) protocol. Similar to the optimization from [48], we implement a truncation protocol for the case of known MSB using VOLE-style OT. In a word, we made all the above optimizations, resulting in faster running time and bringing down more than 90% of the communication cost of CrypTFlow2 for the non-linear layers.
+Overall, we compare the complexity of Cheetah’s protocols with the state-of-the-art counterparts in Table 1.
+1.2 Other Related Work
+Secure computation of machine learning inference algorithms can perhaps date back to [9, 24]. CryptoNets [22] was the ﬁrst system to consider secure two-party neural network inference. The following improvements after CryptoNets can be roughly categorized into three classes. 1) Optimizations for the basic operations of NN such as convolutions [11, 35], matrix multiplications [34, 42] and non-linear activation functions [20]. 2) Optimizations for a speciﬁc class of NN. For instance, NN uses linear activation functions only [8, 18, 28] and binarized NNs [3, 50]. 3) Using mixed primitives (e.g., Garbled Circuit, Trusted Execution Environment, HE and OT) to achieve the best performance for both the linear and non-linear functions in NNs [7, 35, 41, 45, 47, 56]. Some other works consider the secure inference problem with more than two parties such as [16, 17, 37, 37, 39, 44]. These HE-free approaches are usually more efﬁcient than the two-party counterparts. For instance, [39] is more than 15× faster than CrypTFlow2 on ResNet50.
+2 Preliminaries
+2.1 Notations
+We denote by [[n]] the set {0, · · · , n − 1} for n ∈ N. We use · , · and · to denote the ceiling, ﬂooring, and rounding function, respectively. We denote Zq = Z ∩ [− q/2 , q/2 ] for q ≥ 2. Particularly, Z2 denotes the set {0, 1}. For a signed integer x, we write x f to denote the arithmetic right-shift of x by f -bit. λ is the security parameter. We use F to denote a general ﬁeld. The logical AND, OR and XOR is ∧, ∨ and
+⊕, respectively. Let 1{P } denote the indicator function that is 1 when P is true and 0 when P is false.
+
+Table 1: Comparison with the state-of-the-art of secure 2PC
+protocols for the linear functions and non-linear functions in
+DNNs. The linear functions include the convolution (CONV),
+batch normalization (BN), and fully connection (FC). The
+convolution and batch normalization take as input of a 3dimension tensor T ∈ FC×H×W . M and h denote the number and the size of the ﬁlters, respectively. The fully connection takes as input of a vector ui ∈ Fni and outputs a vector uo ∈ Fno . We write n∗ = min(ni, no) and n¯ = max(ni, no). The nonlinear functions include the comparison of two -bit private
+integers and the truncation of the low f -bit of -bit integers. λ is the security parameter (usually λ ≥ 128).
+
+Linear Function
+
+CONV
+
+[43, 49] Cheetah
+
+Mult.
+O(MCHW h2) O(MCHW )
+
+Rotations
+O(MCHW h2) 0
+
+BN
+
+[49] O(CHW ) Cheetah O(CHW )
+
+FC
+
+[26] O(noni) Cheetah O(noni)
+
+0 0
+
+O(n¯(n∗
+
++
+
+log2
+
+(
+
+no n∗
+
+)))
+
+0
+
+Non-linear Function
+
+Communication (bits)
+
+Compare
+
+[49] Cheetah
+
+< λ + 14 < 11
+
+Trunc
+
+[49] Cheetah
+
+λ( + f + 2) + 19 + 14 f 13
+
+‡ Assume MSB is already known.
+
+We use lower-case letters with a “hat” symbol such as aˆ to
+represent a polynomial, and aˆ[ j] to denote the j-th coefﬁcient of aˆ. We use the dot symbol · such as aˆ · bˆ to represent the
+multiplication of polynomials. For a 2-power number N, and
+q > 0, we write AN,q to denote the set of integer polynomials AN,q = Zq[X]/(XN + 1). We use bold upper-case letters such as T to represent multi-dimension tensors, and use T[c, i, j]
+to denote the (c, i, j) entry of a 3-dimension tensor T. We use
+bold lower-case letters such as a to represent vectors, and use
+a[ j] to denote the j-th component of a. We use a b to denote
+inner product of vectors. Polynomial Arithmetic. Given polynomials aˆ, bˆ ∈ AN,q, the product dˆ = aˆ · bˆ over AN,q is deﬁned by
+
+dˆ[i] = ∑ aˆ[ j]bˆ[i − j] − ∑ aˆ[ j]bˆ[N + j − i] mod q. (1)
+
+0≤ j≤i
+
+i< j<N
+
+(1) comes from the fact that XN ≡ −1 mod XN + 1.
+
+2.2 Lattice-based Homomorphic Encryption
+Our protocols use two lattice-based HEs, i.e., HE that based on learning with errors (LWE) and its ring variant (ring-LWE). These two HEs share a set of parameters HE.pp = {N, σ, q, p}
+
+3
+
+such that q, p ∈ Z and q p > 0 where the plaintext modulus p can be a non-prime value.
+
+The basic asymmetric RLWE encryption scheme uses
+
+a secret polynomial as the secret key sk = sˆ ∈ AN,q. The
+
+associated public key is computed as pk = (uˆ0 · sˆ + eˆ0, uˆ0)
+
+where uˆ0 ∈ AN,q is chosen uniformly at random, and the error
+
+eˆ0 ∈ AN,q is chosen by sampling its coefﬁcients from χσ a
+
+discrete Gaussian distribution of standard deviation of σ. The
+
+RLWE encryption of a message mˆ ∈ AN,p is given as a tuple of
+
+polynomials RLWENpk,q,p(mˆ ) = (
+
+q mˆ
+p
+
++ eˆ, 0) − uˆ · pk ∈ A2N,p,
+
+where the coefﬁcients of eˆ ∈ AN,q is sampled from χσ and
+
+the coefﬁcients of uˆ ∈ AN,q is chosen from {0, ±1} uni-
+
+formly at random. A RLWE ciphertext (bˆ, aˆ) is decrypted
+
+as RLWE−sk1(bˆ, aˆ) =
+
+p (bˆ + aˆ · sˆ) q
+
+≡ mˆ mod p.
+
+In our protocols, we use the notation LWENs ,q,p(m) to de-
+
+note the LWE encryption of a message m ∈ Zp under a
+
+secret vector s ∈ ZNq . The LWE ciphertext of m is given
+
+as a tuple (b, a) ∈ ZNp +1 and it is decrypted by computing
+
+LWE−s 1(b, a) =
+
+p (b + a
+q
+
+s)
+
+≡ m mod p. To lighten the no-
+
+tation, we unify the secret of LWE and RLWE ciphertexts by
+
+identifying the LWE secret s[ j] = sˆ[ j] for all j ∈ [[N]]. We write the LWE encryption of m as LWEnsk,q,p(mˆ ) from now on.
+The proposed protocol leverages the following functions
+
+supported by the RLWE encryption.
+
+• Homomorphic addition ( ) and subtraction ( ). Given RLWE ciphertexts CT0 and CT1, which respectively encrypts a polynomial pˆ0 and pˆ1, the operation CT0 CT1 (resp. CT0 CT1) results at an RLWE ciphertext CT that decrypts to pˆ0 + pˆ1 ∈ AN,p (resp. pˆ0 − pˆ1).
+• Homomorphic multiplication ( ). Given an RLWE ciphertext CT that encrypts a polynomial pˆ, and given a plain element cˆ ∈ AN,p, the operation cˆ CT results at an RLWE ciphertext CT that decrypts to pˆ · cˆ ∈ AN,p.
+• Extract. Given (bˆ, aˆ) = RLWENpk,q,p(mˆ ) of mˆ we can extract an LWE ciphertext of the k-th coefﬁcient of mˆ , i.e., (b, a) = Extract((bˆ, aˆ), k). The tuple (b, a) is a valid LWE ciphertext of mˆ [k] under the secret key sk. This has the effect of avoiding extra information leakage when only certain coefﬁcients are expected to be received by a party. We defer the details of Extract to Chen et al.’s paper [14, §3.3].
+
+By setting a prime p ≡ 1 mod 2N, it is possible to use the SIMD technique [55] to amortize the cost of homomorphic multiplications. For instance, [26] computes the inner product of two encrypted vector of N elements using one homomorphic multiplication and O(log2(N)) homomorphic rotations. Cheetah does not use SIMD and rotations, so we defer these details to Appendix B.
+
+2.3 Oblivious Transfer
+
+Our protocols rely heavily on oblivious transfer (OT) for non-
+
+linear computation (e.g., comparison). In a general 1-out-of-2
+
+OT, denoted by
+
+2 1
+
+-OT
+
+, a sender inputs two messages m0
+
+and
+
+m1 of length bits and a receiver inputs a choice bit c ∈ {0, 1}.
+
+At the end of the protocol, the receiver learns mc, whereas the
+
+sender learns nothing. OT is usually realized by building a few
+
+base OT instances with public key cryptography and extend-
+
+ing to a large amount of instances with efﬁcient symmetric
+
+cryptographic operations (IKNP OT extension [32]). When
+
+sender messages are random or correlated in a way, general
+
+OT can be replaced with random OT (ROT) or correlated OT
+
+(COT) which are more efﬁcient in communication [4]. More
+
+general 1-out-of-N OT
+
+n 1
+
+-OT
+
+can be implemented in an
+
+IKNP-style OT extension, or with log2 n calls to
+
+2 1
+
+-OTλ
+
+[46].
+
+Recently, [10] propose silent OT extension, where a large
+
+amount of random OT correlations can be generated with a
+
+low-communication input-independent setup and a second
+
+phase of pure local computation. The technique is later im-
+
+proved with more efﬁcient computation in Ferret [59] and
+
+Silver [15]. With little communication cost, these VOLE-style
+
+OTs pave the way for the possibility of next-generation secure
+
+computation. We use VOLE-style OT as a building block for
+
+more efﬁcient designs of non-linear layers in DNN inference.
+
+2.4 Arithmetic Secret Sharing
+
+For the arithmetic secret sharing, an -bit value x is shared
+
+additively in the ring Z2
+
+as the sum of two values, say
+
+x
+
+A 2
+
+and
+
+x
+
+B 2
+
+.
+
+To
+
+reconstruct
+
+the
+
+value
+
+x,
+
+we
+
+compute
+
+the
+
+modulo
+
+addition, i.e., x ≡
+
+x
+
+A 2
+
++
+
+x
+
+B 2
+
+mod 2 . In the two-party set-
+
+ting, value x ∈ Z2 is secretly shared between Alice and Bob,
+
+by letting Alice hold the share
+
+x
+
+A 2
+
+and letting Bob hold the
+
+share
+
+x
+
+B 2
+
+.
+
+Also,
+
+we
+
+will
+
+omit
+
+the
+
+subscript
+
+if
+
+the
+
+modulo
+
+2
+
+is clear from the context.
+
+Fixed-point Values and Truncation. Most prior works on
+
+2PC use ﬁxed-point arithmetic, where a real value x˜ ∈ R is encoded as a ﬁxed-point value x = x˜2 f ∈ Z under a speciﬁed
+
+precision f > 0. The multiplication of two ﬁxed-point values
+
+of f -bit precision results at a ﬁxed-point value of 2 f -bit pre-
+
+cision. In order to do subsequent arithmetics, a truncation is
+
+required to scale down to f -bit precision. Suppose
+
+x
+
+A 2
+
+and
+
+x
+
+B 2
+
+are the shares of a double-precision value, i.e.,
+
+x˜22 f
+
+.
+
+A faithful truncation protocol should take
+
+x
+
+A 2
+
+and
+
+x
+
+B 2
+
+as
+
+input and compute the shares of x˜22 f f .
+
+2.5 Local Truncation Trade-offs
+
+The local truncation protocol of [45] introduces probabil-
+
+ity errors. For example, to perform the local truncation on
+
+x
+
+A 2
+
+and
+
+x
+
+B 2
+
+,
+
+two
+
+share
+
+holders
+
+set
+
+x
+
+A 2
+
+=
+
+x
+
+A 2
+
+/2 f
+
+and
+
+x
+
+B 2
+
+=2
+
+−
+
+2
+
+−
+
+x
+
+B 2
+
+/2 f
+
+mod 2 , respectively. Then the
+
+4
+
+value x equals to x˜2 f + e0 + e1 with two probability errors where the small error |e0| ≤ 1 occurs at the chance of 1/2 and the harsh error |e1| < 2 occurs with a chance of x/2 .
+Many previous 2PC-NN systems that leverage the local truncation will set a proper bit length to avoid the harsh error as much as possible. For example, DELPHI [43] sets
+= 41 which can translate a probability ε ≈ 2−19 of the e1 error on their datasets. However we consider a such ε is still not small enough for DNNs because the number of local truncations needed is vast for DNNs. For instance, the number of local truncations needed by the the ﬁrst convolution layer in ResNet50 is about 8.0 × 105. In other words, the local truncation will introduce at least one e1 error for this layer at the chance of 1 − (1 − ε)8.0×105 which is about 78% for DELPHI’s parameters. What’s worse, the large error(s) will propagate to the following layers and ﬁnally ruin the prediction. To decreases the error probability ε a larger bitlength is needed. This also renders a larger overhead on both of the linear protocols and non-linear protocols. This also somehow demonstrates why prior systems that leverage the local truncation might be limited to small datasets and shadow neural networks or introduce a large overhead.
+2.6 Secure Neural Network Inference
+In this section we describe an abstraction of DNN and set up the secure neural inference problem that we will tackle in the rest of the manuscript. DNN takes an input x (e.g., RGB image) and processes it through a sequence of linear and nonlinear layers in order to classify it into one of the potential classes, e.g., z = fd( fd−1(· · · ( f1(x, W1), · · · ), Wd−1), Wd) where fd is the function evaluated in the d-th layer and Wd is the weight parameter(s) used in that layer. Suppose we already have 2PC protocols that take secret-shared inputs and output secret-shared results for the functions f1, f2, · · · , fd, to achieve the secure inference, we can simply invoke the corresponding 2PC protocols sequentially.
+We now describe the functions we are targetting, and then present how to evaluate those functions privately.
+2.6.1 Linear Layers
+Fully Connected Layer (FC). The input to a fully connected layer is a vector v ∈ Fni of length ni and its output is a vector u ∈ Fno of length no. A fully connected layer is parameterized by the tuple (W, b) where W ∈ Fno×ni is the weight matrix and b is an no-sized bias vector. The output is speciﬁed by the linear transformation u = Wv + b. Convolution Layer (CONV). A two dimensional strided convolution Conv2D(T, K; s) over a ﬁeld F operates on a 3-dimension tensor T ∈ FC×H×W with a stride s > 0 and a set of kernels (also called ﬁlters) represented by a 4-dimension tensor K ∈ FM×C×h×h to generate a 3-dimension output tensor T ∈ FM×H ×W where H = (H − h + s)/s and W =
+
+(W − h + s)/s . If T is an RGB image then C = 3 and H,W denote the height and width of the image, respectively. Also, M denotes the number of kernels used in the convolution and h is the size of the kernels.
+From a mathematical viewpoint, the two dimensional strided convolution can be seen as calculating weighted sums
+
+T [c , i , j ] = ∑ T[c, i s + l, j s + l ]K[c , c, l, l ]. (2)
+c∈[[C]]
+l,l ∈[[h]]
+
+for each position (c , i , j ) of the output tensor T .
+Batch Normalization Layer (BN). In DNNs, a BN layer
+BN(T; α, β) takes as input of 3-dimension tensor T ∈ FC×H×W and output a 3-dimension tensor T of the same shape. An BN layer is speciﬁed by the tuple (µ, θ) where µ ∈ FC is the scaling vector and θ ∈ FC is the shift vector. For all c ∈ [[C]], i ∈ [[H]] and j ∈ [[W ]], T is computed via
+
+T [c, i, j] = µ[c]T[c, i, j] + θ[c].
+
+(3)
+
+By viewing each channel of T as a HW -sized vector, we can naturally rewrite the BN evaluation to a form that involves scalar-vector multiplications and vector additions only.
+
+2.6.2 Non-linear Layers
+In the context of deep learning, the non-linear layers consist of an activation function that acts on each element of the input independently or a pooling function that reduces the output size. Typical non-linear functions can be one of several types: the most common ones in DNNs are ReLU functions (i.e., ReLU(x) = max(0, x)) and max-pooling functions. In the context of 2PC, truncation is also considered as a non-linear layer because truncation is beyond the ability of arithmetic circuit. Following the blueprint of CrypTFlow2, these non-linear layers can be evaluated securely via OT-based protocols.
+
+2.6.3 Two-Party Inference System & Threat Model
+Suppose the secure inference is executed jointly by Alice (Server) and Bob (Client). Let IA and IB be the private input of Alice and Bob to a two-party protocol say Π, respectively. We write OA, OB ← Π(IA, IB) to denote an execution of Π where OA and OB are the output to Alice and Bob, respectively.
+We target the same threat model of DELPHI and CrypTFlow2. Cheetah is designed for the two-party semi-honest setting in which both of parties follow the speciﬁcation of the protocol and only one of the them is corrupted by an adversary. In the context of cryptographic inference, Alice holds a DNN while Bob holds an input to the network, typically an image. By assuming semi-honest Alice and Bob, our system enables Bob to learn only two pieces of information: the architecture of the neural network (i.e., the number of layers, the type of layers, and the size of each layer), and the inference result. Alice is either allowed to learn the result or nothing, depending
+
+5
+
+Parameters: Shape meta ni, no > 0. Computation: On input v A ∈ Fni , W ∈ Fno×ni and b ∈ Fno from Alice and input v B ∈ Fni from Bob, compute u = Wv + b. Sample an uniform vector r from Fno . Return: r to Alice and v − r ∈ F∗ to Bob.
+(a) Ideal Functionality FFC
+Parameters: Shape meta M,C, H,W, h and stride s > 0. Computation: On input T A ∈ FC×H×W , K ∈ FM×C×h×h from Alice and input T B ∈ FC×H×W from Bob, compute T = Conv2D(T, K; s). Sample an uniform tensor R from F with the same shape of T . Return: R to Alice and T − R ∈ F∗ to Bob.
+(b) Ideal Functionality FCONV
+Parameters: Shape meta C, H,W . Computation: On input T A ∈ FC×H×W , µ, θ ∈ FC from Alice and input T B ∈ FC×H×W from Bob, compute T = BN(T; µ, θ). Sample an uniform tensor R from F with the same shape of T . Return: R to Alice and T − R ∈ F∗ to Bob.
+(c) Ideal Functionality FBN
+Figure 1: Ideal Functionalities of Linear Layers
+on the application scenario. All other information about Bob’s private inputs and the parameters of Alice’s neural network model should be kept secret. We provide formal deﬁnitions of threat model in Appendix A.
+Like all the prior semi-honest inference systems, Cheetah was not designed to defend against attacks based purely on the inference results (such as the API attacks [54,57]). Indeed, we can integrate orthogonal techniques such as differential privacy [2, 33] to provide an even stronger privacy guarantee.
+3 Proposed 2PC Protocols of Linear Layers
+The core computation in FC, CONV and BN can be rewritten as a batch of inner products. In deep neural networks, the fan-in to the inner product circuit can be large, leading a vast number of homomorphic multiplications. To amortize the cost of multiplications, most of the prior HE-based approaches choose to use the SIMD technique. As we have mentioned, the sum-step in the inner product circuit demands expensive homomorphic rotations. Also the SIMD technique requires plaintext from a prime ﬁeld Zp such that p ≡ 1 mod 2N.
+On the other hand, our linear protocols are free of SIMD and homomorphic rotation. We observe that the polynomial multiplication (1) itself can be viewed as a batch of inner products if we arrange the coefﬁcients properly. In this section, we present and use a pair of natural mappings (πiF , πwF ) to properly place the values in the input and weight to poly-
+nomial coefﬁcients for each of the functionality F in Figure 1.
+With the help of (πiF , πwF ), we then show how to evaluate these
+
+Inputs & Outputs:
+
+u A , u B ← HomFC({ v A , W, b}, { v B , sk})
+
+W ∈ Znpo×ni , b ∈ Znpo , v A , v B ∈ Znpi , and u = Wv + b ∈ Znpo . Public Parameters: pp = (HE.pp, pk, ni, no, niw, now).
+• Shape meta ni, no such that ni, no > 0. The partition window size 0 < niw ≤ ni, 0 < now ≤ ni such that niwnow ≤ N.
+• Set ni = ni/niw and no = no/now .
+
+1: Bob ﬁrst partitions its input shares v B into subvectors vα B ∈ Znpiw for α ∈ [[ni]]. Zero-padding them when ni niw.
+2: Bob encodes the vectors to polynomials vˆα B = πifc( vα B) for α ∈ [[ni]]. Then Bob sends the RLWE ciphertexts {CTα = RLWENpk,q,p( vˆα B)} to Alice.
+3: Similarly, Alice ﬁrst partitions its shares v A into vα A ∈ Znpiw following the same manner in Step 1. Also, Alice
+
+partitions the weight matrix W into block matris Wβ,α ∈ Znpow×niw . Zero-padding is used to the right-most (resp.
+
+bottom-most) blocks when ni niw (resp. no now). Then
+
+Alice encodes the subvectors and block matrices to polyno-
+
+mials vˆα A = πifc vα A and wˆ β,α = πwfc(Wβ,α) for α ∈ [[ni]]
+
+and β ∈ [[no]].
+
+4: On receiving the ciphertexts {CTα} from Bob, Alice oper-
+
+5:
+
+ates CTβ [Extract
+
+= and
+
+α∈[[ni]]((CTα Re-mask.] Alice
+
+vˆα A) samples
+
+wˆβ,α) for β ∈ [[no]]. r ∈ Znpo uniformly at
+
+random to re-mask the computing ciphertexts. Speciﬁcally,
+
+for each i ∈ [[no]], Alice ﬁrst extracts an LWE ciphertext
+cti = Extract(CTi mod no , (i mod no)ni + ni − 1) and then remasks it via cti = cti r[i]. Alice then sends the LWE ciphertexts {cti} back to Bob. 6: Alice outputs r + b mod p as the share u A.
+
+7: On receiving the LWE ciphertexts {cti} from Alice, Bob computes u B [i] = LWE−sk1 (cti) for all i ∈ [[no]].
+
+Figure 2: Proposed Secure Fully Connection Protocol
+
+functionalities privately. Also, πiF and πwF are well-deﬁned for any p > 1 such as p = 2 , allowing our protocols to accept
+secretly shared input from the ring Z2 for free. All above makes our protocols fundamentally different from the previ-
+ous SIMD-based approaches.
+
+3.1 Fully Connection
+We present our 2PC protocol for FC layers in Figure 2. The core computation in an FC layer is the matrix-vector multiplication u = Wv which can be decomposed into inner products of vectors. Our mapping functions πwfc and πifc are specialized for computing the inner product using polynomial arithmetic. Intuitively, when multiplying two polynomials of degree-N, the (N − 1)-th coefﬁcient of the resulting polynomial is the inner product of the two coefﬁcient vectors in opposite orders. We can easily extend this idea to a batch of inner prod-
+
+6
+
+Toy example over Z25 .
+
+W=
+
+1 4
+
+2 5
+
+3 6
+
+7 , v = 8 ⇒ Wv ≡
+9
+
+18
+
+26 mod 25
+
+Cheetah evaluates Wv using πwfc and πifc.
+πwfc(W) → wˆ = 3X 0 + 2X 1 + 1X 2 + 6X 3 + 5X 4 + 4X 5 ∈ A8,25 πifc(v) → vˆ = 7X 0 + 8X 1 + 9X 2 ∈ A8,25
+⇓ wˆ · vˆ mod (X8 + 1, 25) wˆ · vˆ ≡ 21X0 + 6X1 + 18X2+
+4X3 + 284 + 26X5 + 13X6 + 4X7 mod (X8 + 1, 25) ⇓ Extract needed coefﬁcients
+LWE(18) = Extract(RLWE(wˆ · vˆ), 2) LWE(26) = Extract(RLWE(wˆ · vˆ), 5)
+
+Figure 3: Toy example for πwfc and πifc with N = 8 and p = 25.
+
+ucts. We now give the πifc : Znpi → AN,p. Here
+
+deﬁnitions of πwfc : Znpo we ﬁrst require noni ≤
+
+×ni → AN,p and N for simplicity.
+
+vˆ = πifc(v) where vˆ[ j] = v[ j]
+
+(4)
+
+wˆ = πwfc(W) where wˆ[i · ni + ni − 1 − j] = W[i, j],
+
+where i ∈ [[no]], j ∈ [[ni]] and all other coefﬁcients of vˆ and wˆ are set to 0. The multiplication of polynomials uˆ = wˆ · vˆ ∈ AN,p directly gives the matrix–vector multiplication Wv ≡ u mod p in some of its coefﬁcients.
+
+Proposition 1 Given two polynomials vˆ = πifc(v), wˆ = πwfc(W) ∈ AN,p, the multiplication Wv ≡ u mod p can be evaluated via the product uˆ = vˆ · wˆ over the ring AN,p. That is u[i] is computed in uˆ[i · ni + ni − 1] for all i ∈ [[no]].
+Proof 1 For each i ∈ [[no]], we write n˜i = i·ni +ni −1 for simplicity. By the deﬁnition of (1) and because vˆ[ j] = 0 for j ≥ ni, we have uˆ[n˜i] = ∑0≤ j<ni vˆ[ j]wˆ[ni − j] = ∑0≤ j<ni v[ j]W[i, j] which is exactly u[i].
+
+In Proposition 1, other coefﬁcients besides uˆ[n˜i] in uˆ contain extra information beyond Wv. To prevent such leakage, Alice uses the Extract(·) function to extract the needed coefﬁcients from uˆ. We present a toy example in Figure 3.
+When nino > N, we can ﬁrst partition the weight matrix into sub-matrices of 0 < n¯i × n¯o elements such that n¯in¯o ≤N (n¯i and n¯o can be chosen freely as public parameters as long as they satisfy this constraint). Zero-padding is used when ni n¯i or no n¯o. Then we convert the task of matrix multiplication in shape ni × no to subtasks of a smaller size n¯i × n¯o.
+Theorem 1 The protocol HomFC in Figure 2 realizes the
+ideal functionality FFC of Figure 1a for F = Zp in presence
+of a semi-honest admissible adversary.
+
+We defer the proof to Appendix D due to the space limit. For
+the complexity, Bob encrypts and sends ni RLWE ciphertexts to Alice. Alice operates with noni = O(noni/N) homomorphic multiplications and additions. Alice sends no LWE ciphertexts to Bob for decryption which can be compressed to about
+O((no + noN) log2 q) bits using the optimizations in § 5.2.
+
+3.2 Two Dimensional Convolution
+
+We now present how to evaluate the two dimensional con-
+volution (2) using polynomial arithmetic over the ring AN,p. Consider the most simple case of (2) such that H = W = h and M = 1, i.e., the input tensor has the same shape as the convo-
+lution kernel. Then the computation in (2) becomes an inner product of two ﬂatten vectors by concatenating T and K row-
+by-row and channel-by-channel. For general cases, we can
+view the computation of 2-dimension convolution as a batch of inner products of h2 values. We now give the deﬁnitions of πiconv : ZCp×H×W → AN,p and πwconv : ZMp ×C×h×h → AN,p. Here we require MCHW ≤ N for simplicity.
+
+tˆ = πiconv(T) st. tˆ[cHW + iW + j] = T[c, i, j]
+
+(5)
+
+kˆ = πwconv(K) st. kˆ[O − c CHW − cHW − lW − l ] = K[c , c, l, l ],
+
+where O = HW (MC − 1) + W (h − 1) + h − 1, and all other coefﬁcients of tˆ and kˆ are set to 0. The multiplication tˆ· kˆ ∈
+AN,p directly gives the 2-dimension convolution in some of the coefﬁcients of the resulting polynomial.
+
+Proposition 2 Given two polynomials tˆ = πiconv(T), kˆ = πwconv(K) ∈ AN,p, the convolution T = Conv2D(T, K; s) (2) can be evaluated by the polynomial multiplication tˆ = tˆ · kˆ over the ring AN,p. For all positions (c , i , j ) of T , T [c , i , j ] is computed in the coefﬁcient tˆ [O − c CHW +
+i sW + j s] where O = HW (MC − 1) +W (h − 1) + h − 1.
+
+Similarly, Alice can apply the Extract(·) function to prevent possible leakage. We ﬁrst present the basic version of our secure convolution protocol in Figure 4 which demands “small enough tensors” i.e., MCHW ≤ N.
+
+Theorem 2 The protocol HomCONV in Figure 4 realizes
+the ideal functionality FCONV of Figure 1b for F = Zp and
+for inputs that MCHW ≤ N in presence of a semi-honest
+admissible adversary.
+
+We defer the correctness and security proofs to Appendix D.
+
+3.2.1 On the Cases of Large Tensors
+We need to partition large input tensors and kernels so that each of the smaller blocks can be ﬁt into one polynomial in AN,p. Particularly, we deﬁne the size of partition window for the (M,C, H,W )-axis as Mw,Cw, Hw and Ww, respectively. The size of the partition windows can be chosen freely as long as they satisfy the following constraints:
+
+7
+
+Inputs and Outputs:
+
+T A , T B ← HomCONV({ T A , K}, { T B , sk})
+
+such that T A , T B ∈ ZCp×H×W , K ∈ ZMp ×C×h×h and T = Conv2D(T, K; s) ∈ ZMp ×H ×W . Public Parameters: pp = (HE.pp, pk, M,C, H,W, h, s).
+
+• Shape meta M,C, H,W, h such that MCHW ≤ N and h ≤ H,W ,
+
+and stride s > 0.
+
+• Set H =
+
+H−h+s s
+
+,W
+
+=
+
+W −h+s s
+
+, and O = HW (MC − 1) +
+
+W (h − 1) + h − 1.
+
+1: Bob encodes its share as polynomial tˆ B = πiconv( T B). Bob sends the ciphertext CT = RLWENpk,q,p( tˆ B) to Alice.
+2: Alice encodes its share of input tensor and the ﬁlter as polynomials tˆ A = πiconv( T A), kˆ = πwconv(K).
+3: Alice samples R ∈ ZMp ×H ×W uniformly at random.
+4: On receiving the RLWE ciphertext CT from Bob, Alice operates to obtain CT = (CT tˆ A) kˆ.
+5: [Extract and Re-mask.] For each c ∈ [[M]], i ∈ [[H ]] and
+j ∈ [[W ]], Alice ﬁrst extracts a LWE ciphertext ctc ,i , j = Extract(CT, O − c CHW + i sW + j s) and then re-masks
+it via ctc ,i , j = ctc ,i , j R[c , i , j ]. Alice then sends the ciphertexts {ctc ,i , j } back to Bob. 6: Alice outputs R as the share T A.
+7: On receiving the LWE ciphertexts from Alice, Bob computes T B [c , i , j ] = LWE−sk1 (ctc ,i , j ) for all positions (c , i , j ).
+
+Figure 4: Proposed Secure Convolution Protocol (Basic Ver)
+
+0 < Mw ≤ M, 0 < Cw ≤ C, h ≤ Hw ≤ H, h ≤ Ww ≤ W
+
+and MwCwHwWw ≤ N. For instance, in our experiments,
+
+to minimize the number of ciphertexts sent by Bob, we
+
+choose the window sizes Hw and Ww that minimize the
+
+product
+
+C N /(HwWw )
+
+·
+
+H−h+1 Hw−h+1
+
+·
+
+W −h+1 Ww+h−1
+
+. When Hw and
+
+Ww are speciﬁed, the partition window sizes along the C-
+
+axis and M-axis is Cw = min(C, N/(HwWw) ) and Mw =
+
+min(M, N/(CwHwWw) ), respectively.
+
+By splitting the big tensor and kernel into smaller blocks
+
+and zero-padding the margin blocks, we can apply (5) on the
+
+corresponding pair of subtensor and subkernel. We demon-
+
+strate why such partitions can work correctly. From the deﬁ-
+
+nition in (2), the convolution along the M-axis is independent
+
+for each subkernel, and thus we can equally split the M-axis
+
+into dM =
+
+M Mw
+
+groups and each of them contains Mw sub-
+
+kernels. Similarly, the convolution along the C-axis requires
+
+extra additions which are supported by HEs. Thus we can
+
+safely partition along the C-axis without overlapping too.
+
+When the kernel size h > 1, we need to take extra care for
+
+the partition over the H-axis and W -axis. That is, we need
+
+to make sure that the stride window is not split into two
+
+adjacent partitions. Speciﬁcally, we partition along the H-axis
+
+and W -axis into dH =
+
+H −h+1 Hw−h+1
+
+and dW =
+
+W −h+1 Ww−h+1
+
+blocks,
+
+respectively. For the sub-block indexed by (α ∈ [[dH ]], β ∈
+
+0123 4567 8 9 10 11 12 13 14 15
+
+01 45 89 12 13
+
+0123 4567
+
+01 45
+
+Figure 5: Partitioning the input tensor along the H-axis and W axis where N = 16,C = 1, H,W = 5, h = 2, and Hw,Ww = 4. Digits represent the coefﬁcient indices in an encoded polynomial. The dashed parts are zero padding.
+
+[[dW ]]), it contains exact Hw continuous rows that starts from the α(Hw − h + 1)-th row, and exact Ww continuous columns that starts from the β(Ww − h + 1)-th column of the big tensor T. When h > 1, there are overlapping between adjacent blocks.
+We give an example of this case in Figure 5.
+
+3.2.2 HomCONV (Full Protocol)
+
+The full version of HomCONV is given in Appendix C due
+
+to the space limit but we state the complexity of HomCONV.
+
+In HomCONV, Bob sends O(CHW /N) RLWE ciphertexts to
+
+Alice which are about O(2CHW log2 q) bits. Alice operates
+
+O(MCHW /N) homomorphic additions and multiplications.
+
+Alice
+
+sends
+
+back
+
+O(
+
+M Mw
+
+H
+
+W
+
+)
+
+LWE
+
+ciphertexts
+
+to
+
+Bob
+
+for
+
+decryption. The computation complexity of HomCONV is
+
+independent with the kernel size h where the previous secure
+
+convolution protocols [11, 35, 41] scale quadratically with h.
+
+3.3 Batch Normalization
+The batch normalization (3) can be evaluated using scalarpolynomial multiplications by mapping each channel of the tensor to polynomials. This idea will lead to a secure BN protocol of a communication cost of O(C HW /N ) ciphertexts. We can reduce this communication cost by “stacking” multiple channels of the tensor into a single polynomial. For example, when C2HW ≤ N, we can even put all the channels into one polynomial. We now give the deﬁnitions of πibn : ZCp×H×W → AN,p and πwbn : ZCp → AN,p. Here we demand C2HW ≤ N for simplicity.
+tˆ = πibn(T) s.t. tˆ[cCHW + iH + j] = T[c, i, j] aˆ = πwbn(α) s.t. aˆ[cHW ] = α[c]
+where c ∈ [[C]], i ∈ [[H]] and j ∈ [[W ]]. All other coefﬁcients of tˆ and aˆ are set to zero. The polynomial product tˆ = tˆ· aˆ
+
+8
+
+Inputs and Outputs: T A , T B ← HomBN
+
+T A , µ, θ , T B , sk
+
+s.t. T A , T B ∈ ZCp×H×W , µ, θ ∈ ZCp and T = BN(T; µ, θ). Public Parameters: pp = (HE.pp, pk,C, H,W,Cw, Hw,Ww).
+• The partition window sizes 0 < Cw ≤ C, 0 < Hw ≤ H and 0 < Ww ≤ W such that Cw2 HwWw ≤ N.
+• Let dC = C/Cw , dH = H/Hw and dW = W /Ww .
+1: Bob partitions its share tensor into sub-blocks Tγ,α,β B ∈ ZCpw×Hw×Ww (with zero-padding if necessary).
+2: Bob then encodes the sub-blocks as polynomials tˆγ,α,β B = πibn( Tγ,α,β B) for γ ∈ [[dC]], α ∈ [[dH ]] and β ∈ [[dW ]]. Bob then sends {CTγ,α,β = RLWENpk,q,p( tˆγ,α,β B)} to Alice.
+3: Alice partitions and encodes its input tensor and the scaling vector as polynomials tˆγ,α,β A = πibn( Tγ,α,β A) and aˆγ = πwbn(µγ), respectively.
+4: Alice samples R ∈ ZCp×H×W uniformly at random. 5: On receiving the ciphertexts {CTγ,α,β} from Bob, Alice
+operates CTγ,α,β = (CTγ,α,β tˆγ,α,β A) aˆγ for γ ∈ [[dC]], α ∈ [[dH ]] and β ∈ [[dW ]]. 6: [Extract and Re-mask.] For each c ∈ [[C]], i ∈ [[H]] and
+j ∈ [[W ]], Alice ﬁrst extracts a LWE ciphertext ctc,i, j = Extract(CTc ,i , j , cCHW + cHW + iH + j), where c ≡ c mod dC, i ≡ i mod H and j ≡ j mod W . Then Bob remasks these ciphertexts via ctc,i, j = ctc,i, j R[c, i, j]. 7: Alice sends the ciphertexts {ctc,i, j} back to Bob, and Alice ouputs T A as T A [c, i, j] = R[c, i, j] + θ[c] mod p.
+8: On receiving the LWE ciphertexts from Alice, Bob ouputs T B as T B [c, i, j] = LWE−sk1 (ctc,i, j).
+
+Figure 6: Proposed Secure Batch Normalization Protocol
+
+gives the multiplication part of (3) in some of coefﬁcients of tˆ . That is tˆ [cCHW + cHW + iH + j] equals to T[c, i, j]α[c] for all (c, i, j) position. When C2HW > N, we can ﬁrst partition T into sub-blocks in a shape of Cw × Hw × Ww such that Cw2 HwWw ≤ N. Since each channel is proceed independently in the BN computation, we can just apply the mapping functions πibn, πwbn to the sub-blocks of T.
+Theorem 3 The protocol HomBN in Figure 6 realizes the
+ideal functionality FBN of Figure 1c for the ﬁeld F = Zp in
+presence of a semi-honest admissible adversary.
+We defer the proof to Appendix D due to the space limit. For the complexity, Bob encrypts and sends O(CHW /N) RLWE ciphertexts to Alice. Alice operates with O(CHW /N) homomorphic operations. Finally, Alice sends O(CHW ) LWE ciphertexts to Bob for decryption.
+
+Parameters: Bit width > 0. Computation: On input x ∈ Z2 from Alice and input y ∈ Z2 from Bob, compute b = 1{x > y}. Sample a bit r from Z2 uniformly at random. Return: r to Alice and b ⊕ r to Bob.
+(a) Ideal Functionality FMill
+
+Parameters: Bit width > 0 and ﬁxed-point precision 0 < f < .
+
+Computation: On input
+
+x
+
+A 2
+
+from Alice and input
+
+x B from
+
+Bob, compute x = x/2 f . Sample a uniform value r from Z2 .
+
+Return: r to Alice and x − r ∈ Z2 to Bob.
+
+(b) Ideal Functionality Ftru,nf c
+
+Figure 7: Ideal Functionalities of Non-linear Functions
+
+Table 2: Communication complexity of various OT protocols
+
+used in CrypTFlow2 and Cheetah. Cheetah uses VOLE-style
+
+OT for the underlying calls to
+
+2 1
+
+-ROTλ.
+
+Function
+
+2 1
+
+-OT
+
+2 1
+
+-COT
+
+n 1
+
+-OT
+
+(n ≥ 3)
+
+Communication (bits) CrypTFlow2 Cheetah
+
+λ+2
+
+2 +1
+
+λ+
+
++1
+
+2λ + n
+
+n + log2 n
+
+4 Optimized 2PC Protocols of Non-Linear Functions
+
+For non-linear computation, [49] presents various protocols
+
+that are tailored to be highly efﬁcient on IKNP-style OT ex-
+
+tension. In this section, we show that their protocols can be
+
+simpliﬁed and optimized on VOLE-style OT extension.
+
+Throughout this section, we make
+
+and
+
+n 1
+
+-OT
+
+.
+
+We instantiate
+
+n 1
+
+-OT
+
+use of
+
+2 1
+
+with the
+
+-OT ,
+
+2 1
+
+-COT
+
+algorithm pro-
+
+posed by Naor and Pinkas [46] by using log2 n calls to
+
+2 1
+
+-ROTλ, whereas CrypTFlow2 implements it with the IKNP-
+
+style OT extension proposed in [36]. Due to the usage of
+
+VOLE-style OT, our calls to
+
+2 1
+
+-ROTλ
+
+enjoys almost 0 amor-
+
+tized communication cost. We provide a brief comparison
+
+of these two approaches in Table 2. When n and the mes-
+
+sage length are small, our approach demonstrates prominent
+
+advantage, which is indeed the case in all protocols used in
+
+neural network inference (usually, n ≤ 16, ≤ 2).
+
+4.1 Leaner and Better Millionaires’ Protocol
+Millionaires’ protocol for comparing two integers (x, y ∈ {0, 1} ) is the core building block of almost every non-linear
+layer, such as ReLU, truncation, and pooling. Let FAND denote
+the functionality that accepts boolean shares of x and y and returns boolean shares of x ∧ y (protocol details in Appendix F). We brieﬂy recall the high-level intuition of the millionaires’
+
+9
+
+Table 3: Communication complexity of millionaires’ protocols of -bit integers.
+
+Millionaires’ Protocol
+
+CrypTFlow2 (m = 4, IKNP,
+
+n 1
+
+-OT)
+
+Naive (m = 1, VOLE,
+
+2 1
+
+-ROT)
+
+Cheetah (m = 4, VOLE,
+
+2 1
+
+-ROT)
+
+Communication (bits) < λ + 14 < 16 < 11
+
+protocol in [49]:
+
+1. Each party parses its own -bit input as smaller blocks of
+
+m bits. Let x j and y j denote the j-th block of P0 and P1,
+
+respectively. Two parties invoke
+
+2m 1
+
+-OT1 to compute a
+
+boolean share of ltj = 1{x j < y j} (similar invocation
+
+for eq j = 1{x j = y j}).
+
+2. Two parties use FAND to combine the former outputs in a
+tree evaluation (of depth log ( /m)) with the observation:
+1{x < y} = 1{x1 < y1} ⊕ (1{x1 = y1} ∧ 1{x0 < y0}), where x = x1||x0 and y = y1||y0.
+
+In stage 2, [49] presents various optimizations to realize FAND
+
+efﬁciently in the context of IKNP-style OT extension, such as
+
+using
+
+16 1
+
+-OT2
+
+to generate two beaver triples and
+
+8 1
+
+-OT2 to
+
+generate correlated triples. However, in Cheetah, these are less
+
+efﬁcient than using
+
+2 1
+
+-ROT1 to generate the beaver triples [4].
+
+Nevertheless, their insight in stage 1 to start working with
+
+m-bit blocks remains important to greatly reduce the number
+
+of AND gates compared to a naive approach of using an eval-
+
+uation tree of depth log . We compare the communication
+
+complexity of the three approaches in Table 3. We reuse the
+
+millionaires’ protocol ﬂow from CrypTFlow2, but replace the
+
+underlying FAND implementation with our aforementioned so-
+
+lution. Let (
+
+m
+
+A 2
+
+,
+
+m
+
+B2 ) = Mill
+
+(x, y) denote the millionaires’
+
+protocol where Alice’s input is x, Bob’s input is y, and they
+
+receive boolean shares as output:
+
+m
+
+A 2
+
+⊕
+
+m
+
+B 2
+
+=
+
+1{x
+
+>
+
+y}.
+
+4.2 Approximate Truncation
+In ﬁxed-point computation, truncation is a necessary procedure to maintain the precision after multiplication. CrypTFlow2 proposes faithful truncation that realizes the function-
+ality FTr,ufnc (Figure 7b). We observe that large overhead in
+the protocol can be removed in neural network inference.
+
+4.2.1 One-Bit Approximate Truncation
+In prior works [43–45], local truncation is used to approximate
+FTr,ufnc, which leads to both a large error with small probability
+and a last-bit small error with 1/2 probability. CrypTFlow2 corrects both these errors, resulting in a heavy faithful truncation protocol. Indeed, the large error destroys the result, and in practice, the probability is actually non-negligible when
+
+Inputs and Outputs:
+
+z
+
+A 2
+
+,
+
+z
+
+B 2
+
+← Trunc(
+
+x
+
+A 2
+
+,
+
+x
+
+B 2
+
+,
+
+f)
+
+such
+
+that x ∈ Z2 , and z = x f or z = (x f ) − 1.
+
+1: Alice and Bob call the millionaires’ protocol:
+
+(
+
+w
+
+A 2
+
+,
+
+w
+
+B2 ) = Mill
+
+(
+
+x
+
+A,2
+
+−1−
+
+x
+
+B).
+
+2: Alice and Bob invoke an instance of FB22fA with inputs
+
+(
+
+w
+
+A 2
+
+,
+
+w
+
+B2 ) and learn (
+
+w
+
+A 2f
+
+,
+
+w
+
+B 2f
+
+).
+
+3: Alice computes z A = ( x A
+
+f)−
+
+w
+
+A 2f
+
+·2
+
+−f
+
+.
+
+Bob
+
+com-
+
+putes z B = ( x B
+
+f)−
+
+w
+
+B 2f
+
+·2
+
+−f
+
+.
+
+Figure 8: Proposed One-Bit Approximate Truncation Protocol
+in the FB22fA-hybrid model.
+
+≤ 64, which is the case in this work. Nonetheless, as shown by [16], the last-bit small error does not affect the quality of prediction models in machine learning which we also experimentally verify in a concrete neural network (see § 6.4). We observe that by removing the constraint of correcting the last-bit error, the truncation protocol can be made far more lightweight, providing signiﬁcant improvement in communication and computation.
+Proposition 3 Given an unsigned -bit integer x and its arithmetic shares x0 and x1, deﬁne w = 1{x0 + x1 > 2 − 1}. Let c be one-bit integer 0 or 1. We have: (x0 f ) + (x1 f ) − w · 2 = (x f ) − c.
+Proof 2 The proposition follows from Corollary 4.2 in [49]. First, w denotes whether the sum of two shares wrap around 2 . If so, there will be large error for local truncation and it should be corrected by subtracting 2 . c comes from a probabilistic last-bit error that is decided by whether the sum of least signiﬁcant s bits of x0 and x1 wraps around 2 f .
+Let FB22fA denote the functionality that accepts boolean shares
+of x ∈ {0, 1} and returns arithmetic shares of x in Z2f . We
+provide an implementation of FB22fA in Appendix F. The one-
+bit approximate truncation protocol is provided in Figure 8.
+
+4.2.2 Approximate Truncation with Known MSB
+
+As pointed out by [48], 2PC protocols could be designed in
+
+a far more efﬁcient way when the MSB of the inputs are
+
+known. In these cases, truncation can be further optimized
+
+to be a cheap operation. We consider the case of our one-bit
+
+approximate truncation when MSB is zero (e.g., after ReLU),
+
+and give the corresponding protocol details in Figure 9. When
+
+MSB is known, computing boolean shares of the wrap-around
+
+bit w can be accomplished with a single call to
+
+2 1
+
+-OT1
+
+instead
+
+of the expensive Mill protocol. Indeed, when MSB is zero,
+
+w = msb( x A) ∨ msb( x B). A similar protocol can also be
+
+derived when MSB is one and w = msb( x A) ∧ msb( x B).
+
+10
+
+Inputs and Outputs:
+
+z
+
+A 2
+
+,
+
+z
+
+B 2
+
+← Truncmsb
+
+x
+
+A 2
+
+,
+
+x
+
+B 2
+
+,f
+
+such that x ∈ Z2 , msb(x) = 0, and z = x f or z = (x f ) − 1.
+
+1: Alice samples
+
+w
+
+A 2
+
+←R
+
+{0, 1}.
+
+2:
+
+If msb(
+
+x
+
+A) = 0, Alice sets (s0, s1) = (
+
+w
+
+A 2
+
+,
+
+1
+
+⊕
+
+w
+
+A 2
+
+);
+
+oth-
+
+erwise, Alice sets (s0, s1) = (1 ⊕
+
+w
+
+A 2
+
+,
+
+1
+
+⊕
+
+w
+
+A2 ).
+
+3: Alice and Bob invoke
+
+2 1
+
+-OT1,
+
+where
+
+Alice
+
+inputs
+
+messages
+
+(s0, s1) and Bob inputs a choice msb( x B). Bob learns
+
+w
+
+B 2
+
+as its output.
+
+4: Alice and Bob invoke an instance of FB22fA with inputs
+
+(
+
+w
+
+A 2
+
+,
+
+w
+
+B 2
+
+)
+
+and
+
+learn
+
+(
+
+w
+
+A 2f
+
+,
+
+w
+
+B 2f
+
+).
+
+5: Alice computes z A = ( x A
+
+f)−
+
+w
+
+A 2f
+
+·2
+
+− f . Bob com-
+
+putes z B = ( x B
+
+f)−
+
+w
+
+B 2f
+
+·2
+
+−f
+
+.
+
+Figure 9: Proposed Truncation Protocol with Input MSB=0
+in the FB22fA-hybrid model.
+
+4.2.3 Communication Complexity
+
+We provide a comparison of communication complexity
+
+among the discussed truncation protocols in Table 4. CrypT-
+
+Flow2’s faithful truncation involves a single call to FM−ill1,
+
+4 1
+
+-OT
+
+, FB22A,
+
+and
+
+FMfill. This leads to a communication up-
+
+per bound of λ( + f + 2) + 19 + 14 f bits when sub-block
+
+length m = 4 in the millionaires’ protocol. A direct replace-
+
+ment of OT with the VOLE version gives us an upper bound
+
+of 16 + 11 f bits, according to our complexity analysis in
+
+Table 2 and 3 (FB22A uses a single call of
+
+2 1
+
+-COT
+
+).
+
+One-
+
+bit approximate truncation involves a call to FMill and FB22fA,
+
+which gives a communication of 13 bits. When MSB is
+
+known, the cost is reduced to f + 4 bits.
+
+5 Further Optimizations
+We present some optimizations that have not been considered in the previous inference systems [7, 35, 43, 49]. Some of our optimizations can also be applied to these systems.
+
+5.1 Reducing Computation Overhead
+The BN layer can be placed right after a CONV or FC layer. For instance, 58 out of the 121 BN layers in DenseNet121 are placed right after a CONV layer. We observe that we can apply the BN fusion technique to save the computation of HomBN since the weights of the BN layer and the CONV layer are already known by Alice. Speciﬁcally, for each BNthen-CONV structure in the DNN, Alice ﬁrst multiplies the weights of the BN layer (i.e., µ) to the kernel K of the CONV layer. Then Alice and Bob jointly invoke the HomCONV protocol on the scaled kernel. After HomCONV, Alice adds the shift vector θ to her additive share. Interestingly, by using BN fusion, we also save the computation of truncation since we have saved one depth of ﬁxed-point multiplication.
+
+Table 4: Communication complexity of truncation protocols of -bit integers truncated by f bits.
+
+Truncation Protocol Faithful [49]
+Faithful (VOLE) One-bit approx. (VOLE) One-bit approx. (VOLE, MSB)
+
+Communication (bits) λ( + f + 2) + 19 + 14 f
+16 + 11 f 13 f +4
+
+5.2 Reducing Communication Overhead
+We present two orthogonal optimizations for reducing the volume of ciphertexts sent by Alice in our protocols.
+In the proposed linear protocols, Alice sends many LWE ciphertexts back to Bob for decryption. Indeed, some of the LWE ciphertexts will share the same vector a in their second component if they are extracted from the same RLWE ciphertext. To reduce the communication overhead, Alice can only send one copy of this vector to Bob.
+Our second optimization comes from an insightful observation to the (R)LWE decryption formula. Suppose Alice needs to send an LWE ciphertext (b, a) ∈ ZNq +1 to Bob for decryption. Our optimization suggests Alice send just some of the high-end bits of b and the values in a to Bob and skip the remaining low-end parts. In brief, Alice can skip the low b =√ log2(q/p) − 1 bits of b and the low a = log2(q/(6.6 N p)) bits of the values in a when transferring the ciphertext to Bob. Bob might fail to decrypt the “deform” ciphertext at a negligible chance (i.e., < 2−38). Indeed, this optimization saves about 16% – 25% of the communication sent by Alice in our HE-based protocols. We defer the calculation of b and a to to Appendix E.
+
+6 Evaluations
+
+6.1 Experiment Setup
+
+Our implementation is built on top of the SEAL library [52]
+
+with the HEXL acceleration [31] and the EMP toolkit [58].
+
+We also extend the Ferret2 protocol in EMP to support var-
+
+ious application-level OT types, such as
+
+n 1
+
+-OT
+
+.
+
+To
+
+com-
+
+pare, we use the open-source library SCIHE that provided
+
+by the authors of CrypTFlow2. Besides the OT-based non-
+
+linear protocols in CrypTFlow2, SCIHE also offers many op-
+
+timized implementation of state-of-the-arts including the se-
+
+cure convolution [35, 43], and the matrix–vector multiplica-
+
+tion from [13, 26] using an old version of SEAL. For a fair
+
+comparison, we modify the code in SCIHE to adopt the latest
+
+version of SEAL and to apply HEXL acceleration.
+
+Testbed Environment. All the following experiments were
+
+performed on Alibaba Cloud ecs.c7.2xlarge instances with a
+
+2Our protocol can use any VOLE-style OT extension such as [10, 15, 59].
+
+11
+
+Table 5: Comparing the running time and communication
+costs of our linear protocols with the state-of-the-arts. All runs were executed using single thread. 1MB = 220 bytes.
+
+FC [49, 51] Ours
+
+ni, no
+2048, 1001 512, 10
+2048, 1001 512, 10
+
+End2End Time LAN WAN
+
+1,533ms 1,587ms 17ms 60ms
+
+111ms 4ms
+
+171ms 51ms
+
+Commu.
+0.50MB 0.50MB 1.83MB 0.11MB
+
+CONV HW,C, M, h, s
+
+[49, 51] Ours
+
+2242, 3, 64, 7, 2 2242, 3, 64, 3, 2 562, 64, 256, 1, 1 562, 256, 64, 1, 1
+2242, 3, 64, 7, 2 2242, 3, 64, 3, 2 562, 64, 256, 1, 1 562, 256, 64, 1, 1
+
+End2End Time LAN WAN
+
+Commu.
+
+25.52s 7.06s 8.21s 7.41s
+
+27.28s 8.78s 8.74s 8.51s
+
+76.02MB 76.02MB 28.01MB 52.02MB
+
+1.30s 1.33s 0.83s 0.70s
+
+2.11s 2.16s 1.10s 0.99s
+
+49.62MB 49.62MB 15.30MB 17.07MB
+
+BN [49, 51] Ours
+
+HW,C
+562, 64 562, 256 562, 64 562, 256
+
+End2End Time LAN WAN
+
+Commu.
+
+0.28s 1.14s
+
+0.50s 12.51MB 2.17s 49.01MB
+
+0.22s 0.88s
+
+0.34s 6.84MB 1.36s 27.34MB
+
+2.70 GHz processor and 16 gigabytes of RAM. All our programs are implemented in C++ and compiled by gcc-8.4.0. We ran our benchmarks in two network settings. The bandwidth between the cloud instances were about 384 MBps (LAN) and 44 MBps (WAN), respectively. The round-trip time were about 0.3ms (LAN) and 40ms (WAN), respectively.
+Concrete SEAL’s Parameters. We instantiate our protocols using the SEAL parameters HE.ppCheetah = {N = 4096, q ≈ 2105, p = 237, σ = 3.2}. Recall that the current secure convolution protocol in SCIHE [51] demands HW /s2 ≤ N/2. For most of the time, it can be instantiated using the SEAL parameters HE.ppSCI = {N = 8192, q ≈ 2180, p ≈ 237, σ = 3.2}. On the other hand, to handle the convolution on large tensors we have to instantiate SCIHE using a larger lattice dimension e.g., N = 32768 in their implementation. The security levels under these parameters are not aligned but all of them can provide at least λ = 128 bits of security according to SEAL.
+DNN Architectures. We measure the performance of Cheetah on 6 DNNs. For instance, the ResNet50 is trained to classify RGB images of 224 × 224 pixels into 1001 classes. The ResNet50 has over 23 million trainable parameters. It consists of 53 CONV layers, 49 BN layers and 1 FC layer. For the non-linear operations, ResNet50 consists of 49 ReLU, 98
+
+Table 6: Comparing the running time and communication costs of our non-linear protocols with the state-of-the-art. All runs were executed using single thread. The communication and timing are accumulated for 216 runs of the protocols.
+
+Benchmark Millionaire
+Truncation Trunc. with known MSB
+
+Method
+[49] Ours
+[49] Ours
+[49] Ours
+
+End2End Time LAN WAN
+
+572ms 1,680ms
+
+496ms 663ms
+
+1.1×
+
+2.5×
+
+544ms 1,914ms
+
+432ms 655ms
+
+1.2×
+
+2.9×
+
+213ms 31ms 6.8×
+
+716ms 101ms
+7.1×
+
+Commu.
+31.56MB 2.72MB 11.6×
+34.57MB 2.86MB 12.0×
+14.09MB 0.16MB 88.0×
+
+truncation, 1 max-pooling, 1 average-pooling and 1 argmax. Metrics. We measure the total communication including all the messages sent by Alice and Bob but excluding the onetime setup (e.g., keys generation and base-OT). We measure the end-to-end running time including the time of transferring messages through the LAN/WAN but we rule out the time for HE key generation and base-OT.
+6.2 Microbenchmarks
+6.2.1 Linear Functions
+We compare the performance of the proposed linear protocols with the counterparts implemented in SCIHE in Table 5. The key takeaway is that our computation time is about 1.3× – 20× faster than SCIHE’s, and our communication cost is about 1.5× – 2× lower3, depending on the input size.
+Moreover, our linear protocols can accept additive shares from the ring Z2 that is more friendly for subsequent nonlinear layers, while prior approaches [26, 35, 43, 49] that leverage the homomorphic rotation could only accept shares from a prime ﬁled Zp. To accept shares from Z2 , they need to apply the Chinese Remainder Theorem to expand the plaintext modulus to above (2 + 1 + 40) bits for achieving 40bit statistical security [19]. The downside is that it will increase the computation and communication costs by a factor of O((2 + 1 + 40)/ ) which is about 4 for our parameters.
+6.2.2 Non-linear Functions
+We also benchmark the non-linear functions in Table 6, by running SCIHE and Cheetah with a single thread under the LAN and WAN settings. The performance accounts for 216 calls to the protocols, which resembles a scenario of batch
+3The only exception is the FC layer, where our communication cost may be 1.33MB higher than theirs.
+
+12
+
+Table 7: Performance comparison with DELPHI [43, Figure
+13] in the LAN setting. Inputs to the benchmarks were RGB images of 32 × 32 pixels. Aligned parameters of sharing modulo to Z241 and ﬁxed-point precision to f = 11 with DELPHI were used for Cheetah in this benchmark.
+
+Benchmark System DELPHI [43]
+MiniONN Cheetah
+DELPHI [43] ResNet32 Cheetah
+1GB = 230 bytes.
+
+End2End Time
+≈ 110s 3.55s
+≈ 30×
+≈ 200s 15.95s ≈ 12×
+
+Commu.
+≈ 3.6GB 0.03GB ≈ 117×
+≈ 6.5GB 0.11GB ≈ 58×
+
+execution in neural network inference. From the table, we observe that our solution signiﬁcantly reduces the communication cost, i.e., by more than 10× in all non-linear protocols. The improvements come from both the VOLE-style OT upgrades, and our more concise protocol designs.
+6.3 Comparison with DELPHI
+In Table 7, we compare Cheetah with DELPHI [43], one of the state-of-the-art 2PC-NN systems. Similar to DELPHI, we perform these computations on the CIFAR dataset [38] with a larger bit-width of = 41 in the WAN setting using 4 threads. Note that Cheetah’s HE-based protocols are also compatible with the online/ofﬂine optimizations [5] used by DELPHI. Thus, in Table 7, we present the sum of the ofﬂine and online costs of DELPHI reported in their paper (updated version). Here, Cheetah is about 1 order of magnitude faster than DELPHI and about 2 orders of magnitude efﬁcient than DELPHI in terms of communication. Cheetah can give the same output as DELPHI since both frameworks will introduce 1-bit error in each truncation if we assume the harsh truncation error in DELPHI does not occur on shallow NNs.
+6.4 Comparison with CrypTFlow2
+With all our protocols and optimizations in place, we demonstrate the performance of Cheetah by running cryptographic inferences on large DNNs efﬁciently. Table 8 shows that Cheetah is efﬁcient enough to evaluate SqueezeNet [30], ResNet50 [27], and DenseNet121 [29] within 3 minutes even under the WAN setting. The end-to-end running time of Cheetah was about 2× – 5× faster than SCIHE within 8% bandwidth consumption of SCIHE. To the best of our knowledge, no prior secure two-party inference system can evaluate ResNet50 and DenseNet121 within 10 minutes under the commodity hardware and network conditions as ours. Compare with a Three-party Approach. In Table 8, we also provide the performance of SecureQ8 [16], one of the
+
+Table 8: Performance comparison with SCIHE and SecureQ8 (three-party) on large-scale DNNs. We used the precision f = 12 for ﬁxed-point values and 4 threads for the benchmarks.
+
+Benchmark
+
+System
+
+End2End Time LAN WAN
+
+Commu.
+
+SqNet
+
+SCIHE [49] SecureQ8 [16]
+Cheetah
+
+41.1s 147.2s 4.4s 134.1s 16.0s 39.1s
+
+5.9GB 0.8GB 0.5GB
+
+RN50
+
+SCIHE [49] 295.7s 759.1s SecureQ8 [16] 32.6s 379.2s
+
+Cheetah
+
+80.3s 134.7s
+
+29.2GB 3.8GB 2.3GB
+
+DNet
+
+SCIHE [49] 296.2s 929.0s
+
+SecureQ8 [16] 22.5s 342.6s
+
+Cheetah
+
+79.3s 177.7s
+
+35.4GB 4.6GB 2.4GB
+
+SqNet = SqueezeNet; RN50 = ResNet50; DNet = DenseNet121
+
+30 25 20 15 10
+5 0
+0123456789
+
+12
+
+SCI-HE
+
+Cheetah
+10
+
+8
+
+6
+
+4
+
+2
+
+0 0123456789
+
+Figure 10: The top-10 values in the prediction vector of 1000 values from SqueezeNet (left) and ResNet50 (right).
+
+most efﬁcient three-party secure inference framework. These results are obtained by re-running their implementation [53] under ours environment. As is shown, SecureQ8 was 3× - 4× faster than Cheetah on LAN, while Cheetah was 2× - 3× faster on WAN by the virtue of less communication 4 .
+6.5 Effective Approximate Truncation
+To demonstrate the effectiveness of our approximate truncation protocols, we performed more predictions on SqueezeNet using an image set [1] that includes about 1,000 images from ImageNet. For all these images, Cheetah outputs the same classiﬁcation label as SCIHE. Let’s zoom in a bit. In Figure 10, we present the top-10 values in the prediction vectors (i.e., the input to the ﬁnal ArgMax layer) computed by SCIHE and Cheetah on ResNet50 and SqueezeNet. Here we can see that Cheetah gives almost the same prediction vectors as SCIHE which are bit-wise equivalent to the plaintext ﬁxed-point computation. Also, according to the extensive experiments in CrypTFlow2 [49, Table 10], the prediction accuracy achieved by ﬁxed-point computation can match the accuracy of the ﬂoating-point counterpart. We conclude that our approximate truncation protocols are effective for the 2PC-NN setting.
+4Note that the implementation [53] uses ﬁxed ring sizes i.e., ∈ {64, 128}.
+
+13
+
+Conclusion
+Secure two-party deep neural network inference is getting closer to practicality. Cheetah presents a highly optimized architecture that runs the complex ResNet50 model in less than 2.5 minutes even under the WAN setting, consuming 2.3 GB of communication. The evidential improvement over stage-of-the-art comes from a set of novel cryptographic protocols that are built upon a more profound exploration of the problem-setting. Cheetah also provide better alternatives to a wide spectrum of functional evaluation problems in secure two-party computation.
+One of our furture work is to apply orthogonal optimizations commonly adopted in DNN such as quantization and hardware acceleration. We believe the day is not that far off when some applications such as privacy-preserving medical diagnosis could be done in seconds. Availability. Cheetah is available from https://github. com/Alibaba-Gemini-Lab/OpenCheetah. Acknowledgment. The authors would like to thank the anonymous reviewers for their insightful comments and Dr. Marina Blanton for the shepherding. The authors would also like to thank ChenKai Weng from Northwestern University for helpful discussions on Ferret.
+References
+[1] Imagenet-sample-images. https://github.com/ EliSchwartz/imagenet-sample-images, 2020. 1000 images, one random image per image-net class. For easy visualization/exploration of classes.
+[2] Martín Abadi, Andy Chu, Ian J. Goodfellow, H. Brendan McMahan, Ilya Mironov, Kunal Talwar, and Li Zhang. Deep learning with differential privacy. In CCS, pages 308–318, 2016.
+[3] Nitin Agrawal, Ali Shahin Shamsabadi, Matt J. Kusner, and Adrià Gascón. QUOTIENT: two-party secure neural network training and prediction. In CCS, pages 1231– 1247, 2019.
+[4] Gilad Asharov, Yehuda Lindell, Thomas Schneider, and Michael Zohner. More Efﬁcient Oblivious Transfer and Extensions for Faster Secure Computation. In Proceedings of the 2013 ACM SIGSAC Conference on Computer and Communications Security, pages 535–548, New York, NY, USA, 2013.
+[5] Donald Beaver. Efﬁcient multiparty protocols using circuit randomization. In CRYPTO, volume 576, pages 420–432, 1991.
+[6] Michael Ben-Or, Shaﬁ Goldwasser, and Avi Wigderson. Completeness theorems for non-cryptographic fault-
+
+tolerant distributed computation (extended abstract). In STOC, pages 1–10. ACM, 1988.
+[7] Fabian Boemer, Anamaria Costache, Rosario Cammarota, and Casimir Wierzynski. nGraph-HE2: A highthroughput framework for neural network inference on encrypted data. In WAHC, pages 45–56. ACM, 2019.
+[8] Fabian Boemer, Yixing Lao, Rosario Cammarota, and Casimir Wierzynski. nGraph-HE: a graph compiler for deep learning on homomorphically encrypted data. In Computing Frontiers, pages 3–13, 2019.
+[9] Raphael Bost, Raluca Ada Popa, Stephen Tu, and Shaﬁ Goldwasser. Machine learning classiﬁcation over encrypted data. In NDSS, 2015.
+[10] Elette Boyle, Geoffroy Couteau, Niv Gilboa, Yuval Ishai, Lisa Kohl, Peter Rindal, and Peter Scholl. Efﬁcient tworound OT extension and silent non-interactive secure computation. In CCS, pages 291–308, 2019.
+[11] Alon Brutzkus, Ran Gilad-Bachrach, and Oren Elisha. Low latency privacy preserving inference. In ICML, pages 812–821, 2019.
+[12] Ran Canetti. Security and composition of multiparty cryptographic protocols. Journal of Cryptology, 13(1):143–202, 2000.
+[13] Hao Chen, Wei Dai, Miran Kim, and Yongsoo Song. Efﬁcient multi-key homomorphic encryption with packed ciphertexts with application to oblivious neural network inference. In CCS, pages 395–412, 2019.
+[14] Hao Chen, Wei Dai, Miran Kim, and Yongsoo Song. Efﬁcient homomorphic conversion between (ring) LWE ciphertexts. In Kazue Sako and Nils Ole Tippenhauer, editors, ACNS, volume 12726, pages 460–479, 2021.
+[15] Geoffroy Couteau, Peter Rindal, and Srinivasan Raghuraman. Silver: Silent VOLE and oblivious transfer from hardness of decoding structured LDPC codes. In CRYPTO, pages 502–534, 2021.
+[16] Anders P. K. Dalskov, Daniel Escudero, and Marcel Keller. Secure evaluation of quantized neural networks. Proc. Priv. Enhancing Technol., 2020(4):355–375, 2020.
+[17] Anders P. K. Dalskov, Daniel Escudero, and Marcel Keller. Fantastic four: Honest-majority four-party secure computation with malicious security. In Michael Bailey and Rachel Greenstadt, editors, USENIX, pages 2183– 2200, 2021.
+[18] Roshan Dathathri, Olli Saarikivi, Hao Chen, Kim Laine, Kristin E. Lauter, Saeed Maleki, Madanlal Musuvathi, and Todd Mytkowicz. CHET: an optimizing compiler
+
+14
+
+for fully-homomorphic neural-network inferencing. In SIGPLAN, pages 142–156, 2019.
+[19] Daniel Demmler, Thomas Schneider, and Michael Zohner. ABY - A framework for efﬁcient mixedprotocol secure two-party computation. In NDSS. The Internet Society, 2015.
+[20] Daniel Escudero, Satrajit Ghosh, Marcel Keller, Rahul Rachuri, and Peter Scholl. Improved primitives for MPC over mixed arithmetic-binary circuits. In CRYPTO, pages 823–852, 2020.
+[21] Craig Gentry, Shai Halevi, and Nigel P. Smart. Homomorphic evaluation of the AES circuit. In CRYPTO, pages 850–867, 2012.
+[22] Ran Gilad-Bachrach, Nathan Dowlin, Kim Laine, Kristin E. Lauter, Michael Naehrig, and John Wernsing. CryptoNets: Applying neural networks to encrypted data with high throughput and accuracy. In ICML, pages 201–210, 2016.
+[23] Oded Goldreich. The Foundations of Cryptography Volume 2: Basic Applications. Cambridge University Press, 2004.
+[24] Thore Graepel, Kristin E. Lauter, and Michael Naehrig. ML Conﬁdential: Machine learning on encrypted data. In Taekyoung Kwon, Mun-Kyu Lee, and Daesung Kwon, editors, ICISC, pages 1–21, 2012.
+[25] V. Gulshan, L. Peng, M. Coram, M. C. Stumpe, D. Wu, A. Narayanaswamy, S. Venugopalan, K. Widner, T. Madams, J. Cuadros, R. Kim, R. Raman, P. C. Nelson, J. L. Mega, , and D. R. Webster. Development and validation of a deep learning algorithm for detection of diabetic retinopathy in retinal fundus photographs. JAMA, 316:2402–2410, 2016.
+[26] Shai Halevi and Victor Shoup. Algorithms in HElib. In CRYPTO, pages 554–571, 2014.
+[27] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR, pages 770–778, 2016.
+[28] Ehsan Hesamifard, Hassan Takabi, Mehdi Ghasemi, and Rebecca N. Wright. Privacy-preserving machine learning as a service. PoPETs, 2018(3):123–142, 2018.
+[29] Gao Huang, Zhuang Liu, Laurens van der Maaten, and Kilian Q. Weinberger. Densely connected convolutional networks. In CVPR, pages 2261–2269, 2017.
+[30] Forrest N. Iandola, Matthew W. Moskewicz, Khalid Ashraf, Song Han, William J. Dally, and Kurt Keutzer. Squeezenet: Alexnet-level accuracy with 50x fewer parameters and <1mb model size. CoRR, 2016.
+
+[31] Intel HEXL (release 1.2.2). https://arxiv.org/abs/ 2103.16400, October 2021.
+[32] Yuval Ishai, Joe Kilian, Kobbi Nissim, and Erez Petrank. Extending Oblivious Transfers Efﬁciently. In CRYPTO, pages 145–161, 2003.
+[33] Bargav Jayaraman and David Evans. Evaluating differentially private machine learning in practice. In Nadia Heninger and Patrick Traynor, editors, USENIX, pages 1895–1912, 2019.
+[34] Xiaoqian Jiang, Miran Kim, Kristin E. Lauter, and Yongsoo Song. Secure outsourced matrix computation and application to neural networks. In CCS, pages 1209– 1222, 2018.
+[35] Chiraag Juvekar, Vinod Vaikuntanathan, and Anantha Chandrakasan. GAZELLE: A low latency framework for secure neural network inference. In USENIX, pages 1651–1669, 2018.
+[36] Vladimir Kolesnikov and Ranjit Kumaresan. Improved OT extension for transferring short secrets. In CRYPTO, pages 54–70, 2013.
+[37] Nishat Koti, Mahak Pancholi, Arpita Patra, and Ajith Suresh. SWIFT: super-fast and robust privacypreserving machine learning. In Michael Bailey and Rachel Greenstadt, editors, USENIX, pages 2651–2668, 2021.
+[38] Alex Krizhevsky. Learning multiple layers of features from tiny images. https://www.cs.toronto.edu/ ~kriz/learning-features-2009-TR.pdf, 2009.
+[39] Nishant Kumar, Mayank Rathee, Nishanth Chandran, Divya Gupta, Aseem Rastogi, and Rahul Sharma. CrypTFlow: Secure tensorﬂow inference. In SP, pages 336– 353. IEEE, 2020.
+[40] Yehuda Lindell. How to simulate it - A tutorial on the simulation proof technique. In Yehuda Lindell, editor, Tutorials on the Foundations of Cryptography, pages 277–346. 2017.
+[41] Jian Liu, Mika Juuti, Yao Lu, and N. Asokan. Oblivious neural network predictions via minionn transformations. In CCS, pages 619–631, 2017.
+[42] Wenjie Lu and Jun Sakuma. More practical privacypreserving machine learning as A service via efﬁcient secure matrix multiplication. In Michael Brenner and Kurt Rohloff, editors, WAHC, pages 25–36, 2018.
+[43] Pratyush Mishra, Ryan Lehmkuhl, Akshayaram Srinivasan, Wenting Zheng, and Raluca Ada Popa. DELPHI: A cryptographic inference service for neural networks. In USENIX, pages 2505–2522, 2020.
+
+15
+
+[44] Payman Mohassel and Peter Rindal. ABY3: A Mixed Protocol Framework for Machine Learning. In CCS, pages 35–52, 2018.
+
+[45] Payman Mohassel and Yupeng Zhang. SecureML: A system for scalable privacy-preserving machine learning. In SP, pages 19–38. IEEE Computer Society, 2017.
+
+[46] Moni Naor and Benny Pinkas. Oblivious Transfer and Polynomial Evaluation. In STOC, pages 245–254, 1999.
+
+[47] Arpita Patra, Thomas Schneider, Ajith Suresh, and Hossein Yalame. ABY2.0: improved mixed-protocol secure two-party computation. In Michael Bailey and Rachel Greenstadt, editors, USENIX, pages 2165–2182, 2021.
+
+[48] Deevashwer Rathee, Mayank Rathee, Rahul Kranti Kiran Goli, Divya Gupta, Rahul Sharma, Nishanth Chandran, and Aseem Rastogi. SiRnn: A math library for secure RNN inference. In SP, pages 1003–1020. IEEE, 2021.
+
+[49] Deevashwer Rathee, Mayank Rathee, Nishant Kumar, Nishanth Chandran, Divya Gupta, Aseem Rastogi, and Rahul Sharma. CrypTFlow2: Practical 2-party secure inference. In CCS, pages 325–342. ACM, 2020.
+
+[50] M. Sadegh Riazi, Mohammad Samragh, Hao Chen, Kim Laine, Kristin E. Lauter, and Farinaz Koushanfar. XONN: XNOR-based oblivious deep neural network inference. In Nadia Heninger and Patrick Traynor, editors, USENIX, pages 1501–1518, 2019.
+
+[51] Secure and correct inference (SCI) library. https: //github.com/mpc-msri/EzPC/tree/master/SCI, June 2021.
+
+[52] Microsoft SEAL (release 3.7). https://github.com/ Microsoft/SEAL, September 2021. Microsoft Research, Redmond, WA.
+
+[53] Multi-protocol SPDZ.
+
+https://github.com/
+
+data61/MP-SPDZ/tree/master, February 2022.
+
+[54] Reza Shokri, Marco Stronati, Congzheng Song, and Vitaly Shmatikov. Membership inference attacks against machine learning models. In SP, pages 3–18, 2017.
+
+[55] Nigel P. Smart and Frederik Vercauteren. Fully homomorphic SIMD operations. Des. Codes Cryptogr., 71(1):57–81, 2014.
+
+[56] Florian Tramèr and Dan Boneh. Slalom: Fast, veriﬁable and private execution of neural networks in trusted hardware. In ICLR, 2019.
+
+[57] Florian Tramèr, Fan Zhang, Ari Juels, Michael K. Reiter, and Thomas Ristenpart. Stealing machine learning models via prediction apis. In USENIX, pages 601–618, 2016.
+
+[58] Xiao Wang, Alex J. Malozemoff, and Jonathan Katz. EMP-toolkit: Efﬁcient MultiParty computation toolkit. https://github.com/emp-toolkit, 2022.
+[59] Kang Yang, Chenkai Weng, Xiao Lan, Jiang Zhang, and Xiao Wang. Ferret: Fast extension for correlated OT with small communication. In CCS, pages 1607–1626, 2020.
+[60] Xiaoyong Zhu, George Iordanescu, Ilia Karmanovi, and Mazen Zawaideh. Using microsoft ai to build a lungdisease prediction model using chest x-ray images.
+A Threat Model and Security
+We provide security against a static semi-honest probabilis-
+tic polynomial time adversary A following the simulation
+paradigm [12, 23, 40]. That is, a computationally bounded
+adversary A corrupts either Alice (Server) or Bob (Client) at
+the beginning of the protocol ΠF and follows the protocol speciﬁcation honestly. Security is modeled by deﬁning two interactions: a real interaction where Alice and Bob execute
+the protocol ΠF in the presence of A and the environment E
+and an ideal interaction where the parties send their inputs
+to a trusted party that computes the functionality F faithfully. Security requires that for every adversary A in the real inter-
+action, there is an adversary Sim (called the simulator) in the
+ideal interaction, such that no environment E can distinguish
+between real and ideal interactions. We recap the deﬁnition of a cryptographic inference proto-
+col in DELPHI [43]. The server holds a model W consisting
+of d layers W1, · · · , Wd. The client holds an input vector x.
+Deﬁnition 1 A protocol Π between a server having as input
+model parameters W = (W1, . . . , Wd) and a client having as
+input a feature vector x is a cryptographic inference protocol if it satisﬁes the following guarantees.
+• Correctness. On every set of model parameters W that
+the server holds and every input vector x of the client, the output of the client at the end of the protocol is the
+correct prediction W (x).
+• Privacy. We require that a corrupted, semi-honest client does not learn anything about the server’s network
+parameters W . Formally, we require the existence
+of an efﬁcient simulator SimC such that ViewCΠ ≈c SimC(meta, out) where ViewCΠ is the view of the client in the execution of Π, meta includes the meta information (i.e., the public parameters HE.pp, the public key pk, the number of layers, the size and type of each layer, and the activation) and out denotes the output of the inference.
+We also require that a corrupted, semi-honest server does not learn anything about the private input x of the client. Formally, we require the existence of an efﬁcient
+
+16
+
+Inputs and Outputs T A , T B ← HomCONV { T A , K}, { T B , sk}
+and T = Conv2D(T, K; s) ∈ ZMp ×H ×W . Public Parameters: pp = (HE.pp, pk, M,C, H,W, h, s).
+
+such that
+
+T A , T B ∈ ZCp×H×W , K ∈ ZMp ×C×h×h
+
+• Shape meta M,C, H,W, h such that h2 ≤ N and stride s > 0. The optimal sizes of the partition winodws that minimize
+
+argminHw,Ww
+
+C N /(HwWw )
+
+H −h+1 Hw−h+1
+
+W −h+1 Ww+h−1
+
+such that h ≤ Hw ≤ H, h ≤ Ww ≤ W and HwWw ≤ N.
+
+•
+
+The partition window size along the C-axis and M-axis is Cw = min(C,
+
+N HwWw
+
+) and Mw = min(M,
+
+N Cw HwWw
+
+).
+
+• Set dM =
+
+M Mw
+
+, dC =
+
+C Cw
+
+, dH =
+
+H −h+1 Hw−h+1
+
+and dW =
+
+W −h+1 Ww−h+1
+
+. Ow = HwWw(MwCw − 1) +Ww(h − 1) + h − 1.
+
+• Set H =
+
+H −h+s s
+
+,W
+
+=
+
+W −h+s s
+
+,H w=
+
+Hw−h+s s
+
+and W w =
+
+Ww−h+s s
+
+.
+
+1: Bob ﬁrst partitions T B into blocks along the H-axis and W -axis Tα,β B ∈ ZCq ×Hw×Ww for α ∈ [[dH ]] and β ∈ [[dW ]]. Each block Tα,β B consists of Hw continuous rows and Ww continuous columns of T B. Indeed, Tα,β B is taken from the α(Hw − h + 1)-th row and β(Ww − h + 1)-th column of T B. Zero-padding might be used to make sure all Tα,β B blocks
+contain the same number of rows and columns. 2: Bob then splits the channels of each block tensor Tα,β B into non-overlapping blocks Tγ,α,β B ∈ ZCpw×Hw×Ww for γ ∈ [[dC]].
+Also, zero-padding might be used to make sure all Tγ,α,β B blocks contain the same number of channels. 3: Bob encrypts and then sends the RLWE ciphertexts {CTγ,α,β = RLWENpk,q,p(πiconv( Tγ,α,β B))} to Alice. 4: Alice partitions T A into blocks Tγ,α,β A ∈ ZCpw×Hw×Ww following the same manner in Step 1 and Step 2. Then Alice
+encodes each block to a polynomial via tˆγ,α,β A = πiconv( Tγ,α,β A). 5: Alice then splits K into sub-kernels along the M-axis, i.e., Kθ ∈ ZMp w×C×h×h for θ ∈ [[dM]]. Then Alice further split
+each Kθ into smaller block along the C-axis, i.e., Kθ,γ ∈ ZMp w×Cw×h×h for γ ∈ [[dC]]. Zero-padding might be used to
+make sure all blocks contains the same number of elements. Then Alice encodes these block tensors into polynomials kˆθ,γ = πwconv(Kθ,γ, Ow). 6: Alice samples T A from ZMp ×H ×W uniformly at random and outputs it. 7: On receiving {CTγ,α,β}, Alice computes CTθ,α,β = γ∈[[dC]](CTγ,α,β tˆγ,α,β A) kˆθ,γ for θ ∈ [[dM]], α ∈ [[dH ]] and β ∈
+[[dW ]].
+8: [Extrat and Re-mask.]For each c ∈ [[M]], i ∈ [[H ]], and j ∈ [[W ]], Alice sends an LWE ciphertext to Bob ctc ,i , j = Extract(CTθ,α,β, Ow − cCwHwWw + isHw + js) T A [c , i , j ], where the index of CTθ,α,β is calculated as θ = c /Mw ,
+α = i s/(Hw − h + 1) , and β = j s/(Ww − h + 1) . The position of the extracting coefﬁcient is determined by c ≡
+c mod Mw, i ≡ i mod Hw and j ≡ j mod Ww. 9: On receiving the ciphertexts {ctc ,i , j }, Bob outputs T B ∈ ZMp ×H ×W where T B [c , i , j ] = LWE−sk1(ctc ,i , j ).
+
+Figure 11: Proposed Secure Convolution Protocol (Full Version)
+
+simulator SimS such that ViewΠS ≈c SimS(meta) where ViewΠS is the view of the server in the execution of Π.
+B SIMD and Homomorphic Rotation
+The SIMD technique [55] uses a discrete fourier transform over the prime ﬁeld Zp to convert vectors v, u ∈ ZNp of N elements to ring elements vˆ ∈ AN,p and uˆ ∈ AN,p, respectively. The product polynomial vˆ· uˆ ∈ AN,p decodes to the Hadamard product between the vectors v and u. In the context of encryption, the SIMD technique can amortize the cost of homomorphic multiplication by a factor of 1/N. However, once the
+
+SIMD-encoded vector is encrypted, it is not straightforward to manipulate the positions of the encoded values. For example, to homomorphically right-hand-side rotate the encrypted vector by k ∈ [1, N) unit, one needs to multiply the ciphertext with a rotation key given as RLWENsk,q,p(ρ5k mod 2N (sk)) where the automorphism ρg : AN,p → AN,p is deﬁned by ρg(aˆ(X)) = aˆ(Xg) mod XN + 1.
+C Full Version of HomCONV
+We now present the full version of HomCONV in Figure 11. In Step 1 and Step 2 of Figure 11, Bob ﬁrst partitions its share
+
+17
+
+of tensor (with zero-padding) into smaller blocks of the same shape Cw × Ww × Hw along the three dimensions. Bob then sends to Alice dCdH dW RLWE ciphertexts that each of them encrypts one partition block of T B in Step 3. In the next two steps, Alice ﬁrst partitions its share T A following the same partitioning manner in Step 1 and Step 2. After that Alice partitions the kernel K into dMdC non-overlapping blocks Then Alice can encode each of them using πwconv with an identical parameter Ow that is because the tensor T is partitioned into blocks of the same shape Cw × Hw × Ww. On receiving the RLWE ciphertexts from Bob, Alice then computes the secure convolution using dMdCdH dW homomorphic multiplications and homomorphic additions. Indeed, the RLWE ciphertext CTθ,α,β in Step 7 corresponds to the convolution of the block tensor Tα,β and the sub-kernels Kθ. As a result, each RLWE ciphertext CTθ,α,β obtains at most MwHwWw values of T in its encrypted coefﬁcients. Finally, Alice extracts MH W LWE ciphertexts that each of them encrypts one entry of the output tensor T . Similar to the basic version, in Step 8 Alice randomizes the encrypted values in the LWE ciphertexts by homomorphically adding uniform random values before sending back the LWE ciphertexts to Bob for decryption.
+Theorem 4 The protocol HomCONV in Figure 11 realizes
+the ideal functionality FCONV of Figure 1b for the ﬁeld F =
+Zp and for h2 ≤ N in presence of a semi-honest admissible adversary.
+
+D Proofs
+
+Proof 3 (Proposition 2) We write O = O − c CHW for simplicity. By the deﬁnition (1) we have
+
+tˆ [x] = ∑ tˆ[d]kˆ[x − d] − ∑ tˆ[d]kˆ[N + x − d] (6)
+
+0≤d≤x
+
+x<d<N
+
+for all x ∈ [[N]]. Since tˆ[x] is zero for all x ≥ CHW and the target position O + i sW + j s > CHW , we thus have
+
+tˆ [O + i sW + j s] = ∑ tˆ[d]kˆ[O + i sW + j s − d] d<CHW
+= ∑ tˆ[cHW + iW + j]kˆ[O + i sW + j s − (cHW + iW + j)] c,i, j
+= ∑ tˆ[cHW + iW + j]kˆ[O − cHW − (i − i s)W − ( j − j s)] c,i, j
+= ∑ tˆ[cHW + (i s + l)W + j s + l ]kˆ[O − cHW − lW − l ]
+c,i , j
+
+The last line replaces i = i s + l and j = j s + l . Also, according to the deﬁnition of πwconv, the value kˆ[O − cHW − lW − l ] is zero when l, l ∈/ [[h]]. Thus, we only need to take care of
+
+the positions that l, l ∈ [[h]]. The above equation continues.
+= ∑ tˆ[cHW + (i s + l)W + j s + l ]kˆ[O − cHW − lW − l ]
+c∈[[C]]
+l,l ∈[[h]]
+= ∑ T[c, i s + l, j s + l ]kˆ[O − c CHW − cHW − lW − l ]
+c∈[[C]]
+l,l ∈[[h]]
+= ∑ T[c, i s + l, j s + l ]K[c , c, l, l ]
+c∈[[C]]
+l,l ∈[[h]]
+The ﬁnal line is exactly T [c , i , j ].
+Proof 4 (Theorem 2.) The correctness of Theorem 2 is directly derived from Proposition 2. We now show the the privacy part. (Corrupted Alice.) Alice’s view of ViewHAomCONV consists of an RLWE ciphertext CT . The simulator SimA for this view can be constructed as follows.
+1. Given the access to meta, SimA outputs the ciphertext CT = RLWEpNk,q(0) to Alice.
+The security against a corrupted Alice (Server) is directly reduced to the semantic security of the underly encryption. Thus we have ViewHAomCONV ≈c SimA(meta). (Corrupted Bob.) Bob’s view of ViewHBomCONV consists of LWE ciphertexts {ctc ,i , j }, and the decryption of these LWE ciphertexts, i.e., T B. The simulator SimC for this view can be constructed as follows.
+1. On receiving the RLWE ciphertext CT from Bob and given the access to meta, SimB samples uniform random polynomial rˆ ∈ AN,p and computes CT = RLWENpk,q(rˆ).
+2. For each c ∈ [[M]], i ∈ [[H ]] and j ∈ [[W ]], SimB outputs an LWE ciphertext c˜tc ,i , j = Extract(CT) to Bob.
+3. Given the access to out, SimB outputs the tensor T˜ such that T˜ [c , i , j ] = rˆ[O − c CHW + i sW + j s] for each c ∈ [[M]], i ∈ [[H ]] and j ∈ [[W ]].
+Similarly, the LWE ciphertexts {ctc ,i , j } ≈c {c˜tc ,i , j } due to the semantic security. Also, the values in the output tensor T B of Bob in HomCONV distribute uniformly in Zp which is exact the same distribution SimB samples T˜ . Thus we have ViewHBomCONV ≈c SimB(meta, out).
+The security proofs for the Theorems 1 3 and 4 can be given in a similar manner.
+E On the Calculation of a and b
+Remind that the LWE ciphertext (b, a) ∈ ZNq +1 of message m ∈ Zp is decrypted by ﬁrst computing me = b + a s which equals to q/p m + e for some error e. Then we obtain
+
+18
+
+Table 9: DNN Architectures.
+
+Networks linear operations
+
+non-linear operations
+
+CONV BN FC ReLU-then-Trunc Trunc
+
+MNet
+
+7
+
+01
+
+7
+
+0
+
+RN32
+
+34 34 1
+
+31
+
+37
+
+SqNet
+
+26
+
+00
+
+26
+
+0
+
+RN50
+
+53 49 1
+
+49
+
+49
+
+DNet
+
+121 121 0
+
+121
+
+120
+
+MNet = MiniONN; RN32 = ResNet32; RN50 = ResNet50 SqNet = SqueezeNet; DNet = DenseNet121
+
+Inputs & Outputs:
+
+z
+
+A 2
+
+,
+
+z
+
+B 2
+
+← AND
+
+x
+
+A 2
+
+,
+
+x
+
+B 2
+
+,
+
+y
+
+A 2
+
+,
+
+y
+
+B 2
+
+s.t. x, y, z ∈ {0, 1} and z = x ∧ y.
+
+1:
+
+Alice and Bob jointly generate a beaver triple:
+
+c
+
+A 2
+
+⊕
+
+c
+
+B 2
+
+=
+
+(
+
+a
+
+A 2
+
+⊕
+
+a
+
+B2 ) ∧ (
+
+b
+
+A 2
+
+⊕
+
+b
+
+B 2
+
+).
+
+2: Alice computes
+
+e
+
+A 2
+
+=
+
+x
+
+A 2
+
+⊕
+
+a
+
+A 2
+
+and
+
+f
+
+A 2
+
+=
+
+y
+
+A 2
+
+⊕
+
+b A2 .
+
+Bob computes
+
+e
+
+B 2
+
+=
+
+x
+
+B 2
+
+⊕
+
+a
+
+B 2
+
+and
+
+f
+
+B 2
+
+=
+
+y
+
+B 2
+
+⊕
+
+b B2 .
+
+3: Alice and Bob open e and f .
+
+4:
+
+Alice computes
+
+z
+
+A 2
+
+=(
+
+a
+
+A 2
+
+·
+
+f)⊕(
+
+b
+
+A 2
+
+·
+
+e)
+
+⊕
+
+c
+
+A 2
+
+,
+
+and
+
+Bob
+
+computes
+
+z
+
+B 2
+
+= (e ·
+
+f)⊕(
+
+a
+
+B 2
+
+·
+
+f)⊕(
+
+b
+
+B 2
+
+·
+
+e)
+
+⊕
+
+c
+
+B 2
+
+Figure 12: Protocol for FAND.
+
+the message as m = me p/q . In other words, the low = log2(q/p) bits of me will be dropped during the divide-thenround and thus are useless for decryption. This motives us to skip some of the low-end bits of b and a, and to only transfer the remains high-end bits to reduce the communication cost if the LWE ciphertext is sent for decryption.
+We explicitly write the high-end and low-end parts of b and a as b = bH 2 b +bL and a = aH 2 a +aL such that 0 ≤ bL < 2 b and the values in aL are 2 a -bounded. Then me can be written
+
+as me = bL + aL s + bH 2 b + aH s2 a . If the sum bL + aL s < 2 then we can just send the high-end parts bH and aH for de-
+cryption. The key here is to ﬁnd out an upper bound for
+
+aL s. Remind that the secret vector s distributes uniformly in {0, ±1}N. Since a is basically an uniform random vector,
+
+we can assume that the values in aL distributes uniformly in
+
+[0√, 2
+
+a ).
+
+Then
+
+the
+
+variance
+
+of
+
+aL
+
+s
+
+is
+
+Var
+
+≈
+
+2N 9
+
+(2
+
+a )2.
+
+We
+
+use
+
+7 Var (i.e., 7 times standard deviation) as a high-probability
+
+upper bound (≈ 1 − 2−38.5) on the value aL s. Finally, to determine the concrete b and a, we can either maximize the
+
+number of bits that can be saved that is b + N a under the
+
+constraints a, b ∈ [0, log2(q) ) and 7
+
+2N 9
+
+2
+
+a
+
++2
+
+b
+
+<
+
+2
+
+,
+
+or just setting b =
+
+− 1 and a =
+
+− 1 − log2(7
+
+2N 9
+
+)
+
+.
+
+Inputs and Outputs:
+
+d
+
+A 2f
+
+,
+
+d
+
+B 2f
+
+← B2A
+
+c
+
+A 2
+
+,
+
+c
+
+B 2
+
+,
+
+f
+
+such
+
+that c ∈ {0, 1} and d = c.
+
+1: Alice and Bob invoke an instance of
+
+2 1
+
+-COT f , where Alice
+
+is the sender with correlation function g(x) = x − 2
+
+c
+
+A 2
+
+and
+
+Bob is the receiver with input choice c B2 . Alice learns x and
+
+Bob learns y.
+
+2:
+
+Alice computes
+
+d
+
+A 2f
+
+=
+
+c
+
+A 2
+
+− x,
+
+and
+
+Bob
+
+computes
+
+d
+
+B 2f
+
+=
+
+c
+
+B 2
+
++
+
+y.
+
+Figure 13: B2A Protocol.
+
+F Protocols for FAND and FB22fA
+
+We describe the classic protocol for computing FAND in Fig-
+
+ure 12, where beaver triples are generated with
+
+2 1
+
+-ROT1
+
+[4].
+
+We describe a protocol for FB22fA in Figure 13, which is also
+
+used in CryptoFlow2 [49, 51], except that
+
+2 1
+
+-COT f
+
+is instan-
+
+tiated with VOLE-style OT.
+
+19
+

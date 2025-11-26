@@ -1,0 +1,231 @@
+ 
+Your Privacy 
+ 
+We use cookies to make sure that our website works properly, as well as some ‘optional’ cookies to personalise content and advertising, provide social media features and analyse how people use our site. By accepting some or all optional cookies you give consent to the processing of your personal data, including transfer to third parties, some in countries outside of the European Economic Area that do not offer the same data protection standards as the country where you live. You can decide which optional cookies to accept by clicking on ‘Manage Settings’, where you can also find more information about how your personal data is processed. Further information can be found in our privacy policy . 
+Accept All Cookies Manage Preferences 
+Skip to main content 
+ 
+Advertisement 
+SpringerLink 
+Search 
+Go to cart 
+ 
+    Log in 
+ 
+    Published: 02 May 2018 
+ 
+Next-generation cybersecurity through a blockchain-enabled federated cloud framework 
+ 
+    Olumide O. Malomo , 
+    Danda B. Rawat   & 
+    Moses Garuba   
+ 
+The Journal of Supercomputing volume  74 ,  pages 5099–5126 ( 2018 ) Cite this article 
+ 
+    1594 Accesses 
+ 
+    16 Citations 
+ 
+    Metrics details 
+ 
+Abstract 
+ 
+Minimizing the breach detection gap (BDG) for cyber-attacks is a big concern for all organizations and governments. Cyber-attacks are discovered daily, many of which have gone undetected for days to years before the victim organizations detect and deploy the cyber defense. Cyber defense solutions are advancing to combat risks and attacks from traditional to next-generation advanced defense protection solutions. However, many individuals, organizations and businesses continue to be hit by new waves of global cyber-attacks. In this paper, we present a blockchain-enabled federated cloud computing framework that uses the Dempster–Shafer theory to reduce BDG by continuously monitoring and analyzing the network traffics against cyber-attacks. We evaluate the proposed approach using numerical results, and the proposed approach outperforms the traditional approaches. 
+ 
+This is a preview of subscription content, access via your institution . 
+References 
+ 
+    Wang Y-M (2009) Security challenges in an increasingly connected world 
+ 
+    Government Accountability Office (GAO), Center for Science, Technology, and Engineering Report to Congressional Requesters: Internet of Things Status and implications of an increasingly connected world 
+ 
+    FTC Staff Reporting, “Internet of Things: Privacy and Security in a Connected World” 
+ 
+    EndGame (2016) Mind the Detection Gap: Three things SOC teams must consider for earliest detection of unknown threats 
+ 
+    Hutchins EM, Cloppert MJ, Amin RM (2011) Intelligence-driven computer network defense informed by analysis of adversary campaigns and intrusion kill chains. Lead Iss Inf Warf Secur Res 1:80 
+ 
+    Google Scholar   
+ 
+    SANS Institute (2014) Killing advanced threats in their tracks: an intelligent approach to attack prevention 
+ 
+    Silvey L (2016) Cybersecurity and data breach: impact on business in Illinois 
+ 
+    Kaspersky Lab. (2017) Damage control: the cost of security breaches IT security risks special report series 
+ 
+    Germano JH, Goldman ZK (2014) After the breach: cybersecurity liability risk 
+ 
+    Experis (2014) Security breaches: is anyone safe? 
+ 
+    Valdetero J, Zetoony D, Cave B (2014) Data security breaches incident preparedness and response 
+ 
+    Ponemon Institute (2011) Reputation impact of a data breach 
+ 
+    NTT Com Security (2016) Security Breaches—what’s the real cost to your business? Risk:Value Report 
+ 
+    Sungard Availability Services, “The consequences of a Cyber Security Breach” Retrieved from https://www.sungardas.com/en/cyber-security-advice/articles/the-consequences-of-a-cyber-security-breach.html 
+ 
+    Gold S (2011) Advanced evasion techniques 
+ 
+    Article   Google Scholar   
+ 
+    Phan B Seven key features to help you stop advanced evasion techniques at the firewall Senior Security Architect, McAfee 
+ 
+    Matrosov A, Rodionov E (2013) Advanced evasion techniques by Win32/Gapz 
+ 
+    OECD (2010) The changing consumer and market landscape 
+ 
+    KPMG (2017) The changing landscape of disruptive technologies 
+ 
+    Stratton AM, Wong KW (1997) Issues essential to world web market 
+ 
+    Kehrli J (2016) Blockchain explained 
+ 
+    Narayanan A, Miller A (2016) Cryptocurrencies, blockchains, and smart contracts; hardware for deep learning 
+ 
+    Lemieux VL (2018) Trusting records: is blockchain technology the answer? 
+ 
+    Dinh TT, Wang J, Chen G, Liu R, Ooi BC, Tan K (2017) BLOCKBENCH: a framework for analyzing private blockchain 
+ 
+    Li W, Fedorov S, Sforzin A, Karame GO Towards scalable and private industrial blockchains 
+ 
+    Emmadi N, Narumanchi H (2017) Reinforcing immutability of permissioned blockchains with keyless signatures. Infrastructure 
+ 
+    Stiller B, Bocek T Blockchains and smart contracts—a valuable alternative for distributed data bases 
+ 
+    Digitalogy (2017) All you need to know about blockchain! 
+ 
+    Tapscott D, Tapscott A (2017) How blockchain will change organization 
+ 
+    Ding CH, Nutanong S, Buyya R Peer-to-peer networks for content sharing 
+ 
+    De Gruyter (2017) Blockchain revolution 
+ 
+    Norta A (2015) Creation of smart-contracting collaborations for decentralized autonomous organization 
+ 
+    Google Scholar   
+ 
+    Monax (2017) Explainer–blockchain. Retrieve from https://monax.io/explainers/Blockchains 
+ 
+    Liang X, Shetty S, Tosh D, Kamhoua C, Kwiat K, Njilla L (2017) ProvChain: a blockchain-based data provenance architecture in cloud environment with enhanced privacy and availability 
+ 
+    Pilkington M (2015) Blockchain technology: principles and applications 
+ 
+    Hull R (2017) Blockchain: distributed event-based processing in a data-centric world 
+ 
+    Gervais A, Karame GO, Wust K (2016) On the security and performance of proof of work blockchains 
+ 
+    Larimer D (2013) Transactions as proof-of-stake 
+ 
+    Milutinovic M, Wu H, He H, Kanwal M (2016) Proof of luck: an efficient blockchain consensus protocol 
+ 
+    Cachin C (2016) Architecture of the hyperledger blockchain fabric 
+ 
+    Mazieres D (2016) The stellar consensus protocol: a federated model for internet-level consensus 
+ 
+    Baliga A (2017) Understanding blockchain consensus models 
+ 
+    ComputerWeekly. Nearly a third of malware attacks are zero-day exploits. Retrieved from http://www.computerweekly.com/news/450415866/Nearly-a-third-of-malware-attacks-are-zero-day-exploits 
+ 
+    Digital-Guardian (2017) 91% Of cyber attacks start with a phishing email: here’s how to protect against phishing. Retrieved from https://digitalguardian.com/blog/91-percent-cyber-attacks-start-phishing-email-heres-how-protect-against-phishing 
+ 
+    Sentz K, Ferson S (2002) Combination of Evidence in Dempster–Shafer theory, April 2002 
+ 
+    Horneman A, Dell N (2014) Smart collection and storage method for network traffic data 
+ 
+    He J (2015) Dempster–Shafer theory of evidence 
+ 
+    Rawat DB, Njilla L, Kwiat K, Kamhoua CA (2018) iShare: Blockchain Based Privacy-aware Multi-Agent Information Sharing Games for Cybersecurity. In: Proceedings of the 2018 International Conference on Computing, Networking and Communications (ICNC): Communications and Information Security Symposium. Maui, Hawaii, USA, March 5–8, 2018 
+ 
+    Rawat DB, Alshaikhi A (2018) “Leveraging Distributed Blockchain-based Scheme for Wireless Network Virtualization with Security and QoS Constraints.” In: Proceedings of the 2018 International Conference on Computing, Networking and Communications (ICNC): Communications and Information Security Symposium, Maui, Hawaii, USA, March 5–8, 2018 
+ 
+Download references 
+Acknowledgements 
+ 
+This work was supported in part by the U.S. National Science Foundation (NSF) under Grants CNS-1658972 and CNS-1650831, and by the U.S. Department of Homeland Security (DHS) under Grant award number, 2017‐ST‐062‐000003. However, any opinion, finding, and conclusions or recommendations expressed in this document are those of the authors and should not be interpreted as necessarily representing the official policies, either expressed or implied, of the funding agencies. All co-authors have contributed in this paper. 
+Author information 
+Affiliations 
+ 
+    Data Science and Cybersecurity Center (DSC2), College of Engineering and Architecture, Department of Electrical Engineering and Computer Science, Howard University, Washington, DC, 20059, USA 
+ 
+    Olumide O. Malomo, Danda B. Rawat & Moses Garuba 
+ 
+Corresponding author 
+ 
+Correspondence to Danda B. Rawat . 
+Rights and permissions 
+ 
+Reprints and Permissions 
+About this article 
+Verify currency and authenticity via CrossMark 
+Cite this article 
+ 
+Malomo, O.O., Rawat, D.B. & Garuba, M. Next-generation cybersecurity through a blockchain-enabled federated cloud framework. J Supercomput 74, 5099–5126 (2018). https://doi.org/10.1007/s11227-018-2385-7 
+ 
+Download citation 
+ 
+    Published : 02 May 2018 
+ 
+    Issue Date : October 2018 
+ 
+    DOI : https://doi.org/10.1007/s11227-018-2385-7 
+ 
+Keywords 
+ 
+    Federated cloud 
+    Blockchain 
+    Breach detection gap 
+    Federated blockchain cloud computing 
+    Dempster–Shafer theory  
+ 
+Access options 
+Buy single article 
+ 
+Instant access to the full article PDF. 
+ 
+USD 39.95 
+ 
+Price includes VAT (USA) 
+Tax calculation will be finalised during checkout. 
+ 
+Rent this article via DeepDyve. 
+ 
+Learn more about Institutional subscriptions 
+ 
+    Sections 
+    Figures 
+    References  
+ 
+    Abstract 
+    References 
+    Acknowledgements 
+    Author information 
+    Rights and permissions 
+    About this article  
+ 
+Advertisement 
+ 
+Over 10 million scientific documents at your fingertips 
+Switch Edition 
+ 
+    Academic Edition 
+    Corporate Edition 
+ 
+    Home 
+    Impressum 
+    Legal information 
+    Privacy statement 
+    California Privacy Statement 
+    How we use cookies 
+    Manage cookies/Do not sell my data 
+    Accessibility 
+    FAQ 
+    Contact us 
+    Affiliate program 
+ 
+Not logged in - 154.17.2.206 
+ 
+Not affiliated 
+Springer Nature 
+ 
+© 2022 Springer Nature Switzerland AG. Part of Springer Nature . 

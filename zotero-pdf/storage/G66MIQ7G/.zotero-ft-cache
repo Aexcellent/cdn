@@ -1,0 +1,461 @@
+Mobile Networks and Applications (2022) 27:2172–2181 https://doi.org/10.1007/s11036-021-01854-x
+
+Demand Forecasting for Freight Transport Applying Machine Learning into the Logistic Distribution
+
+Toma´ s Eloy Salais-Fierro1 · Jania Astrid Saucedo Mart´ınez1
+
+Accepted: 3 September 2021 / Published online: 27 January 2022 © The Author(s), under exclusive licence to Springer Science+Business Media, LLC, part of Springer Nature 2021
+Abstract The use of information technologies such as Transportation Management System (TMS) is crucial to improve the transportation process in a company, offering potential results that include optimization of shipments, an increase in cost savings and customer satisfaction. The TMS, along with data analysis techniques such as Machine Learning (ML) and/or Data Mining (DM) are useful tools for demand forecasting, facilitating strategic, tactical and operational decision making, which ultimately improves the logistics distribution performance. For this, this work proposes a methodology that will compare three prediction methods (traditional statistical method, hybrid method and artificial neural network), which will be tested through the Mean Squared Error (MSE) indicator to determine which one has more accurate results in the forecast of demand for freight transport. The experimental results obtained in this research show that the historical data saved in a TMS can be used for reliably freight transportation demand forecasting. Each of the three methods proposed in this paper has been an effective tool in resolving time series forecasting problems, and when Artificial Neuronal Network (ANN) was used, better results are yielded.
+Keywords Time series forecasting · Machine Learning · Freight transportation · Transportation management system · Artificial neural networks
+
+1 Introduction
+In the current globalized economy, competition is not between companies but between the performance of supply chains, which requires a more precise evaluation of logistics processes, so working as independent entities is not an option. So, with more demanding customers, the best way to achieve their satisfaction must be by finding the lowest possible logistics costs. Frequent technological innovations have practically become an obligation for logistics players rather than a competitive advantage, hence concepts such as Artificial Intelligence (AI), machine learning (ML), data mining (DM), Industry 4.0, Internet of things (IoT), Big
+Jania Astrid Saucedo Mart´ınez jania.saucedomrt@uanl.edu.mx
+1 Facultad de Ingenieria Mecanica y Electrica, Universidad Autonoma de Nuevo Leon, San Nicolas de los Garza, NL, 66445, Mexico
+
+Data, among others, are increasingly present in the business world.
+In terms of customer satisfaction, transportation has an important place as it guarantees deliveries on time and without damage. The movements that impact the product delivery to the customer, generate costs and times that must be reduced to achieve an efficient process. For this reason, transport is a key factor within the supply chain since it is a fundamental issue for improving logistics management..
+Many solutions have been proposed to solve transportation problems in the supply chain. Transportation management system or TMS has been a widely used tool because it serves to save costs, improved route selection, better decision-making, etc, while responding more quickly to world-class requirements. TMS demonstrates that information technologies are fundamental to “survive” in markets that evolve quickly and respond to customers with greater requirements, thus ensuring, the economic performance of the company.
+On the other hand, numerical methods have always been used to solve transportation problems, so AI is a strategic point in this field. Using mathematical algorithms and ML or DM, interesting models can be created to improve the
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+2173
+
+logistics process through data analysis and using different tools such as Matlab, R or the Weka software.
+Taking into account the utilities of the TMS, through its data storage function, in this work they have been transformed into useful information that contributes to decisionmaking. Three data analysis methods were compared to obtain a good time series prediction on freight demand using real data from a leading manufacturing company in its sector, located in Nuevo Leo´n, Mexico. A traditional statistical method, a hybrid method (traditional statistical method + ANN) and the use of ANN resulted in any of these three tools being able to solve these types of problems, but it should be noted that with ANN better results were obtained.
+A dataset was obtained from the information stored in the TMS of a company. After that, the data was prepared in order to do a freight transportation demand forecasting using the autoregressive integrated moving average method, better know as ARIMA. The ARIMA forecast result was used as target for the Nonlinear Autoregressive Network with Exogenous Inputs (NARX) because in this investigation it was proposed to improve it. Lastly it was done the Nonlinear Autoregressive Neural Network (NAR) forecast, in other words, the prediction was done only with the input data without target information.
+The rest of this document is organized as follows: Section 2 provides general background information on issues related to this research. Section 3 describes the general details of the proposed methodology. While in Section 4 the results of the experiments are explained after having used the proposed methodology with actual data from a manufacturing company, in addition to presenting the discussion of them. And finally, in Section 5, the article ends with the conclusions and a proposal for future work.
+
+2 Background
+2.1 TMS
+The use of Information and Communication Technologies (ICT) has been key to improving many activities in our normal life and in the Logistics area it has been a strategic point of competence. In the field of freight transport, various solutions have been presented to carry out movements in a strategic way, ensuring customers a product in a timely manner that implies the lowest possible cost for companies. Therefore, moving goods, people and data from one place to another has been a fundamental issue for political, economic and social development. Transportation is immersed in day-to-day activities because a way is required to move from point A to point B, constantly seeking to shorten distances and reduce costs that could generate the desired displacement, which makes it a decisive link in the supply chain, as depicted in the Fig. 1.
+In the search to reduce logistics costs and trying to achieve the efficiency of the processes involved in the supply chain, ICTs have played a central role through tools such as TMS, which is used in outbound logistics to plan and control product distribution activities.
+TMS was developed in the 1990s due to the need for solutions to address complex transportation chains due to the complexity of global and closely related supply chains [1]. It has evolved over the years, and as a consequence, it is one of the transport tools most used by companies, since it allows the control of freight costs, integration with other ICTs and interaction with customers, business partners and operators [2]. In other words, it has become a useful strategy for decision-making, allowing costs to be reduced and helping to optimize transportation. Therefore, a TMS is a transport solution that contributes to saving time and improving productivity [3].
+
+Fig. 1 Transportation in the supply chain
+
+2174
+Fig. 2 Forecasting approaches. Source: [8]
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+Among the benefits that a TMS offers, is the ability to collect transportation data that can be transformed in a practical way to support decision-making in companies [4]. Therefore, it can be viewed as a database in which information about freight movements from a point A to a point B, such as the type of vehicle, stop locations, stop times for loading and unloading, is stored, allowing shipment planning according to decision rules or algorithms [5], whose data can be transformed into useful information that contributes to managerial decision making, thus improving the performance of the supply chain [6].
+With that information stored by a TMS, data analysis can be performed to forecast future transportation demands, and thus be prepared to meet them properly. [7] reported that transportation demand forecasts serve to be prepared to meet demand in terms of quantity and quality with the least consumption of resources possible, resources that are generally wasted trying to move both goods and passengers from one place to another.
+Different techniques have been used to make prediction that contribute to decision making, In Fig. 2 can be seen some forecasting approaches made with information provided by [8]. It is worth to mention that in this research the Time Series Models were used because it was wanted to observe the behavior of the variable in the time.
+Below is a summary of the time series models, emphasizing the use of statistical methods, artificial neural networks, and hybrid methods to forecast demand.
+
+2.2 The time series forecasting models
+Time Series Models are observations that are done through time [9], with which future events can be predicted.
+How it can be seen in the Table 1, the researchers have used different forecasting techniques based on historical data. Although for a long time, the statistical methods of prediction known as traditional have been used in many research works. Lately, they have been working with ANN, mainly due to its learning characteristics, its ability to manage big data, its power to replicate and scale processes, and its speed to process data.
+In this research work was selected a forecasting traditional methods according to the data set collected, after that, the resulting forecast was used as target for the network type NARX and the these two methods results were compared with the network type NAR result. Below these kind of ANN are going to be explained.
+2.2.1 Artiﬁcial neural networks
+Artificial Neural Network is part of the IA and imitate the functioning of biological neural network. It is a tool for the data extraction in order to convert them in useful information for the making-decision, for instance, by creating forecasts. ANN have proven to be a powerful tool for the efficient events prediction, therefore, it has been investigated by several authors
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+Table 1 Forecasting using different methods
+
+Author(s) Publication Year Forecasting of.... ..
+
+[10]
+
+2002
+
+[11]
+
+2003
+
+[12]
+
+2008
+
+[13]
+
+2010
+
+[14]
+
+2012
+
+[15]
+
+2013
+
+[16]
+
+2013
+
+[17]
+
+2014
+
+[18]
+
+2014
+
+[19]
+
+2014
+
+[20]
+
+2014
+
+[21]
+
+2015
+
+[22]
+
+2015
+
+[23]
+
+2016
+
+[24]
+
+2016
+
+[25]
+
+2017
+
+International travel demand for Australia Oil sales Cetes trend Demand of commodities after natural disasters Wood sales in Mexico Demand of the interspinous dynamic fixative Demand for calls in the Call Center Time series data of various kinds Demand of perishable dairy products ATMs’ cash demand Food products sales Demand for re-manufactured products Gas consumption Electric vehicle charging demand for stochastic power System operation Demand for medical supplies Container flows
+
+∗EMD: Empirical Model Decomposition. ∗HW: Holt-Winters. ∗SMA: Simple Moving Average. ∗ARIMA: Autoregressive Integrated Moving Average. ∗SES: Single Exponential Smoothing.
+
+2175
+Methods
+ARIMA ANN vs. 12 Traditional Methods ARIMA vs. ANN Hybrid (EMD-ARIMA) ARIMA vs. NAR, ARMAX vs NARX Hybrid (ARIMA - ANN) 3 Traditional Methods vs. ANN ARIMA vs. ANN vs. Hybrid (ARIMA-ANN) HW vs. ARIMA ANN 3 Traditional Methods vs. ANN Exponential smoothing ANN ARIMA
+SMA vs. Hibryd (Croston- SES) ANN
+
+in different fields such as finance, energy generation, service, medicine, environmental sciences and material sciences [26].
+In relation to demand forecasts, the electric power field has been widely investigated due to its importance to society. A general vision of the energy demand forecasting methods published between 2005 and 2015 was shown by [27], concluding that the method most used for researchers has been ANN, which demonstrate its effectiveness in making predictions. Additionally, the authors proposed as a future research field, the hybrid methods development using the several methods combination in order to make demand forecasts.
+ANN has also been used in the transport area, and studies such as the that was done by [28] demonstrated their effectiveness; Using ANN, these authors designed a methodology to inter-modal transport demand forecast, that is, the prediction of the daily containers release from the port terminals, concluding that, with the information collected about the current day (ship arrival , amount of containers according to destination, historical quantities arrival, etc.) can be predicted the containers number of 20 and 40 feet that will leave the port the following day, which
+
+will improve the transport efficiency in an inter-modal chain.
+On the other hand, [29] used three algorithms to predict the weight transported by the company Iran Khodro Company (IKCO), demonstrating that ANN can be used for the transport demand forecast. So, in the transport field, ANN have been well received because of their ability to analyze large data amounts, their modeling flexibility, their accuracy to generate results, their adaptability, and their ability to learn; in general, they usually make good predictions [30].
+It should be noted that ANN can be modeled using different computational interface, from Excel sheet to sophisticated software such as R, Weka, Matlab, etc. The software Matlab with its Neural Network ToolboxTM has been widely used for the events prediction taking into account a historical data time series, where it can be possible to use nonlinear Auto-regressive Network External (Exogenous) input (NARX) and Nonlinear Auto-regressive (NAR).
+Basically, to use the NAR network, only the input data is required, that means, it is to predict y(t) series given the y(t) past values, as it can be seen in the Eq. 1. While, the NARX network is use when the researchers have a target,
+
+2176
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+Fig. 3 Proposed methodology
+
+so, it is to predict y(t) series given y(t) and x(t) past values, as it can be seen in Eq. 1.
+
+y(t) = f (y(t − 1), ..., y(t − d))
+
+(1)
+
+y(t) = f (y(t − 1), ..., y(t − d), x(t − 1), ..., x(t − d)) (2)
+
+In this research work, both the NARX network type and the NAR network type were used, the first with historical data on transportation demand, while the second used the same input data set. In addition to an objective data set that they were obtained from the forecast generated by a traditional statistical method.
+Next, the proposed method to obtain a more robust and flexible forecast is explained.
+
+3 The ANN forecasting approach
+
+The vehicle quantity required by the company was predicted for that it can be prepared to satisfy its future demand. 3. Determine the forecast time horizon.
+Six months freight transport prediction was carried out, that is, a medium term forescasting.1 4. Select the forecast models.
+The data were analyzed by different statistical models, concluding that the Auto-regressive Integrated Moving Average (ARIMA) was the one that most fit them. The ARIMA forecast results were used as target data for the ANN, thus creating a hybrid ARIMA-ANN model. Finally, the forecast was made using only ANN for can compared the three proposed scenarios results.
+3.1.2 Product or service selection
+The freight transport demand in a manufacturing company was selected to be forecast following the next steps:
+– The study focused on the Mexico’s northwestern region, because it is the one with the most movement when it comes to freight transport.
+– The 3.5 tons truck was selected for analysis because it has been the most popular type of vehicle in the analyzed region of Mexico.
+3.1.3 Collect the necessary data to prepare the forecast
+The data was obtained from the TMS of a manufacturing company. The data collected included information regarding the freight movement (vehicle unit, dispatch point, destination, dates, stop numbers, among others) from January 2014 to September 2018.
+
+As can be seen in the Fig. 3, the methodology consists of 4 phases which are explained below:
+3.1 PHASE I. data analysis
+In this phase consists of the following stages and the data were collected from a manufacturing company.
+
+3.2 PHASE II. tool design
+In this phase was established the resources that would be necessary for the correct use of the tool. It consists of the following stages:
+3.2.1 Requirement
+
+3.1.1 Characterization of the entity from the relevant elements
+Here the proposed forecast was described. This stage was divided in the next steps:
+1. Description of the use of the forecast. The freight transport demand of a Mexican manufac-
+turing company leader in its field was forecast. 2. Establish what is intended to forecast.
+
+Based on the previous literature review and according to the type of problem, the resources used are the following:
+– Microsoft Excel. It was used to sort the data base, find its data correlations, normalize them and do the respective normalisation.
+1It must be taken into account that the short term usually covers periods until of 3 months, the medium term of 3 to 18 months and the long term will be greater than 1 year [8].
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+2177
+
+– IBM SPSS Statistics. It was used to graph the autocorrelation functions.
+– Statgraphics Centurion XVIII. It was used to select the traditional statistical method more suitable for the data set.
+– MATLAB Neural Network Toolbox. It was used for the artificial networks development.
+3.2.2 Variable selection and data preparation
+Taking into account that it was wanted to observe the single variable behavior over time, then it was determined that the input variable would be the transport demand historical information. Additionally, when the forecast with the NARX type network was done, the forecast results obtained through the traditional statistical method were used as its objective variable.
+After than the respective variable was selected, the data that were used to make the forecast were prepared following the next steps:
+1. From the original source, the relevant data to make the forecast were transferred to other file, that is to say, the vehicle type, the product shipment status and the shipment date.
+
+2. The data was organized by date (by months) and grouped according to mexican regions where the freight were sent. It should be noted that the database was limited to Monterrey plant information of the case study company.
+3. The information that was collected was reviewed to ensure that it was complete and relevant. The erroneous data were corrected and those that were not necessary for the research were eliminated. Finally, the missing data was added.
+4. The network data were normalized with the Eq. 3, because it was used the activation function hyperbolic tangent due to it is used in multilayer networks such as the one proposed by [16]
+5. Finally, the forecast resulting data were denormalized with the Eq. 4, that is, inverting the activation function 3.
+
+xn = 2
+
+x − xmin xmax − xmin
+
+−1
+
+(3)
+
+xn =
+
+xn + 1 2
+
+(xmax − xmin)
+
++ xmin
+
+(4)
+
+Where x = A value of the data set, *xmax = Maximum value of the data set and xmin = Minimum value of the data set.
+
+Table 2 ANN parameters
+
+Parameter
+
+NARX
+
+NAR
+
+Data source Software Normalization equation Input data
+Target data
+Training Data % Validation Data % Testing Data % Network model Network type Training algorithm Layers number Hidden layer activation function Output layer activation function Hidden neurons number Delays number Epoch Error Indicator Desnormalization equation Re-entered?
+
+TMS Matlab Neural Network Toolbox See Eq. 3 Historical demand of truck 3.5 in the northeast mexican region Prediction results with the ARIMA method for the periods where the information is known 80% 5% 15% NARX MLP MLP 2 Hyperbolic tangent Linear 6 2 15 MSE See Eq. 4 Yes
+
+TMS Matlab Neural Network Toolbox See Eq. 3 Historical demand of truck 3.5 in the northeast mexican region –
+70% 15% 15% NAR MLP MLP 2 Hyperbolic tangent Linear 18 2 8 MSE See Eq. 4 Yes
+
+∗MLP: Multilayer Perceptron
+
+2178
+Fig. 4 Transportation flow of the company case study
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+3.2.3 Modeling
+According to the literature review, which allowed us to know the results of other research works, the following parameters were specified in relation to the type of tool used to forecast. But beforehand, the demand correlation of the vehicle type with respect to the monthly series is calculated.
+
+2. Using Statgraphics was selected the traditional statistical method that best suited the data set collected.
+3. The traditional statistical method selected in the previous point was developed.
+4. The validation of the traditional statistical method previously selected was carried out with the data that was set aside for this purpose.
+
+Traditional statistical method model: Next, it will be shown the steps that were followed to determine the traditional statistical method used:
+a. Using SPSS were graphed the autocorrelation function (ACF) and the partial autocorrelation function (PACF).
+b. Staphgraphics was the software used to select the forecast method that more fitted to the data, that is to say, ARIMA.
+c. Using Statgraphics, ARIMA was developed for predicting the periods with known information and for forecasting six future periods.
+d. The model was validated using real data from the company case study and with the residuals correlogram developed in Statgraphics.
+ANN method: As literature review result and after conducting experiments, the Table 2 shows the parameters that were defined to model the network type NAR and NARX.
+
+3.3.2 ANN method model
+Next, can be seen the steps that were followed to make the freight demand forecast using this method.
+1. The standardized data was entered into the Matlab software, which was used to model the network taking into account its structure. Matlab was selected because it is widely used to solve these types of problems due to the intuitive way of processing data, its processing capacity, its speed, the good results it generates and the scalability of the same. It should be noted that Matlab has a specific module called Neural Network ToolboxTM for managing artificial neural networks.
+
+3.3 PHASE III. implementation
+
+Here, the forecasts were made following the next steps depending on the method used.
+
+3.3.1 Traditional statistical method
+
+Next, the steps that were followed to make the freight demand forecast using this method.
+1. Statistical analysis:
+– The demand behavior was graphed. – The ACF and PACF were graphed.
+
+Fig. 5 Some OTM functions
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+2179
+
+Fig. 6 Truck 3.5 demand
+
+The data entered into Matlab were:
+– Input data. Historical data of the variable to forecast.
+– Target data (for the NARX net). Forecast results that were generated with the
+traditional statistical method.
+2. The ANN was developed. 3. The ANN validation model was carried out with the
+data that was set aside for this purpose.
+3.4 PHASE IV. evaluation
+The three models forecasts results were compared using MSE in order to know which one was able to generate most accurate prediction.
+4 Results analysis and discussion
+To evaluate the effectiveness of the proposed methodology to forecast freight transport demand, three forecasting methods were compared. The data used was obtained from a case study of a company located in Nuevo Leo´n, whose
+
+transport flow is activated when a material assignment is made, and ends when the product is delivered to the plant / branches or to the final customer, as it can be observed in the Fig. 4.
+The company has a TMS since 2014, which has allowed it to optimize its transport process taking advantage of the benefits that it offers (some of these benefits can be seen in the Fig. 5), but the data stored by this software has not been used to perform data analysis for forecasting future events of the company’s freight transport. For that reason, this investigation is important due to permit to identify an accurate method to predict freight transport demand and in this way to be able to combat dynamic current markets uncertainty.
+The truck 3.5 demand was graphed in the Fig. 6, which shows to have a stationary behavior because there is no significant upward or downward trend in the data behavior.
+On the other hand, in the Table 3 and in the Fig. 7 are shown the forecast results of the three methods proposed using the truck 3.5 information in the Northeast of Mexico of the company that was used as case study.
+Comparing the results generated by each of the methods with which the forecast was made, it can be observed that the MSE in the models with ANN was lower. The above
+
+Table 3 Forecasts Comparison - 6 future periods
+
+Period
+
+Real Data
+
+ARIMA Result
+
+ARIMA Error
+
+40
+
+182
+
+176
+
+41
+
+181
+
+182
+
+42
+
+154
+
+173
+
+43
+
+175
+
+160
+
+44
+
+229
+
+149
+
+45
+
+218
+
+141
+
+MSE
+
+2,153
+
+6 −1 −19
+15 80 77 1,025
+
+NARX Result
+185 197 154 144 175 173
+
+NARX Error
+−3 −16
+0 31 54 45 666
+
+NAR Result
+169 169 207 180 230 189
+
+NAR Error
+13 12 −53 −5 −1 29
+
+2180
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+Fig. 7 Comparison of forecasting methods - 6 future periods
+
+indicates that the ANN model had a better performance in this work and even it improved a traditional statistical method results as ARIMA.
+5 Conclusion and future work
+Forecasting is a good strategy to predict events that may affect the supply chain, which is why this research work has proposed a methodology that takes advantage of a TMS data storage capacity to forecast the demand for freight transport.
+Three time series methods were compared to determine which one were the most accurate in connection with their prediction results.The ARIMA method was compared with ANN (NARX and NAR net) using actual data taken from a Mexican manufacturing company leader in its field, what has allowed to conclude the following:
+– More advantage of a TMS can be get if to perform analysis with the data that it store is done.
+– As usual, none of the methods used to forecast the freight transport demand yielded exact results, but all three made good predictions.
+– The ANN are promising tools in the field of logistics, in this research the NARX network improved the results of the ARIMA method and the NAR network obtained the best 6 future periods prediction performance
+– As there is no a specific formula to find the best ANN architecture, the experimentation through trial and error is an useful process to get satisfactory prediction results.
+The following is proposed as future work:
+– To use a more robust database in order to obtain more accurate prediction results.
+– To make the forecast of long-term transport demand having a more robust database.
+
+– To do the forecast with an external variable that affect the freight transport demand.
+– To use the trial and error method with others network architecture, for instance, changing the training algorithm, the activation function, among others.
+– To compare the forecast result with the generated with other tools, for example with different statistical software (R, Weka, IBM SPSS Statistics, etc.).
+References
+1. Nettstra¨ters A, Geißen T, Witthaut M, Ebel D, Schoneboom J, Ten Hompel, M (eds), (2015) Cloud Computing for Logistics pp 1–11, https://doi.org/10.1007/978-3-319-13404-8
+2. Peerless Research Group, Transportation Management Systems. Tech. rep., Supply Chain Management Review, Logistics Management for Oracle (2014). https://www.logisticsmgmt.com/wp content/oracle wp transmangmt 0814b.pdf
+3. Ross DF (2016) Introduction to Supply Chain Management Technologies, 2nd edn. CRC Prees, New York
+4. Martel A, Klibi W (2016) In: Designing Value-Creating Supply Chain Networks. Springer, Berlin, pp 161–206. https://doi.org/10. 1007/978-3-319-28146-9 5
+5. Ballou R (2004) Log´ıstica: Administracio´n de la cadena de suministro. Pearson Educacio´n, Me´xico, Me´xico. https://docs.google. com/file/d/0B5MTkAxQgJnKVnZoWkxQSWVRaTg/view
+6. BluJay Solutions Ltd, How to turn big data into actionable intelligence. The four step process to continuous cost savings. Tech. rep., BluJay Solutions Ltd (2018). https://www.blujaysolutions. com/wp-content//2018/02/WP Actionable-Intelligence 0218.pdf
+7. Dragu V, Dinu O, Oprea C, Roman EA (2017) IOP Conference series: materials science and engineering 252(1). https://doi.org/10 .1088/1757-899X/252/1/012050
+8. Heizer J, Render B (2009) Principios de Administracio´n de Operaciones Se´ptima edicio´n. PEARSON EDUCACIO´ N, Me´xico
+9. Chatfield C (2000) Time-Series forecasting, vol 1 (Chapman & Hall/CRC
+10. Lim C, McAleer M (2002) Tour Manag 23(4):389. https://doi.org/ 10.1016/S0261-5177(01)00098-X
+11. Sebastian N, Britos P, Bibiana B, Garcia-Martinez R (2003) Reportes Te´cnicos en Ingenier´ıa del Software 5(1):1.
+
+Mobile Netw Appl (2022) 27:2172–2181
+
+2181
+
+https://www.researchgate.net/publication/26520179 Pronostico de Ventas Comparacion de Prediccion entre Redes Neuronales y Metodos Estadisicos 12. Castro A, Torres I (2008) Comercio Exterior 58(11):794. https:// dialnet.unirioja.es/servlet/articulo?codigo=2778864 13. Xu X, Qi Y, Hua Z (2010) Expert Systems with Applicationspplications 37(6):4313. https://doi.org/10.1016/j.eswa.2009.11.069 14. Ortiz CE (2012) Modelos econome´tricos y de redes neuronales para predecir la oferta maderera en me´xico: ARIMA vs NAR y ARMAX vs NARX. Tesis de maestr´ıa en ciencias, Universidad Auto´noma Metropolitana 15. Narva´ez J, Jairo JDF, Valencia M (2013) Revista Ingenier´ıa Industrial 1(1):63. https://revistas.upb.edu.co/index.php/ industrial/article/view/2309/2059 16. Jime´nez JM (2013) Prono´stico de demanda de llamadas en los call center, utilizando redes neuronales artificiales. Ph.D. thesis, Universidad de Piura. https://pirhua.udep.edu.pe/handle/11042/ 1745 17. Babu CN, Reddy BE (2014) Appl Soft Comput 23:27. https://doi. org/10.1016/j.asoc.2014.05.028 18. Pereira C, Pereira CR, Catapan A, Ortato U, Vieira W (2014) WSEAS Transactions on Business and Economics 11(1):608 19. Venkatesh K, Ravi V, Prinzie A, Van den Poel D (2014) Eur J Oper Res 232(2):383. https://doi.org/10.1016/j.ejor.2013.07.027 20. Ruelas EA, Laguna JA (2014) Ingenier´ıa Industrial. Actualidad y Nuevas Tendencias 12:91. http://www.redalyc.org/articulo.oa? id=215037911008
+
+21. Matsumoto M, Ikeda A (2015) Journal of Remanufacturing
+
+5(1):1. https://doi.org/10.1186/s13243-015-0010-y
+
+22. Szoplik J (2015) Energy 85:208. https://doi.org/10.1016/j.energy.
+
+2015.03.084
+
+23. Amini MH, Kargarian A, Karabasoglu O (2016) Electr Power
+
+Syst Res 140:378. https://doi.org/10.1016/j.epsr.2016.06.003
+
+24. Cheng CY, Chiang KL, Chen MY (2016) J Med Syst 40(10):217.
+
+https://doi.org/10.1007/s10916-016-0571-9
+
+25. Tsai F. m., Huang LJW (2017) Int J Prod Res 55(17):5001.
+
+https://doi.org/10.1080/00207543.2015.1112046
+
+26. Lao O., Rivas A., Caridad M., Marrero F. (2017) Ciencias Holgu´ın
+
+23:1. http://www.redalyc.org/articulo.oa?id=181549596004
+
+27. Ghalehkhondabi I, Ardjmand E, Weckman GR, Young WA (2017)
+
+Energy Systems 8(2):411. https://doi.org/10.1007/s12667-016-
+
+0203-y
+
+28. Bilegan IC, Crainic TG, Gendreau M (2008) European Journal Of
+
+Operational Research 13:1
+
+29. Rahman M, Jafarzadeh-Ghoushchi S, Wahab DA,
+
+Jafarzadeh-Ghoushji M (2014) Life Science Journal
+
+11(2002):146.
+
+http://www.lifesciencesite.com/lsj/life1102s/
+
+025 B00046life1102s14 146 154.pdf
+
+30. Karlaftis MG, Vlahogianni EI (2011) Transportation Research
+
+Part C: Emerging Technologies 19(3):387. https://doi.org/10.
+
+1016/j.trc.2010.10.004
+
+Publisher’s Note Springer Nature remains neutral with regard to
+jurisdictional claims in published maps and institutional affiliations.
+

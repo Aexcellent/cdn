@@ -1,0 +1,1363 @@
+Decision Support Systems 89 (2016) 1–16
+Contents lists available at ScienceDirect
+Decision Support Systems
+journal homepage: www.elsevier.com/locate/dss
+
+Real-time container transport planning with decision trees based on ofﬂine obtained optimal solutions
+Bart van Riessen a,b,⁎, Rudy R. Negenborn b, Rommert Dekker a
+a Econometric Institute, Erasmus University Rotterdam, Rotterdam, The Netherlands b Department of Maritime and Transport Technology, Delft University of Technology, Delft, The Netherlands
+
+article info
+Article history: Received 12 June 2015 Received in revised form 17 March 2016 Accepted 5 June 2016 Available online 14 June 2016
+Keywords: Intermodal planning Synchromodal planning Container transportation Decision support Decision trees
+
+abstract
+Hinterland networks for container transportation require planning methods in order to increase efﬁciency and reliability of the inland road, rail and waterway connections. In this paper we aim to derive real-time decision rules for suitable allocations of containers to inland services by analysing the solution structure of a centralised optimisation method used ofﬂine on historic data. The decision tree can be used in a decision support system (DSS) for instantaneously allocating incoming orders to suitable services, without the need for continuous planning updates. Such a DSS is beneﬁcial, as it is easy to implement in the current practice of container transportation. Earlier proposed centralised methods can ﬁnd the optimal solution for the intermodal inland transportation problem in retrospect, but are not suitable when information becomes gradually available. The main contributions are threefold: ﬁrstly, a structured method for creating decision trees from optimal solutions is proposed. Secondly, an innovative method is used for obtaining multiple equivalent optimal solutions to prevent overﬁtting of the decision tree. And ﬁnally, a structured analysis of three error types is presented for assessing the quality of an obtained tree. A case study illustrates the method's purpose by comparing the quality of the resulting plan with alternative methods.
+© 2016 Elsevier B.V. All rights reserved.
+
+1. Introduction
+Continuous growth of global container volumes puts increasing pressure on the inland road, water and rail connections, especially in developed countries with limited public support for infrastructural expansion. Simultaneously, shippers require more reliable inland connections because their supply chain demands for just-in-time delivery, and the environmental impact of the inland transportation is increasingly bound by restrictions from governments and from shippers themselves. In this study, we consider decision support for the planning of inland transportation. The problem is based on the situation of European Gateway Services (EGS), an inland transportation network providing transportation between the deepsea ports in Rotterdam and various extended gates in the European hinterland [43,45]. Although the inland network has sufﬁcient capacity in general, temporary congestion occurs frequently on all inland modes: road, water, and rail connections. Most inland transportation of containers is carried out by operators that are dedicated to speciﬁc modes. In the light of these developments, an
+⁎ Corresponding author at: Econometric Institute, Erasmus School of Economics, Erasmus University Rotterdam, P.O. Box 1738, 3000 DR Rotterdam, The Netherlands. Tel.: +31 10 4081262.
+E-mail addresses: vanriessen@ese.eur.nl (B. van Riessen), r.r.negenborn@tudelft.nl (R.R. Negenborn), rdekker@ese.eur.nl (R. Dekker).
+
+integral approach for the routing and planning of all inland container transportation is vital. In this study we propose a real-time DSS for providing improved planning support. In particular, we propose to use decision trees as method in the DSS. Decision trees are a way to represent rules underlying data with hierarchical, sequential structures that recursively partition the data [23]. In our method, the routing decision is made per container, by applying the tree to the properties of the container transportation order (i.e. booking). Fig. 1 gives an example of a decision tree supporting the routing decision for a container.
+1.1. Characteristic intermodal decision problem
+For a particular corridor (i.e., the set of available transportation options between two locations), a set of inland services is available, characterised by the mode of transport (barge, rail or truck), cost per container, departure time, arrival time, and vehicle capacity (volume and weight). Naturally, the time between departure and arrival of a service depends on the mode's travel speed. Typically, speed and cost are high for trucking and low for barge transport. Volume capacity is high for barge transportation and low for a truck. The weight capacity for both barge and truck is mostly not restrictive. The mode train has intermediate levels for speed, cost and capacity, but typically has a restrictive weight capacity, especially in mountainous regions. In this setting, we consider scheduled barge and train services with ﬁxed capacities,
+
+http://dx.doi.org/10.1016/j.dss.2016.06.004 0167-9236/© 2016 Elsevier B.V. All rights reserved.
+
+2
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+1.2. Real-time intermodal planning problem
+
+Fig. 1. Example decision tree for deciding on the mode of transportation for a container. The ﬁrst decision is based on whether or not the container has property A. If not, a second decision follows, based on whether or not the container has property B.
+while trucks can be ordered at any time without limits. Generally, in a transportation setting, orders arrive sequentially at a transportation network planning department. Each order has several attributes, such as the client name, the number of containers for the order, the booking lead time, the transport lead time and the size and weight of each container in the order. The number of containers is measured in standard container sizes of Twenty feet Equivalent Units (TEU). The booking lead time is the time between the arrival of the order and the availability of the container; the transport lead time is the time between the availability of the containers and the due time at the destination (see Fig. 2). The planner's goal is to transport the containers at the lowest possible total cost, ideally before the due time of the containers, but often it is allowed to deliver a little later, indicated by the overdue time. In practice, overdue delivery can sometimes be negotiated with customers, in our modelling overdue delivery is allowed at a penalty cost for the network operator. The characteristics of this decision problem do not change over time, giving rise to periodicity, e.g. weekly. Therefore, analytics on historic information can be used to ﬁnd patterns and create a decision tree (DT). Subsequently, this decision tree can be used for decision support in future periods.
+Fig. 3 illustrates an example of the characteristic intermodal decision problem schematically. We consider 1 origin, A, and 2 destinations: B and C. Both destinations can be reached by using a truck (T) or a rail connection can be used (R), for transport from A to B or from A via B to C. In the case of using rail transportation for containers with destination C, last mile trucking from B to C is required. In general, rail is cheaper than truck, but has limited capacity. Trucking capacity is abundant, and considered unlimited for this study. The train has a limited capacity, denoted by K. The costs for the four transportation options are denoted as cdm, where d denotes the destination and m denotes the used mode, d ∈ {B, C} , m ∈ {R, T}. E.g., cBR denotes the costs for transporting one unit from A to destination B by rail. Typically, the goal is to maximise the utilisation rate of the lower priced rail mode for the highest yielding destination. Because of different transportation restrictions between container classes and differences in costs, this decision problem is not straightforward.
+For the planner, who must make decisions instantaneously for incoming orders, the question is how many slots to reserve for each destination, i.e., use a booking limit of KB slots for containers to destination B and KC slots for destination C, adhering to KB + KC = K.
+Fig. 2. Timeline of orders and inland transportation.
+
+Nowadays, in real cases (according to our experiences with EGS) often a greedy approach or ﬁrst come, ﬁrst serve (FCFS) approach is used for planning the container transportation. In case of a greedy approach, a container transportation order is assigned to the cheapest feasible service at the time of order arrival, i.e. the cheapest service with free capacity that travels within the container's time restrictions. In an FCFS approach, a booking is assigned to the earliest available service. In both methods, an order is assigned instantaneously at the time of order arrival.
+The problem addressed in this study is to allocate an incoming order immediately to the most suitable inland service, as part of the optimization of the entire corridor. Existing scientiﬁc methods for real-time decision making for planning of inland container transportation focus on ﬁnding cheapest or shortest paths per transport order [49,50]. More advanced methods for solving the online problem require realtime automated data processing and are less insightful to human planning operators [22,25]. We propose a method for allocating orders to services based on optimal historical plans.
+1.3. Proposed method for real-time decision support
+In recent years, several studies have proposed optimisation methods for determining the optimal allocation of containers to all available inland transportation services, considering capacity, costs, lead times and emissions. The proposed methods are suitable for solving the ofﬂine planning problem, in which an optimal network plan is created for a batch of transportation orders collectively. In intermodal networks, such as the network of European Gateway Services, the implementation of a centralised ofﬂine approach is difﬁcult for various reasons:
+• Real-time decisions: The nature of the inland transport logistics requires a real-time approach, in which a customer can get immediate feedback on the selected mode, route, and most importantly, the estimated time of arrival. Consequently, updates in the planning of inland transportation have large inﬂuences on the subsequent production processes, possibly resulting in an undesired cascade of changes in earlier determined plans. An improved solution method must support real-time planning decisions, without continuous planning updates.
+• Incomplete information: The operation of transportation systems is often not centralised, but depends on multiple cooperating decision makers, e.g. a logistics service provider and a transportation operator. The supply chain of container logistics lacks information integration [39]. Capacity and/or demand information for future periods is often not fully available. However, existing centralised optimisation methods depend strongly on complete information from integrated and automated processes, both for terminals, as for other parts of the supply chain. They lack the ﬂexibility to deal with incomplete information. A method must therefore be able to provide decision support even with incomplete information.
+• Human-aware decision making: In relation to the previous aspect, planning operators manually gather information ad hoc, such as real-time information on capacity and delays. Delays are common as the workloads in container terminals have a stochastic nature and are distributed unevenly in time [24]. For this, direct communication between manual operators is essential [12]. A transparent approach is required that allows the human operators to include manually obtained information in the decision process. We consider this the white box poperty of the desired solution method.
+In this paper, we propose a general method for a real-time DSS that addresses the aforementioned issues, by meeting three main requirements. Firstly, the proposed method allows real-time decision support for allocating incoming transport orders directly to available inland services, resulting in a stable solution and instant feedback to the customer
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+3
+
+Fig. 3. Characteristic decision problem.
+
+without the necessity of continuous planning updates. Secondly, the method does not need complete information to provide decision support: The decision tree obtained by our method can be applied in realtime in daily practice without an automated decision system. Thirdly, the proposed method provides decision support in a white box system. The human planner responsible for a central network planning can check available capacity on a proposed service manually and include that in the decision process. In a case study, we will exemplify how the proposed method adheres to these three characteristics while resulting in a solution closer to the optimum than the current practice, although some misclassiﬁcations are still to be expected. It is assumed that the problem is repetitive over time: the weekly service schedule and the distribution of demand are considered as constant in time.
+1.4. Approach
+The model we propose is based on an analysis of the solution space of an ofﬂine optimization model, and translates the ofﬂine model's optimal solutions to a decision tree: a white box representation of decision rules. It will therefore more easily be accepted for use in daily practice. The method must operate well under various circumstances and therefore multiple historic order arrival patterns are used. The proposed approach is valid for a decision process with repetitive patterns, for which ofﬂine optima of historic data can be determined. The quality of the real-time decision support will depend on the problem structure. We introduce a method to assess that a priori (i.e. before applying it in real-time). In the remainder of this paper, we focus on the problem of intermodal hinterland transportation. In Section 6 we will provide insight on how to apply the proposed method to other cases as well.
+The approach is pictured schematically in Fig. 4. First, the data of historic demands are assembled, i.e. the historic container transportation bookings. Secondly, the optimal transportation plan is determined using the recently proposed linear container allocation problem with time restrictions (LCAT) [42]. The resulting optimal solutions for historical demand periods provide the baseline for real-time decision support and are used in the third step to ﬁnd properties of an effective planning of a container considering the uncertainty in the demand. The relations between container properties and the planned mode and route for that container in the optimal solution are determined. For this, we use a method of supervised learning for creating a decision tree based the allocations in optimal plans of the training sets. The supervised learning algorithm creates decision rules for the allocation of a container to a suitable service based on the container and order properties, such as the time of availability, the transportation lead time, and container mass. Subsequently, the set of rules can be used in a real-time setting as DSS: for each incoming order the DSS will provide a human planner with a set of suitable services in an understandable way.
+It is expected that the performance of the proposed method is comparable to a low-level assignment strategy such as ﬁrst-come, ﬁrst serve
+
+for cases with orders that are entirely randomly distributed across the selected input features. If, however, historic information contains speciﬁc demand patterns, identiﬁable from the selected features, our method will capture those patterns without further detailed analysis. In this article we extend our previous work on real-time decision support based on ofﬂine optimisation [44].
+1.5. Contribution
+The main contributions of the method are threefold. First, we propose a structured method for creating decision trees from optimal solutions. Secondly, we use a method for obtaining multiple equivalent optimal solutions to prevent overﬁtting of the decision tree. And ﬁnally, we develop a structured analysis of three error types for assessing the quality of an obtained tree and the expected error compared to the theoretical optimum. The remainder of this paper is organised as follows. Section 2 provides an overview of relevant literature on real-time decision support and decision trees. Subsequently, Section 3 gives a formal description of the proposed method for obtaining and using the decision tree. In this section, we also compare the results of the proposed method with an optimal strategy for the characteristic intermodal problem. In Section 4 methods for estimating the performance of the algorithm in general are described. In Section 5, the method is applied in a more general case study of an intermodal hinterland transportation corridor, i.e. in this case, multiple modes are available for transporting containers between two locations. This case study is motivated by a practical case in the port of Rotterdam. Section 6 summarises the ﬁndings of the study and provides an outlook on future research.
+2. Literature overview of real-time decision-making (using ofﬂine models)
+2.1. Optimisation models for decision problems
+In the literature, several methods have been proposed to deal with uncertainty in a combinatorial optimization problem. Gal and Davis [13] describe parametric analysis in linear programming (LP); Jenkins [19] describes parametric analysis in (mixed) integer linear programming (MIP). His purpose is to study the sensitivity of the problem's objective for certain parameters. Greenburg [15] gives an extensive overview of the more general concept of post solution analysis for both LP and MIP. He mentions the concept of stability analysis: ﬁnding the set of parameters for which a given solution remains optimal. However, Wallace [48] illustrates that sensitivity analysis is only appropriate for deterministic problems and not suitable to support decision making under uncertainty. An alternative for parametric analysis of a solution is to develop a robust planning, that is optimal considering the uncertainty of all parameters. Since 2000, a large number of studies have been published on Robust Optimization, see Bertsimas et al. [3] for an overview.
+
+Fig. 4. Proposed methodology for real-time decision support based on optimal solutions obtained ofﬂine.
+
+4
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+Both parametric analysis and robust optimization assume a ﬁxed set of decision variables. However, in our case, the number of decisions to take depends on the number of transportation orders. Branley et al. [6] describe the concept of post-evaluation analysis. The purpose of such an analysis is to describe the decision surface, representing the value of the objective of the problem for a set of decision variables. Such a surface gives insight in the effect of certain decisions, but creating such a surface is computationally very demanding as all optimal solutions must be found. This problem belongs to the class of #P-complete problems and is as least as difﬁcult as NP-complete problems [38]. In postoptimization analysis, only a set of optimal solutions is studied, i.e., a subset of solutions with equal optimal objective value [46]. Such postoptimization analysis is often applied in multi-objective decisionmaking.
+The intermodal decision problem can be considered as a speciﬁc type of multi-knapsack problem. The multi-knapsack problem is a well-known problem in literature, e.g. Rinnooy Kan et al. [31], Pak and Dekker [28] and Van Hentenryck and Bent [40]. The former two do not address decision support for real-time decisions. Van Hentenryck and Bent [40] address a category of problems for which the uncertainty does not depend on the decision-making. Typically, the time-critical nature of the decisions in such a problem require online decision making. Online anticipatory algorithms (OAA) are used to solve this type of problems, by combining online algorithms and optimisation models. For making a decision at a given point in time a distribution of future events is assumed. If a predictive model is not available, sampling of historic data can be used. With OAA, an optimal policy that prescribes the required action in any state is not necessary, instead, only the decision provided the current situation and the expected future events are considered using optimization models. An OAA can be used in an iterative manner, alternating between decision-making and incorporating new observations. However, in our proposed method we do not yet consider iterative learning. The distributions of inputs are sampled and learned independently from historic data of the underlying decision process [40,41]. Verwer et al. [47] propose a method that can be seen as the inverse from our proposal: Their technique encodes optimisation models from learned decision trees, which can be used in auction settings. The method we propose uses a new approach for post-optimization analysis. As no predictive model is available, generally, we propose a learning algorithm that translates historic optimal solutions of the ofﬂine problem into real-time decision support.
+2.2. Decision support systems in container transportation
+Steiger [35] states that the purpose of a decision support system is to provide understanding to the decision maker. Apart from the solution to a model, this also requires insight in the model and model outcome. Giboney et al. [14] shows that the representation of a knowledge systems is crucial for user acceptance. In relation to container logistics, existing literature mostly focuses on modelling and ﬁnding solutions. Several DSSs have been developed that focus on the operational problem of container transhipment in container terminals [24,26,37]. Ursavas [37] also mentions some works in literature that have proposed DSSs for container transportation problems. Some studies consider that demand is known in advance, such as Shen and Khoong [34], who developed a mathematical model for planning the distribution of empty containers, suggesting speciﬁc options to the decision maker. Bandeira et al. [2] propose a computer-based heuristic for solving a network ﬂow model of both empty and full containers. After each time step, newly arrived future demand is considered. Jansen et al. [18] describe an automated planning program for container trucking. Several studies considered a stochastic model using the expected future demand, e.g. Cheung and Chen [10]. However, because of the problem complexity and consequential computation time, this type of problems is impractical for application in real-time, as well as that no theoretical distribution of the future demand is available. More advanced methods for solving
+
+the online problem include Nabais et al. [25], who uses model predictive control to achieve a required modal split, and Li et al. [22], who developed a sequential linear programming approach. All methods use computerised systems for providing proposed solutions to the decision maker.
+Table 1 provides an overview of mentioned literature for decision support systems in real-time container transportation planning. For each of them is indicated to what extent they meet the 3 requirements for our problem as introduced in Section 1.3. From Table 1 we can see that all methods support decisions in real time to various extent. Several can deal with incomplete demand information, e.g. by using distributions of future demand. Most techniques require complete information on capacity, except for Ziliaskopoulos and Wardell's method, in which capacity is not considered. Also, none of the existing methods have a white box representation of the decision process. Therefore, our approach is compared with two simple heuristics that do meet all 3 requirements: a greedy approach and a FCFS approach.
+2.3. Decision trees
+We select decision trees as the classiﬁcation approach for our study for several reasons. Firstly, decision trees provide direct insight into which rules and criteria lead to a decision. This is important for practical acceptance by the manual planning operators and is deﬁned as a white box property. Secondly, decision trees can be trained using ofﬂine data. Subsequently, a decision tree can be used to distinguish between more than two classes, i.e., different inland services. Finally, the learning method must be suitable for using input parameters with categorical data, for instance, the customer type [21]. Huysmans et al. [16] describe several rule-base decision support methods: decision trees, decision tables and textual rule set descriptions. They performed empirical tests of users using these methods on various problems. For classiﬁcation type problems, as in our case, decision tables result in slightly faster and more accurate results. However, as no direct methods for obtaining decision tables exist, decision trees are a suitable alternative.
+The challenge is to create an accurate classiﬁer. The accuracy only be determined after the learning process, i.e. by splitting the data in a training and test set, or by cross-validation techniques [21]. In our method we use a test set and a training set to validate the performance of the classiﬁer.
+Decision tree classiﬁers are used as a method to structure complex decision-making. The decision is split up in multiple stages of simpler sub decisions. A decision tree can be represented by an acyclic directed graph, where a decision rule is associated with each node [33]. To make a decision using a decision tree, the sub decisions per node are applied recursively to the parameters of the case. The decision rule at each node level deﬁnes what the next node of the decision process will be. This is called the child-node. Nodes without children are called leaf nodes and are associated with the ﬁnal decision outcomes of the tree.
+The generalisation error of a tree is deﬁned as the misclassiﬁcation rate over the input distribution [32]. Typically, the goal for creating a decision tree is to ﬁnd an optimal tree that minimises the generalisation error. Finding an optimal tree is an NP hard task, which is only feasible for small problem sizes [32]. The topology of a decision tree and the decision rule at each node can be estimated empirically, using real-world data for which the intended outcome is known, i.e., supervised learning [1].
+Estimating a decision tree involves three aspects: design of the tree structure, the inference method decision rule at each node, and the selection of the feature set containing the input parameters [33]. The tree structure and decision rules are determined using a learning heuristic, or inference method. Rokach and Maimon [32] provide an overview of inference methods: Most often a top-down heuristic is used as inference method, although bottom-up inference methods also exist. The inference of the tree usually involves a growth phase followed by a pruning phase. In the growth phase, branches are added
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+Table 1 Overview of decision support techniques in literature with respect to 3 requirements.
+
+Technique
+
+Real-time decision support
+
+Level of information required
+
+Demand
+
+Capacity
+
+Shen and Khoong [34], Network ﬂow Cheung and Chen [10], Stoch. Progr. Ziliaskop. and Wardell [49], Shortest p. Janssen et al. [18], Multi-step heuristic Bandeira et al. [2], Network ﬂow Nabais et al. [25], Model predictive control Li et al. [22], Sequential LP Cormen et al. [11], Greedy Ishfaq and Sox [17], First Come First Serve Proposed method, Decision Tree
+
+Periodically Time restrictivea Instantly Periodically (15 m) Periodically Instantly Periodically Instantly Instantly Instantly
+
+Complete Distribution Current order Active orders Distribution Distribution Complete Current order Current order Historic orders
+
+Complete Complete Ignored Complete Complete Complete Complete On requestb On requestb Historicb
+
+a The proposed stochastic programming approach can be applied periodically, but may take very long to solve. b With Greedy and FCFS the operator can request up-to-date capacity info per incoming order; this is also possible in our proposed method.
+
+5
+White box
+N N N N N N N Y Y Y
+
+starting from the root of the tree while considering a splitting criterion. In the pruning phase, branch nodes are turned into leave nodes and the leaf nodes of that node are removed [32]. According to Arentze and Timmermans [1], the following are the most widely used learning heuristics: C4.5 [30], CART [7] and CHAID [20]. All methods consider a condition with a single input variable as splitting criterion and use a top down induction method. Chandra and Varghese [9] mention two popular splitting criteria: the Gain ratio [30] and the Gini index [7]. Lastly, the set of input parameters must be determined. Often, this is carried out in a greedy way, by adding the input parameter that adds the most value to the classiﬁcation accuracy iteratively, until no more improvement is made [32].
+The induction of a decision tree via a learning heuristic requires a training set for the learning process and a test set to evaluate the quality of the induced tree in a cross-validation. If some observations are more important than others, it is possible to add observation weights to each observation.
+3. Decision trees for real-time decision making in intermodal planning
+3.1. Approach
+This study focuses on developing a method that is suitable for operational usage in a real-time setting. The quality of the real-time method is compared to the quality of a theoretically optimal solution, obtained ofﬂine. In the method we propose in this study, we do not aim to formulate the online decision problem explicitly. Instead we aim to translate the results of an optimal model into rules for online application automatically. We do not pursue rule inference by interviewing operational planning experts, as it has two disadvantages. This approach typically results in a few rules per man day [29]. An expert system that can provide decision support for container transportation planning may require a large amount of rules. As a result, the rule inference for an entire network may be time-consuming. Secondly, the quality of the transportation by the operational planning experts is unsure. For these reasons, we use a machine learning technique to infer the decision rules based on optimal planning solutions of the ofﬂine problem. The DSS is induced in a series of steps. The approach depicted in Fig. 1 is formalised in Algorithm 1. Sections 3.2 to 3.4 describe the steps 2 to 4 of Algorithm 1, respectively.
+Algorithm 1. Obtain real-time decision support
+1. Assemble N demand sets for training 2. Determine P optimal solutions for each demand set using the CLCAT
+model. 3. Infer decision tree T based on N× P solutions 4. Use decision tree T in a real-time setting on a per-container planning
+heuristic.
+
+3.2. Finding P optimal solutions using the CLCAT model
+
+The model we use to determine the optimal solution for the trans-
+
+portation planning is based on the earlier proposed LCAT model [42].
+
+That model delivers optimal solutions for the planning of an entire net-
+
+work. For the characteristic intermodal problem studied in this article,
+
+we introduce the simpliﬁed formulation of minimising costs on a single
+
+corridor, the Corridor Linear Container Allocation model with Time
+
+restrictions (CLCAT).
+
+The set of all cargo types that must be planned is denoted by demand
+
+set C and the set containing all services by S. The total number of TEU of cargo type c that must be transported is denoted as the demand dc, this
+
+demand must be transported on one of the intermodal services or by di-
+
+rect truck. The set of services includes all available train and barge ser-
+
+vices, but not trucks, as trucks do not depart at predeﬁned service
+
+schedules. Each service has a slot capacity us and a weight capacity of ms, departs at time TDs and arrives at time TAs. Let xsc denote the number
+of TEU of cargo type c ∈ C that is assigned to service s∈ S. Each container
+
+of class c has a weight of Wc and must be transported in the time window from tacvailable to tdc ue. The number of days that these containers are late is denoted by τsc. The number of TEU of cargo class c assigned to a direct truck is denoted by vc. No capacity or time restrictions are
+
+considered for trucking, as it is only used in exceptional cases. It is as-
+
+sumed that required trucking capacity is readily available. The transit
+
+costs of transporting one TEU on service s are denoted as cs and the cost for direct trucking of a container of cargo class c is denoted as ctc.
+The objective of CLCAT is to minimise the total transportation costs of
+
+all containers, considering a penalty for overdue delivery of cτ per day:
+
+min JCLCAT
+
+¼
+
+X
+
+XÀcsxcs −cττcs
+
+þ
+
+cct vc
+
+Á ;
+
+ð1Þ
+
+s∈S c∈C
+
+subject to : vc þ X xcs ¼ dc
+
+∀c ∈ C
+
+ð2Þ
+
+s
+
+X
+
+xcs ≤ us
+
+∀s ∈ S
+
+ð3Þ
+
+c
+
+X
+
+Wcxcs ≤ ms
+
+∀s ∈ S
+
+ð4Þ
+
+c
+
+xcs T
+
+s D
+
+≥
+
+xcs tcavailable
+
+∀c ∈ C; ∀s ∈ S
+
+ð5Þ
+
+X
+
+xcs
+
+À T
+
+s A
+
+−tcdue
+
+Á ≤ τcs
+
+∀c ∈ C; ∀s ∈ S
+
+ð6Þ
+
+q
+
+xcs; τcs ; vc ≥ 0
+
+∀c ∈ C; ∀s ∈ S;
+
+ð7Þ
+
+where the maximum capacity of service s is denoted by us (TEU capacity) and ms (mass capacity). Constraints (2) ensure that all demand is met. By
+
+6
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+constraints (3) and (4), the total number of TEU on each service is restricted to the available capacity. Constraints (5) and (6) are the time constraints, where constraints (6) are for on-time delivery: τsc measures the total number of days that containers of cargo class c on service s are late. Finally, constraints (7) are the nonnegativity constraints for the three sets of variables.
+For most problems, multiple equivalent optimal solutions of (1) − (7) exist, as each solution consists of speciﬁc assignments of cargo to a service. Often, some of these ﬂows are fully exchangeable, e.g. because multiple services s are available with equal costs. In order to prevent overﬁtting on one optimal solution and to get decision rules that resemble all available optimal solutions as closely as possible, we need to determine a set of optimal solutions for demand set C. Finding all optimal solutions is a very difﬁcult task [38], so we use a new, innovative approach, aimed at ﬁnding a random subset of the set of optimal solutions. In order to generate such a random subset of optimal solutions, we solve the following problem P times:
+
+X
+
+min rx
+
+ð8Þ
+
+subject to : ð2Þ−ð7Þ
+XX csxcs −cτ τcs þ cct vc ¼ JCLCAT
+s∈S c∈C
+
+ð9Þ ð10Þ
+
+where x = [xsc, τsc, vc]T, a vector of all decision variables, and r is a row vector of the same length of random numbers from the standard uniform distribution (ranging from 0 to 1). By (10), all feasible solutions of (8) − (10) are optimal solutions of (1) − (7). The random vector r is introduced to get random subset of solutions out of the set of all optimal solutions, i.e., solving (8) − (10) P times corresponds to generating P random optimal solutions from the set of optimal solutions to (1) − (7). By deﬁnition, all these solutions have equal objective value JCLCAT. As mentioned in the introduction, a centralised ofﬂine optimisation method such as the CLCAT model is not useful in many practical situations for three reasons: it does not support real-time decisions; it would require extensive IT implementation to obtain all data form the transportation system; it requires complete information. In practice, real-time decisions require a heuristic provides decision support per incoming order anticipating unknown information, such as future demand. Current practical heuristics do not do that, but only provide solutions for available information. Below, we describe how the proposed DSS framework uses the optimal solutions on historic data in a learning algorithm to obtain a real-time DSS.
+
+3.3. Decision tree inference
+
+In order to obtain a decision tree that performs well under various circumstances and demand sets we use N demand sets for training. Historical data provides the distribution of attribute values; the sets can be demand sets from the last N weeks for instance. It is assumed that future demand will show a similar structure as the historic demand sets. Per demand set, P optimal solutions are determined using (8) – (10). In this study, we use P = 50 optimal solutions. In total, we use P plans for N demand sets, i.e. PN optimal plans. Each observation in this set of solution denotes the allocation of xsc containers of cargo class c to service s. Each plan can contain |C||S| observations, resulting in m= NP|C||S| observations in total for the inference process. For creating the tree, the importance of each observation is proportional to the number of containers xsc that is assigned, hence xsc is used as the observation weight. We aim to create a decision tree that predicts the allocated service, based on selected input features from the transportation booking.
+The inference of the decision tree is carried out using the CART method [7], with Gini's split criterion: This method is suitable for discrete and nominal input features, aims for splitting on the most distinguishing feature and is also suitable for small data sets. The CART
+
+method uses recursive partitioning and selects in each node the input feature that gives the least impurity of the child nodes, according to the Gini's index. The Gini index is denoted by [32]:
+
+X σ y¼c j Z2
+
+Gðy; ZÞ ¼ 1−
+c j∈domðyÞ
+
+jZj2
+
+;
+
+where y represents the target attribute, | Z | represents the number of observations in the set and |σy=cj Z| the number of observations in the set with target value y = cj. Hence, a pure node with just one class has only observations with y = c1 and Gini index 0; otherwise the Gini index is positive. So the Gini index is a measure of node impurity. The recursive partitioning of nodes continues until in each node the stopping criterion has been reached; we choose to stop splitting a node that corresponds to less than 20% of the average allocation to a service, i.e. 20% of the number of observations m divided by the number of services s. Hence, the minimum node size is ϵ ¼ 0:2 ms . Further detailing the allocation would likely result in overﬁtting. With each leaf node, a table is associated containing the class distribution in that leaf node for all observations in the training sets. If a leaf node is pure and the Gini-index equals zero, the classiﬁcation table for that node has only one entry: all observations in the training set associated with that node were assigned to a single inland service. For leaf nodes with some impurity, the largest class indicates the label of that leaf node.
+The obtained decision tree classiﬁes incoming transport orders by recursively making sub decisions until a leaf node is reached. A classiﬁcation table is association with each leaf node, indicating the distribution of inland services used for bookings that end in that leaf node. A human planning operator can use this list for determining the actual allocation, while he considers the remaining capacity and other practical considerations. In the approach we describe in this paper, we use a heuristic for the actual allocation, called the DT heuristic in the remainder of the paper.
+3.4. Applying the decision tree in a per-container planning heuristic
+We introduce the DT heuristic to use the inferred decision tree for assigning incoming orders to inland services. It can be used on a percontainer basis. For each order, the splitting criterion in subsequent nodes are applied. Orders for transporting multiple containers can be considered as one, without loss of generality as the decision tree gives the same results for each container. In practice, this process can be carried out by a human operator using the decision tree. In order to demonstrate our approach in a systematic way we use an automated heuristic to generate the transportation plan for our case study. Using the decision tree, an incoming transportation order is associated with one of the leave nodes. The DT heuristic will use the classiﬁcation table of that node containing the distribution of services associated with that leaf node in decreasing order. The DT heuristic is provided in Algorithm 2, considering a previously obtained decision tree T. Note that the greedy strategy of step 4 in Algorithm 2 will select a direct truck if none of the available inland services has capacity left. The allocation process is repeated at the arrival of every transportation order. To clarify the process of the decision tree inference and application, the next section shows an explanatory example for the characteristic intermodal problem.
+Algorithm 2. Decision tree heuristic using decision tree T
+1. Consider incoming container transportation order 2. Apply decision tree T to obtain the classiﬁcation table of the resulting
+leave node 3. Assign containers to the services that have capacity left proportional-
+ly to distribution in the classiﬁcation table
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+7
+
+4. If none of the indicated services has capacity available, the container is assigned to another service according to a greedy strategy, i.e., the feasible service with minimum cost is selected.
+
+3.5. Complexity of pre-processing steps and real-time operations
+
+For real-time decision support, the running time of any DSS is critical. Our method supports real-time decisions by using a preprocessing step based on historic data. Here we show that the complexity of each step is polynomial, and that the pre-processing steps result in a signiﬁcant reduction of complexity for the real-time decision process.
+Without pre-processing, we could apply LP (1) − (7) to ﬁnd the optimal plan. The average case complexity of solving LP (1)− (7) is determined using the result of Borgwardt [4] for the average running time of the simplex method:
+
+
+
+
+
+O
+
+n3
+
+p1 n−1
+
+;
+
+ð11Þ
+
+in which n denotes the number of columns, i.e. the number of decision variables, and p the number of rows, i.e. the number of constraints. In our case, the number of decision variables n = 2(|C||S|) + |C|, with |C| and |S| denoting the number of cargo types and services, respectively. The number of constraints p = 3|C||S| + |C| + 2|S |. Substituting n and p in (11), and observing that n − 1 ≥ 2, the average case complexity of LP (1)− (7) is
+
+
+
+
+
+O ðjCjjSjÞ3þα ;
+
+ð12Þ
+
+3.6. Validation of the DT heuristic using the characteristic intermodal decision problem
+In this section, we make a comparison between the optimal strategy and using our DT heuristic in the characteristic intermodal problem. For this problem, as depicted in Fig. 3, the question is how many slots to reserve for each destination. It is possible to determine an optimal strategy analytically; but even for such a simple problem it requires detailed analysis. Here we show that our DT heuristic is much more convenient to apply and results in results very close to the optimum. The purpose here is not to study a very realistic case, but merely a small example for which a comparison with the optimum is possible. In Section 4 we present a method for assessing the quality of the DT heuristic in more general cases, for which comparing to the optimum is not possible. This is also demonstrated in a more elaborate case study in Section 5.
+In the characteristic intermodal decision problem, a planner has to decide between a lower priced, ﬁxed capacity mode and a higher priced ample capacity mode. Two order types compete for the lower priced mode, in this case orders for two destinations, B and C. Containers for both destinations can go by a ﬁxed capacity on rail, or using ample capacity of trucking, so we consider 4 transportation options: rail to B (BR), rail to C (BT), trucking to B (CR) and trucking to C (CT). For an optimal strategy, we need to determine the booking limits for rail slots toward B (KB) and toward C (KC), adhering to KB +KC = K, resulting in the lowest expected total cost. A detailed overview of determining these booking limits is presented in Appendix A, here we provide the main results.
+
+with 0 b α ≤ 12. In the ﬁrst pre-processing step, we consider LP (8) – (10), which also
+
+has average case complexity (11) as only 1 constraint is added in com-
+
+parison to LP (1) − (7). We solve this LP PN times (Section 3.2), i.e. for N
+
+historic periods and P repetition per period.
+
+The second pre-processing step is the learning algorithm for the DT
+
+(Section 3.3). The complexity of the learning algorithm can be deter-
+
+mined using the rationale of Su and Zhang [36]. In each node, containing
+
+a subset of |Z| observations, one of l attributes must be selected as split-
+
+ting criterion by considering each possible split for each candidate attri-
+
+bute. This operation has complexity of O(|Z|l). For each level in the tree,
+
+the union of the subsets comprises all m observations. Hence, the com-
+
+plexity for each sublevel is of O(ml), with m= NP|C||S|. Considering the
+
+minimum node sizeϵ ¼ 0:2 jmSj, the maximum depth of the tree (the max-
+
+imum
+
+number
+
+of
+
+levels)
+
+equals
+
+m ϵ
+
+¼
+
+5jSj.
+
+During
+
+the
+
+inference
+
+process,
+
+a
+
+maximum of 5|S| levels must be considered. Hence, the complexity of
+
+the entire inference operation is:
+
+
+
+
+
+O jCjjSj2l :
+
+ð13Þ
+
+From (12) and (13) we can see that the average running time of the pre-processing steps to obtain the tree is polynomial in the number of cargo types and the number of services considered in the problem. The algorithm can also be applied to larger scale problems.
+Finally, we consider the problem of the real time decision problem as well (Section 3.4). The decision tree is used for each incoming order. The complexity of applying the tree only depends on the number of levels in the tree, so it has a complexity:
+
+OðjSjÞ:
+
+ð14Þ
+
+Comparing (14) with (12), we see that the making decisions with the decision tree is much less computationally complex than solving the LP for the optimal solution. This supports our aim to derive a decision support system that can be easily applied in real-time in practice, leveraging information of historic optima.
+
+3.6.1. Optimal slot reservation We assume independent distributions for the number of containers
+for destination B and C during a planning period, denoted by NB and NC, respectively. For each destination d and mode m, we consider the number of used slots (i.e. planned containers), denoted by Sdm with a cost denoted by cdm. Note that the costs of transporting one unit from A to C via rail, cCR, also include the costs for last mile trucking between B and C. In line with the characteristic intermodal problem, we consider the set of problems for which the trucking costs exceed rail costs for all destinations x, i.e., cdT ≥ cdR. The optimal booking limit on the train for each destination can be found by minimising the total costs for all transports, denoted by J. The expected costs are a sum of the costs for all four transportation options:
+
+
+
+
+
+
+
+
+
+Eð JÞ ¼ cBRE SBR þ cBTE SBT þ cCRE SCR þ cCTE SCT ;
+
+ð15Þ
+
+where E is the expectancy operator. For a known booking limit KB (and KC), we can determine the expected utilisation on each mode and each destination. First, we determine the expected slots used for
+
+transportation to destination B. The expected number of train slots
+
+used for destination B is the sum of the conditional expectation if
+
+NB ≤ KB and of the case that NB N KB:
+
+ E SBR ¼ EðNBjNB ≤ KBÞℙðNB ≤ KBÞ þ KBℙðNBNKBÞ;
+
+ð16Þ
+
+where ℙ(·) denotes the probability of event ·, and
+
+EðNB
+
+jNB
+
+≤KBÞ
+
+¼
+
+X n
+n∈f1;2;…g
+
+ℙðNB ¼ n ∩ n≤ ℙðNB ≤ KBÞ
+
+KBÞ
+
+¼
+
+X
+n∈f1;2;…;K
+
+B
+
+g
+
+n
+
+ℙðNB ℙðNB
+
+¼ nÞ ≤ KBÞ
+
+:
+
+ð17Þ
+
+By substituting (17) in (16), we get the expected number of rail slots
+
+used for destination B:
+
+ E SBR ¼
+
+X nℙðNB ¼ nÞ þ KBℙðNBNKBÞ
+
+n∈f1;2;…;K B g
+
+ð18Þ
+
+8
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+The results for the other transportation options are shown in Appendix A. Substituting (4) and (A7)− (A9) in (15) gives the expected costs for a given value of KB (and KC = K – KB). The optimal booking limit for rail slots used for destination B, i.e., the optimal value of KB is then determined by solving
+
+K
+
+Ã B
+
+¼
+
+argmin
+
+EðcT Þ:
+
+KB
+
+This is valid for any independent distributions of NB and NC. Here, we will determine the optimal value KB⁎ for a uniform distribution of the demand to destinations B and C. E.g., for uniform distributions
+NB ~ U(b1, b2), NC ~ U(c1, c2), that allow a total demand exceeding the train capacity, i.e., b2 + c2 N K, the expected number of rail slots used for destination B can be estimated using (18) as
+
+ E SBR
+
+¼
+
+ðK B −b1 Þ
+
+b1 þ KB þ 1 2ðb2−b1Þ
+
+þ
+
+KB
+
+b2 −K B b2 −b1
+
+ E SBR
+
+¼
+
+KB2
+
+þ
+
+b12−2KBb2 þ 2ðb1−b2Þ
+
+b1 −K B
+
+:
+
+ð19Þ
+
+The results for the other transportation options are presented in Appendix A. By using KC = K – KB and ﬁnding the minimum of (15), we can ﬁnd the analytical optimal value for KB:
+
+K
+
+Ã B
+
+¼
+
+ðc2−K
+
+þ 12ÞðcCR−cCTÞðb1−b2Þ þ ðb2 þ 12ÞðcBR−cBTÞðc1−c2Þ ðb1−b2ÞðcCR−cCTÞ þ ðc1– c2ÞðcBR− cBTÞ
+
+ð20Þ
+
+The optimal value KB⁎ is the upper limit for slots that can be used for transporting containers to destination B by rail. Next, we will compare the result of the proposed decision tree method with the analytical optimum.
+
+3.6.2. Comparing DT heuristic to optimal solution for the characteristic intermodal problem
+Now, we will use some speciﬁc instances to compare the performance of the DT heuristic with the analytical optimum for this problem. We assume a capacity of K =40 for the train and we consider three demand scenarios. Table 2 shows the hypothetical costs and demand scenarios. The cost for the more expensive mode, trucking, is equal in both cases. The rail connection that is available travels directly to destination B, omitting the need for a last-mile trucking leg. Hence, this is the lowest priced transport. Using the rail connection to destination C requires a last-mile truck delivery. For this transport an intermediate cost is assumed. The three demand scenarios all result in a conﬂict between planning containers for destination B or C on the train. We determine the optimal booking limits (i.e. slot reservations) using (20). The resulting limits for destination B and C are denoted in Table 3. For all three instances, we applied Algorithm 1 to obtain decision trees. As the ﬁrst step, we assemble data patterns for training: we generate 20 sets of demand volumes for destination B and C using NB and NC, with a speciﬁc arrival sequence. For the real-time application of the DT heuristic, the sequence of bookings is relevant. Secondly, we ﬁnd the optimal solution for each of these 20 demand sets using the CLCAT model. Thirdly, we use the results to train the decision tree on, with the following features for a container transportation order j: the destination Dj and the amount of containers with destination C that has already been ordered dCj before order i.
+As the decision tree inference method is based on the demand set, we repeated the process 3 times, creating 3 decision trees per demand
+
+Table 2 Cost matrix and three demand instances of the characteristic decision problem.
+
+Destination
+B C
+
+Train
+cBR = 2 cCR = 3
+
+Truck
+cBT = 4 cCT = 4
+
+Demand (1)
+NB ~ U(30, 40) NC ~ U(0, 20)
+
+Demand (2)
+NB ~ U(20, 30) NC ~ U(0, 20)
+
+Demand (3)
+NB ~ U(15, 25) NC ~ U(15, 25)
+
+Table 3 Optimal slot reservations for characteristic decision problem instances.
+
+Destination
+
+KB⁎
+
+KC⁎
+
+Demand (1)
+
+36
+
+4
+
+Demand (2)
+
+28
+
+12
+
+Demand (3)
+
+22
+
+18
+
+scenario, using independent demand sets. Fig. 5 shows the resulting decision trees. If we inspect the decision trees for scenario 1, we observe that the trees shown in Fig. 5a and b result in a maximum of 3, resp. 4, train slots for destination C. This is remarkably close to the optimum of 4. However, Fig. 5c shows a tree that only uses 1 rail slot for destination C, which is too conservative, compared to the optimum. For demand scenario 2, the decision trees shown in Fig. 5d and e result in a maximum of 10, resp. 11, train slots for destination C, which is close to the optimum of 12. Fig. 5f shows a very simple decision tree, that allocates all incoming orders to the train. This results in the optimum in most cases (e.g. if NB+NC≤40), but in some extreme case may allow too many slots be used for destination C (e.g. if a large number of orders for destination C arrives early). Finally, for demand scenario 3, we obtain three very similar trees, in which 16–18 train slots are used for destination C (Fig. 5g-i). This is again close to the optimum of 18 slots for destination C. The results for all scenarios show that the proposed method can identify the structure of the problem from the historic demand and provides a decision tree close to the optimal solution in most cases for this characteristic intermodal problem. In the next section, the DT heuristic will be applied to several variants of the characteristic intermodal problem with a range of parameters to validate the method for the more general situation.
+3.6.3. Evaluation of the DT heuristic applied to variants of the characteristic intermodal decision problem
+The previous section looked in detail into several examples of generated trees. To validate the approach more generally, we apply it to a larger set of scenarios of the characteristic intermodal problem. For this, we determine multiple input values for the cost parameters and demand interval. Each combination of input parameters is considered as a separate instance. The demand intervals are deﬁned as
+NB $ Uðb1; b1 þ wbÞ; NC $ Uðc1; c1 þ wcÞ
+The parameters used are indicated in Table 4. Taking all combinations results in a total of 2187 scenarios. For each scenario, plans are created for 50 test instances using 4 methods: the theoretical optimum (obtained ofﬂine using the CLCAT model), the DT heuristic, the Greedy approach and the FCFS approach. For comparison, we use the competitive ratio of the objective costs of the heuristics and the optimal objective value. The competitive ratio is determined as the ratio of the optimal objective value and the objective value of the heuristic's results [5]. The optimal objective value can be obtained ofﬂine using the CLCAT model. By this deﬁnition, the competitive ratio of the CLCAT solution is always equal to 1, and for the heuristics always ≤1. A high competitive ratio indicates a good plan.
+For each scenario and for each method, the mean and standard deviation of the competitive ratio is determined over 50 test instances. The averages over all scenarios are shown in Table 5. Further detail can be seen in the boxplots of Fig. 6. This shows that the DT heuristic performs generally better than the alternatives. Furthermore, we look in more detail into the differences in competitive ratio per scenario. Fig. 7 shows the competitive ratio of the DT heuristic over the alternatives, in ascending order. The competitive ratio ηG,DT of the DT heuristic over the Greedy algorithm is deﬁned as the ratio of the total costs of using these methods, denoted as JDT and JG, respectively:, and similarly with the costs of FCFS, denoted by JFCFS:
+
+ηG;DT
+
+¼
+
+JG JDT
+
+;
+
+ηFCFS;DT
+
+¼
+
+JFCFS : JDT
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+9
+
+Fig. 5. Decision trees obtained from Algorithm 1 for scenarios 1 (a–c), 2 (d–f) and 3 (g–i).
+
+A number higher than 1 indicates that the DT heuristic outperforms the other method. The DT heuristic outperforms the Greedy algorithm in roughly half of the scenarios and the FCFS in most. More precisely, the competitive ratio of the DT heuristic is as least as good as the Greedy algorithm in 1746 (80%) scenarios and as least as good as the FCFS approach in 1838 (84%) scenarios.
+The results of this section and the previous one show that in most cases the DT heuristic is preferable compared to the alternative heuristics, Greedy and FCFS. However, in some cases, the DT heuristic underperforms. The intuition for this is as follows. The DT heuristic uses a classiﬁcation mechanism of optimal assignments in historic data sets and applies that to incoming orders. Optimal assignments are classiﬁed based on the order properties used in learning the tree. For those problem variants in which the optimal allocations follow a speciﬁc structure with a repetitive nature, the DT is capable of ﬁnding
+
+and exploiting that structure. As expected, due to stochasticity in the demand, some assignments might be misclassiﬁed. Generally, the beneﬁt of following the DT assignment outweighs the cost of occasional misclassiﬁcation. However, in problem variants with limited structure, the beneﬁt of the DT heuristic diminishes, and the DT assignments may result in higher costs than the alternative algorithms, due to
+
+Table 4 Values of input parameters.
+
+Parameter
+cBR cBT cCR cCT
+
+Values
+0 1, 2, 3 2, 3, 4 2, 3, 4
+
+Parameter
+b1 , c1 wb , wc K
+
+Values
+0, 10, 20 20, 30, 40 40
+
+Fig. 6. Average competitive ratios over 50 test sets for 2187 instances.
+
+Table 5 Resulting mean and standard deviation of competitive ratios over 2187 instances.
+
+DT
+
+Greedy
+
+FCFS
+
+Mean Standard deviation
+
+98.5% 2.0%
+
+94.7% 3.6%
+
+82.1% 5.1%
+
+Fig. 7. Competitive ratio of DT compared to Greedy / FCFS.
+
+10
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+misclassiﬁcation. Considering the 20% of variants in which the DT underperforms the Greedy algorithm (as seen in Fig. 7), we found this occurs predominantly if the rail corridor was not beneﬁcial for destination C (cCRN cCT) or if the corridor is less beneﬁcial for destination C than for destination B(cCR N cCT and cCT − cCR b cBT − cBR). In these cases, the using structure of the problem provided too little beneﬁt to compensate for some misclassiﬁcations.
+Therefore, it is vital to measure the quality of an obtained tree in any scenario before applying it in practice. The next section will provide an analysis method of the algorithm in order to determine the quality of a tree in advance, by assessing the misclassiﬁcation error and two other sources of error.
+4. Algorithm analysis
+As shown in the previous section, the proposed DT heuristic provides an improvement over existing heuristics in most cases, but not in all. Therefore, in the following, we will address the performance of the DT heuristic by estimating the gap between the solution of the DT heuristic and the optimal solution. This algorithm analysis allows to address the expected quality of the DT directly after obtaining it, before applying it in practice. If the algorithm analysis results in acceptably low error, the DT can be used in practice. If not, we can reiterate the learning process, for instance with a different feature set.
+The purpose of the decision tree heuristic is to ﬁnd solutions as close as possible to the optimum. We use some notation to distinguish between several sets of solutions. We denote the set of all possible demand patterns by Δ and the set of all optimal solutions for all demands sets by Ω. During the decision tree inference, we use a subset of optimal solutions Z , Z ⊂ Ω, the solutions to the training set of historic data. Also we have a set of solutions to an independent test set of historic data, denoted by Y , Y ⊂ Ω. To ﬁnd an estimate of the optimality gap of the DT heuristic, we consider each service in the service schedule separately. Let us consider service b ∈ {1,2, …}. A solution si ∈ Ω consists of a list of allocations of containers to services b ∈ {1, 2, …}. For each service b, we denote the number of available slots as Kb. Let nib denote the number of slots of service b that are in use in optimal solution si. The average number of slots in use on service b over all optimal solutions si ∈ Ω, is denoted by nΩb . The average number of slots in use on service b over the subset of optimal solutions si ∈ Z is denoted by nZb. If decision tree T is applied to a subset of demand patterns, we obtain a set of solutions R′. We denote a solution in this set as rk′ ∈ R′. For service b the number of used slots in this solution is denoted by n′bk and the distribution of number of used slots is denoted as nbR′, with mean nRb0. We use the accent to indicate the results of applying the tree directly, without the heuristic of Algorithm 2. Note that applying the decision tree directly may result in overbooking on a service, as no capacity limits are considered. Hence, ﬁnally, we consider the set of solutions R, obtained by applying Algorithm 2, the DT heuristic. A solution rk∈R denotes the heuristic's solution to demand set k. For service b the number of used slots in solution rk is denoted by nbk and the distribution of used slots is denoted as nbR, with mean nRb.
+The cost on a slot of service b is denoted by cb, and the total cost for all slots of service b in a solution si is cbnib. The DT heuristic aims to ﬁnd the optimal number of used slots for each service b, but an error in ﬁnding the optimal number results in a different total cost for the found solution. For each service b, we distinguish between 3 error types:
+Error type α. Historic data error. The decision support system is trained on historic data set Z. The target value of allocations to a service is based on the expected number of used slots of service b from the historic data. The error in determining this target value from the historic data is denoted as error type α. This error type represents data inaccuracy, rather than an error of the algorithm.
+
+Error type β. Misclassiﬁcation error. Secondly, the decision tree must represent a classiﬁcation that results in assigning the correct target number of containers to service b. The misclassiﬁcation of containers in service b is denoted as error type β.
+Error type γ. Capacity-restriction error. Finally, error type γ consists of misclassiﬁcation due to the capacity limits of service b. Due to the stochastic nature of new demand patterns, the actual number of containers allocated to service b by the decision support system is variable. Because of the maximum capacity of service b, the expected value of containers allocated to this service is lower than the number would be in a case without capacity limits.
+Below, we elaborate on how the size of all three error types can be estimated during the inference process, before the decision tree is used for real-time decision support.
+
+4.1.1. Error type α, historic data error
+
+First we look at error type α, the historic data error. This error
+
+measures the accuracy of the average number of used slots for service
+
+b in the historic data. We compare the set of available optimal solutions
+
+Z with the set of all possible optimal solutions Ω. In practice, not all
+
+demand patterns Δ are known, and not all optimal solutions Ω can be
+
+computed in advance. Instead, we can use only a subset of all optimal
+
+solutions Z ⊂Ω. The average number of used slots of service b is estimat-
+
+ed using subset Z, using nZb and variance σ b;α 2:
+
+X
+
+nZb ¼
+
+i∈Z nib jZj X
+
+; 
+
+2
+
+σ b;α 2 ¼
+
+i∈Z nib−nZb jZj
+
+ð21Þ
+
+Error type α denotes the difference in the allocations between subset Z and complete set Ω:
+
+
+
+
+
+eb;α ¼ E nZb−nΩb :
+
+A positive value eb,α denotes an overestimation of the number of containers assigned to service b. According to the Central Limit Theo-
+rem, the difference nZb−nΩb is normally distributed with mean 0 and standard deviation σb.α/ √ n. This gives E½eb;α ¼ 0 and a 95% conﬁdence interval for eb,0 of
+
+0 Æ 2 pσ bﬃﬃ:ﬃαﬃﬃ :
+
+ð22Þ
+
+jZj
+
+4.1.2. Error type β, misclassiﬁcation error
+
+Secondly, we determine the size of error type β, the misclassiﬁcation error of the tree. Let us consider decision tree T that is able to provide a perfect classiﬁcation, i.e. with a node purity of 100%. The probability of a container allocation to service b is a property of this decision tree, de-
+noted by Prb. For this perfect decision tree, it holds that PrbnZ ¼ nZb , with nZ the average total number of containers in the solutions of the training set. However, in practice, the decision tree will not be perfect
+and PrbnZ ≠ nZb, due to some misclassiﬁcation errors. This is error type β. For estimating the size of error type β, we use the empirical distribution nbR′, denoting the number of slots of service b used in the tree's solutions rk′. This empirical distribution nb has a mean of
+
+nZb ¼ PrbnZ
+
+ð23Þ
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+11
+
+and a variance of
+
+
+
+2
+
+X
+
+σ
+
+2 b;β
+
+¼
+
+i∈Z
+
+nib −nZb jZj−1
+
+:
+
+ð24Þ
+
+For a given tree, the size of error type β can be determined directly after creation, by identifying:
+
+eb;β ¼ nZb−nZb;
+
+with a variance equal to Eq. (24) and a 95% conﬁdence interval of:
+
+eb;β
+
+Æ
+
+2
+
+pσ bﬃﬃ:ﬃ0ﬃﬃ jZj
+
+:
+
+ð25Þ
+
+The value of eb,β denotes the average number of containers that the tree assigns to service b in excess of the optimum. A positive value of eb,β denotes that more containers are booked on service b than in the optimum; a negative value denotes that less containers are booked on service b than in the optimum.
+
+4.1.3. Error type γ, capacity-restriction error
+
+Finally, we consider error type γ, the capacity-restriction error. For
+assessing the quality of the online solution with this decision tree, we
+consider a set of new demand instances, test set D. If we apply the
+tree directly, we obtain a set of solutions R. We compare these with
+the set of solutions H, obtained by applying Algorithm 2.
+The distribution of used slots on service b in solution rk ∈R is denoted by nbrk. We denote the distribution of nbrk by nbR. The number of containers classiﬁed in service b may be higher than its capacity Kb. On the other hand, we have nbhk the number of containers assigned to service b in solution hk ∈H, which is obtained by the DT heuristic. Hence, the capacity restrictions are adhered to. We denote the distribution of nbhk by nbH. Error type 2 estimates the difference between the solutions rk and hk. The theoretical distributions of nbR and nbH are not known, as they depend on the structure of tree T. In order to assess the size of this capacity-restriction
+error, we can use an empirical distribution of containers assigned to b, based on the distribution of nbR and nbH in the solutions for test set D. Now, the size of error type 2 for service b is determined by the expected
+difference in number of containers assigned to service b:
+
+eb;2
+
+¼
+
+EÀnHb
+
+−nRb
+
+Á :
+
+ð26Þ
+
+We obtain the variance of error γ also by using the empirical distributions:
+
+σ
+
+2 b;γ
+
+¼
+
+VarÀnHb −nRb Á
+
+¼
+
+X
+
+ nRb
+
+−nHb
+
+−Ànrbk
+
+−nrbk
+
+Á2
+
+jRj−1
+
+:
+
+k∈D
+
+ð27Þ
+
+This gives a 95% conﬁdence interval for error type γ of:
+
+eb;γ
+
+Æ
+
+2
+
+pσ bﬃﬃ;ﬃ2ﬃﬃ jRj
+
+:
+
+ð28Þ
+
+4.1.4. Total error estimate
+
+Finally, to estimate the total error in cost, we take the sum of all errors multiplied by the respective slot costs.
+
+XÀ
+
+Á
+
+e ¼ cb eb;α þ eb;β þ eb;γ :
+
+b
+
+ð29Þ
+
+Note that a positive error value denotes additional costs compared to the optimal solution. For individual services, an individual error
+
+component can be negative, for instance, when Algorithm 2 allocates less containers to a speciﬁc service than in the optimal solution. Assuming that the error types α, β and γ for each service b are independent, the variance for the total error is:
+
+X
+
+
+
+σ2 ¼
+
+cb
+
+σ
+
+2 b;α
+
+þ
+
+σ
+
+2 b;β
+
+þ
+
+σ
+
+2 b;γ
+
+:
+
+b
+
+ð30Þ
+
+Assuming independence is conservative. In practice, the errors may have dependencies, resulting in a lower variance because of cross-correlations between the error terms. Determining these crosscorrelations in general will be difﬁcult and we will use (30) to determine the error variance.
+
+5. Case study
+
+In Section 3.5 we compared the proposed method with the optimal strategy in a small example. In this section, we will apply the DT heuristic to a more elaborate case study, and we will use the analysis method of Section 4 to determine a conﬁdence interval for the obtained results. In our experiments, we will compare three online heuristics and the optimal ofﬂine plan in a series of simulations. As before, we use the competitive ratio to compare the objective costs of the heuristics and the optimal objective value, obtained ofﬂine using the CLCAT model. A high competitive ratio indicates a good plan.
+
+5.1. Scenarios
+
+We compare two scenarios with identical service schedules, but different demand patterns. In Scenario 1 the demand is distributed randomly across the input features and in Scenario 2 a speciﬁc demand pattern is considered. First we consider Scenario 1. Fig. 8 shows a service schedule for a week with the Estimated Time of Departure (ETD) and Estimated Time of Arrival (ETA) of three services from A toward B. Trucks can always be used, and are therefore not shown. As our model is aimed at operators of intermodal networks, trucking is only used as a last resort, e.g. in case of disruptions or peak demands. Hence, the incidental demand for trucking is generally easily met by available capacity. The trucking capacity does not have to be modelled. For generating the tree, we use the container's time of availability (tacvailable), the transport lead time (tL = tdcue− tacvailable) and the container weight Wc.
+Also, ﬁve transport demand ﬂows are indicated. These ﬂows have some variability; for obtaining the demand, we use a normal distribution with a mean of 50 TEU and a standard deviation of 12.5 TEU, which we round to integers. We assume that the weight per TEU is 10 t. The tacvailable and tdc ue of these ﬂows are indicated by the shaded bands in Fig. 8. E.g., ﬂow 1 is available at A at some point during Monday and is expected two days later at B. The only service suitable for this ﬂow is Train 1, as it departs after the containers are available and arrives at B before the due time of ﬂow 1. Alternatively, trucks could be selected, but at much higher costs. Table 6 provides details on the services.
+For this scenario, the optimal solution can be easily found by reasoning: Flow 1 and 2 must be fully assigned to Train 1 and Barge 1, respectively. Flow 3 is fully transported by trucks, as no suitable service is available. Then ﬁnally, ﬂow 4 and 5 share service Train 2 up to its full capacity, however, the expected number of containers in ﬂow 4 and 5 is 100 TEU, which is larger than the TEU-capacity for Train 2 (90 TEU), so some trucks must be used. The same solution is found by applying the learning method proposed in the previous section. The trees inference process was implemented using the CART implementation of the Statistics toolbox of MATLAB R2012a and the experiments were carried out using an AMD Athlon II X2 3.0 Ghz processor. The resulting decision tree for scenario 1 is shown in Fig. 9: the optimal solution is mapped entirely by the tree. Fig. 9 also exempliﬁes three important characteristics of the method. Firstly, the tree can be used as decision support per incoming container transportation order. Hence, immediate feedback
+
+12
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+Fig. 8. Transport orders and service schedule for the case study.
+
+Table 6 Inland services for the case study.
+
+Trains 1 and 2 Barge 1 Trucking
+
+Capacity
+[TEU]
+90 200 –
+
+[tonnes]
+1000 10.000 –
+
+Costs
+[per TEU]
+100 50
+285
+
+can be provided to the customer after processing the order. Secondly, the decision tree is presented in a comprehensible manner to human planners. If, because of some disruption, Barge 1 is late, the planner can make a manual decision on an alternative routing for affected containers. Thirdly, apart from the order information the human planner does not need anything else to apply the decision tree. Subsequently, he can manually check if the proposed allocation is suitable. No realtime information exchange is required.
+Scenario 2 is identical to Scenario 1, except for one property: we now assume that all containers of ﬂow 4 have a weight of 25 t (all other ﬂows remain 10 t per TEU). If the solution of Scenario 1 would be applied to this scenario, Train 2 will most likely not be used to its full TEU capacity as the weight limit is reached well before that. So, for this scenario the optimal solution is slightly different: all containers of ﬂow 5 must be planned on Train 2, while the containers of ﬂow 4 are planned on Train 2 if possible. The remaining containers of ﬂow 4 must be transported by trucks. With this solution, Train 2 can be used to its full TEU capacity. The corresponding tree for Scenario 2 was generated in a similar way as in Scenario 1 (depicted in Appendix B). Using (22), (25) and (28), we determine the expected error types 0, 1 and 2 for of applying this tree for scenario 2 in an online setting. Table 7 provides the expected error for the number of assigned containers to all four services including standard deviations. This results in a 95% conﬁdence interval for the total error costs of [277, 1917] in excess of the estimated total cost of 36,807. This corresponds to a 95% conﬁdence interval for
+
+the expected competitive ratio between 95.1% and 99.3% using the tree in Fig. 9.
+5.2. Experiments
+In order to test our method, we apply our DT heuristic to both scenarios described, as well as a greedy and a FCFS heuristic. In the greedy heuristic, every incoming order is assigned to the available slot with the lowest price, whereas the FCFS heuristic selects the earliest available slot. We compare using the competitive ratio. Hence, we compare three online heuristics and the optimal ofﬂine plan in a series of simulations.
+We generate N =20 new demand sets of a week for both scenarios. The sets for both scenarios are equal, except for the weight of ﬂow 4: 25 t per TEU instead of 10 t. For each of these sets P =50 optimal solutions are computed ofﬂine using (8) – (10) and the results are used by the learning algorithm to generate the decision tree. Subsequently, we similarly generated 50 test sets for both scenarios and applied the four methods. Fig. 10 shows boxplots of the competitive ratios of the 50 test sets for both scenarios. The box plots consists of the median in a box of from the 25 to 75 percentile. The whiskers denote the minimum and maximum competitive ratio, truncated at a whisker length of 1.5 times the length of the box. Results exceeding the whiskers are plotted as outliers. In Scenario 1, both the DT heuristic and the greedy heuristic found the optimum in all 50 test sets. The FCFS heuristic performed much worse with a competitive ratio of 0.92. From Fig. 8 we can deduct that a FCFS heuristic will allocate orders of ﬂow 2 to Train 1, and requires the use of trucks for ﬂow 1 when Train 1 is full. This results in additional costs and a lower competitive ratio.
+In Scenario 2, all heuristics have an average competitive ratio lower than 1. On average, the DT heuristic outperformed the other heuristics with a competitive ratio of 95.4% compared to 92.5% (greedy) and 86.1% (FCFS). A Wilcoxon signed-rank test was used to test the measured results for signiﬁcance. This showed that the solution of the Greedy approach and the optimal solution in scenario 1 did not differ
+
+Fig. 9. Tree obtained from the learning method (for Scenario 1).
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+13
+
+Table 7 Estimation of error types 0,1 and 2 for scenario 2 (50 test sets).
+
+Service
+
+cb
+
+eb,0 ± σb,0
+
+eb,1 ± σb,1
+
+eb,2 ± σb,2
+
+Train 1
+
+100
+
+0 ± 1.6
+
+Train 2
+
+100
+
+0 ± 1.2
+
+Barge
+
+50
+
+0 ± 2.0
+
+Truck
+
+285
+
+0 ± 2.6
+
+0±0 −5 ± 13.9
+0±0 5 ± 13.9
+
+1 ± 0.3 −2 ± 15.7
+1 ± 0.3 1 ± 15.3
+
+eb ± σb
+1 ± 1.6 −7 ± 21.0 −1 ± 2.1
+6 ± 20.8
+
+signiﬁcantly. All other methods in scenario 1 and 2 resulted in signiﬁcantly different competitive ratios. The results are in accordance with our expectations: with randomly distributed demand, the DT heuristic performs comparable with the low-level greedy heuristic as in Scenario 1. However, if the demand follows speciﬁc patterns, as in Scenario 2, the DT heuristic outperforms the other heuristics. Also, we see that the resulting competitive ratio is within the 95% conﬁdence interval we have determined for the tree. This shows that our method performs as expected.
+6. Conclusions & future research
+In this paper we proposed a new approach for decision support using information of ofﬂine optimal solutions of container transportation problems in an online setting. Three problems concerning existing optimization methods are addressed with this new method:
+• The method provides instant decisions for an incoming order, for direct feedback to the customer. The method does not use additional planning updates after the ﬁrst allocation, allowing the customer to align the container transportation with the subsequent steps in his supply chain.
+• The method does not need the level of automation and standardised communication protocols for information exchange that centralised planning optimizations methods need. In our method optimisation can be carried out ofﬂine for historic data.
+• The method provides a white box decision tree representation of decision rules, useful and acceptable for human operators in logistics as indicated by Huysmans et al. [16].
+
+Fig. 10. Experiment results of case study a) Boxplots of competitive ratios of 50 test sets (scenario 1) b) Boxplots of competitive ratios of 50 test sets (scenario 2).
+
+We have selected decision tree classiﬁers as the supervised learning method, as this method can use ofﬂine input, it is suitable for classifying into multiple classes and it allows for categorical attributes. A general four step method is proposed: historic data assembly, optimisation of historic sets, decision tree inference, applying the decision tree in real time. In this article, we have used a container transportation setting to develop these steps. The proposed method uses an ofﬂine optimal planning method (CLCAT) to get optimal results of historic transportation problems. The results are translated into a decision tree with the CART inference method. Also, we used a mathematical model for obtaining multiple ofﬂine optima with equivalent objective value as input for the learning algorithm. Finally, we proposed an analysis to assess the quality of the tree using three error types: the historic data error, the misclassiﬁcation error and the over-capacity error. By determining the size of the errors, the quality of the obtained decision tree can be estimated before applying it in practice.
+The proposed DSS framework shows that traditional manual planning can be improved without extensive IT development. The DT heuristic uses optimal solutions and translates that to real-time decisions. Managers responsible for operational planning should consider such an approach as an alternative for costly, time-consuming and/or infeasible system integration projects. In a case study we found that the DT approach could reduce inefﬁciency, as measured by the competitive ratio, by half, amounting to a 3% reduction of transportation costs compared to a Greedy approach. Secondly, our tools for the algorithm analysis in Section 4 will support management in assessing the expected beneﬁts before applying it in practice. Speciﬁcally for the case of intermodal transportation providers, our case study results show that this approach improves the quality of the plan signiﬁcantly in comparison with every day practices such as Greedy or FCFS.
+With the decision tree method it is possible to exploit speciﬁc demand patterns in historic data. We showed that the proposed method was able to identify a speciﬁc pattern automatically, such as a categories of containers with speciﬁc weights. However, if no speciﬁc patterns exist in the historic demand, the method will give results comparable to alternative low-level heuristics, such as ﬁrst come, ﬁrst serve (FCFS) or a greedy heuristic. It is important to use the proposed algorithm analysis for each case, to identify whether signiﬁcant improvement can be expected from using the DT approach in comparison with alternatives.
+Secondly, in this paper, we used the DT heuristic to model the human operator using the decision tree. In practice, this method supports the human operator by indicating suitable services for an order, while the operator is still able to incorporate his speciﬁc knowledge into his decisions.
+Finally, the applicability of the DT approach is restricted by the problem size of the historic optimisation problems. Although our method results in a real-time DSS with a low complexity, by carrying out the more complex optimisation of historic data and the DT inference process ofﬂine, the problem size may be restrictive if it is not feasible to ﬁnd historic optima at all. In that case an alternative approach for ﬁnding good solutions for the historic data may be used.
+Future research on this method includes two directions. On the one hand, additional studies may improve the proposed method by iteratively improving the decision tree using online updating or introducing a guided decision tree learning process. On the other hand, new applications of the proposed method must be studied. The proposed DT approach may have value for any operational decision process with the three requirements of the problem addressed in this article, i.e. realtime decision support, no system automation, a white box system. The method is especially promising in situations that lack automated and standardised information exchange, such as planning in a hospital environment or scheduling in rail applications. The proposed four step method is suitable for applications in these topics, but future research must show its value in those cases.
+
+14
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+Acknowledgements
+
+This research is partially supported by the NWO/STW VENI project ‘Intelligent multi-agent control for ﬂexible coordination of transport hubs’ (project 11210) of the Dutch Technology Foundation STW, and Erasmus Smart Port. The studied operational planning decisions and decision support for the intermodal problem were identiﬁed and discussed in cooperation with European Gateway Services, a subsidiary of Europe Container Terminals (ECT), Rotterdam. We thank our colleague Michel van de Velden for comments that greatly improved the manuscript.
+
+Appendix A. Results on optimal slot reservation in characteristic intermodal problem
+
+A.1. Optimal slot reservation
+
+For a known demand pattern, the booking limit that results in the highest expectation of used slots can be determined. We assume independent distributions for the number of containers for destination B and C during a planning period, denoted by NB and NC, respectively. For each destination d and mode m, we consider the number of used slots (i.e. planned containers), denoted by Sdm. The optimal booking limit on the train for each destination can be found by minimising the total costs for all transports, denoted by cT. The expected costs are a sum of the costs for all four transportation options:
+
+
+
+
+
+
+
+
+
+EðcT Þ ¼ cBRE SBR þ cBTE SBT þ cCRE SCR þ cCTE SCT ;
+
+ðA1Þ
+
+where E is the expectancy operator. For a known booking limit KB (and KC), we can determine the expected number of slots used on each mode and each destination. First, we determine the expected slots used for transportation to destination B. The expected number of train slots used for destination B is:
+
+ E SBR ¼ EðNBjNB ≤ KBÞℙðNB ≤ KBÞ þ KBℙðNBNKBÞ;
+
+ðA2Þ
+
+where ℙ(·) denotes the probability of event ·, and
+
+EðNBjNB
+
+≤KBÞ
+
+¼
+
+X n
+n∈f1;2;…g
+
+ℙðNB ¼ n ∩ n ≤ KBÞ ℙðNB ≤ KBÞ
+
+¼
+
+X n
+n∈f1;2;…;K B g
+
+ℙðNB ℙðNB
+
+¼ nÞ ≤KBÞ
+
+:
+
+ðA3Þ
+
+By substituting (A3) in (A2), we get the expected number of rail slots used for destination B:
+
+ E SBR ¼
+
+X nℙðNB ¼ nÞ þ KBℙðNBNKBÞ
+
+n∈f1;2;…;K B g
+
+ðA4Þ
+
+The expected number of units that is transported to destination B by truck is computed as
+ E SBT ¼ EðNB−KBjNBNKBÞℙðNBNKBÞ ¼ ðEðNBjNBNKBÞ−KBÞℙðNBNKBÞ ðA5Þ
+
+with
+
+EðNB jNB NK B Þ
+
+¼
+
+X n ℙðNB ¼ n ∩ nNKBÞ
+
+n∈f1;2;…g
+
+ℙðNB NK B Þ
+
+¼
+
+X
+
+n ℙðNB ¼ nÞ :
+
+n∈fKBþ1;KBþ2;…g ℙðNBNKBÞ
+
+ðA6Þ
+
+Again, by substituting (A6) in (A5), we get the result:
+
+ E SBT ¼
+
+X nℙðNB ¼ nÞ−KBℙðNBNKBÞ
+
+n∈fK B þ1;K B þ2;…g
+
+ðA7Þ
+
+The results for the expected number of slots used for transportation toward destination C are determined in a similar way as (A2) – (A7):
+
+ E SCR ¼
+
+X nℙðNC ¼ nÞ þ KCℙðNCNKCÞ
+
+n∈f1;2;…;K C g
+
+ðA8Þ
+
+ E SCT ¼
+
+X nℙðNC ¼ nÞ−KCℙðNCNKCÞ
+
+n∈fK C þ1;K C þ2;…g
+
+ðA9Þ
+
+Substituting (A4) and (A7) – (A9) in (A1) gives the expected costs for a given value of KB (and KC = K – KB). The optimal booking limit for rail slots used for destination B, i.e., the optimal value of KB is then determined by solving
+
+K
+
+Ã B
+
+¼
+
+argmin
+
+EðcT Þ:
+
+KB
+
+In the next section, we will determine the optimal value KB⁎ for a uniform distribution of the demand to destinations B and C.
+
+A.2. Optimal slot reservation for uniformly distributed demand
+
+For known distributions of NB and NC, the value of KB that results in the lowest expected costs can be computed. E.g., for uniform distribu-
+tions NB ~ U(b1, b2) , NC ~ U(c1, c2), that allow a total demand exceeding the train capacity, i.e., b2 + c2 N K, the expected number of rail slots used for destination B can be estimated by rewriting (A4) as
+
+ E SBR
+
+
+
+¼
+
+ðK B −b1 Þ
+
+b1 þ KB þ 1 2ðb2−b1Þ
+
+þ
+
+KB
+
+b2 −K B b2 −b1
+
+ E SBR
+
+¼
+
+KB2
+
+þ
+
+b12−2KBb2 þ 2ðb1−b2Þ
+
+b1 −K B
+
+:
+
+ðA10Þ
+
+The expected number of units transported to destination B by truck can be determined by rewriting (A7) as
+
+ E SBT
+
+¼
+
+ðb2 −K B Þ
+
+b2 þ KB þ 1 2ðb2−b1Þ
+
+−K B
+
+b2 −K B b2 −b1
+
+ E SBT
+
+¼
+
+−
+
+K
+
+2 B
+
+þ
+
+b22−2KBb2 þ 2ðb1−b2Þ
+
+b2 −K B
+
+:
+
+ðA11Þ
+
+Similarly, we can rewrite (A8) and (A9) as
+
+ E SCR
+
+¼
+
+KC2
+
+þ
+
+c12−2KCc2 þ 2ðc1−c2Þ
+
+c1 −K C
+
+;
+
+ E SCT
+
+¼
+
+−
+
+K
+
+2 C
+
+þ
+
+c22−2KCc2 þ 2ðc1−c2Þ
+
+c2 −K C
+
+:
+
+ðA12Þ ðA13Þ
+
+Combining and rewriting (A1), (A10) – (A13) gives
+
+
+
+
+
+
+
+
+
+EðcT Þ ¼ cBRE SBR þ cCRE SCR þ cBTE SBT þ cCTE SCT :
+
+ðA14Þ
+
+By using KC = K – KB and ﬁnding the minimum of (A14), we can ﬁnd the analytical optimal value for KB:
+
+
+
+
+
+
+
+
+
+K
+
+Ã B
+
+¼
+
+c2−K
+
+þ
+
+1 2
+
+ðcCR−cCTÞðb1−b2Þ þ
+
+b2
+
+þ
+
+1 2
+
+ðcBR −cBT Þðc1 −c2 Þ
+
+ðb1−b2ÞðcCR−cCTÞ þ ðc1– c2ÞðcBR− cBTÞ
+
+ðA15Þ
+
+The optimal value KB⁎ is the upper limit for slots that can be used for transporting containers to destination B by rail. Next, we will compare the result of the proposed decision tree method with the analytical optimum.
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+15
+
+Appendix B. Decision tree for case study scenario 2
+
+References
+[1] T.A. Arentze, H.J. Timmermans, A learning-based transportation oriented simulation system, Transportation Research Part B: Methodological 38 (7) (2004) 613–633.
+[2] D.L. Bandeira, J.L. Becker, D. Borenstein, A DSS for integrated distribution of empty and full containers, Decision Support Systems 47 (4) (2009) 383–397.
+[3] D. Bertsimas, D.B. Brown, C. Caramanis, Theory and applications of robust optimization, SIAM Review 53 (3) (2011) 464–501.
+[4] K.H. Borgwardt, The average number of pivot steps required by the simplex-method is polynomial, Mathematical Methods of Operational Research 26 (1) (1982) 157–177.
+[5] A. Borodin, R. El-Yaniv, Online Computation and Competitive Analysis, Cambridge University Press, Cambridge, 1998.
+[6] B. Branley, R. Fradin, S.O. Kimbrough, T. Shafer, On Heuristic Mapping of Decision Surfaces for Post-Evaluation Analysis, Proceedings of the Thirtieth Hawaii International Conference on System Sciences January 1997, pp. 416–425.
+[7] L. Breiman, J. Friedman, C.J. Stone, R.A. Olshen, Classiﬁcation and Regression Trees, CRC Press, Boca Raton, FL, 1984.
+[9] B. Chandra, P. Paul Varghese, Moving towards efﬁcient decision tree construction, Information Sciences 179 (8) (2009) 1059–1069.
+[10] R.K. Cheung, C.Y. Chen, A two-stage stochastic network model and solution methods for the dynamic empty container allocation problem, Transportation Science 32 (2) (1998) 142–162.
+[11] T.H. Cormen, C.E. Leiserson, R.L. Rivest, Introduction to Algorithms, MIT Press, Cambridge, 1990.
+[12] A.M. Douma, Aligning the Operations of Barges and Terminals through Distributed Planning, University of Twente, 2008.
+[13] T. Gal, G.V. Davis, Postoptimal Analyses, Parametric Programming, and Related Topics, McGraw-Hill International, New York, 1979.
+[14] J.S. Giboney, S.A. Brown, P.B. Lowry, J.F. Nunamaker, User acceptance of knowledgebased system recommendations: explanations, arguments, and ﬁt, Decision Support Systems 72 (2015) 1–10.
+[15] H.J. Greenberg, An Annotated Bibliography for Post-Solution Analysis in Mixed Integer Programming and Combinatorial Optimization, Advances in Computational and Stochastic Optimization, Logic Programming, and Heuristic Search, Operations Research/Computer Science Interfaces, Vol. 9, Springer, USA 1998, pp. 97–147.
+[16] J. Huysmans, K. Dejaeger, C. Mues, J. Vanthienen, B. Baesens, An empirical evaluation of the comprehensibility of decision table, tree and rule based predictive models, Decision Support Systems 51 (1) (2011) 141–154.
+[17] R. Ishfaq, C.R. Sox, Design of intermodal logistics networks with hub delays, European Journal of Operational Research 220 (3) (2012) 629–641.
+[18] B. Jansen, P.C. Swinkels, G.J. Teeuwen, B.V.A. de Fluiter, H.A. Fleuren, Operational planning of a large-scale multi-modal transportation system, European Journal of Operational Research 156 (1) (2004) 41–53.
+[19] L. Jenkins, Parametric methods in integer linear programming, Annals of Operations Research 27 (1) (1990) 77–96.
+[20] G.V. Kass, An exploratory technique for investigating large quantities of categorical data, Applied Statistics 29 (2) (1980) 119–127.
+[21] S.B. Kotsiantis, Supervised machine learning: a review of classiﬁcation techniques, Informatica 31 (2007) 249–268.
+[22] L. Li, R.R. Negenborn, B. De Schutter, A Sequential Linear Programming Approach for Flow Assignment in Intermodal Freight Transport, 16th International IEEE Conference on Intelligent Transportation Systems October 2013, pp. 1224–1230 (IEEE).
+[23] S.K. Murthy, Automatic construction of decision trees from data: a multi-disciplinary survey, Data Mining and Knowledge Discovery 2 (4) (1998) 345–389.
+[24] K.G. Murty, J. Liu, Y.W. Wan, R. Linn, A decision support system for operations in a container terminal, Decision Support Systems 39 (3) (2005) 309–332.
+
+[25] J.L. Nabais, R.R. Negenborn, R.B. Carmona Benitez, M.A. Botto, A Constrained MPC Heuristic to Achieve a Desired Transport Modal Split at Intermodal Hubs, Proceedings of the 16th International IEEE Conference on Intelligent Transportation Systems (IEEE ITSC 2013), the Hague, the Netherlands October 2013, pp. 714–719.
+[26] E.W. Ngai, T.E. Cheng, S. Au, K.H. Lai, Mobile commerce integrated with RFID technology in a container depot, Decision Support Systems 43 (1) (2007) 62–76.
+[28] K. Pak, R. Dekker, Cargo Revenue Management: Bid-Prices for a 0–1 Multi Knapsack Problem (No. ERS-2004-055-LIS), ERIM Report Series Research in Management2004.
+[29] J.R. Quinlan, Induction of decision trees, Machine Learning 1 (1) (1986) 81–106.
+[30] J.R. Quinlan, C4.5: Programs for Machine Learning, Morgan Kaufmann, 1993. [31] A.H.G. Rinnooy Kan, L. Stougie, C. Vercellis, A class of generalized greedy algorithms
+for the multi-knapsack problem, Discrete Applied Mathematics 42 (2) (1993) 279–290. [32] L. Rokach, O. Maimon, Top-down induction of decision trees classiﬁers — a survey, IEEE Transactions on Systems, Man, and Cybernetics, Part C: Applications and Reviews 35 (4) (2005) 476–487. [33] S.R. Safavian, D. Landgrebe, A survey of decision tree classiﬁer methodology, IEEE Transactions on Systems, Man, and Cybernetics 21 (3) (1991) 660–674. [34] W.S. Shen, C.M. Khoong, A DSS for empty container distribution planning, Decision Support Systems 15 (1) (1995) 75–82. [35] D.M. Steiger, Enhancing user understanding in a decision support system: a theoretical basis and framework, Journal of Management Information Systems (1998) 199–220. [36] J. Su, H. Zhang, A Fast Decision Tree Learning Algorithm, Proceedings of the National Conference on Artiﬁcial Intelligence, Vol. 21(1) July 2006, p. 500. [37] E. Ursavas, A decision support system for quayside operations in a container terminal, Decision Support Systems 59 (2014) 312–324. [38] L.G. Valiant, The complexity of computing the permanent, Theoretical Computer Science 8 (2) (1979) 189–201. [39] M.R. van der Horst, P.W. de Langen, Coordination in hinterland transport chains: a major challenge for the seaport community, Maritime Economics & Logistics 10 (1) (2008) 108–129. [40] P. Van Hentenryck, R. Bent, Online Stochastic Combinatorial Optimization, The MIT Press, 2009. [41] P. Van Hentenryck, R. Bent, E. Upfal, Online stochastic optimization under time constraints, Annals of Operations Research 177 (1) (2010) 151–183. [42] B. van Riessen, R.R. Negenborn, G. Lodewijks, R. Dekker, Impact and relevance of transit disturbances on planning in intermodal container networks using disturbance cost analysis, Maritime Economics & Logistics 17 (4) (2015) 440–463. [43] B. van Riessen, R.R. Negenborn, R. Dekker, G. Lodewijks, Service network design for an intermodal container network with ﬂexible transit times and the possibility of using subcontracted transport, International Journal of Shipping and Transport Logistics 7 (4) (2015) 457–478. [44] B. Van Riessen, R.R. Negenborn, R. Dekker, White Box Optimization of Container Transport Planning, Proceedings of the International Forum on Operation Research and Statistics 2014. Barcelona, Spain, 2014. [45] A. Veenstra, R. Zuidwijk, E. van Asperen, The extended gate concept for container terminals: expanding the notion of dry ports, Maritime Economics & Logistics 14 (1) (2012) 14–32. [46] V. Venkat, S.H. Jacobson, J.A. Stori, A post-optimality analysis algorithm for multiobjective optimization, Computational Optimization and Applications 28 (3) (2004) 357–372. [47] S. Verwer, Y. Zhang, Q.C. Ye, Learning optimization models in the presence of unknown relations, 2014, Available from http://arxiv.org/abs/1401.1061v2.
+
+16
+
+B. van Riessen et al. / Decision Support Systems 89 (2016) 1–16
+
+[48] S.W. Wallace, Decision making under uncertainty: is sensitivity analysis of any use? Operations Research 48 (1) (2000) 20–25.
+[49] A. Ziliaskopoulos, W. Wardell, An intermodal optimum path algorithm for intermodal networks with dynamic arc travel times and switching delays, European Journal of Operational Research 125 (3) (2000) 486–502.
+[50] H. Ayed, C. Galvez-Fernandez, Z. Habbas, D. Khadraoui, Solving time-dependent multimodal transport problems using a transfer graph model, Computers & Industrial Engineering 61 (2) (2011) 391–401.
+Bart van Riessen is a PhD researcher at Erasmus University Rotterdam. He specialised in several quantitative aspects of transportation planning and he studied several aspects of network planning optimization of container logistics in Europe. His ambition is to combine both advanced quantitative research with practical applications for present-day challenges in logistics. In other positions during his past experience, his work consisted of quantitative research in several domains, such as airport passenger queuing or energyefﬁcient transportation.
+
+Rudy R. Negenborn received the PhD degree in distributed control from Delft University of Technology, the Netherlands. Currently, he is assistant professor in Control of Transport Technology at the Section Transport Engineering & Logistics, Department of Maritime and Transport Technology, Delft University of Technology, The Netherlands. Rudy Negenborn's research interests include multi-agent systems, distributed control, and model predictive control, with applications in control of networked transport systems and logistics. He is editor of the books “Intelligent Infrastructures”, “Distributed Model Predictive Control Made Easy”, and “Transport of Water versus Transport over Water”.
+Rommert Dekker is a professor of operations research and quantitative logistics at the Erasmus School of Economics (ESE). His research interests include reverse logistics, service logistics, container logistics and transportation optimization. He has published over 100 papers in journals like Management Science, Transportation Science, Transportation Research B and E, Production Operations Managements, European Journal of Operational Research and many more. He is part of SmartPort, a centre for port research sponsored by the Port of Rotterdam.
+

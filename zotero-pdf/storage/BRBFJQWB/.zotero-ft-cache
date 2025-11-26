@@ -1,0 +1,106 @@
+
+ACM Digital Library home
+
+        Sign in
+
+10.1145/1455770.1455804 acmconferences Article/Chapter View Abstract Publication Pages ccs Conference Proceedings conference-collections
+ccs
+research-article
+FairplayMP: a system for secure multi-party computation
+Share on
+
+    Authors:
+    Assaf Ben-David
+    ,
+    Noam Nisan
+    ,
+    Benny Pinkas
+
+Authors Info & Claims
+CCS '08: Proceedings of the 15th ACM conference on Computer and communications security October 2008 Pages 257–266 https://doi.org/10.1145/1455770.1455804
+Online: 27 October 2008 Publication History
+
+    264 citation
+    1,664
+    Downloads 
+
+    Get Citation Alerts
+    Save to Binder
+    Export Citation
+
+    Get Access 
+
+    18 References
+
+ABSTRACT
+
+We present FairplayMP (for "Fairplay Multi-Party"), a system for secure multi-party computation. Secure computation is one of the great achievements of modern cryptography, enabling a set of untrusting parties to compute any function of their private inputs while revealing nothing but the result of the function. In a sense, FairplayMP lets the parties run a joint computation that emulates a trusted party which receives the inputs from the parties, computes the function, and privately informs the parties of their outputs. FairplayMP operates by receiving a high-level language description of a function and a configuration file describing the participating parties. The system compiles the function into a description as a Boolean circuit, and perform a distributed evaluation of the circuit while revealing nothing else. FairplayMP supplements the Fairplay system [16], which supported secure computation between two parties. The underlying protocol of FairplayMP is the Beaver-Micali-Rogaway (BMR) protocol which runs in a constant number of communication rounds (eight rounds in our implementation). We modified the BMR protocol in a novel way and considerably improved its performance by using the Ben-Or-Goldwasser-Wigderson (BGW) protocol for the purpose of constructing gate tables. We chose to use this protocol since we believe that the number of communication rounds is a major factor on the overall performance of the protocol. We conducted different experiments which measure the effect of different parameters on the performance of the system and demonstrate its scalability. (We can now tell, for example, that running a second-price auction between four bidders, using five computation players, takes about 8 seconds.)
+
+References
+
+    . Beaver, S. Micali and P. Rogaway. The round complexity of secure protocols. In 22th STOC, pp. 503--513, 1990. Google Scholar Google Scholar Digital Library Digital Library
+    . Ben-Or, S. Goldwasser and A. Wigderson. Completeness Theorems for Non-Cryptographic Fault-Tolerant Distributed Computation. In ph$20$th STOC, pages 1--10, 1988. Google Scholar Google Scholar Digital Library Digital Library
+    . Bogetoft, D.L. Christensen, I. Dåmgard, M. Geisler, T. Jakobsen, M. Krøigaard, J.D. Nielsen, J.B. Nielsen, K. Nielsen, J. Pagter, M. Schwartzbach and T. Toft. Multi-Party Computation Goes Live Cryptology ePrint Archive, Report 2008/068, 2008. Google Scholar Google Scholar
+
+Show All References
+Index Terms
+
+    FairplayMP: a system for secure multi-party computation
+
+        Software and its engineering
+
+Comments
+Please enable JavaScript to view the comments powered by Disqus.
+
+View Table of Contents
+back
+Categories
+
+    Journals
+    Magazines
+    Books
+    Proceedings
+    SIGs
+    Conferences
+    Collections
+    People
+
+About
+
+    About ACM Digital Library
+    Subscription Information
+    Author Guidelines
+    Using ACM Digital Library
+    All Holdings within the ACM Digital Library
+    ACM Computing Classification System
+
+Join
+
+    Join ACM
+    Join SIGs
+    Subscribe to Publications
+    Institutions and Libraries
+
+Connect
+
+    Contact
+    Facebook
+    Twitter
+    Linkedin
+
+The ACM Digital Library is published by the Association for Computing Machinery. Copyright © 2022 ACM, Inc.
+
+    Terms of Usage
+    Privacy Policy
+    Code of Ethics
+
+ACM Digital Library home
+ACM home
+About Cookies On This Site
+
+We use cookies to ensure that we give you the best experience on our website.
+
+Learn more
+
+Got it!
+

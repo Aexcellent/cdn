@@ -1,0 +1,566 @@
+Neurocomputing 158 (2015) 210–215
+Contents lists available at ScienceDirect
+Neurocomputing
+journal homepage: www.elsevier.com/locate/neucom
+Brief Papers
+Prediction models based on multivariate statistical methods and their applications for predicting railway freight volume
+Yandong Yang, Congzhou Yu n
+College of Education and P. E., Bohai University, Liaoning 121013, China
+
+article info
+Article history: Received 30 November 2014 Received in revised form 6 January 2015 Accepted 25 January 2015 Communicated by Yang Tang Available online 10 February 2015
+Keywords: Prediction modell Multivariate statistical methods Partial least squares Railway freight volume
+
+abstract
+Four prediction models based on the multivariate statistical methods are constructed in this work and they are successfully applied in predicting the Railway Freight Volume (RFV). RFV directly reﬂects the regional economic states such as production improvement and economic restructuring. Accurately predicting the RFV is of great use in production planning, decision making, labor allocating, etc. In this work, based on the multivariate statistical methods, i.e. ordinary least squares regression (OLSR), principal component regression (PCR), partial least squares regression (PLSR), and modiﬁed partial least squares regression (MPLSR), four RFV prediction models are constructed and the detailed comparison is made by implementing them on a practical dataset. From the simulation results, the conclusion can be derived that the MPLSR based prediction model outperforms the other three models.
+& 2015 Elsevier B.V. All rights reserved.
+
+1. Introduction
+With the rapid development of economic globalization and regional economic integration, the logistics industry has entered a new stage of a rational, pragmatic and rapid development [1]. The renascent logistics industry is a service industry and provides great support to other industries. One of the important factors of affecting regional logistics is the economic development in one region. Regional economic development is multi-level, multi-factor and complex system [2,3]. The demand of logistics is just a reﬂection of the integrated system. It is also an important factor of deciding the development policy of logistics industry [4,5]. However, it is complicated and it cannot exactly describe the quantitative relationship. Fortunately, useful information can be tapped from time series data in the stable situation. A quantitative analysis mathematical model can be established by seeking the variation of logistics. Then the logistics can be predicted. Through the analysis of the logistics, the standard living of a region can be obtained [6,7]. It will bring great help to planning of railway departments, through predicting logistics with current data. Rail freight demand forecast refers to the rail freight market research. After analysis, the scientiﬁc methods are used to estimate the future demand for freight and variation tendency. It provides a scientiﬁc basis for policy formulation and improving law regulations. In order to plan reasonably or avoid wasting energy, an accurate prediction of railway freight is needed.
+n Corresponding author. E-mail addresses: yandong.yang2014@gmail.com (Y. Yang),
+congzhou.yu2014@gmail.com (C. Yu).
+http://dx.doi.org/10.1016/j.neucom.2015.01.046 0925-2312/& 2015 Elsevier B.V. All rights reserved.
+
+In recent years, many scholars have studied railway freight volume forecast in many different methods. In Ref. [8], rough sets theory was used to predict the demand for rail freight. Moreover, it is concluded that the data can be directly used when using rough set. This method proposed in [8] avoids the subjective factors and improves the reliability and validity of the forecast [8]. In Ref. [9], a study of the combination of rail freight forecasting methods is conducted and satisfactory results are shown. The theory of grey system is also introduced in Ref. [10] and it is based on railway freight volume data of Sichuan province. Then, DGM (2, 1) prediction model of Sichuan railway freight volume is built and the predictive values are tested. It is demonstrated that the model is of high precision and it can be used for freight volume forecast conclusion. At last, based on the algorithm, the railway freight volume of Sichuan province from 2010 to 2015 are predicted [10]. In Ref. [11], the method which based on improved BP neural network model is used to forecast railway freight volume. This method is proposed for the shortage of standard BP neural network based on the analysis of railway freight volume forecasting methods. The improved BP algorithm can get better solution, and can also shorten the training time. The method based on GA-BP model can be proposed to resolve the problem of railway freight volume forecasting in Ref. [12]. Reference [12] introduces the gray correlation analysis to determine the correlation of the national rail freight and its main impact factors, then GA-BP neural network prediction model is established according to their correlation factors associated with above standard values. And the feasibility and effectiveness of this method are proved.
+By analyzing these study, it is found that the models established by our predecessors exist some errors and the case study is also not perfect. For example, grey model method can predict roughly the change trend of freight volume over a period of time, but the
+
+Y. Yang, C. Yu / Neurocomputing 158 (2015) 210–215
+
+211
+
+uncertainty factors, such as environmental factors and emergency, have a large inﬂuence on factors. And BP neural network exists the drawback, such as low convergence speed, falling into local minimum easily and network training sensitively for the initial weights and thresholds. It will produce strong volatility, so the accuracy is not high for the short-term freight volume forecasting. However, in order to forecast the regional logistics demand, choosing the most suitable method is the key to obtain high-precision forecast results. Four algorithms will be proposed to overcome the drawbacks of the aforementioned approaches in this paper. The four algorithms are OLSR, PCR, PLSR and MPLSR [13]. And these algorithms can avoid the disaster of dimensions effectively. At the same time, they can eliminate the inﬂuence of the multicollinearity in regression models. They can work on huge amount of data to complete the prediction of railway freight volume. The basic idea of the four algorithms is to represent the high dimensional data set by a smaller set of latent variables. Then they can reduce computational load.
+In this paper, the reliability of the four algorithms will be tested according to the data set of rail freight. Jiangxi province is located in the middle of China. The logistics activity plays a key role to link the west, the north and the south part of China. With the domestic logistics heating up, Jiangxi province regard speeding up the development of modern logistics as a strategy option for adjustment of economic efﬁciency in Jiangxi province. As the eleventh ﬁve year plan goes on, GDP and social total consumption have been increasing in Jiangxi province due to the implementation of the Open Strategy. Therefore, it is an important topic to predict the demand of railway logistics so that logistics of Jiangxi province can be planned based on it. In order to predict logistics of Jiangxi province, the multivariate methods will be used. This algorithm can help to predict logistics and build the ﬁtted model. In order to obtain an efﬁcient prediction model, a comparison amongst the models established by ordinary least squares regression, principal component regression [14], partial least squares regression, and a modiﬁed partial least square regression is made. And the best model is selected out by the analysis of error of the various forecasting methods. Then the advantage of MPLSR algorithm can be shown by comparison with the other three algorithms. MPLSR has a simpler math description than others. The method is simple in computation, high in reliability and has wide applications. Now MPLSR is used in framework of data-driven approaches [15–17] and system control [18,17], and the best result can be obtained [19]. Here MPLSR is used to forecast railway freight volume in the next ﬁve years, and provides suggestions for the future of scientiﬁc development.
+2. Algorithms introduction
+Multivariate statistics is a powerful tool to solve problems of railway logistics forecast, which often includes a large number of data. Multivariate statistics has been extensively applied to many sphere, such as predicting railway logistics by PLS regression [20,21], ﬁnding the main factors which inﬂuences the freight by PCA [22] and PLS.
+For this part, in addition to describing three classical multivariate statistics methods, a modiﬁed PLS regression method is also imported, which has a simpler math description compared with standard PLS regression.
+2.1. Ordinary least squares regression (OLSR)
+Ordinary least squares regression (OLSR) aims to establish the optimal method of mathematical relationships according to the principle of minimum squared error of measure data. OLSR can easily obtain the unknown data. In most cases, OLSR appears in the lower-dimensional
+
+case. But, it can also settle the problem generated by multi-dimensional. The following is a brief introduction to the algorithm.
+
+ Step 1: Standardize the collected measurable variables and
+response variables, denoted as X ¼ ½x1 ⋯ xm A RnÂm, Y ¼ ½y1 ⋯ yp A RnÂp.
+ Step 2: Minimize the sum of errors ei:
+
+ei ¼ yi À Xβi
+
+ð1Þ
+
+βi ¼ arg min eTi ei ¼ arg min ðyi À XβiÞT ðyi À XβiÞ
+
+i ¼ 1; …; p
+
+ð2Þ
+
+Because of the invertibility of XTX, the variable βi can also be
+calculated by
+
+βi ¼ ðXT XÞ À 1XT yi
+
+ð3Þ
+
+ Step 3: Establish the regression model:
+
+Y ¼ XP þ Q
+
+ð4Þ
+
+in which P is formed by βi, Q is formed by ei.
+
+2.2. Principal component regression (PCR)
+
+During multiple linear regression analysis, we often encounter phenomenon of approximate linear relationship between the independent variable. This phenomenon is the so-called collinearity. When collinearity is severe, the regression model established by the least squares method will increase the variance parameters. Making the regression equation becomes difﬁcult. In order to overcome this problem, Hotelling proposed principal component analysis in 1933. The core idea of principal component analysis is to reduce the dimension by regarding a few indicators as the comprehensive index, and try not to change the indicator system to explain the extent of the dependent variable. According to the idea of principal component analysis, W. F. Massy proposed principal component regression in 1965 [14]. Today, PCR has been widely used. And it become a effective method to resolve multicollinearity problem, and the algorithm can be brieﬂy formulated as follows.
+
+ Step 1: Standardize the original data. Presented as X ¼
+½x1 ⋯ xmT A RnÂm, Y ¼ ½y1 ⋯ ypT A RnÂp.
+ Step 2: Calculate eigenvalues and the corresponding orthonor-
+mal eigenvectors of covariance matrix XT X:
+
+1 nX
+
+T
+
+X
+
+¼
+
+T
+
+ΛT
+
+T
+
+ð5Þ
+
+Λ ¼ diagðλ1⋯λmÞ; λ1 4⋯ 4 λm 4 0
+
+In which n is the dimension of covariance matrix XT X, Λ is the diagonal matrix, λi is the eigenvalues of covariance matrix XT X,
+T is the so-called orthogonal matrix, and it contains eigenvec-
+tors corresponding to eigenvalues.
+ Step 3: Select k principal components. If the sum of eigenvalues
+ratio reaches a certain level, such as 85 percent, k is the number
+of the principal. Then these k components can replace all the
+independent variables, and calculate the score matrix Zk.
+
+Zk ¼ XTpc
+
+ð6Þ
+
+where Tpc ¼ ½t1 … tk A RnÂk, k is the number of the principal
+components.
+ Step 4: Establish prediction model Y:
+
+βi
+
+¼
+
+ðZTk
+
+ZkÞ
+
+À
+
+1
+
+Z
+
+T k
+
+yi ;
+
+B ¼ ½β1 … βpT A RmÂp
+
+ð7Þ
+
+Y ¼ ZkB þ E ¼ XP þ E; P ¼ TpcB
+
+ð8Þ
+
+212
+
+Y. Yang, C. Yu / Neurocomputing 158 (2015) 210–215
+
+2.3. Partial least squares regression (PLSR)
+Partial least squares regression modeling provide a kind of manylinear regression modeling method. The measurable matrix is highly correlated with large dimension, OLSR might be no longer valid. To solve this problem, the PLSR has been proposed. PLSR focused on principal component analysis, canonical correlation analysis and linear regression analysis features. So, in addition to providing a more reasonable regression model in the analysis results, PLSR [23] can complete some researches similar to principal component analysis and canonical correlation analysis. PLSR is widely used in many ﬁelds, such as fault detection [24], neuroimaging [25], monitoring on modern industry [26] and analysis of rail freight. Many improvements have been made in PLS since 1982 when Herman Wold proposed the PLS algorithm [27,28]. In this section, the standard PLSR method will be considered as follows.
+
+ Step 3: Count the regression coefﬁcient matrix P:
+
+1Y T n
+
+X
+
+%
+
+PT
+
+Rn;
+
+R ¼ XTX
+
+ð18Þ
+
+P ¼ R À 1XT Y if rankðRÞ ¼ m
+
+P ¼ R†XT Y if rankðRÞ o m
+
+ð19Þ
+
+in which the R† is the pseudoinverse of R.
+ Step 4: Construct the ﬁnal model of MPLSR:
+
+Y ¼ XP þ Ey
+
+ð20Þ
+
+in which Ey is the residual part of Y that is uncorrelated with X.
+
+3. Railway logistics forecast of Jiangxi province with four regression model
+
+ Step 1: Standardize the original data presented as X ¼ ½x1 …
+xpT A RnÂp, Y ¼ ½y1 … yqT A RnÂq.
+ Step 2: Calculate the following equations γ times iteratively:
+
+ðwk; vkÞ ¼ arg max wTk XT Yvk; k ¼ 1⋯γ;
+
+ð9Þ
+
+‖wk‖2 ¼ 1; ‖vk‖2 ¼ 1;
+
+ð10Þ
+
+For this part, multivariate statistical methods will be used to establish the relationship between freight indexes and rotation volume of goods transport. These methods have a ﬁtting and forecast capability, and the best method can be selected to predict the need of railway logistics by comparing relevant ﬁgures or indexes in the future.
+
+tk ¼ Xkwk; uk ¼ Ykvk;
+
+ð11Þ 3.1. Data collecting
+
+Xk ¼ tkαTk þ Xk þ 1; Y k ¼ tkβTk þ Y k þ 1;
+
+ð12Þ
+
+αk
+
+¼
+
+X
+
+T k
+
+‖tk
+
+tk ‖2
+
+;
+
+βk
+
+¼
+
+Y
+
+T k
+
+‖tk
+
+tk ‖2
+
+;
+
+ð13Þ
+
+Xk þ 1 ¼ Xk À tkαTk ; Y k þ 1 ¼ Y k À tkβTk
+
+ð14Þ
+
+where the wk, vk and tk, uk are the loading vector and score
+vector of X and Y, respectively. And γ is the number of latent
+variables that is selected by the cross-validation criteria.
+ Step 3: Put wk, tk, αk and βk into W, T, A, B, and the partial least
+squares regression model can be expressed as follows:
+
+T ¼ XW; X ¼ TAT þ E
+
+ð15Þ
+
+Y ¼ TBT þ F ¼ XP þ F;
+
+ð16Þ
+
+The article collected data (cite: Chinese Statistical Yearbook) from 1999 to 2009 in Jiangxi province and its inﬂuencing factors in rail freight. Speciﬁc data will be shown in Table 1.
+Assuming GDP, total retail sales of social consumer goods, primary sector, secondary industry, tertiary-industry, total export-import volume, denoted as X ¼ ½x1 … x6. And railway rotation volume of freight transport is expressed as Y. These data can be found in Table 1. And the ﬁrst ﬁve data is one hundred million RMB for the unit, the last data uses one hundred million tons as one unit. Then, the autocorrelation coefﬁcients of the variables can be calculated through using the data set in Table 1. Speciﬁc data can be expressed in Table 2. According to Table 2, the autocorrelation coefﬁcients of the variables is large. Then the problem that independent variable existing severe multiple correlations has been seen.
+
+P ¼ WBT :
+
+ð17Þ 3.2. Building model
+
+2.4. Modiﬁed partial least squares regression (MPLSR)
+
+PCR and PLSR will project the raw data into the principal component space, latent variable space and free space. And the multicollinearity problem that is a obstacle for the OLSR. Through the lower dimension of principal components space or latent variables space, this problem can be overcame. But, these methods will have any deviation on the result of PCR and PLSR. When the set data exists multicollinearity problem or the number of samples less than the number of variables, OLSR can't work very well. In order to solve these problems, Yin et al. proposed the MPLSR, which has been veriﬁed on the industrial benchmark of Tennessee Eastman process for fault detection [29] and a good result has been obtained [30]. MPLSR can avoid these drawbacks and it can provide a clearer interpretation of the correlation model. MPLSR has less computational load than the other three algorithms. And the algorithm can be expressed speciﬁcally as follows.
+
+ Step 1: Place collected variables into X and Y. Normalize them,
+
+
+
+represented as X ¼ ½x1 … xm A RnÂm and Y ¼ ½y1 … yp A RnÂp. Step 2: Calculate eigenvalues and eigenvectors of XT X.
+
+In order to make prediction, the data set will be used. Some models will be built through four kinds of regression methods. Because OLSR is under the inﬂuence of multicollinearity problem, the method cannot work well. What's more, OLSR is not approving to build the regression equation when the number of samples is
+
+Table 1 Railway logistics of Jiangxi province from 1999 to 2009 and the raw data of inﬂuencing factors.
+
+Year GDP
+
+TRSCG Primary Secondary Tertiary- Total exportsector industry industry import volume
+
+RVGT
+
+1999 1962.9 650.5 464.4 2000 2003.1 704.9 485.1 2001 2175.7 763.3 506.0 2002 2450.5 832.7 535.9 2003 2830.5 923.2 560.0 2004 3495.9 1059.9 711.7 2005 4056.8 1236.2 727.4 2006 4820.5 1428.0 786.1 2007 5800.3 1683.1 905.8 2008 6971.1 2142.0 1060.4 2009 7655.2 2484.4 1098.7
+
+758.2 700.8 788.1 951.8 1227.4 1595.7 1917.5 2320.7 2840.9 3414.9 3919.5
+
+740.4 817.2 881.6 962.7 1043.1 1188.5 1411.9 1563.7 1753.6 2005.1 2637.1
+
+81.6 100.9
+95.1 105.3 157.1 219.2 252.6 450.6 640.8 846.2 794.0
+
+438.5 462.0 468.1 521.0 556.1 613.4 613.7 641.8 682.9 672.3 659.1
+
+TRSCG – total retail sales of consumer goods; and RVGT – rotation volume of goods transport.
+
+Y. Yang, C. Yu / Neurocomputing 158 (2015) 210–215
+
+213
+
+Table 2 The correlation coefﬁcient of the independent variables and the dependent variable.
+
+x1
+
+x2
+
+x3
+
+x4
+
+x5
+
+x6
+
+y
+
+x1 1.0000 0.9971 0.9804 0.9985 0.9934 0.9620 0.9470 x2 0.9971 1.0000 0.9736 0.9926 0.9984 0.9574 0.9471 x3 0.9804 0.9736 1.0000 0.9787 0.9732 0.9163 0.9661 x4 0.9985 0.9926 0.9787 1.0000 0.9882 0.9567 0.9661 x5 0.9934 0.9984 0.9732 0.9882 1.0000 0.9416 0.9492 x6 0.9620 0.9574 0.9163 0.9567 0.9416 1.0000 0.8578 y 0.9470 0.9471 0.9661 0.9466 0.9492 0.8578 1.0000
+
+smaller than the number of variables. It's apparent that OLSR is incapable of building the model.
+With the exception of OLSR, other multivariate statistical methods like PCR, PLSR, and MPLSR have been used to establish the relevant models. Speciﬁc regression model is as follows:
+
+(1) PCR
+
+y ¼ 412:2001 þ 0:0065x1 þ 0:0217x2 þ 0:0580x3
+
+þ 0:0118x4 þ 0:0225x5 À 0:0448x6
+
+ð21Þ
+
+(2) PLSR
+
+y ¼ 210:6008 þ 0:0397x1 À 032258x2 þ 0:7702x3
+
+þ 0:0927x4 À 0:0890x5 À 0:3219x6
+
+ð22Þ
+
+(3) MPLSR
+
+y ¼ 180:8419 þ 0:4447x1 À 0:5293x2 þ 0:1052x3
+
+À 0:3244x4 À 0:0088x5 À 0:5421x6
+
+ð23Þ
+
+In order to compare the error between all the forecast of
+
+regression model and the actual value. In this paper, the size of
+
+the error will be indicated by the root mean square error (RMS).
+
+And the speciﬁcs are expressed as follows:
+
+RMS ¼ qﬃPﬃﬃﬃﬃﬃniﬃ¼ﬃﬃﬃﬃp1ﬃﬃﬃðﬃﬃﬃyﬃﬃﬃﬃﬃiﬃﬃÀﬃﬃﬃﬃyﬃ^ﬃﬃiﬃpﬃﬃÞﬃﬃ2ﬃ
+
+ð24Þ
+
+N
+
+in which yi is the observed value for the i-th sample; y^ ip is the model predicted response values for the i-th sample, respectively; n is the number of observed samples.
+The cumulative percent variance select 95 percent as standard. It will be ﬁrstly applied to select the number of PCs. PLSR can also select its main inﬂuence component. But for MPLSR, it is not necessary to select the main indexes. Fig. 1 shows the predicting efﬁciency of different models obtained by PCR, PLSR and MPLSR. As it is shown in Fig. 1, three simulation results can describe the relationship between the actual value and the predicted value in PCR, PLSR and MPLSR. The diagonal line in the ﬁgure represents the ideal situation that actual values are the same as the predicted values exactly. However, three prediction models will produce certain error. If the point is more closer to the diagonal, the difference between the predicted values and actual values is more smaller. Then it explains that prediction has a better effect. From three simulation results, MPLSR has the smallest difference between the predicted values and actual values. Therefore, the predicted values are closest to the actual values than other methods. Then, the best prediction can be obtained. In MPLSR model, there exists very little difference between the predicted values and actual values. The RMS values denote the predicted ability of different models. Then Table 3 can also show that the predicting efﬁciency of MPLSR is the best among these three models while PCR model is the worst through the RMS values.
+
+In accordance with Fig. 1 and Table 3, it is obvious that disparate multivariate statistical methods will signally inﬂuence the result of the prediction model. Because of multicollinearity problem and the number of samples less than that of variables in the data set, the OLSR is thoroughly impracticable for constructing the prediction model. Through comparing the values of RMS, the phenomenon that MPLSR has good predictive ability can be discovered. So, in the paper, the railway freight volume of Jiangxi province will be predicted by MPLSR in the next ﬁve years.
+
+3.3. Railway logistics forecast of Jiangxi province in next ﬁve years
+
+Through the above analysis, the error of building model with MPLSR is minimal. Then in this section the data will be forecasted by MPLSR. Before predicting the data of next ﬁve years, some main affecting indexes should be selected by comparing the contribution. In order to analyze the contribution of the railway logistics forecast's every affecting index, a contribution ratio (CR) is introduced and it can be formulated as follows:
+
+y À P0 ¼ PX;
+
+CRi
+
+¼
+
+Pixi yÀP0
+
+P ¼ ½P1; P2…Pm A R1Âm
+
+X ¼ ½x1; x2…xmT A R1Âm
+
+i ¼ 1; …; m
+
+ð25Þ
+
+where P is the coefﬁcient matrix of regression equation and P0 is the constant. The beneﬁts of this deﬁnition for CR are that the sum of all CRi ði ¼ 1⋯mÞ equals 1.
+To simplify the model or get rid of the unproﬁtable indexes which contribute little to the predicted values, the CR threshold is applied. And the otiose indexes will be ignored if its CR is lower than the CR threshold. As the best prediction model, MPLSR model is applied to analyze the CR of each index and selects main affecting indexes. The contribution rate of six factors inﬂuencing the railway freight volume in Jiangxi province can be obtained by MATLAB programs, and it will be shown in Fig. 2. As can be seen from the ﬁgure, these three indexes, i.e. GDP, total retail sales of consumer goods, secondary industry, play major roles among the six factors. And their cumulative contribution value has reached 0.95. Therefore, the three factors meet the predicted needs. And the new model based on the selected factors still presents a good railway freight volume predicting ability by MPLSR method.
+Using raw data in Table 1, the data of these three factors is presented. And then the equation will be predicted by MPLSR as follows:
+
+y ¼ 497:1442 þ 0:1016x^ 1 À 0:4590x^ 2 þ 0:1344x^ 3
+
+ð26Þ
+
+where x^ 1, x^ 2 and x^ 3 represents the factors after completing screening.
+According to the twelfth ﬁve year plan targets of Jiangxi province in China, GDP growth rate will reach 11 percent. The total retail sales of social consumer goods will manage to achieve 16 percent while secondary industry will attain 23 percent. With the growth rate of these three factors, the value of 2010 can be determined. By calculation, railway logistics of Jiangxi province in 2010 is 685.5 billion tonne-km. And the growth of railway logistics in next ﬁve years may reach at 4 percent. Then it will be used to predict railway logistics from 2011 to 2015. And the speciﬁc data can be seen in Table 4.
+
+4. Conclusion
+In this paper, four multivariate statistical methods, i.e. OLSR, PCR, PLSR and MPLSR, are ﬁrstly reviewed. Then based on these methods and using the practical data set about the RFV of Jiangxi province, four prediction models are constructed. According to
+
+214
+
+Y. Yang, C. Yu / Neurocomputing 158 (2015) 210–215
+
+actual Rail transport actual Rail transport actual Rail transport
+
+800
+
+800
+
+800
+
+750
+
+750
+
+750
+
+700
+
+700
+
+700
+
+650
+
+650
+
+650
+
+600
+
+600
+
+600
+
+550
+
+550
+
+550
+
+500
+
+500
+
+500
+
+450
+
+450
+
+450
+
+400 400 450 500 550 600 650 700 750 800 PCR predicted Rail transport
+
+400 400 450 500 550 600 650 700 750 800 PLSR predict Rail transport
+
+400 400 450 500 550 600 650 700 750 800 MPLSR predicted Rail transport
+
+Fig. 1. Predicted railway logistics versus actual railway logistics.
+
+Table 3 The root mean square error of three regression models.
+
+PCR
+
+PLSR
+
+RMS
+
+41.8237
+
+22.5046
+
+MPLSR 16.4423
+
+contribution ratio
+
+3.5
+
+3
+
+2.5
+
+2
+
+1.5
+
+1
+
+0.5
+
+0
+
+−0.5
+
+−1
+
+−1.5
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+indexes
+
+Fig. 2. The CR of six factors.
+
+Table 4 Railway logistics forecast of Jiangxi province.
+
+Years RLF
+
+2011 712.9
+
+2012 741.4
+
+2013 777.1
+
+RLF – railway logistics forecast.
+
+2014 801.9
+
+2015 833.9
+
+comparing the evaluation index, i.e. RMS, the prediction error offered by MPLSR model is the lowest among these constructed prediction models. With this derived result, the MPLSR based prediction model is further used for predicting the RFVs of Jiangxi Province in the next ﬁve years. The efﬁciency of the MPLSR model is necessary to be veriﬁed on a larger data set. Moreover, the RFV prediction models are signiﬁcative to be proposed in the future work.
+
+Acknowledgments
+This work was supported by the National Social Science Foundation of China (no. 14BGL105).
+References
+[1] L. Wan, Logistics industry development present situation and strategy analysis in Jiangxi province, Chin. trade (2010) 72–73.
+[2] S. Yin, O. Kaynak, Big data for modern industry: challenges and trends, in: Proceedings of the IEEE, http://dx.doi.org/10.1109/JPROC.2015.2388958, 2015.
+[3] G. He, Forecast of regional logistics requirements and application of grey prediction model, J. Beijing Jiaotong Univ. (Soc. Sci. Ed.) 7 (1) (2008) 33–37.
+[4] J. Hua, L. Qi-hong, Application research of the grey forecast in the logistics demand forecast, in: First International Workshop on Education Technology and Computer Science, 2009.
+[5] S. Yin, S. Ding, X. Xie, H. Luo, A review on basic data-driven approaches for industrial process monitoring, IEEE Trans. Ind. Electron. 61 (11) (2015) 6418–6428.
+[6] X. Lin, Y. Chen, Study on railway freight volume forecast by the gray Markov chain method, J. China Railw. Soc. 27 (3) (2005) 15–19.
+[7] Y. Zhang, B. Shuai, Railway freight volume forecast in northeast region based on the improved gray model, J. Railw. Sci. Eng. 9 (5) (2012) 125–128.
+[8] C. Zhang, M. Liu, Z. Yu, Based on rough sets and multiple regression analysis of Jiangxi railway logistics forecast, Bus. Strategy (2012) 112–114.
+[9] P. Yang, J. Long, J. Ma, The study of combine-forecast method for railway freight volumes, Logist. Sci-Tech 29 (135) (2006) 66–68.
+[10] D. Wu, Railway freight volume forecast of Sichuan province based on the model of gray DGM (2,1), Railw. Freight Transp. (2009) 13–15.
+[11] W. Zhu, Forecasting railway freight volume based on improved BP neural network model, J. Shijiazhuang Tiedao Univ. Nat. Sci. Ed. 27 (2) (2014) 79–82.
+[12] P. Li, Railway freight volume forecasting method based on GA-BP model, J. Lanzhou Jiaotong Univ. 33 (3) (2014) 203–207.
+[13] G. Wang, S. Yin, Enhanced quality-related fault detection approach based on OSC and M-PLS, IEEE Trans. Ind. Inf. (2015), http://dx.doi.org/10.1109/TII.2015.2396853.
+[14] C. Guo, X. Chen, Principal component regression in SPSS achieve, Stat. Decis. 1 (2011) 157–159.
+[15] D. Wang, Robust data-driven modeling approach for real-time ﬁnal product quality prediction in batch process operation, IEEE Trans. Ind. Inf. 7 (2) (2011) 371–377.
+[16] S. Yin, X. Zhu, Intelligent particle ﬁlter and its application on fault detection of nonlinear system, IEEE Trans. Ind. Electron. (2015), http://dx.doi.org/10.1109/ TIE.2015.2399396.
+[17] S.J. Qin, Survey on data-driven industrial process monitoring and diagnosis, Annu. Rev. Control 36 (2) (2012) 220–234.
+[18] S. Yin, Z. Huang, Performance monitoring for vehicle suspension system via fuzzy positivistic C-means clustering based on accelerometer measurements, IEEE/ASME Trans. Mechatron. (2014), http://dx.doi.org/10.1109/TMECH.2014.2358674.
+[19] X. Xie, S. Yin, H. Gao, O. Kaynak, Asymptotic stability and stabilisation of uncertain delta operator systems with time-varying delays, IET Control Theory Appl. 7 (8) (2013) 1071–1078.
+[20] P. GELADI, B.R. Kowalski, Partial least square regression: a tutoria, Anal. Chim. Acta (1986) 1–17.
+[21] S. Yin, X. Zhu, O. Kaynak, Improved PLS focused on key performance indictor related fault diagnosis, IEEE Trans. Ind. Electron. (2014), http://dx.doi.org/ 10.1109/TIE.2014.2345331.
+[22] S. Yin, X. Gao, H. Karimi, X. Zhu, Study on support vector machine based fault detection in Tennessee Eastman process, Abstr. Appl. Anal. 2014 (2014).
+
+Y. Yang, C. Yu / Neurocomputing 158 (2015) 210–215
+
+215
+
+[23] M. Daszykowski, Y.V. Heyden, B. Walczak, Robust partial least squares model for prediction of green tea antioxidant capacity from chromatograms, J. Chromatogr. A 1176 (1) (2007) 12–18.
+[24] S. Yin, X. Zhu, Fault detection based on a robust one class support vector machines, Neurocomputing 145 (5) (2014) 263–268.
+[25] A. Krishnan, L.J. Williams, A.R. McIntosh, Herv, Partial least squares (PLS) methods for neuroimaging: a tutorial and review, Neuroimage 56 (2) (2011) 455–475.
+[26] S. Yin, X. Li, H. Gao, O. Kaynak, Data-based techniques focused on modern industry: an overview, IEEE Trans. Ind. Electron. 62 (1) (2015) 657–667.
+[27] V.E. Vinzi, Handbook of Partial Least Squares: Concepts, Methods and Applications, Springer, Berlin Heidelberg, 2010.
+[28] H. Wold, Soft modelling: the basic design and some extensions, Syst. Under Indirect Observ. II (1982) 36–37.
+[29] G. Wang, S. Yin, O. Kaynak, A LWPR based data-driven fault detection approach for nonlinear process monitoring, IEEE Trans. Ind. Electron. 10 (4) (2014) 2016–2023.
+[30] S. Yin, W. Guang, Robust PLS approach for KPI related prediction and diagnosis against outliers and missing data, Int. J. Syst. Sci. 45 (7) (2014) 1375–1382.
+
+Yandong Yang is serving as a professor in Bohai University, Liaoning, China. He has authored or coauthored 5 books and more than 20 peer-reviewed journal papers. His research interests include human resource management and logistics.
+Congzhou Yu is currently pursuing the B.Sc. degree in the College of Education and P.E., Bohai University, Liaoning, China. His main research interest is logistics.
+

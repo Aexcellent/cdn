@@ -1,0 +1,1748 @@
+Batch Fully Homomorphic Encryption over the Integers
+Jean-S´ebastien Coron1, Tancr`ede Lepoint2,3, and Mehdi Tibouchi4
+1 Tranef, France jscoron@tranef.com 2 CryptoExperts, France 3 E´cole Normale Sup´erieure, France tancrede.lepoint@cryptoexperts.com 4 NTT Secure Platform Laboratories, Japan tibouchi.mehdi@lab.ntt.co.jp
+Abstract. We extend the fully homomorphic encryption scheme over the integers of van Dijk et al. (DGHV) to batch fully homomorphic encryption, i.e. to a scheme that supports encrypting and homomorphically processing a vector of plaintext bits as a single ciphertext. Our variant remains semantically secure under the (error-free) approximate-GCD problem. We also show how to perform arbitrary permutations on the underlying plaintext vector given the ciphertext and the public key. Our scheme oﬀers competitive performance: we describe an implementation of the fully homomorphic evaluation of AES encryption, with an amortized cost of about 12 minutes per AES ciphertext on a standard desktop computer; this is comparable to the timings presented by Gentry et al. at Crypto 2012 for their implementation of a Ring-LWE based fully homomorphic encryption scheme.
+Keywords: Fully Homomorphic Encryption, Batch Encryption, Homomorphic AES.
+1 Introduction
+Fully Homomorphic Encryption. Fully homomorphic encryption (FHE) allows a worker to perform implicit additions and multiplications on plaintext values while exclusively manipulating encrypted data. The ﬁrst construction of a fully homomorphic scheme (based on ideal lattices) was described by Gentry in [Gen09], and proceeds in several steps. First, one constructs a somewhat homomorphic encryption scheme, which only supports a limited number of multiplications: ciphertexts contain some noise that becomes larger with successive homomorphic multiplications, and only ciphertexts whose noise size remains below a certain threshold can be decrypted correctly. The second step is to squash the decryption procedure associated with an arbitrary ciphertext so that it can be expressed as a low degree polynomial in the secret key bits. Then, Gentry’s key idea, called bootstrapping, consists in homomorphically evaluating this decryption polynomial on encryptions of the secret key bits, resulting in a diﬀerent ciphertext associated with the same plaintext, but with possibly reduced noise. This refreshed ciphertext can then be used in subsequent homomorphic operations. By repeatedly refreshing ciphertexts, the number of homomorphic operations becomes unlimited, resulting in a fully homomorphic encryption scheme.
+Since Gentry’s breakthrough result, many improvements have been made, introducing new variants, improving eﬃciency, and providing new features. Recently, Brakerski, Gentry and Vaikuntanathan described a diﬀerent framework where the ciphertext noise grows only linearly with the multiplicative level instead of exponentially [BGV12], so that bootstrapping is no longer necessary to obtain a scheme supporting the homomorphic evaluation of any given polynomial size circuit. Currently three main families of fully homomorphic encryption schemes are known:
+1. Gentry’s original scheme [Gen09] based on ideal lattices. An implementation of Gentry’s scheme was proposed by Gentry and Halevi in [GH11] with a public key of 2.3 GB and a ciphertext refresh procedure of 30 minutes; the implementation is based on many interesting algorithmic optimizations, including some borrowed from Smart and Vercauteren [SV10].
+An extended abstract [CCK+] will appear at Eurocrypt 2013, merged with some independent but overlapping work from Cheon et al.
+
+2. van Dijk, Gentry, Halevi and Vaikuntanathan’s (DGHV) scheme over the integers [DGHV10]. It was recently shown how to signiﬁcantly reduce the public key size in DGHV, yielding a 10.3 MB public key and an 11-minute refresh procedure [CNT12].
+3. Brakerski and Vaikuntanathan’s scheme based on the Learning with Errors (LWE) and Ring Learning with Errors (RLWE) problems [BV11a,BV11b], and follow-up works (e.g. the scale-free variant of Brakerski [Bra12] and the NTRU-variant [LATV12]). An implementation is described in [GHS12b] with an eﬃcient (given the current state of knowledge) homomorphic evaluation of the full AES encryption circuit. The authors use the batch RLWE-based scheme proposed in [BGV12,GHS12a], that allows one to encrypt vectors of plaintexts in a single ciphertext and to perform any permutation on the underlying plaintext vector while manipulating only the ciphertext [SV11].
+
+Our Contributions. In this paper we focus on the DGHV scheme. Our goal is to extend DGHV to support the same batching capability [SV11] as in RLWE-based schemes [BV11a,BV11b], and to homomorphically evaluate a full AES circuit with roughly the same level of eﬃciency as [GHS12b], in order to obtain an implementation of a FHE scheme with similar features but based on diﬀerent techniques and assumptions.
+In the original DGHV scheme, a ciphertext has the form
+c = q · p + 2r + m
+where p is the secret key, q is a large random integer, and r is a small random integer (noise); the bit message m ∈ {0, 1} is recovered by computing m = [c mod p]2. The scheme is clearly homomorphic for both addition and multiplication, since addition and multiplication of ciphertexts correspond to addition and multiplication of plaintexts modulo 2.
+To encrypt multiple bits mi into a single ciphertext c, we use the Chinese Remainder Theorem with respect to a tuple of coprime integers p0, . . . , p −1. The batch ciphertext has the form
+−1
+c = q · pi + CRTp0,...,p −1 (2r0 + m0, . . . , 2r −1 + m −1),
+i=0
+and correctly decrypts to the bit vector (mi) given by mi = [c mod pi]2 for all 0 i < .5 Modulo each of the pi’s the ciphertext c behaves as in the original DGHV scheme. Accordingly, the addition or multiplication of two ciphertexts yields a new ciphertext that decrypts to the componentwise sum or product mod 2 of the original plaintexts.
+The main challenge, however, is to amend this construction so as to prove semantic security. In the original DGHV scheme, public-key encryption is performed by masking the message m with a random subset sum of the public key elements xj = qj · p + rj as
+
+c = m + 2r + 2 xj .
+
+(1)
+
+j∈S
+
+x0
+
+The semantic security is proved by applying the Leftover Hash Lemma on the subset sum, and using the random 2r in (1) to further randomize the ciphertext modulo p.
+Extending DGHV public-key encryption to the batch setting may at ﬁrst seem straightforward: one can use a similar random subset sum technique in the batch variant by generating public key elements xj with a small residue modulo each of the pi’s instead of only modulo p. However, for the proof of semantic security to go through, the ciphertext c should then be independently randomized modulo each of the pi’s, which isn’t easy to achieve without knowing the pi’s. Indeed, if we only use
+
+5 We denote by CRTp0,...,p −1 (a0, . . . , a −1) the unique integer u smaller than
+
+−1 i=0
+
+pi
+
+such
+
+that
+
+u
+
+mod
+
+pi
+
+=
+
+ai
+
+for
+
+all 0 i < .
+
+2
+
+a single additive term 2r as in (1), then the same random term 2r = 2r mod pi is added modulo each of the pi, which breaks the security proof.
+Our main contribution in this paper is to provide a “correct”, provably semantically secure generalization of DGHV to the batch setting. This is done by replacing the term 2r in Equation (1) by another subset sum of public key elements which, taken modulo each of the pi’s, generate a lattice with special properties. Our security proof then applies the Leftover Hash Lemma modulo this lattice instead of only modulo q0. We describe the new batch DGHV scheme in Section 3 and its security proof in Section 3.3. We show that our batch DGHV scheme can encrypt = O˜(λ2) bits in a single ciphertext; therefore the ciphertext expansion ratio becomes O˜(λ3) instead of O˜(λ5) in the original scheme.
+In addition to componentwise addition and multiplication, we also show how to perform any permutation on plaintext bits publicly. As opposed to [BGV12,GHS12a], we cannot use an underlying algebraic structure to perform rotations over plaintext bits (clearly, the automorphisms of Z do not provide any useful action on ciphertexts). Instead we show how to perform arbitrary permutations on the plaintext vector during the ciphertext refresh operation at no additional cost (but with a slight increase of the public key size). Our Recrypt operation is done in parallel over the slots, with the same complexity as a single Recrypt operation in the original scheme.
+Finally, we describe an implementation of our batch DGHV scheme, with concrete parameters. We use our batch DGHV scheme to homomorphically evaluate the full AES encryption circuit. For the “Large” parameters with 72 bits of security, our implementation homomorphically encrypts up to 531 AES ciphertexts in parallel in an amortized 12 minutes per AES ciphertext on a desktop computer. This is comparable to the timings presented by Gentry et al. at Crypto 2012 for their implementation of an RLWE-based scheme [GHS12b].6
+While our batch variant of DGHV does not provide additional features nor signiﬁcantly improved eﬃciency over the RLWE-based scheme of [GHS12a], we believe it is interesting to obtain FHE schemes with similar properties but based on diﬀerent techniques and assumptions.
+
+2 The Somewhat Homomorphic DGHV Scheme
+In this section, we recall the somewhat homomorphic encryption scheme over the integers of van Dijk, Gentry, Halevi and Vaikuntanathan (DGHV) in [DGHV10]. Let λ be the security parameter, τ be the number of elements in the public key, γ their bit-length, η the bit-length of the secret key p and ρ (resp. ρ ) the bit-length of the noise in the public key (resp. in a fresh ciphertext).
+For a real number x, we denote by x , x and x the upper, lower or nearest integer part of x. For integers z, p we denote the reduction of z modulo p by (z mod p) or [z]p with −p/2 < [z]p p/2. For a speciﬁc η-bit odd integer p, we use the following distribution over γ-bit integers:
+Dγ,ρ(p) = {Choose q ← Z ∩ [0, 2γ/p), r ← Z ∩ (−2ρ, 2ρ) : Output x = q · p + r} .
+DGHV. KeyGen(1λ). Generate an η-bit random prime integer p. For 0 i τ , sample xi ← Dγ,ρ(p). Relabel the xi’s so that x0 is the largest. Restart unless x0 is odd and [x0]p is even. Let pk = (x0, x1, . . . xτ ) and sk = p.
+DGHV. Encrypt(pk, m ∈ {0, 1}). Choose a random subset S ⊆ {1, 2, . . . , τ } and a random integer r in (−2ρ , 2ρ ), and output the ciphertext:
+
+c = m + 2r + 2 xi .
+
+(2)
+
+i∈S
+
+x0
+
+6 Note that our implementation uses bootstrapping whereas the implementation of [GHS12b] uses leveled homomorphic encryption without bootstrapping.
+
+3
+
+DGHV. Evaluate(pk, C, c1, . . . , ct). Given the circuit C with t input bits and t ciphertexts ci, apply the addition and multiplication gates of C to the ciphertexts, performing all the additions and multiplications over the integers, and return the resulting integer.
+DGHV. Decrypt(sk, c). Output m ← [c mod p]2.
+As shown in [DGHV10] the scheme is somewhat homomorphic, i.e. a limited number of homomorphic operations can be performed on ciphertexts. More precisely given two ciphertexts c = q · p + 2r + m and c = q · p + 2r + m where r and r are ρ -bit integers, the ciphertext c + c is an encryption of m + m mod 2 under a (ρ + 1)-bit noise and the ciphertext c · c is an encryption of m · m with noise bit-length 2ρ . Since the ciphertext noise must remain smaller than p to maintain correctness, the scheme roughly allows η/ρ successive multiplications on ciphertexts.
+The scheme is semantically secure under the Approximate-GCD assumption (see [DGHV10]):
+Deﬁnition 1 (Approximate GCD). The (ρ, η, γ)-Approximate-GCD problem consists, given a random η-bit odd integer p and given polynomially many samples from Dγ,ρ(p), in outputting p.
+
+3 Our Batch DGHV Scheme
+
+We now describe our extension of the DGHV scheme to the batch setting. The goal is to pack plaintext bits m0, . . . , m −1 into a single ciphertext. Homomorphic addition and multiplication will then apply in parallel and component-wise on the mi’s.
+As explained in the introduction we use Chinese Remaindering with respect to coprime integers p0, . . . , p −1 to encrypt (m0, . . . , m −1) as
+
+−1
+c = q · pi + CRTp0,...,p −1 (2r0 + m0, . . . , 2r −1 + m −1) .
+i=0
+
+By extending the original DGHV public-key encryption equation (2), a plaintext vector m = (m0, . . . , m −1) could then be encrypted into a single ciphertext:
+
+−1
+
+c=
+
+mi · xi + 2r + 2 xi
+
+(3)
+
+i=0
+
+i∈S
+
+x0
+
+where the plaintext elements xi satisfy xi mod pj = ri,j and the additional public key elements xi are such that xi mod pj = δi,j + 2ri,j; this yields [c mod pj]2 = mj as required.7
+The main challenge, however, is to obtain a batch DGHV scheme which is still semantically secure. The proof of semantic security for the original DGHV scheme is based on applying the Leftover Hash Lemma on the subset sum, and using the random 2r in (1) to further randomize the ciphertext modulo p. However we see that such randomization with 2r in (3) does not work in the batch setting, because the same random term 2r = 2r mod pi is added modulo each of the pi, whereas for the security proof to go through these random terms should be independently distributed modulo each of the pi’s. Therefore a new technique is required to extend DGHV to semantically secure batch encryption.
+In the following, we start by describing a variant of DGHV still for a single bit message m only, but which does extend naturally to the batch setting. We ﬁrst consider the DGHV scheme without the additional random 2r, since this term is of no use in the batch setting. A single message bit m is then encrypted as
+
+c = m + 2 xi
+
+i∈S
+
+x0
+
+7 We denote by δi,j the Kronecker delta, δi,j = 1 if i = j and 0 otherwise.
+
+4
+
+where xi = qi · p + ri. In order to prove semantic security as in [DGHV10], one should prove that the values q and r given by c = q · p + 2r + m are essentially random and independently distributed.
+The randomness of q = 2 i∈S qi mod q0 follows from the Leftover Hash Lemma (LHL) modulo q0. However we cannot apply the LHL to r = i∈S ri because it is distributed over Z instead of modulo an integer. Note that in the original scheme the randomness of r followed from adding a
+random 2r in (1), much larger than the ri’s. Let us assume that we could somehow reduce the integer variable r = i∈S ri modulo some
+integer . Then we could apply the LHL simultaneously modulo q0 and modulo , and the distributions of q mod q0 and r mod would be independently random as required. However, during public-key encryption we certainly do not have access to the variable r = i∈S ri, so we cannot a priori reduce it modulo an integer in the encryption phase.
+Our technique is the following: instead of reducing the variable r modulo , we add a large
+random multiple of to r . This can be done by extending the public key with a new element Π
+such that Π mod p = . Encryption would then be performed as
+
+c = m + 2b · Π + 2 xi
+
+(4)
+
+i∈S
+
+x0
+
+for some large random integer b. Modulo p this gives a new integer r = r + b · ; we argue that this enables to proceed as if r was actually reduced modulo . Namely, if we generate the ri’s such that the sum r = i∈S ri is not much larger than , then reducing r modulo would just subtract a small multiple of , which is negligible compared to the large random multiple b · . Formally the distribution of r + b · is statistically close to (r mod ) + b · , which enables us to apply the LHL to r mod and eventually obtain a security proof.
+Now the advantage of (4) is that it can be easily extended to the batch setting. Instead of using a single random multiple of Π, we use a subset sum of such multiples Πi, where Πi mod pj = i,j. The Leftover Hash Lemma is then applied modulo the lattice generated by the i,j. This shows that the random noise values modulo the pi’s follow essentially independent distributions, and eventually leads to a security proof.
+
+3.1 Description
+
+BDGHV. KeyGen(1λ). Generate a collection of random η-bit primes p0, . . . , p −1, and denote π their product. Let us deﬁne the error-free public key element x0 = q0 · π, where q0 ← Z ∩ [0, 2γ/π) is a 2λ2-rough integer8.
+Generate the following integers xi, xi and Πi with a quotient by π uniformly and independently distributed in Z ∩ [0, q0), and with the following distribution modulo pj for 0 j < :
+
+1 i τ, 0 i − 1, 0 i − 1,
+
+xi mod pj = 2ri,j, xi mod pj = 2ri,j + δi,j, Πi mod pj = 2 i,j + δi,j · 2ρ +1,
+
+ri,j ← Z ∩ (−2ρ −1, 2ρ −1) ri,j ← Z ∩ (−2ρ, 2ρ)
+i,j ← Z ∩ (−2ρ, 2ρ)
+
+Finally, let pk = x0, (xi)1 i τ , (xi)0 i −1 , (Πi)0 i −1 and sk = (pj)0 j −1.
+BDGHV. Encrypt(pk, m ∈ {0, 1} ). Choose random integer vectors b = (bi)1 i τ ∈ (−2α, 2α)τ and b = (bi)0 i −1 ∈ (−2α , 2α ) and output the ciphertext:
+
+−1
+
+−1
+
+τ
+
+c=
+
+mi · xi + bi · Πi + bi · xi .
+
+(5)
+
+i=0
+
+i=0
+
+i=1
+
+x0
+
+8 An integer a is b-rough when it does not contain prime factors smaller than b. As in [CMNT11] one can generate q0 as a product of 2λ2 -bit primes.
+
+5
+
+BDGHV. Decrypt(sk, c). Output m = (m0, . . . , m −1) where mj ← [c]pj mod 2. BDGHV. Add(pk, c1, c2). Output c1 + c2 mod x0 BDGHV. Mult(pk, c1, c2). Output c1 · c2 mod x0.
+3.2 Parameters and Correctness
+The parameters must be set under the following constraints:
+• ρ 2λ to avoid brute force attack on the noise [CN12], • η α + ρ + 1 + log2( ) for correct decryption, • η ρ · Θ(λ log2 λ) for homomorphically evaluating the “squashed decryption” circuit • γ = ω(η2 · log λ) in order to thwart lattice-based attacks (see [DGHV10,CMNT11]); • ρ ρ + λ and α α + λ for the proof of semantic security (see below), • α · τ γ + λ and τ · (ρ + 2) + λ in order to apply the leftover hash lemma (see below).
+To satisfy the above constraints one can take ρ = 2λ, η = O˜(λ2), γ = O˜(λ5), α = O˜(λ2), τ = O˜(λ3) as in [CNT12], and ρ = 3λ, α = O˜(λ2) and = O˜(λ2). The main diﬀerence with the original DGHV scheme is that the ciphertext expansion ratio becomes γ/ = O˜(λ3) instead of γ = O˜(λ5). However the public key size (using the compressed public key technique from [CNT12]) becomes O˜(λ7) instead of O˜(λ5). We refer to Section 4.4 for concrete parameters and timings.
+We prove the following lemma in Appendix A. We refer to Appendix A for the deﬁnition of correctness for batch homomorphic encryption schemes, with respect to a set CE of permitted circuits.
+Lemma 1. The above scheme is correct for CE .
+3.3 Semantic Security
+Ideally we would like to base the security of the new batch DGHV scheme on the same assumption as the original scheme, i.e. the Approximate-GCD assumption from Deﬁnition 1. However we can only show its security under the (stronger) error-free Approximate-GCD assumption already considered in [CMNT11,CNT12]. For two speciﬁc integers p and q0, we use the following distribution over γ-bit integers:
+Dρ(p, q0) = {Choose q ← [0, q0), r ← Z ∩ (−2ρ, 2ρ) : Output y = q · p + r} .
+Deﬁnition 2 (Error-free approximate GCD). The (ρ, η, γ)-error-free Approximate-GCD problem is: For a random η-bit prime p, given y0 = q0 · p where q0 is a random integer in [0, 2γ/p), and polynomially many samples from Dρ(p, q0), output p.
+Theorem 1. The batch DGHV scheme is semantically secure under the error-free-approximateGCD assumption.
+3.4 Proof of Theorem 1
+We proceed in two steps. First we prove that our batch DGHV scheme is semantically secure under a new assumption, which we call the error-free -decisional-approximate-GCD assumption. We then show that this new assumption is implied by the (computational) error-free Approximate-GCD assumption from the previous section.
+Given integers q0 and p0, . . . , p −1, we deﬁne the following oracle Oq0,(pi)(v) which, given as input a vector v ∈ Z , outputs x with
+x = CRTq0,(pi)(q, v0 + 2r0, . . . , v −1 + 2r −1)
+6
+
+where q ← [0, q0) and ri ← (−2ρ, 2ρ). We denote by CRTq0,(pi)(q, a0, . . . , a −1) the unique integer
+
+u smaller than x0 = q0 ·
+
+−1 i=0
+
+pi
+
+such
+
+that
+
+u
+
+≡
+
+q
+
+[q0]
+
+and
+
+u
+
+≡
+
+ai
+
+[pi]
+
+for
+
+all
+
+0
+
+i < . Therefore
+
+Oq0,(pi)(v) outputs a ciphertext for the plaintext v. Note that the components vi can be any integer,
+
+not only 0, 1.
+
+Deﬁnition 3 (EF- -dAGCDλ,γ,η). The error-free -decisional-approximate-GCD problem is as follows. Pick random η-bit integers p0, . . . , p −1 of product π, a random 2λ2-rough q0 ← Z ∩ [0, 2γ/π), a random bit b, set v0 = (0, . . . , 0) and v1 ← {0, 1} . Given x0 = q0p0 · · · p −1, z = Oq0,(pi)(vb) and oracle access to Oq0,(pi), guess b.
+The decisional problem is therefore to distinguish between an encryption of 0 and an encryption of a random message. To prove semantic security we must show that this still holds when using the public-key encryption procedure instead of the oracle Oq0,(pi); this essentially amounts to applying a variant of the Leftover Hash Lemma.
+
+Lemma 2. The batch DGHV scheme is semantically secure under the error-free -decisionalapproximate-GCD assumption.
+
+Proof. Under the attack scenario the attacker ﬁrst receives the public key, and outputs two -bit messages m0 and m1. The challenger returns an encryption of mb for a random bit b. The attacker ﬁnally outputs a guess b and succeeds if b = b. We use a sequence of games and denote by Si the event that the attacker succeeds in Gamei.
+Game0: this is the attack scenario. We simulate the challenger by running KeyGen to obtain pk and sk.
+
+Game1: we introduce a vector representation of ciphertexts. To any ciphertext c mod x0 we associate the vector:
+
+c = f (c) = (c mod q0, c mod p0, . . . , c mod p −1) ∈ Zq0 × Z .
+
+We observe that if a ciphertext c is an encryption of 0 then it is equivalently rewritten as c =
+
+(qc, 2c0, . . . , 2c −1) = I2 · (qc, c0, . . . , c −1) where I2 is the diagonal matrix with (1, 2, . . . , 2) on the diagonal.
+
+Given two integers x, y, we have that if |x mod pi| < pi/4 and |y mod pi| < pi/4 for all i, then f (x + y) = f (x) + f (y). Since we only consider ciphertexts which have suﬃciently small residues
+
+modulo the pi’s, when adding ciphertexts we can therefore work indiﬀerently with integer or our
+
+vector representation. In vector representation the encryption equation (5) can then be rewritten
+
+as9
+
+c = (0, m)T + I2 · X · m + X · b + Π · b mod x0.
+
+(6)
+
+where the columns of matrices X , X and Π contain the vector representations (with the previous I2 factor) of the ciphertexts xi (without the δi,j terms), xi and Πi from the public key:
+
+ qx0 · · · qx −1 
+
+ qx1 · · · qxτ 
+
+
+
+X
+
+ =
+ 
+
+r0,0 ...
+
+···
+
+r −1,0 ...
+
+ ,  
+
+X
+
+ =
+ 
+
+r1,0 ...
+
+···
+
+rτ,0 
+
+
+
+...
+
+, Π = 
+
+
+
+
+
+
+
+
+
+r0, −1 · · · r −1, −1
+
+r1, −1 · · · rτ, −1
+
+qΠ0 · · ·
+
+0,0 + 2ρ · · ·
+
+...
+
+...
+
+0, −1 · · ·
+
+qΠ −1
+
+
+
+−1,0 
+
+...
+
+.  
+
+−1, −1 + 2ρ
+
+We now modify the encryption Equation (6) as follows. We pre-reduce the term X · m + X · b modulo the lattice Π formed by the column vectors of x0 and Π:
+
+ q0
+
+0
+
+Π
+
+=  
+
+...
+
+0
+
+qΠ0 · · ·
+
+0,0 + 2ρ · · ·
+
+...
+
+...
+
+0, −1 · · ·
+
+qΠ −1
+
+
+
+−1,0 
+
+...
+
+,  
+
+−1, −1 + 2ρ
+
+9 Given a ciphertext c, we denote by c mod x0 the vector obtained by reducing the ﬁrst component modulo q0.
+
+7
+
+which gives the new encryption equation:
+
+c = (0, m)T + I2 · (X · m + X · b) mod Π + Π · b mod x0 .
+
+(7)
+
+We prove in Appendix B.3 that two distributions are statistically close, which gives: Claim 1. |Pr[S1] − Pr[S0]| · τ · 2α−α +2.
+
+Game2: we show in Appendix B.4 that using the LHL, the term X · b in Equation (7) is statistically
+
+close to uniform modulo Π . Therefore we can replace the term X · m + X · b by a random vector
+
+u modulo Π to get
+
+c = (0, m)T + I2 · (u + Π · b ) mod x0.
+
+(8)
+
+Claim 2. |Pr[S2] − P [S1]| 2 · τ · 2ρ−ρ +2 + 2γ−α·τ + · ρ · 2 ·(ρ +2)−τ .
+
+Game3: we keep the same encryption equation
+c = (0, m)T + I2 · (u + Π · b ) mod x0,
+but we slightly modify the distribution of u. Instead of generating a random u modulo Π , we generate a vector u whose ﬁrst component is uniform in [0, q0) and the other components are uniform in [0, 2ρ ). We show in Appendix B.7: Claim 3. |Pr[S3] − Pr[S2]| 2 · 2ρ−ρ +2 + 2−α +3.
+Game4: instead of generating the public key with KeyGen, we simulate the public key using the oracle Oq0,(pi) from the error-free -decisional Approximate-GCD problem. Moreover the encryption equation from Game3 can be computed directly in integer representation instead of vector representation using Oq0,(pi). Therefore we can simulate the public key and ciphertext encryption without knowing the pi’s, and we still have:
+Pr[S4] = Pr[S3].
+
+Game5: to prepare for the -decisional problem, we slightly modify the encryption equation with
+
+c = (0, m)T + I2 · (z + u + Π · b ) mod x0.
+
+(9)
+
+where z is a vector whose ﬁrst component is uniform in [0, q0) and the other components are uniform in (−2ρ, 2ρ). From the distribution of z and u, we obtain:
+
+|Pr[S5] − Pr[S4]| · 2ρ−ρ .
+
+(10)
+
+Game6: we modify again the encryption equation by adding a vector z1 = (0, v1)T where v1 ←
+
+{0, 1} , as follows
+
+c = (0, m)T + z1 + I2 · (z + u + Π · b ) mod x0.
+
+(11)
+
+It is easy to see that the gap between Game 5 and Game 6 is at most the distinguishing advantage of an eﬃcient adversary against the error-free -decisional-approximate-GCD problem. Namely the vector I2 · z in Equation (9) can be obtained through z = Oq0,(pi)(v0) where v0 = 0 , whereas the vector z1 + I2 · z can be obtained from z = Oq0,(pi)(v1) where v1 ← {0, 1} . Therefore
+
+|Pr[S6] − Pr[S5]| ε . EF- -dAGCD
+
+Game7: we remove the term (0, m)T in (11). Then the adversary’s view in Game 7 is independent
+
+from m and we get
+
+1
+
+Pr[S7]
+
+=
+
+. 2
+
+8
+
+The statistical distance between the random variables (0, m)T + z1 + I2 · z and z1 + I2 · z is at most · 2−ρ. Therefore:
+|Pr[S7] − Pr[S6]| · 2−ρ.
+Finally all the previous probability gaps can be made negligible by satisfying the constraints on the parameters from Section 3.2; this concludes the proof of Lemma 2.
+We then prove the following Lemma in Appendix C. Combined with Lemma 2 this proves Theorem 1.
+Lemma 3. The -decisional-Approximate-GCD problem is hard if the error-free-approximate-GCD problem is hard.
+
+4 Making the Scheme Fully Homomorphic
+In this section, we follow Gentry’s blueprint [Gen09] to transform a somewhat homomorphic encryption scheme into a fully homomorphic encryption scheme.
+
+4.1 The Squashed Scheme
+
+As mentioned in the introduction, to follow Gentry’s blueprint and make our somewhat homomorphic scheme amenable to bootstrapping, we ﬁrst need to squash the decryption circuit, i.e. change the decryption procedure so as to express it as a low degree polynomial in the bits of the secret key.
+We use the same technique as in the original DGHV scheme [DGHV10] but generalize it to the batch setting. We add to the public key a set y = {y0, . . . , yΘ−1} of rational numbers in [0, 2) with κ bits of precision after the binary point, such that for all 0 j − 1 there exists a sparse subset Sj ⊂ [0, Θ − 1] of size θ with i∈Sj yi 1/pj mod 2. The secret-key is replaced by the indicator vector of the subsets Sj. Formally the scheme is modiﬁed as follows:
+
+BDGHV. KeyGen(1λ). Generate sk∗ = (p0, . . . , p −1) and pk∗ as before. Set xpj ← 2κ/pj for
+
+j = 0, . . . , − 1. Choose at random Θ-bit vectors sj = (sj,0, . . . , sj,Θ−1), each of Hamming
+
+weight θ, for 0 j < . Choose at random Θ integers ui ∈ [0, 2κ+1) for 0 i < Θ, fulﬁlling the
+
+condition that xpj =
+
+Θ−1 i=0
+
+sj,i
+
+· ui
+
+mod
+
+2κ+1
+
+for
+
+all
+
+j.
+
+Set
+
+yi
+
+=
+
+ui/2κ
+
+and
+
+y
+
+=
+
+(y0, . . . , yΘ−1).
+
+Hence, each yi is a positive number smaller than two, with κ bits of precision after the binary
+
+point, and veriﬁes
+
+1 Θ−1 pj = i=0 sj,i · yi + εj mod 2
+
+(12)
+
+for some |εj| < 2−κ. Output the secret key sk = (s0, . . . , s −1) and public key pk = (pk∗, y0, . . . , yΘ−1).
+
+BDGHV. Expand(pk, c). The ciphertext expansion procedure takes as input a ciphertext c and
+computes an expanded ciphertext: for every 0 i Θ−1, compute zi given by zi = c·yi mod 2 with n = log2(θ + 1) bits of precision after the binary point. Deﬁne the vector z = (zi)i=0,...,Θ−1 and output the expanded ciphertext (c, z).
+
+BDGHV. Decrypt(sk, c, z). Output m = (m0, . . . , m −1) with
+
+mj ←
+
+Θ−1
+sj,i · zi
+i=0
+
+⊕ (c mod 2).
+2
+
+(13)
+
+This completes the description of the scheme. We use n = log2(θ + 1) as in [CMNT11]; the proof of the following Lemma is the same as in [CMNT11, Appendix E].
+
+9
+
+Lemma 4. The BDGHV encryption scheme is correct for the set C(PE ) of circuits that compute permitted polynomials.
+Remark 1. To reduce the size of the public key we can generate all the yi’s pseudo-randomly as in [CMNT11], except of them in order to satisfy Equation (12) for all 0 j < .
+
+4.2 Bootstrapping
+
+As in [DGHV10], we get that the BDGHV scheme is bootstrappable. Moreover, the Recrypt procedures works naturally in parallel over the plaintext bits.
+In the original DGHV scheme, the decryption equation was:
+
+Θ−1
+
+m←
+
+si · zi ⊕ (c mod 2)
+
+(14)
+
+i=0
+
+2
+
+and could be homomorphically evaluated by providing an encryption σi of every secret-key bit si; one would obtain a new ciphertext which would encrypt the same plaintext bit m but with a possibly reduced noise.
+Similarly, the decryption Equation (13) for the batch scheme can be evaluated homomorphically by providing for all 0 i < Θ an encryption σi of the secret-key bits sj,i, with:
+
+σi = BDGHV. Encrypt(s0,i, . . . , s −1,i).
+
+This gives a new ciphertext that encrypts the same -bit plaintext vector, but with a (possibly) reduced noise. In other words, instead of having an homomorphic evaluation of a single Equation (14), we have that the equations in (13) are homomorphically evaluated in parallel, one in each of the plaintext slots of the ciphertext. Therefore the Recrypt operation is done in parallel over the slots, with the same complexity as a single Recrypt operation in the original scheme.
+From Gentry’s theorem, we obtain a homomorphic encryption scheme for circuits of any depth. The proof of the following theorem is identical to the proof of Theorem 5.1 in [CMNT11].
+
+Theorem 2. Let E be the above scheme, and let DE be the set of augmented (squashed) decryption circuits. Then DE ⊂ C(PE ).
+
+4.3 Complete Set of Operations for Plaintext Vectors
+From what precedes, we can implement homomorphic SIMD-type operations on our packed ciphertexts, where the Add and Mult operations are applied to diﬀerent input bits at once. However, a desired feature when dealing with packed ciphertexts is the ability to move values between plaintext slots with a public Permute operation. As opposed to [GHS12a] we cannot rely on an underlying algebraic structure. Instead we show how to perform such Permute at ciphertext refresh time. This feature is therefore supported at no extra cost assuming a ciphertext refresh operation has to be carried out anyway (i.e. after each Mult gate). Notice that a similar technique was described independently in [BGH12] for the RLWE-based fully homomorphic schemes [BV11a,BV11b,GHS12a].
+For any permutation ζ over {0, . . . , − 1}, we want to homomorphically evaluate the function
+-Permute (ζ, (u0, . . . , u −1)) = uζ(0), . . . , uζ( −1) .
+Let ζ be a permutation to be applied homomorphically on the plaintext bits. During the KeyGen operation, one can deﬁne for each i ∈ [0, Θ − 1]
+σiζ = BDGHV. Encrypt(sζ(0),i, . . . , sζ( −1),i).
+Now, performing the ciphertext refresh operation (“recryption”) with the σiζ’s instead of the σi’s gives a ciphertext of the plaintext vector (mζ(0), . . . , mζ( −1)) which is exactly the desired result.
+10
+
+Therefore any permutation ζ can be implemented by putting the corresponding σiζ’s in the public key.
+To be able to perform arbitrary permutations on the plaintext vector, one can augment the public key by a minimal set of permutations ζ’s that generates the whole permutation group S , such as the transposition (1, 2) and the cycle (1, 2, . . . , ). In that case the impact on the public key is small (as only 2 · Θ · γ bits are added), but the performance overhead is signiﬁcant, since as many as O( ) ciphertext refresh operations may be needed to carry out a desired permutation.
+A more practical solution is to use a Beneˇs network [Ben64] of permutations as in [GHS12a]. In that case it suﬃces to add 2 log2( ) permuting elements to the public key to enable circular rotations by ±2i bit position. Then any permutation can be obtained in (2 log( ) − 1) steps. At each step, at most two rotations and two Select operations are performed, where the Select operation on c1 and c2 constructs a ciphertext where each of the plaintext slot is chosen either from c1 or c2; such Select operation is easily obtained with two Mult (and two recryptions) and one Add, see [GHS12a]. This approach has a limited impact on the public key (2 log2( ) · Θ · γ more bits), and any permutation can then be performed with at most 6 · (2 log2 − 1) recryptions.
+In practice, however, the circuit to be homomorphically evaluated is likely to be known in advance, so it is possible to put a set of distinguished permutations in the public key that provides an optimal time-memory tradeoﬀ. In the next section, we describe two variants of homomorphic evaluations of the full AES circuit that require respectively only four permutations and no permutation at all.
+
+4.4 Implementation Results
+We provide in Table 1 concrete key sizes and timings for our batch DGHV scheme, based on a C++ implementation using the GMP library. We use essentially the same parameters as in [CNT12,CT12]; in particular, the parameters take into account the attack from [CN12]. We use the same compressed public-key variant as in [CNT12]. We provide a complete description of the scheme in Appendix D. As in [CMNT11,CNT12], we take n = 4 and θ = 15 for all security levels.
+We obtain essentially the same running times as in [CNT12]. The main diﬀerence is that the Recrypt operation is now performed in parallel over = 531 bits (for the “Large” setting) instead of a single bit.
+
+Instance λ
+
+ρ η γ × 10−6 τ Θ pk size
+
+Toy
+
+42 10 26 988 0.29 188 150 647kB
+
+Small 52 37 41 1558 1.6 661 555 13.3MB
+
+Medium 62 138 56 2128 8.5 2410 2070 304MB
+
+Large 72 531 71 2698 39 8713 7965 5.6GB
+
+KeyGen Encrypt Decrypt Mult Expand Recrypt
+
+0.06s 1.74s 73s 3493s
+
+0.02s 0.23s 3.67s 61s
+
+0s 0.02s 0.45s 9.8s
+
+0.003s 0.007s 0.025s 0.08s 0.16s 1.60s 0.72s 28s
+
+0.11s 1.10s 11.9s 172s
+
+Table 1. Benchmarking for our Batch DGHV with a compressed public key on a desktop computer (Intel Core i7 at 3.4Ghz, 32GB RAM).
+
+5 Homomorphic Evaluation of the AES Circuit
+In this section, we show how to homomorphically evaluate the AES-128 encryption circuit using our batch encryption scheme, and provide concrete timings. A similar implementation with the RLWEbased fully-homomorphic encryption scheme [BV11a,BV11b,GHS12a] is described in [GHS12b]. As mentioned in [SV11,NLV11,GHS12b], such an implementation can be used to optimize the communication cost in cloud-based applications. Indeed, since the ciphertext expansion ratio in most fully-homomorphic encryption schemes is huge, data can rather be send encrypted under AES with a ciphertext expansion equal to 1, along with the public key pkFHE of the FHE scheme scheme as well as the AES secret-key encrypted under pkFHE. Then, before the cloud performs homomorphic
+11
+
+operations on the data, it can ﬁrst run the AES decryption algorithm homomorphically to obtain the plaintext data encrypted under pkFHE.10
+We consider our BDGHV scheme with slots. We describe two variants of our implementation which we call byte-wise bitslicing and state-wise bitslicing .
+Byte-Wise Bitslicing. In this representation, the 16-byte AES state is viewed as a matrix of 16 rows of 8 bits each (one row for every byte). Each of the 8 columns is then stored on a diﬀerent ciphertext. Therefore an AES state requires 16 slots of 8 ciphertexts, and one can perform k = /16 AES encryptions in parallel using these 8 ciphertexts. Formally the AES state is composed of 8 ciphertexts c0, . . . , c7, where the underlying plaintexts m0, . . . , m7 are such that mi[k · 16 + j] is the i-th bit of the j-th element of the AES state of the k-th AES.11 We brieﬂy describe how to implement the AES stages; more details are provided in Appendix E.
+The AddRoundKey stage performs a XOR between the AES state and the current round key. This operation only consists of 8 BDGHV. Add operations. The SubBytes stage is implemented using the 115 gates circuit of Boyar and Peralta [BP10] to compute the Sbox. To minimize the number of Recrypt, we perform the Recrypt operation only on 9 of the temporary variables and on the 8 outputs. In total, this stage costs 83 Add, 32 Mult and 17 Recrypt.
+The ShiftRows stage consists in performing a permutation of the state. For this we add the σiζ’s of the associated permutation ζ in the public key, and the rotation is performed at no additional cost during the ﬁnal Recrypt of the SubBytes stages. Finally the MixColumns stage requires 3 permutations of the AES state; it requires a total of 3 × 8 = 24 Recrypt and 38 Add, and the addition of the σiζ’s of three permutations ζ to the public key.
+In total, our byte-wise implementation of AES requires 1260 BDGHV. Add, 320 BDGHV. Mult, and 377 BDGHV. Recrypt.
+State-Wise Bitslicing. In this representation, each of the 128 bits of the AES state is stored in a diﬀerent ciphertext. One can then perform k = AES encryptions in parallel. This corresponds to a full bitslice implementation of AES. More precisely the AES state is composed of 128 ciphertexts c0, . . . , c127, where the underlying plaintexts m0, . . . , m127 are such that mi+j·8[k] is the i-th bit of the j-th byte of the state of the k-th AES.
+The AddRoundKey stage requires 128 Add operations. The SubBytes stage is implemented using the same circuit as above. Since the circuit needs to be evaluated on each of the 16 bytes of the AES state, the stage costs 16 × 83 = 1328 Add, 16 × 32 = 512 Mult, and 16 × 17 = 272 Recrypt. The ShiftRows stage consists in performing a permutation of the state, and this is done by permuting the indices of bits in the homomorphic AES state at no additional cost. The MixColumns stage requires 608 Add. The total cost the AES evaluation is then 14688 BDGHV. Add, 5120 BDGHV. Mult and 2448 BDGHV. Recrypt. More details are provided in Appendix E.
+Implementation Results. We implemented both variants using the concrete parameters from Table 1; our results are summarized in Table 2. The relative time is the total time of AES evaluation divided by the number of encryptions processed in parallel. Notice that the state-wise bitslicing variant yields better relative times.
+Our timings are comparable to [GHS12b] for the RLWE-based scheme, where a relative time of 5 minutes per block is reported; the authors used a 24-core server with 256GB of RAM, while our program runs on a more modest desktop computer with 4 cores and 32GB of RAM (the whole public key ﬁts in RAM). We claim a slightly lower security level, however: 72 bits versus 80 bits for the implementation from [GHS12b].
+10 Note that we focus here on AES encryption rather than AES decryption to be consistent with [GHS12b]. 11 Thus, m0 represents the LSBs of the AES states of the k AES-plaintexts, and m7 the MSBs. This construction is
+similar to general-purpose bitslicing [Bih97,KS09].
+12
+
+(a) Timings for byte-wise representation
+
+Instance λ
+
+# of enc. AddRoundKey ShiftRows MixColumns Total AES Relative
+
+in parallel
+
+and SubBytes
+
+(in hours) time
+
+Toy
+
+42 16 1
+
+Small 52 48 3
+
+Medium 62 144 9
+
+Large 72 528 33
+
+0.006s 0.04s 0.3s 1.6s
+
+2.2s 21s 210s 2970s
+
+3s 29s 290s 4165s
+
+0.013 0.125 1.25 18.3
+
+48s 2min 30s 8min 20s
+33min
+
+(b) Timings for state-wise representation
+
+Instance λ
+
+# of enc. AddRoundKey SubBytes ShiftRows MixColumns Total AES Relative
+
+in parallel
+
+(in hours) time
+
+Toy
+
+42 10 10
+
+Small 52 37 37
+
+Medium 62 138 138
+
+Large 72 531 531
+
+0.06s 0.06s 4.5s 27s
+
+33s 309s 3299s 47656s
+
+0s 0s 0s 0.04s
+
+0.02s 0.09s 0.44s 2.8s
+
+0.08 0.74 7.86 113
+
+29s 1min 12s 3min 25s 12min 46s
+
+Table 2. Timings of byte-wise and state-wise homomorphic AES developed in C++ with GMP, running on a desktop computer (Intel Core i7 at 3.4Ghz, 32GB RAM).
+
+References
+[Ben64] Va´clad E. Beneˇs. Optimal rearrangeable multistage connecting networks. Bell Systems Technical Journal, 43(7):1641–1656, 1964.
+[BGH12] Zvika Brakerski, Craig Gentry, and Shai Halevi. Packed ciphertexts in LWE-based homomorphic encryption. Cryptology ePrint Archive, Report 2012/565, 2012. http://eprint.iacr.org/. To appear in PKC 2013.
+[BGV12] Zvika Brakerski, Craig Gentry, and Vinod Vaikuntanathan. (Leveled) fully homomorphic encryption without bootstrapping. In Shaﬁ Goldwasser, editor, Innovations in Theoretical Computer Science 2012, pages 309–325. ACM, 2012.
+[Bih97] Eli Biham. A fast new DES implementation in software. In Fast Software Encryption, 4th International Workshop, FSE ’97, Haifa, Israel, January 20-22, 1997, Proceedings, volume 1267 of Lecture Notes in Computer Science, pages 260–272. Springer, 1997.
+[BP10] Joan Boyar and Ren´e Peralta. A new combinational logic minimization technique with applications to cryptology. In Paola Festa, editor, Experimental Algorithms, volume 6049 of Lecture Notes in Computer Science, pages 178–189. Springer, 2010.
+[Bra12] Zvika Brakerski. Fully homomorphic encryption without modulus switching from classical GapSVP. In Reihaneh Safavi-Naini and Ran Canetti, editors, Advances in Cryptology – CRYPTO 2012, volume 7417 of Lecture Notes in Computer Science, pages 868–886. Springer, 2012.
+[BV11a] Zvika Brakerski and Vinod Vaikuntanathan. Eﬃcient fully homomorphic encryption from (standard) LWE. In Proceedings of the 2011 IEEE 52nd Annual Symposium on Foundations of Computer Science, FOCS’11, pages 97–106. IEEE Computer Society, 2011.
+[BV11b] Zvika Brakerski and Vinod Vaikuntanathan. Fully homomorphic encryption from Ring-LWE and security for key dependent messages. In Phillip Rogaway, editor, Advances in Cryptology – CRYPTO 2011, volume 6841 of Lecture Notes in Computer Science, pages 505–524. Springer, 2011.
+[CCK+] Jung Hee Cheon, Jean-S´ebastien Coron, Jinsu Kim, Moon Sung Lee, Tancr`ede Lepoint, Mehdi Tibouchi, and Aaram Yun. Batch fully homomorphic encryption over the integers. In To Appear at Eurocrypt 2013.
+[CMNT11] Jean-S´ebastien Coron, Avradip Mandal, David Naccache, and Mehdi Tibouchi. Fully homomorphic encryption over the integers with shorter public keys. In Phillip Rogaway, editor, Advances in Cryptology – CRYPTO 2011, volume 6841 of Lecture Notes in Computer Science, pages 487–504. Springer, 2011.
+[CN12] Yuanmi Chen and Phong Nguyen. Faster algorithms for approximate common divisors: Breaking fullyhomomorphic-encryption challenges over the integers. In David Pointcheval and Thomas Johansson, editors, Advances in Cryptology – EUROCRYPT 2012, volume 7237 of Lecture Notes in Computer Science, pages 502–519. Springer, 2012.
+[CNT12] Jean-S´ebastien Coron, David Naccache, and Mehdi Tibouchi. Public key compression and modulus switching for fully homomorphic encryption over the integers. In David Pointcheval and Thomas Johansson, editors, Advances in Cryptology – EUROCRYPT 2012, volume 7237 of Lecture Notes in Computer Science, pages 446–464. Springer, 2012.
+[CT12] Jean-S´ebastien Coron and Mehdi Tibouchi. Implementation of the fully homomorphic encryption scheme over the integers with compressed public keys in sage, 2012. https://github.com/coron/fhe.
+[DGHV10] Marten van Dijk, Craig Gentry, Shai Halevi, and Vinod Vaikuntanathan. Fully homomorphic encryption over the integers. In Henri Gilbert, editor, Advances in Cryptology – EUROCRYPT 2010, volume 6110 of Lecture Notes in Computer Science, pages 24–43. Springer, 2010.
+13
+
+[Gen09] Craig Gentry. A fully homomorphic encryption scheme. PhD thesis, Stanford University, 2009. crypto. stanford.edu/craig.
+[GH11] Craig Gentry and Shai Halevi. Implementing Gentry’s fully-homomorphic encryption scheme. In Kenneth Paterson, editor, Advances in Cryptology – EUROCRYPT 2011, volume 6632 of Lecture Notes in Computer Science, pages 129–148. Springer, 2011.
+[GHS12a] Craig Gentry, Shai Halevi, and Nigel P. Smart. Fully homomorphic encryption with polylog overhead. In David Pointcheval and Thomas Johansson, editors, Advances in Cryptology – EUROCRYPT 2012, volume 7237 of Lecture Notes in Computer Science, pages 465–482. Springer, 2012.
+[GHS12b] Craig Gentry, Shai Halevi, and Nigel P. Smart. Homomorphic evaluation of the AES circuit. In Reihaneh Safavi-Naini and Ran Canetti, editors, Advances in Cryptology - CRYPTO 2012, volume 7417 of Lecture Notes in Computer Science, pages 850–867. Springer, 2012.
+[KS09] Emilia Ka¨sper and Peter Schwabe. Faster and timing-attack resistant AES-GCM. In Christophe Clavier and Kris Gaj, editors, Cryptographic Hardware and Embedded Systems - CHES 2009, volume 5747 of Lecture Notes in Computer Science, pages 1–17. Springer, 2009.
+[LATV12] Adriana Lo´pez-Alt, Eran Tromer, and Vinod Vaikuntanathan. On-the-ﬂy multiparty computation on the cloud via multikey fully homomorphic encryption. In Proceedings of the 44th Symposium on Theory of Computing Conference, STOC 2012, pages 1219–1234. ACM, 2012.
+[NLV11] Michal Naehrig, Kristin Lauter, and Vinod Vaikuntanathan. Can homomorphic encryption be practical? In Proceedings of the 3rd ACM workshop on Cloud computing security workshop, CCSW ’11, pages 113–124. ACM, 2011.
+[RP10] Matthieu Rivain and Emmanuel Prouﬀ. Provably secure higher-order masking of AES. In Stefan Mangard and Fran¸cois Xavier Standaert, editors, Cryptographic Hardware and Embedded Systems, CHES 2010, volume 6225 of Lecture Notes in Computer Science, pages 413–427. Springer, 2010.
+[SV10] Nigel P. Smart and Frederik Vercauteren. Fully homomorphic encryption with relatively small key and ciphertext sizes. In Phong Nguyen and David Pointcheval, editors, Public Key Cryptography – PKC 2010, volume 6056 of Lecture Notes in Computer Science, pages 420–443. Springer, 2010.
+[SV11] Nigel P. Smart and Frederik Vercauteren. Fully homomorphic SIMD operations, 2011. To appear in Designs, Codes and Cryptography.
+
+A Correctness of the Scheme
+
+We recall and adapt to the batch settings the deﬁnition of correctness from [Gen09,DGHV10]. We consider an homomorphic public-key encryption scheme E with an additional algorithm Evaluate taking as input the public key pk, a mod-2 arithmetic circuit C with t inputs and t ciphertexts ci, and outputting another ciphertext c.
+Deﬁnition 4 (Correct batch homomorphic decryption). The scheme
+E = (KeyGen, Encrypt, Decrypt, Evaluate)
+
+is correct for a given t-input circuit C if, for any key-pair (sk, pk) output by KeyGen(λ), any t plaintext -bit vectors m1, . . . , mt, and any ciphertexts C = (c1, . . . , ct) with ci ← Encrypt(pk, mi), it holds that
+Decrypt(sk, Evaluate(pk, C, C)) = C(m1[0], . . . , mt[0]), . . . , C(m1[ − 1], . . . , mt[ − 1]) .
+
+As in [Gen09,DGHV10], we deﬁne a permitted circuit as one where for any i 1 and any set of integers inputs less that i2i(α +ρ +2) in absolute value, the generalized circuit’s output has absolute value at most 2i(η−3−n) with n = log2(λ + 1) ; we let CE be the set of permitted circuits.
+We show that the batch scheme presented in Section 3 is correct.
+
+Proof (of Lemma 1). Given a ciphertext c outputted by BDGHV. Encrypt(pk, m), there exist integer vectors b = (bi)1 i τ ∈ (−2α, 2α)τ and b = (bi)1 i −1 ∈ (−2α , 2α ) such that
+
+−1
+
+τ
+
+−1
+
+c = mi · xi + bi · xi + bi · Πi mod x0
+
+i=0
+
+i=1
+
+i=0
+
+For each j = 0, . . . , − 1, this gives
+
+|c mod pj | · 2ρ+1 + τ 2α+ρ +1 + · 2α +ρ +1 · 2α +ρ +2.
+
+(15)
+
+14
+
+Let C be a permitted circuit with t inputs and let C† be the corresponding circuit operations over the integers rather than modulo 2. Let ci ← BDGHV. Encrypt(pk, mi). We have, for each j = 0, . . . , − 1,
+
+c mod pj = C†(c1, . . . , ct) mod pj = C†(c1 mod pj, . . . , ct mod pj) mod pj.
+
+(16)
+
+From (15) and the deﬁnition of permitted circuits, we obtain
+
+C†(c1 mod pj, . . . , ct mod pj) 2η−4 pj/8.
+
+Therefore
+
+C†(c1 mod pj, . . . , ct mod pj) mod pj = C†(c1 mod pj, . . . , ct mod pj),
+
+which implies from (16) that c mod pj = C†(c1 mod pj, . . . , ct mod pj), and eventually
+
+[c mod pj]2 = C†([c1 mod pj]2, . . . , [ct mod pj]2) = C(m1[j], . . . , mt[j]),
+2
+which concludes the proof.
+
+B Proof of Lemma 2
+In Sections B.1 and B.2, we establish some preliminary results.
+
+B.1 Cardinality of the Kernel of a Linear Map
+
+Lemma 5. Let G be a ﬁnite abelian group of order |G|. Let t 1 be an integer. For any a =
+
+(a1, . . . , at) ∈ Zt, deﬁne the linear map φa : Gt → G by φa(g1, . . . , gt) =
+
+t i=1
+
+ai
+
+·
+
+gi.
+
+The
+
+cardinality
+
+of the kernel of φa is given by |ker φa| = |G|t−1 ·
+
+r j=1
+
+gcd(dj
+
+,
+
+a1,
+
+.
+
+.
+
+.
+
+,
+
+at),
+
+where
+
+the
+
+dj ’s
+
+are
+
+the
+
+invariant factors of G, i.e. satisfy dj | dj+1 and G
+
+r j=1
+
+Z/dj
+
+Z.
+
+Proof. We prove this result componentwise. Let a ∈ Zt. For any index j ∈ [1, r], consider the map
+
+φj,a : (Z/djZ)t → Z/djZ
+t
+(g1, . . . , gt) → ai · gi.
+i=1
+
+Its image is the subgroup of Z/djZ generated by gcd(a1, . . . , at), hence
+
+|im(φj,a)| = dj/ gcd(dj, a1, . . . , at),
+
+which implies
+
+|ker φj,a| = dtj/|im(φj,a)| = dtj−1 · gcd(dj, a1, . . . , at).
+
+The result follows directly.
+
+B.2 Diagonally Dominant Matrices Given a matrix B = (bij) ∈ Zn×n, we let Λi(B) = k=i |bik|.
+Deﬁnition 5 (Diagonally dominant matrix). A matrix B = (bij) ∈ Zn×n is said to be diagonally dominant if |bii| > Λi(B) for all i.
+We ﬁrst show that a diagonally dominant matrix is invertible and give a bound on the operator norm of its inverse.
+
+15
+
+Lemma 6. Let B = (bij) ∈ Zn×n be a diagonally dominant matrix. Then B is invertible and B−1 ∞ max (|bii| − Λi(B))−1 .
+i=1,...,n
+where · ∞ is the operator norm on n × n matrices with respect to the ∞ norm on Rn.
+
+Proof. For any vector t ∈ Rn, we have
+
+n
+
+B · t ∞ = max
+
+bij · tj
+
+i=1,...,n
+
+j=1
+
+There exists k such that t ∞ = |tk|. Consequently
+
+B·t ∞
+
+n
+bkj · tj
+j=1
+
+|tk| · (|bkk| − Λk(B))
+
+t ∞ · min (|bii| − Λi(B))
+i=1,...,n
+
+t ∞ · ε. (17)
+
+for ε := mini=1,...,n (|bii| − Λi(B)), where ε > 0 since B is a diagonally dominant matrix. This implies that the matrix B is invertible, since Bt = 0 ⇒ Bt ∞ = 0 ⇒ t ∞ = 0 ⇒ t = 0.
+Given u ∈ Rn, let t = B−1u. Then from Equation (17) with Bt = u
+u ∞ B−1u ∞ · ε
+
+Thus
+
+B−1 ∞ max (|bii| − Λi(B))−1 .
+i=1,...,n
+
+Lemma 7. Let B = (bij) ∈ Zn×n be a diagonally dominant matrix, with bii > 0 for all i. Let U be the set of vectors (ui) ∈ Zn such that |ui| < ∆i/2 where ∆i = bii − Λi(B) for all i. The vectors in
+U are all distinct modulo B.
+
+Proof. Let u, u be two distinct vectors in U . We have |ui − ui| < bii − Λi(B) for all i. Let v be a non-zero vector in the lattice generated by the column vectors of B; we show that |vi| bii − Λi(B) for some i. Therefore we must have u = u mod B.
+We write v = B · y for some non-zero vector y ∈ Zn. Let M = max{|yk|; 1 k n} and let i such that |yi| = M . We write:
+
+n
+
+vi = bij yj = biiyi + bij yj
+
+j=1
+
+j=i
+
+which gives:
+
+|biiyi| = |vi − bijyj|
+j=i
+
+which gives using M 1:
+
+|vi| + |bij| · M
+j=i
+
+|vi| + M · Λi(B)
+
+|vi| |biiyi| − M · Λi(B) M · (bii − Λi(B)) bii − Λi(B).
+
+16
+
+B.3 Proof of Claim 1
+
+Given an invertible matrix A ∈ Zn×n and a vector y ∈ Zn, we denote by x = y mod A the vector x = y − A · A−1 · y .
+Since the ﬁrst component of c is always reduced modulo q0, we can restrict ourselves to the last components of the vectors, and to the sub-matrix
+
+ 0,0 + 2ρ · · ·
+
+Π = 
+
+...
+
+...
+
+0, −1 · · ·
+
+
+
+−1,0
+
+...
+
+. 
+
+−1, −1 + 2ρ
+
+More precisely, letting u := X · m + X · b, we have
+
+(u mod Π ) mod x0 = u − Π · Π −1 · u mod x0 = u − Π · Π −1 · u mod x0 .
+
+where u ∈ Z is the vector u with its ﬁrst component removed. This gives
+
+c = (0, m)T + I2 · u + Π · b − Π −1 · u mod x0 .
+
+We have
+
+u ∞ · 2ρ + τ · 2ρ +α τ · 2ρ +α+1 .
+
+Moreover since Π is a diagonally-dominant matrix, we have from Lemma 6 in Appendix B.2
+
+
+
+−1
+
+Π −1 ∞
+
+max  i,i + 2ρ − | k,i|
+i=0,..., −1 k=i
+
+2−ρ +1 .
+
+Therefore
+
+Π −1 · u ∞ Π −1 · u ∞ + 1 Π −1 ∞ · u ∞ + 1 τ · 2α+3 .
+Since the vector b has its components uniformly distributed in (−2α , 2α ), for any ﬁxed vector Π −1 · u the statistical distance between b and b − Π −1 · u is at most · τ · 2α+2−α ; this gives the same upper-bound for the statistical distance between the ciphertext c in Game0 and Game1, which proves the claim.
+
+B.4 Proof of Claim 2
+Our goal is to show that the distribution of the term X · b mod Π is statistically close to the uniform distribution modulo Π . First, we show that the distribution of X mod Π is statistically close to the uniform distribution of matrices with τ columns in Y = Z +1/(Π ). Lemma 8. The distribution of X is ε-statistically close to uniform over Y τ , where
+ε = 2 · τ · 2ρ−ρ +2 .
+Therefore instead of considering the distribution of X ·b mod Π we can consider the distribution of G·b mod Π where G is uniformly distributed over the matrices with τ columns in Y = Z +1/(Π ). For this we consider the family H of hash functions hG : X → Y where X = (−2α, 2α)τ and Y = Z +1/(Π ) deﬁned as
+hG(b) = G · b mod Π , where G is a matrix of τ columns vectors over Y = Z +1/(Π ). Using the Leftover Hash Lemma, we show:
+Lemma 9. The distribution of (G, G · b mod Π ) is ε2-statistically close to uniform modulo Π , with
+ε2 = 2γ−α·τ + · ρ · 2 ·(ρ +2)−τ
+Combining Lemma 8 and Lemma 9 this proves Claim 2.
+
+17
+
+B.5 Proof of Lemma 8
+
+We must show that the distribution of the vectors xi’s is statistically close to uniform modulo Π . For this it suﬃces to show that the distribution of the vectors ri = (ri,0, . . . , ri, −1) ∈ Z is statistically close to uniform modulo Π , where
+
+ 0,0 + 2ρ · · ·
+
+Π = 
+
+...
+
+...
+
+0, −1 · · ·
+
+
+
+−1,0
+
+...
+
+. 
+
+−1, −1 + 2ρ
+
+Namely the ﬁrst coeﬃcient of the xi’s is uniform modulo q0 and independent of the other coeﬃcients, therefore it is distributed as the ﬁrst coeﬃcient of a random vector modulo Π .
+The vectors ri = (ri,0, . . . , ri, −1) ∈ Z are uniformly and independently distributed in the set
+
+U0 = {(uj )j=0,..., −1 ∈ Z : −2ρ −1 < uj < 2ρ −1} .
+
+We must show that when r ← U0 the distribution of r mod Π is statistically close to uniform in Z /(Π ). We consider the following subset of U0:
+
+U0 = {(uj)j=0,..., −1 ∈ Z : |uj| < ∆j/2}
+
+where ∆j := 2ρ − 2ρ − Λj(Π ). From Lemma 7 we have that the vectors of U0 are all distinct modulo Π . Therefore when r ← U0 (instead of U0) then r mod Π is uniformly distributed in the set:
+U1 = {u mod Π : u ∈ U0} ⊂ Z /(Π )
+To prove Lemma 8 it suﬃces to show that the sets U0 and U0 have very close size, and that the sets U1 and Z /(Π ) have very close size. We know that |U0| |U0| 2ρ · and that |U0| = |U1| |Z /(Π )| = |det Π |; therefore it suﬃces to obtain a lower-bound for |U0| and an upper-bound for |det Π |.
+To obtain a lower-bound for |U0| we write:
+
+−1
+
+|U0| |U0|
+
+∆j (2ρ − · 2ρ)
+
+j=0
+
+2ρ · · 1 − 2 · 2ρ−ρ .
+
+(18)
+
+To upper bound |det Π | we use Hadamard’s inequality
+
+det Π
+
+−1
+πj ,
+j=0
+
+where πj is the j-th row of Π . We have for all j:
+
+πj
+
+(2ρ + 2ρ)2 + ( − 1) · (2ρ)2
+
+22ρ + 2ρ +ρ+1 + · 22ρ
+
+22ρ (1 + 2ρ+2−ρ ) 2ρ · 1 + 2ρ+1−ρ .
+
+Thus
+
+det(Π ) 2ρ · · 1 + · 2ρ+1−ρ
+
+Combining the previous inequality with (18), we obtain:
+
+2ρ · · 1 − 2 · 2ρ−ρ
+
+|U0| = |U1| |Z /(Π )| 2ρ · · 1 + · 2ρ+1−ρ .
+
+(19)
+
+Combining inequalities (18) and (19) we obtain that the statistical distance between r mod Π with r ← U0 and the uniform distribution in Z /(Π ) is at most 2 · 2ρ−ρ +2, which proves Lemma 8.
+
+18
+
+B.6 Proof of Lemma 9
+We consider the family H of hash functions hG : X → Y where X = (−2α, 2α)τ and Y = Z +1/(Π ) deﬁned as
+hG(b) = G · b mod Π ,
+where G is a matrix of τ columns vectors over Y = Z +1/(Π ). We must show that (hG, hG(b)) is uniformly distributed in H × Y when h ← H and b ← X.
+We ﬁrst recall the notion of ε-pairwise independence introduced in [CMNT11].
+
+Deﬁnition 6. A family H of hash functions h : X → Y is ε-pairwise independent if
+
+1
+
+Pr [h(x) = h(x )] −
+
+h←H
+
+|Y |
+
+x=x
+
+|X|2 ·
+
+ε .
+
+|Y |
+
+The following generalization of the usual leftover hash lemma is proved in [CMNT11].
+
+Lemma 10 (Leftover hash lemma). Let H be a family of ε-pairwise independent hash functions.
+
+Suppose that h ← H and x ← X are chosen uniformly and independently. Then (h, h(x)) is
+
+(
+
+1 2
+
+|Y |/|X| + ε)-uniform over H × Y .
+
+Therefore to apply Lemma 10 we show that the hash function family hG(b) = G · b mod Π is ε-pairwise independent. We must bound the value δ deﬁned by:
+
+|Y |
+
+1
+
+δ = |X|2
+
+Pr[h(b) = h(b )] −
+
+.
+
+h
+
+|Y |
+
+b=b
+
+Let b, b ∈ X, b = b and deﬁne a = b − b . We denote by (qi, ri) ∈ Z +1 the column vectors of G, for 1 i τ . We have that
+
+
+
+τ
+
+  
+
+φa,q0
+
+(qi)i=1,...,τ
+
+:=
+
+ai · qi = 0 mod q0
+
+h(a) = 0 ∈ Z +1/(Π ) ⇐⇒
+
+i=1 τ
+
+,
+
+  
+
+φa,Π
+
+(ri)i=1,...,τ :=
+
+ai · ri = 0 mod Π
+
+i=1
+
+where
+
+ 0,0 + 2ρ · · ·
+
+Π = 
+
+...
+
+...
+
+0, −1 · · ·
+
+Therefore for any ﬁxed b = b
+
+
+
+−1,0
+
+...
+
+. 
+
+−1, −1 + 2ρ
+
+Pr[h(b)
+h
+
+=
+
+h(b
+
+)]
+
+=
+
+|ker φa,q0 | q0τ
+
+·
+
+ker φa,Π |det(Π )|τ
+
+.
+
+We have that gcd(a1, . . . , aτ , q0) = 1. Indeed, all the factors of q0 are such that 2λ2 > 2α+1 > aj
+
+for all j, and thus any nonzero aj is coprime with q0. Consequently, applying Lemma 5 to G = Zq0, we get
+
+|ker φa,q0 | q0τ
+
+=
+
+1 .
+q0
+
+We now consider the group G = Z /(Π ) and deﬁne the set
+
+U = {a = 0 : gcd(a1, . . . , aτ , dr) = 1},
+
+19
+
+where dr is the larger invariant factor of G, i.e. is such that G Z/d1Z × · · · × Z/drZ with di | di+1, and di = di+1. We denote by U the complement of U . From Lemma 5 we have that ker φa,Π = |det(Π )|τ−1 when a ∈ U . Therefore,
+
+1
+
+Pr[h(b) = h(b )] −
+
+h
+
+q0 |det(Π )|
+
+0
+
+if b − b ∈ U ,
+
+1 q0
+
+if b − b ∈ U .
+
+Therefore it suﬃces to bound the number of (b, b ) such that b − b ∈ U . For any b ∈ X, deﬁne
+
+Ub = {b ∈ X \ {b} : b − b ∈ U }.
+We write dr = β1 · · · βm with βj prime for j ∈ {1, . . . , m}, where the βj’s are not supposed distinct. Thus b ∈ Ub if and only if there exists j ∈ {1, . . . , m} such that bi − bi ∈ βjZ for all i = 1, . . . , τ . Now, since we have |(βjZ ∩ (−2α, 2α))| 2α+1/βj and βj 2, as well as dr |det(Π )| < 2 ·(ρ +1) which implies m · (ρ + 1), we obtain:
+
+|Ub|
+
+m 2α+1 τ j=1 βj
+
+·(ρ +1)
+
+2α+1
+
+τ
+=
+
+· (ρ + 1) · 2ατ .
+
+2
+
+j=1
+
+This gives
+
+|Y |
+
+1 |det(Π )|
+
+1
+
+δ
+
+|X|2 b−b ∈U q0 =
+
+|X |2
+
+b∈X b ∈Ub q0
+
+q0 |det(Π q0 · |X|2
+
+)|
+
+b∈X
+
+|Ub|
+
+|det(Π )| ·
+
+· (ρ + 1) · 2ατ
+
+|X |
+
+2 ·(ρ +1) ·
+
+· (ρ + 1) · 2ατ
+
+2(α+1)·τ
+
+· ρ · 2 ·(ρ +2)−τ
+
+This shows that the hash function family H is ε-pairwise independent, with ε := · ρ · 2 ·(ρ +2)−τ .
+Finally, applying Lemma 10 we obtain that the distribution of (h, h(b)) for h ← H, b ← (−2α, 2α)τ is ε2-uniform over H × Y , where:
+
+1 |Y |
+
+ε2 := 2
+
++ε |X |
+
+2γ−α·τ + · ρ · 2 ·(ρ +2)−τ
+
+which proves Lemma 9.
+
+B.7 Proof of Claim 3 We must show that that the distribution
+D1 = u + Π · b mod x0 : u ← Z +1/(Π ), b ← (Z ∩ (−2α , 2α ))
+is statistically close to the distribution:
+D2 = v + Π · b mod x0 : v ← Zq0 × (Z ∩ [0, 2ρ )) , b ← (Z ∩ (−2α , 2α )) .
+We consider the intermediate distribution: D2 = (v mod Π ) + Π · b mod x0 : v ← Zq0 × (Z ∩ [0, 2ρ )) , b ← (Z ∩ (−2α , 2α )) .
+Applying the same technique as in the proof of Claim 1, the statistical distance between D2 and D2 is at most · 23−α . Moreover applying the same technique as in the proof of Lemma 8 the statistical distance between D1 and D2 is at most 2 · 2ρ−ρ +2. Summing the two statistical distances proves Claim 3.
+
+20
+
+C Proof of Lemma 3
+
+We ﬁrst prove the following lemma.
+
+Lemma 11. The -decisional-Approximate-GCD problem is hard if the 1-decisional-ApproximateGCD problem is hard.
+
+Proof. Given an algorithm A for solving the -decisional-Approximate-GCD problem, we construct
+an algorithm A1 for solving the 1-decisional-Approximate-GCD problem. Our proof is based on generating − 1 of the primes pi’s ourselves and putting the prime p from the 1-decisional instance at a random position among the pi’s; we then show how to simulate the oracle for the -decisional instance using the oracle from the 1-decisional instance; eventually the challenge for the -decisional
+instance is simulated from the 1-decisional challenge using an hybrid argument. We receive as input an integer y0 = p · q0 where p is a random η-bit integer and q0 ← [0, 2γ/p)
+is 2λ2-rough. We select a random integer i0 ∈ [0, − 1] and we generate − 1 random η-bit primes pi for i ∈ [0, − 1] \ {i0}. We implicitly let pi0 = p, where p is unknown. We let:
+
+−1
+
+−1
+
+x0 := y0 · pi = q0 · pi
+
+i=0
+
+i=0
+
+i=i0
+
+and we send x0 to A . Our simulation of the -oracle from the 1-oracle works as follows: given an integer y such
+that y = 2r + v mod p we can obtain by CRT an integer z such that z = 2r + v mod p and z = 2ri + vi mod pi for all i = i0, without knowing p but using y0 = q0 · p. Formally we have the following equality:
+
+CRTq0,(pi)(q, u0, . . . , u −1) = CRTq0·pi0 ,(pi)i=i0 CRTq0,pi0 (q, ui0 ), u0, . . . , ui0−1, ui0+1, . . . u −1 (20)
+Therefore given as input a query v = (vi) to the -oracle Oq0,(pi) we ﬁrst query the 1-oracle Oq0,p with vi0 to obtain:
+y = CRTq0,p(q, 2r + vi0 ) Then we generate random ri ∈ Z ∩ (−2ρ, 2ρ) for all i = i0 and return the following value:
+z := CRTy0,(pi)i=i0 (y, 2r0 + v0, . . . , 2ri0−1 + vi0−1, 2ri0+1 + vi0+1, . . . , 2r −1 + v −1)
+From equality (20), we have:
+
+z = CRTq0,(pi) (q, 2r0 + v0, . . . , 2r −1 + v −1)
+which shows that our simulation of the oracle Oq0,(pi) is perfect. It remains to show how we generate the challenge z for the -instance. We receive as input a
+challenge y = CRTq0,p(q, 2r + vb) from the 1-instance, where b ← {0, 1}, v0 = 0 and v1 ← {0, 1}, and we must output a guess b of b. From y we construct a hybrid challenge z as previously
+
+z = CRTy0,(pi)i=i0 (y, 2r0 + v0, . . . , 2ri0−1 + vi0−1, 2ri0+1 + vi0+1, . . . , 2r −1 + v −1)
+
+where vi = 0 for all 0 i < i0 and vi ← {0, 1} for all i0 < i challenge containing the following bits wi:
+
+− 1. Therefore z is an hybrid
+
+z = CRTq0,(pi)(q, 2r0 + w0, . . . , 2r −1 + w −1) where:
+0 if b = 0 w0 ← 0, . . . , wi0−1 ← 0, wi0 ← {0, 1} if b = 1 , wi0+1 ← {0, 1}, . . . , w −1 ← {0, 1}
+
+21
+
+We send z to the A algorithm; eventually we output the bit b returned by A . To analyze the success probability of our algorithm A1 we use the following hybrid argument.
+We note that the distribution of z for i0 = j and b = 0 is the same as the distribution of z for i0 = j + 1 and b = 1, for all 0 j < − 1. Moreover i0 = 0 and b = 1 corresponds to the -oracle being called with v ← {0, 1} , while i0 = − 1 and b = 0 corresponds to v = 0. Since i0 is generated at random in [0, − 1] the distinguishing probability of our algorithm A1 is given by:
+1 −1 Pr[b = 0|b = 0] − Pr[b = 0|b = 1] = · Pr[b = 0|i0 = j ∧ b = 0] − Pr[b = 0|i0 = j ∧ b = 1]
+j=0
+1 = · Pr[b = 0|v ← {0, 1} ] − Pr[b = 0|v = 0]
+ε =
+where ε is the distinguishing probability of A on the -instance. Therefore the advantage of our algorithm A1 is non-neglible if the advantage of A is non-neligible. This terminates the proof of Lemma 11.
+It remains to show the following lemma.
+Lemma 12. The 1-decisional-Approximate-GCD problem is hard if the error-free ApproximateGCD problem is hard.
+Proof (sketch). The proof is essentially the same as the proof of semantic security of the original DGHV scheme in [DGHV10]. Namely from an algorithm A1 solving the 1-decisional-ApproximateGCD problem one can build a similar “high-accuracy LSB predictor” for given z computing [z mod p]2. Then such “high-accuracy LSB predictor” is used to obtain a Binary GCD algorithm for integers of the form z = q · p + r for small r, which eventually enables to recover p.
+D Complete Description of the Batch DGHV Scheme with Compressed Public Keys
+In this section, we provide a complete description of our batch FHE scheme with the ciphertext compression technique of [CNT12]. Note that as in [CNT12], the ciphertext compression technique is applied to both the public key elements xi’s, xi’s and Πi’s of the somewhat homomorphic scheme, and to the encryption σi’s of the secret key bits. The ciphertext compression technique enables to compress a ciphertext from γ = O˜(λ5) bits down to · η + λ = · O˜(λ2) bits.
+D.1 Description
+BDGHV. KeyGen(1λ). Generate a collection of primes p0, . . . , p −1 of size η bits, and denote π their product. Deﬁne the error-free public key element x0 = q0 · π, where q0 ← Z ∩ [0, 2γ/π) is a 2λ2-rough integer. Initialize a pseudo-random generator f1 with a random seed se1. Use f1(se1) to generate a set of integers χi ∈ [0, x0) for i ∈ [1, τ ], χi ∈ [0, x0) for i ∈ [0, − 1] and χΠi ∈ [0, x0) for i ∈ [0, − 1]. Deﬁne γ-bit integers as follows:
+1. the integers xi’s (1 i τ ) such that xi = χi − ∆i with
+∆i = [χi]π + ξi · π − CRTp0,...,p −1 (2ri,0, . . . , 2ri, −1)
+where ri,j ← Z ∩ (−2ρ −1, 2ρ −1) and ξi ← Z ∩ [0, 2λ+log2( )+ ·η/π);
+22
+
+2. the integers xi’s (0 i − 1) such that xi = χi − ∆i with
+
+∆i = [χi]π + ξi · π − CRTp0,...,p −1 (2ri,0 + δi,0, . . . , 2ri, −1 + δi, −1)
+
+where ri,j ← Z ∩ (−2ρ, 2ρ) and ξi ← Z ∩ [0, 2λ+log2( )+ ·η/π); 3. the integers Πi’s (0 i − 1) such that Πi = χΠi − ∆Πi with
+
+∆Πi = [χΠi ]π + ξiΠ · π − CRTp0,...,p −1 (2 i,0 + δi,02ρ +1, . . . , 2 i, −1 + δi, −12ρ +1)
+
+where i,j ← Z ∩ (−2ρ, 2ρ) and ξiΠ ← Z ∩ [0, 2λ+log2( )+ ·η/π). Additionally, generate at random Θ-bit vectors sj = (sj,0, . . . , sj,Θ−1) for 0 j < , each split in
+
+θ boxes of size B = Θ/θ each, with exactly one non-zero bit in each box, and such that sj,j = 1
+
+for each j = 0, . . . , − 1. Initialize a pseudo-random generator f2 with a random seed se2, and
+
+use f2(se2) to generate integers ui ∈ [0, 2κ+1) for i ∈ Z ∩ [0, Θ − 1]. Then set u0, . . . , u −1 such
+
+that
+Θ−1
+
+xpj =
+
+sj,i · ui mod 2κ+1,
+
+i=0
+
+where xpj = 2κ/pj for each j = 0, . . . , − 1. Initialize a pseudo-random generator f3 with a random seed se3. Use f3(se3) to generate a set of integers χσi ∈ [0, x0) for i ∈ [0, Θ − 1]. For i ∈ [0, Θ − 1], deﬁne the γ-bit integers σi = χσi − ∆σi with
+
+∆σi = [χσi ]π + ξiσ · π − CRTp0,...,p −1 (2ri,0 + s0,i, . . . , 2ri, −1 + s −1,i),
+
+where ri,j ← Z ∩ (−2ρ, 2ρ) and ξiσ ← Z ∩ [0, 2λ+log2( )+ ·η/π). Output the secret key sk = (s0, . . . , s −1) and the public key
+
+pk = x0, se1, (∆i)1 i τ , ∆i 0 i −1 , ∆Πi 0 i −1 , se2, u0, . . . , u −1, se3, (∆σi )0 i<Θ .
+
+BDGHV. Encrypt(pk, m ∈ {0, 1} ). Use f1(se1) to recover the integers χi’s, χi’s, and χΠi ’s. Let xi = χi − ∆i for 1 i τ and xi = χi − ∆i, Πi = χΠi − ∆Πi for 0 i − 1. Choose random integer vectors b = (bi)1 i τ ∈ (−2α, 2α)τ and b = (bi)0 i −1 ∈ (−2α , 2α ) and output the ciphertext:
+
+−1
+
+τ
+
+−1
+
+c=
+
+mi · xi + bi · xi + bi · Πi .
+
+i=0
+
+i=1
+
+i=0
+
+x0
+
+BDGHV. Add(pk, c1, c2). Output c1 + c2 mod x0
+
+BDGHV. Mult(pk, c1, c2). Output c1 · c2 mod x0.
+
+BDGHV. Expand(pk, c). The ciphertext expand procedure takes a ciphertext c and compute the associated expanded ciphertext. To do so, use f2(s2) to recover u , . . . , uΘ−1, then let yi = ui/2κ and compute zi given by zi = c · yi mod 2
+with n bits of precision after the binary point. Deﬁne the vector z = (zi)i=0,...,Θ−1 and output the expanded ciphertext (c, z).
+
+BDGHV. Decrypt(sk, c, z). Output m = (m0, . . . , m −1) with
+
+mj ←
+
+Θ−1
+sj,i · zi
+i=0
+
+⊕ (c mod 2).
+2
+
+BDGHV. Recrypt(pk, c, z). Apply the decryption circuit to the expanded ciphertext z, and the encrypted secret key bits σi. Output the result as a refreshed ciphertext cnew.
+
+23
+
+D.2 Semantic Security
+We prove the semantic security of the previous scheme. Note that the random oracle model is only necessary when using compressed public keys as in [CNT12]; the semantic security of our batch FHE scheme from Section 3 does not require random oracles.
+Theorem 3. The previous encryption scheme is semantically secure under the EF- -dec-AGCD assumption, in the random oracle model.
+Proof (sketch). The proof is almost the same as in Section 3.3. Following the same strategy as in [CNT12], the random oracle can be programmed so that the distribution of the public key is statistically close to that of the batch scheme without compressed public keys.
+
+E Description of our Homomorphic AES Implementations
+In this section we describe two implementations of homomorphic evaluation of an AES circuit (HAES), using our BDGHV scheme with plaintext bits embedded in each ciphertext.
+
+E.1 Byte-Wise Bitslicing
+Throughout this subsection, we denote k = /16 the number of AES-128 encryptions one will be able to perform in parallel. We deﬁne a representation called byte-wise bitslicing in which the HAES state will be composed of 8 ciphertexts, each ciphertext containing one and exactly one bit of each byte of the AES state. This construction is similar to general-purpose bitslicing [Bih97,KS09].
+State. We recall that the AES state is a matrix of 4 × 4 bytes. It can be viewed as a 16-byte vector when reading the bytes by column.
+The state in our representation is composed of 8 ciphertexts c0, . . . , c7, where the underlying plaintexts m0, . . . , m7 are such that mi[k · 16 + j] is the i-th bit of the j-th element of the state of the k-th AES (see Figure 1). Thus m0 represents the LSBs of the bytes of the AES states for the k AES-plaintexts, and m7 the MSBs.
+
+Column 0
+
+...
+
+Row 0
+
+Row 1
+
+Row 2
+
+Row 3
+
+...
+
+...
+
+...
+
+...
+
+...
+
+...
+
+Row 0 ...
+
+Column 3 ...
+...
+
+Row 3 ...
+
+AES 1 AES 2 AES 3 AES k AES 1 AES 2 AES 3 AES k AES 1 AES 2 AES 3 AES k AES 1 AES 2 AES 3 AES k AES 1 AES 2 AES 3 AES k AES 1 AES 2 AES 3 AES k
+
+Fig. 1. Bit ordering in mi in the byte-wise bitslicing representation
+
+AddRoundKey. From the 128-bit AES key, an expanded key is created with (10 + 1) rounds subkeys (namely, one subkey at the beginning of the encryption, and one per round). Each round subkey is XORed at one point with the AES state. Thus, each bit of the subkey is XORed with the corresponding bit of the state.
+In this variant, we construct the round subkeys with the same structure as the HAES state (i.e. 8 ciphertexts); notice that we repeat each bit of the round subkey k times. Therefore, the AddRoundKey stage only consists in adding the corresponding ciphertexts with BDGHV. Add as the underlying operation is a XOR on the plaintext bits. This operation consists of 8 BDGHV. Add operations.
+24
+
+SubBytes. The SubBytes stage consists for each byte b to apply the transformation b → M b254 + c, where the power function is performed over GF(28),
+
+1 0 0 0 1 1 1 1
+
+1 1 0 0 0 1 1 1
+
+1 1 1 0 0 0 1 1
+
+M
+
+=
+
+1 1
+
+1 1
+
+1 1
+
+1 1
+
+0 1
+
+0 0
+
+0 0
+
+1 0
+
+and
+
+c = 0x63 .
+
+0 1 1 1 1 1 0 0
+
+
+
+
+
+0 0 1 1 1 1 1 0
+
+00011111
+
+Notice that the multiplication by M is viewed over GF(2)8 GF(28), viewing b as its bitrepresentation vector.
+A possible way to implement this stage could be to implement the multiplication of two FHE ciphertexts so that each byte of the underlying state is multiplied over GF(28) by the corresponding bit. Each multiplication would consumes one level of noise, i.e. after each multiplication 8 recryptions would be needed to recover a state with a “small” noise (i.e. small enough so that the eight ciphertexts can be multiplied once without prior recryption). The minimal solution to compute b254 from b costs 4 multiplications and several squarings [RP10] (but here the squarings can be obtained easily with several BDGHV. Add only), giving a ﬁnal cost of 32 BDGHV. Recrypt. However, as seen in Section 4.4, the cost of a recryption is really huge compared to the other operations.
+To limit the number of recryptions, we used the 115 gates circuit of Boyar and Peralta [BP10] to compute the Sbox. In this circuit, we also have 32 multiplications, thus one could think that 32 recryptions are necessary. However, we can reduce the number of recryptions to 17 by a careful management of the noise. Recryptions are then performed on temporary variables t21, t22, t23, t24, t26, t29, t33, t36, t40 and on the eight outputs; this enables to transform an homomorphic AES state with “small” noise into an homomorphic AES state with “small” noise after the SubBytes operation. If one does not care about the output noises, only 9 recryptions are performed. Therefore, this stage costs 32 BDGHV. Mult, 17 BDGHV. Recrypt and 83 BDGHV. Add. Note that under our representation the SBOX circuit is evaluated in parallel over the 16 bytes of an AES state, and also on the k AES blocks.
+
+ShiftRows. The ShiftRows stage consists in performing the permutation ζSR on the bytes of the AES state, where the Cauchy’s two-line notation of the permutation is
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ζSR = 0 13 10 7 4 1 14 11 8 5 2 15 12 9 6 3 .
+Since we “sliced” the bytes of the AES state in our representation, we will need to apply a similar permutation on each ciphertext of the state. Since we are performing k AES blocks in parallel, we need to consider the permutation ζ deﬁned by
+ζ(I × k + K) = ζSR(I) × k + K, 0 K k − 1, 0 I 15.
+Next, we need to permute each of the ci’s of the HAES state by ζ to perform the ShiftRows stage. As mentioned in Section 4.3, rotating the slots is “for free” when performed during a recryption. Now, we perform a recryption on each element of the HAES state at the end of the SubBytes stage. Thus, instead of using the regular σi’s, we use the σiζ’s and the ShiftRows stage will be obtained at the end of the SubBytes stage at no additional cost.
+25
+
+MixColumns. The MixColumns stage consists in in multiplying each column of the AES state (thus a vector of four bytes) by the matrix M over GF(28), where
+
+0x02 0x03 0x01 0x01
+
+M
+
+=
+
+0x01 0x01
+
+0x02 0x01
+
+0x03 0x02
+
+0x01 0x03
+
+.
+
+0x03 0x01 0x01 0x02
+
+We can view this operation over the whole state as
+
+s0 s4 s8 s12
+
+s0 s4 s8 s12
+
+s1 s5 s9 s13 s2 s6 s10 s14 s3 s7 s11 s15
+
+s1 s2
+
+s5 s6
+
+s9 s10
+
+s13 s14
+
+=
+
+0x02
+
+×
+
+s1 s2
+
+s5 s6
+
+s9 s10
+
+s13 s14
+
+⊕
+
+0x03
+
+×
+
+s2 s3
+
+s6 s7
+
+s10 s11
+
+s14 s15
+
+⊕
+
+s3 s0
+
+s7 s4
+
+s11 s8
+
+s15 s12
+
+⊕
+
+s0 s1
+
+s4 s5
+
+s8 s9
+
+s12 s13
+
+ 
+
+.
+
+s3 s7 s11 s15
+
+s3 s7 s11 s15
+
+s0 s4 s8 s12
+
+s1 s5 s9 s13
+
+s2 s6 s10 s14
+
+Thus in our implementation, we deﬁne three copies of the HAES state (i.e. 24 additional ciphertexts) and we rotate them according to the permutations ζ1, ζ2 or ζ3, with
+
+ζi(I × k + K) = ζMCi(I) × k + K, 0 K k − 1, 0 I 15, the permutation ζMCi being deﬁned as
+ζMCi(I) = I/4 · 4 + (I + i mod 4), 0 I 15 . This costs 3 × 8 = 24 BDGHV. Recrypt. Next, we need to multiply by 0x02 the current HAES state and by 0x03 the ﬁrst copy.
+
+Algorithm 1 Multiplication by 0x02 in GF(28)
+
+Input: A element b =
+
+7 i=0
+
+bixi
+
+of
+
+GF(2)[x]
+
+Output: The product b · 0x02 over GF(2)[x]/(x8 + x4 + x3 + x + 1)
+
+1: Compute b0 = b7
+
+2: Compute b1 = b0 ⊕ b7
+
+3: Compute b2 = b1
+
+4: Compute b3 = b2 ⊕ b7
+
+5: Compute b4 = b3 ⊕ b7
+
+6: Compute b5 = b4
+
+7: Compute b6 = b5
+
+8: Compute b7 = b6
+
+9: return
+
+7 i=0
+
+bixi
+
+Algorithm 2 Multiplication by 0x03 in GF(28)
+
+Input: A element b =
+
+7 i=0
+
+bixi
+
+of
+
+GF(2)[x]
+
+Output: The product b · 0x03 over GF(2)[x]/(x8 + x4 + x3 + x + 1)
+
+1: return b · 0x02 + b
+
+Multiplications by such values over GF(28) are easy to obtain (see Algorithms 1 and 2). When applying these algorithms on the HAES state (c0, . . . , c7) instead of (b0, . . . , b7), the multiplication by 0x02 is performed in parallel over all the bytes of an underlying AES state, but also on the k AES states. Therefore, 3 + 11 = 14 BDGHV. Add operations are performed during this step.
+Finally, we need to add the four copies (possibly rotated or multiplied) of the state to get the ﬁnal HAES state, and this is performed in 3 × 8 = 24 BDGHV. Add.
+26
+
+Final Cost. The AES encryption process consists of 11 AddRoundKey stages, 10 SubBytes and ShiftRows stages and 9 MixColumns stages. Therefore, the ﬁnal cost is 1260 BDGHV. Add, 386 BDGHV. Recrypt and 320 BDGHV. Mult. However, a ﬁne management of the noise allows us to reduce the number of BDGHV. Recrypt to 377.
+E.2 State-Wise Bitslicing
+Throughout this subsection, we will be able to perform AES-128 encryptions in parallel. We deﬁne a representation called state-wise bitslicing in which the HAES state will be composed of 128 ciphertexts, each ciphertext containing one and exactly one bit of the AES state.
+State. The state in our representation is composed of 128 ciphertexts c0, . . . , c127, where the underlying plaintexts m0, . . . , m127 are such that mi+j·8[k] is the i-th bit of the j-th element of the state of the k-th AES. In other words, the 128 bits of the State are represented in 128 diﬀerent ciphertexts, and since slots are available, one can put diﬀerent AES states in the 128 ciphertexts.
+AddRoundKey. The AddRoundKey stage simply consists of BDGHV. Add operations, one per ciphertext in the state. Therefore, this stage costs 128 BDGHV. Add.
+SubBytes. As above, we use the Boyar and Peralda circuit [BP10] to perform this operation. However, our representation is less adapted to this stage than previously, since even though we process the k AES blocks in parallel, we need to apply this SubBytes stage on each group of 8 ciphertexts corresponding to one of the 16 bytes of the AES state. Therefore, we need to apply the same circuit 16 times with diﬀerent inputs. Therefore, this stage costs 16 × 83 = 1328 BDGHV. Add, 16 × 17 = 272 BDGHV. Recrypt and 16 × 32 = 512 BDGHV. Mult.
+ShiftRows. The permutation of the ShiftRows stage is no longer applied on the plaintext bits in each ciphertext of the State, but on the indices of the ciphertext of the HAES state. This stage is a relabelling of the indices of the ciphertexts of the HAES state. Therefore, this operation does not cost any homomorphic operation.
+MixColumns. As above, the new HAES state can be written as a sum of four (possibly rotated or multiplied) states. But as in the ShiftRows stage, the permutations are no longer applied on the ciphertexts to rotate the plaintext bits, but on the indices of the ciphertexts of the HAES state. Therefore, copying and permuting the states is essentially free. However, we still need to multiply by 0x02 and 0x03 the current HAES state and its ﬁrst permuted copy respectively. Algorithms 1 and 2 are still valid, and allows us to perform such multiplications in (3 + 11) × 16 = 224 BDGHV. Add. Finally, we need to add the 4 × 128 ciphertexts, and this costs 3 × 128 = 384 BDGHV. Add.
+Final Cost. The AES encryption process consists of 11 AddRoundKey stages and 10 SubBytes. Therefore, the ﬁnal cost is 14688 BDGHV. Add, 2720 BDGHV. Recrypt and 5120 BDGHV. Mult. However, a ﬁne management of the noise allows us to reduce the number of BDGHV. Recrypt to 2448 (namely, we do not need to bootstrap at all in SubBytes during the ﬁrst round).
+Even though this representation seems far more costly in number of homomorphic operations, notice that in the state-wise bitslicing representation, we can process 16 times more AES plaintexts in parallel than in the byte-wise bitslicing representation. Therefore, for the same number of AES plaintexts, we save 60% of BDGHV. Recrypt, which gives better relatives times.
+27
+

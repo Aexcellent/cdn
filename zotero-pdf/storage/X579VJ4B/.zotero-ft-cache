@@ -1,0 +1,649 @@
+European Journal of Operational Research 270 (2018) 401–418
+Contents lists available at ScienceDirect
+European Journal of Operational Research
+journal homepage: www.elsevier.com/locate/ejor
+Invited Review
+Simulation of intermodal freight transportation systems: a taxonomy
+Teodor Gabriel Crainic a,b,c, Guido Perboli c,b,∗, Mariangela Rosano c
+a Université du Québec á Montréal, Montréal, Canada b CIRRELT, Montreal, Canada c ICT for City Logistics and Enterprises Center, Politecnico di Torino, Turin, Italy
+
+article info
+Article history: Received 27 July 2017 Accepted 24 November 2017 Available online 2 December 2017
+Keywords: Simulation Intermodal transportation Freight transportation Taxonomy
+
+a b s t r a c t
+Intermodal transportation refers to multimodal chains or networks involving at least two transportation modes, freight being packed into a “container” and not being handled at intermodal-transfer terminals on its trip from its origin to its destination. This characterization makes intermodal transportation a multiactor complex system involving a broad range of interacting stakeholders, decision makers, operations, and planning activities. Due to this complexity, simulation is much studied and used within the ﬁeld of operations research, yielding models, methods, and tools to manage transportation activities and support the decision-making processes. The literature includes a large number of contributions on particular issues, but a broad view of the ﬁeld is still missing. This paper aims to ﬁll this gap, using a new taxonomy to structure the recent relevant literature. The proposed taxonomy thus appears a useful instrument to classify the literature and support further analyzes, identifying main ﬁndings, trends, and future paths of intermodal freight transportation systems across several dimensions (e.g., modes, geographical extensions, time horizons, and simulation objectives).
+Crown Copyright © 2017 Published by Elsevier B.V. All rights reserved.
+
+1. Introduction
+Intermodal freight transportation may be deﬁned as the transportation of loads from the origin to the destination of a shipment, involving at least two transportation modes and services, such that the transfer from one mode to the other is performed at an intermodal terminal. The main characteristic of intermodal freight transportation is that the goods are moved in one loading unit or vehicle and are not handled when changing modes (European Conference of Ministers of Transport, 2001). Although different types of packaging may be present (e.g., boxes, pallets, swap bodies, containers, etc.), going forward we will refer to the packaging simply as containers (European Conference of Ministers of Transport, 2001).
+Intermodal transportation is broadly acknowledged as the backbone of international trade and plays a major role in the globalization of the economy. However, it also serves broader functions, from its role as a major instrument in fostering modal change and the utilization of more environmentally friendly water and rail-based transportation modes to the dedicated rail-based container and trailer transportation systems in various parts of the
+∗ Corresponding author. E-mail addresses: TeodorGabriel.Crainic@cirrelt.net (T.G. Crainic),
+guido.perboli@polito.it (G. Perboli), mariangela.rosano@polito.it (M. Rosano).
+https://doi.org/10.1016/j.ejor.2017.11.061 0377-2217/Crown Copyright © 2017 Published by Elsevier B.V. All rights reserved.
+
+world. Moreover, intermodal transportation supports the eﬃciency of emerging operational and business models for transportation and logistics (e.g., City Logistics, Physical Internet, and Synchromodality) that aim to jointly achieve economic, environmental, and societal objectives. The development of intermodal transportation in these roles therefore has strong implications for various transportation modes and intermodal transfer terminals. This development also involves a broad range of stakeholders and decision makers, operations, and planning activities. All of these aspects increase the complexity of intermodal transportation systems, creating a need for support for the management and monitoring of these activities. In this direction, the ﬁeld of operations research offers a rich set of models and methods to build and manage the “best” operation plans, to select operations or manage alternatives to achieve desired levels of cost versus quality of service versus environmental and societal impacts, and to evaluate strategies and policies. Simulation plays an important role in this context. On the one hand, simulation provides the instruments to validate models and algorithms and to explore their worth under various internal and external conditions. Simulation is also the methodology of choice to represent the behavior of a given transportation system and to estimate its response to various policies and changes in its environment, from the availability and quality of infrastructure to energy prices and environmental regulations.
+The literature offers a number of rather important contributions presenting simulation models and studies on various issues
+
+402
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+related to intermodal transportation. Nevertheless, the literature is missing a broad view of the ﬁeld, and an instrument to assist in classifying a given contribution within the general context of the literature, as well as to identify the areas and topics which have been studied most intensively or have been somewhat neglected, the trends, and the promising research areas. This may be observed even though several papers survey various multi and intermodal transportation issues as part of long-haul transportation (Bektas¸ & Crainic, 2008; Caris, Macharis, & Janssens, 2008; 2013; Crainic & Florian, 2008; Crainic & Kim, 2007) or City Logistics (Benjelloun & Crainic, 2009; Benjelloun, Crainic, & Bigras, 2010; Perboli, De Marco, Perfetti, & Marone, 2014a; SteadieSeiﬁ, Dellaert, Nuijten, Van Woensel, & Raouﬁ, 2014). To the best of our knowledge, however, most of these contributions, in particular the most recent ones, (Bektas¸ & Crainic, 2008; Caris et al., 2008; 2013; Crainic & Kim, 2007; Macharis & Bontekoning, 2004), and (SteadieSeiﬁ et al., 2014), focus either on optimization models and methods for various planning levels, or on speciﬁc issues in intermodal transportation with little attention to simulation methods and a system point of view. One thus observes a signiﬁcant gap the literature. We miss a global, system-wide vision of the problem setting, including the decision makers, the actors involved and the issues they want to address. Consider, to illustrate, that the same regional transportation system simulated from a public authority point of view is generally very different from the one when the decision maker is a company that has to deliver the goods.
+Our goal is to ﬁll this gap by proposing a new taxonomy of simulation models applied to intermodal freight transportation systems. The taxonomy aims to structure the literature on the simulation of intermodal transportation, classify the research contributions, and propose a guide to research analysis. Thus, this taxonomy includes dimensions describing the geographic extension of the system studied, the modes and services making up the network, the time horizon considered, the level of planning, the decision makers, the objectives considered, the goals of the simulation model, and the methodology used.
+To illustrate the effectiveness of the proposed taxonomy, we then use it to classify and review the recent literature on intermodal freight transportation. Further, we consider 89 studies in our analysis, and, to focus on the most recent literature, we generally consider studies from 2007 to 2017. To control the scope of this analysis, we did not consider contributions addressing terminal operations and management, such as the optimization of container terminal operations and the allocation and scheduling of terminal equipment. A reader interested in these topics may consult the surveys in Gambardella and Rizzoli (2000); Stahlbock and Voß (2008), and Bierwirth and Meisel (2010).
+This paper is organized as follows. Section 2 describes intermodal transportation as a complex system and identiﬁes the main sources of complexity, which are reﬂected in the taxonomy axes. Section 3 introduces the proposed taxonomy and provides a detailed description of its axes and categories, including the literature-search methodology adopted, in subsection 3.1. Section 4 provides the survey and detailed analysis of the literature according to the proposed taxonomy, and Section 5 identiﬁes general trends and proposes research directions.
+2. Intermodal transportation as a complex system
+Bektas¸ and Crainic (2008) deﬁnes intermodal transportation as the transportation of people or freight from their origin to their destination by a sequence of at least two modes of transportation without any handling of the freight itself when changing modes. Intermodal transportation aims to reduce cargo-handling, damages, and loss, as well as to improve security and transport speed.
+
+An intermodal transportation system is made up of several different actors interacting with each other, including shippers that generate demand for transportation, carriers that provide the transportation services, facility and physical infrastructure managers, institutional authorities that regulate the system, and customers and citizens that ask for goods.
+Shippers generate the freight transportation demand, as they are generally the senders of the goods. They plan shipments to satisfy their customers and either organize or participate in the organization of how their freight should be moved. Thus, they deﬁne their logistics strategy, which may include intermodal transport.
+Carriers perform the transport for the shippers. Some carriers operate dedicated services, in which a vehicle/container serves a single customer, and others operate on the basis of consolidation, in which each vehicle/container may contain different customers’ freight with different origins or eventual destinations.
+Freight logistics providers (FLPs), third party logistics service providers (3PLs) in particular, undertake various logistics tasks within an intermodal transportation system, providing a range of value-added logistics services, such as warehousing, distribution, shipping, inventory management, co-packing, labeling, repacking, weighing, and quality control. FLPs also collaborate with shippers for both domestic and international intermodal transportation activities. Shippers may actually outsource logistics activities in order to focus on their core businesses and beneﬁt from the expertise of the FLPs. On the other hand, 3PLs also interact with carriers to secure timely transportation capacity for their customers. In this sense, they may sometimes appear as carriers.
+Facility and infrastructure managers may be public entities or private ﬁrms with public stakeholders. They do not plan, organize, or realize freight transportation services but instead deal with the management of the physical network and infrastructure, including roads and highways, the rail infrastructure in Europe, intermodal port terminals, and so on. Thus, they play a central role by providing eﬃcient physical networks and the necessary technology and sensors layers to control and optimize the utilization of the infrastructure and facilities.
+Institutional authorities (e.g., governments and public administrations) are the actors who tax, give incentives, set up policies, and regulate transport activities. Through the policies they set, these actors increasingly frequently aim to guide the transportation and logistics system towards “new,” more beneﬁcial to society, and resilient ways of operation (e.g., the usage of speciﬁc corridors or vehicle and motorization types, mode changes from road-based to water- and rail-based transportation, the reduction of externalities, the consideration of environmental impacts, etc.) We include in this class of actors local and national governments as well as transnational institutions such as the European Commission.
+Finally, customers represent the receivers of the shipments. They can be the ﬁnal client, retailer, distributor, or wholesaler. Customers include citizens as well, and, hence, they are mindful about emissions, safety, and viability within their local areas, and they can inﬂuence the institutional authorities through their votes.
+The aforementioned actors have their own goals, make their own decisions, and are linked with the others through many interconnections, interactions, and interdependencies. All contribute to make intermodal transportation a complex system. Furthermore, these decisions and interrelations may be affected by uncertainty from many different sources, often related to demand, travel times, and handling operations (Maggioni, Perboli, & Tadei, 2014; Perboli, Tadei, & Gobbato, 2014b). Hence, the eﬃciency and reliability of the intermodal transportation system require coordination and fast information ﬂows among several actors, interoperability among the operational activities and modes, and behavioral aspects.
+We illustrate this situation and complexity through the Social Business Network (SBN) shown in Fig. 1. The SBN represents
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+403
+
+Fig. 1. Relationships among the main actors in freight transportation systems.
+
+a complex system in a standard visual manner and is part of the GUEST methodology (Perboli, 2016; The GUEST Initiative, 2017). The SBN is a graph composed of nodes and arcs. The nodes represent players grouped by type. The arcs symbolize the relationships between nodes, and their graphical representation is based on their type (i.e., commercial, normative, or stakeholdership). Fig. 1 shows the SBN for an intermodal transportation system made up of the aforementioned actor types: shippers, carriers, customers, facility and infrastructure managers, and institutional authorities. The graph clariﬁes that an intermodal system has an additional level of complexity due to the correlations between the actors. Moreover, this level of complexity is just one of many that come from examining the system from various points of view, including the presence of multiple objectives (e.g., performance-based, economic, environmental, or social) and of different levels of decision making (e.g., real-time, operational, tactical, or strategic).
+This brief analysis illustrates the many components, decisions, and interactions characterizing intermodal transportation and points to the many ways of approaching its study. The diversity of scope and goals of the studies reviewed in this analysis further supports these observations. A comprehensive classiﬁcation of intermodal transportation simulation models and applications must reﬂect this diversity of means, scopes, and goals as well as identifying less-studied areas in order to provide a global picture of current research and highlight research needs and opportunities. This is the main scope of the taxonomy we introduce in this study, as detailed in the next sections.
+3. The taxonomy
+3.1. Taxonomy construction methodology
+From a methodology point of view, our classiﬁcation was a cluster-analysis-based taxonomy with polythetic classes (Bailey,
+
+1994; 2005). Thus, to build it, we followed the three-step method described by Bailey (2005). We began with an empirical analysis of a database of studies. In the second stage, we represented the cluster on paper. Finally, the third stage was envisioning a mental concept for the cluster, often by mentally generating a name or label for the cluster (such as “Network Description”). We then started to retrieve studies from refereed journals and conference proceedings to source the intermodal freight transportation simulation literature. We referred to the Scopus bibliographic database for our analysis because it contains articles from all major journals dealing with transportation. Many journals are also recognized by the ERA 2012 Journal List evaluation across eight discipline clusters (Australian Research Council, 2012). The following list of keywords (and their combinations) was used to search for studies: intermodal, simulation, freight, transportation, planning, network, and supply chain. Only English language literature was included. Additional studies were retrieved by tracking the research cited in some studies. We also decided to include studies dated from 2007 to 2017 to consider only the most recent literature. We used the online database to ﬁnd about 350 studies. We then ﬁrst reduced the entire set of selected studies to a total of 150 by restricting the topic area. Thus, we did not consider studies dealing with terminal operations and management, such as the optimization of container terminal operations, the allocation and scheduling of terminal equipment, and the optimization of terminal area use. Reviews analyzing the roles of simulation and optimization in intermodal container terminals were presented by Gambardella and Rizzoli (2000); Stahlbock and Voß (2008), and Bierwirth and Meisel (2010). A second screening removed studies dealing with the simulation of telecommunication-related issues (e.g., connected vehicle protocols) and other similar topics, which yielded a ﬁnal selection of about 89 studies.
+Fig. 2 depicts the result of our process and is structured in three levels of detail. The taxonomy provides four axes at the ﬁrst level: Network Description, Planning, Simulation Method, and Scope. The
+
+404
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+Fig. 2. Taxonomy structure.
+
+ﬁrst two axes concern the problem speciﬁcations, the third axis describes how the simulation method was implemented, and the fourth investigates the role of simulation. Each axis is structured at the second level in several categories, for which more precise information is provided by subcategories at the third level. Due to the large number of factors that play important roles in deﬁning an intermodal freight transportation system and their high correlation, we decided to consider only the axes at the root level as mutually exclusive and jointly exhaustive. Our analysis is therefore not globally exhaustive, but we believe it provides a good general overview of the literature trends in the simulation of intermodal freight transportation systems. The rest of this section presents brief descriptions of the object and scope of each axis and its categories.
+3.2. Network description
+Intermodal freight transportation simulators may focus on the entire transportation system of the region considered or on a subset only. This axis thus identiﬁes the network on which simulation is used, and it includes three categories: Types, which specify the degree of modal combination represented; Modes, which specify the transportation modes considered; and Territory, which refers to the geographical dimension of the intermodal transportation system.
+3.2.1. Types This category focuses on the deﬁnition of the network studied
+in terms of the kind of mode combination. The three main network types are:
+• Unimodal. “Intermodality” is often equated in practice and in many papers to container-based transportation. Thus, for example, North American railroads created Intermodal divisions and operate many services identiﬁed as “intermodal”, that is, as containers being moved by trains. This is reﬂected in the literature where a good number of papers focus on one particular mode as part of the intermodal chain. The unimodal-type category reﬂects this situation and groups the associated papers;
+• Multimodal: involves at least two modes and one terminal for transfer;
+
+• Intermodal: refers to a multimodal chain of containertransportation services (Crainic & Kim, 2007) with no freight handling. In fact, as deﬁned above, intermodal transportation generally implies that freight is packed into a box, a container, and is not handled from the time it is packed at the origin until the time it arrives at the point where the container is to be opened, usually at the destination. Thus, it is the container that is moved and transferred.
+3.2.2. Modes We describe the transportation modes according to their main
+transportation engineering infrastructure categories: RO: roads; RA: railways; IWW: inland waterways; M: maritime and coastal navigation; and A: air transportation.
+When several modes are present in a study, we indicate them by a combination of single identiﬁers (e.g., RO/RA stands for the usage of a multimodal or intermodal system using roads and rails).
+3.2.3. Territory The geographic extension of the network is classiﬁed into I, in-
+ternational, which extends from the multi-country level to the continent level and the global level; N, covering single national cases and regional cases (with multiple municipalities); and U, focusing on single cities and their surrounding areas.
+3.3. Planning
+This axis is concerned with the decision-making process, thereby investigating the types of decisions and actors involved according to four categories:
+• Decision makers refers to the actors making the decisions, thereby determining the point of view of the problem;
+• Decision objects states the type of planning and the object of the decision-making process on which the simulation project focuses;
+• Objectives gives the categories of the key performance indicators (KPIs) used to measure and compare the effectiveness of alternatives;
+• Time horizon expresses the time perspective of the planning problem.
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+405
+
+The last two categories are complementary in determining the objectives, formulations, and requirements of the problem and identifying scenario alternatives.
+3.3.1. Decision makers This category identiﬁes the actors for which the proposed mod-
+els were designed, following the main roles deﬁned in Section 2. As stated in Section 2, 3PLs perform many different activities within the intermodal transportation system, according to the requirements of their customers. Hence, we classify the rather limited literature focusing on 3PLs according to the tasks considered in each study, mainly into the categories of shippers or carriers.
+3.3.2. Decision objects This category denotes the type of problem being analyzed from
+the point of view of the scope of the decision process considered. We deﬁne ﬁve subcategories:
+• Infrastructure: refers to the construction or enhancement of infrastructure, including the locations of hubs and other types of terminals and the design of the physical network;
+• Policy: addresses the choice and evaluation of policies; • Operations: is concerned with the planning of shipment and
+transportation activities (e.g., capacity planning, service network design, resource allocation and reallocation, storage of freight and (empty) containers, mode and route choice, vehicle routing, management of disruptions, etc.); • Cooperation: is concerned with the evaluation of the strengths and synergies arising from collaborations, cooperation, and coalitions among carriers, among shippers, or between shippers and carriers, with or without participation from institutional authorities; • Technology: refers to the validation of new technologies and the evaluation of their impacts on the intermodal transportation system.
+3.3.3. Objectives This category describes the goals of the model and the metrics
+used to measure and compare the effectiveness of alternatives:
+• Economics: economic evaluation of the simulated operation, which can include several metrics besides operational costs, such as travel time, fuel consumption, vehicle-traveled distance, and charges (e.g., road pricing);
+• Environment: evaluation of the environmental footprint of transportation networks, mainly through greenhouse gas (GHG) and particle emissions and fuel consumption;
+• Performances: metrics related to the quality of the service offered, which can be measured in terms of speed, ﬂexibility, efﬁciency, reliability, and resilience.
+3.3.4. Time horizon Planning activities can be divided (Crainic & Laporte, 1997) into:
+• Strategic planning: long-term planning decisions, which require the highest level of forecasting, investments, and management and which concern the physical structure of the intermodal transportation system, such as the hub and terminal location, usually identiﬁed as network design problems;
+• Tactical planning: medium-term decisions focusing mainly on the eﬃcient allocation and utilization of existing resources to improve the performance of the system;
+• Operational planning: short time decisions, including real-time decisions.
+
+3.4. Simulation Method
+This axis aims to identify the simulation method adopted in the model. It is composed of three categories: Numerical, which speciﬁes numerical simulations, Optimization, which concerns the use of optimization approaches, and Simulation Optimization Relation, which describes the relationship between simulation and optimization.
+3.4.1. Numerical This category denotes simulations conducted numerically with-
+out using optimization methods.
+3.4.2. Optimization In this setting, demand is represented by one or several
+commodity-speciﬁc origin-destination matrices (mode choices may be included in the matrix deﬁnition as well), and the supply side of the transportation system is represented by a multimodal network with provisions for intermodal transfer. Modes are used to model services (e.g., container-based transportation), vehicles, etc. The behavior of the system under various scenarios is then simulated through an optimization network model (a nonlinear model when congestion phenomena are considered) assigning the demand to the network according to a generalized cost (combining, for example, monetary cost, time value, and energy consumption. Strategic Transportation ANalysis model (STAN) (Crainic & Florian, 2008; Crainic, Florian, & Larin, 1994) represents a typical example of this approach.
+The way both approaches work is based on the type of simulation used. The simulation commonly combines the following two categories, concerning their evolution over time and the inclusion of sources of uncertainty.
+• Static or Dynamic. Static simulation does not represent time explicitly but rather enables the evaluation of a system behavior in a steady state. The simulation model describes the relationship between the input and output variables. Different inputs are generated from the probability distributions of a stochastic system to obtain unknown stochastic outputs. The Monte Carlo simulation is an example of a static simulation. On the contrary, Dynamic simulation analyzes the changes in the system state that occur over time. The simulation model describes all of the entities involved and their interactions to evaluate their impact on the entire system. Agent-based simulation is an example of this category, which can be further split into a discrete and continuous simulation.
+• Stochastic or Deterministic. A Deterministic simulation model exactly computes the future states of the system once the input data and initial state have been deﬁned. On the other hand, in a Stochastic simulation, the behavior of the system is not precisely predicted, but it is affected by uncertainty. Thus, the model uses random inputs and produces random output variables to represent and describe the expected behavior.
+Thus, the combinations of the approaches discussed above are as follows:
+• Static-Stochastic; • Static-Deterministic; • Dynamic-Stochastic; • Dynamic-Deterministic.
+3.4.3. Simulation optimization relation This category enhances the classiﬁcation proposed in Figueira
+and Almada-Lobo (2014):
+• Optimization with simulation-based iterations (OSI): one or more complete simulation runs are performed during some iterations of an optimization procedure;
+
+406
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+• Behaviors and interactions: the simulation model is used to reproduce the respective behaviors of several entities and their interactions;
+• Flow: the object of the simulation is the estimation of traﬃc values, including ﬂows of vehicles, freight, containers, etc.;
+• Scenario: a simulation framework is created to set up the scenario to which the optimization procedure is then applied;
+• Event: the simulation is used to reproduce a stochastic event.
+
+Fig. 3. Number of studies selected from each year.
+• Simulation with optimization-based iterations (SOI): one or more complete optimization procedures are performed during a simulation process; the simulation-by-optimization approach is a speciﬁc case of SOI in which a single iteration of the optimization model is performed;
+• Alternate simulation–optimization (ASO): both simulation and optimization run alternately, either to the end or incompletely, with feedback loops in each iteration;
+• Sequential simulation–optimization (SSO): simulation and optimization run sequentially, with either optimization following simulation or the opposite;
+• Simulation (SIM): simulation without any optimization procedure.
+3.5. Scope
+This axis classiﬁes the role of the simulation and includes two categories: simulated objects and simulation objectives.
+3.5.1. Simulated objects This category deﬁnes the main objects of the simulation:
+
+3.5.2. Simulation objectives This category classiﬁes the simulation purpose according to four
+categories:
+• What-if analysis: the objective is to analyze a hypothetical system under some possible/forecasted/imagined scenario as well as to compare two or more system alternatives;
+• Forecasting: the simulation aims to study and evaluate the characteristics of an actual system as well as predict its performance under various conditions/scenarios;
+• Validation: the focus is on the validation of a proposed solution, a new policy, a mathematical model, or a modeling approach;
+• Enhancement: the simulation is combined with optimization to enhance the solution, which usually requires alternate simulation and optimization procedures connected through a performance feedback loop.
+4. Detailed analysis
+Fig. 3 summarizes the number of publications from 2007 to 2017. An exponential increase in the number of published studies applying simulation models to intermodal freight transportation may be observed. The decrease observed for the years 2014 and 2017 may be explained by the fact that the volumes related to very popular conferences (e.g., City Logistics) were scheduled for publication in these years but were not yet indexed.
+Table 1 shows the list of journals where the studies used in this analysis appeared. The list is sorted according to the number of publications and listed in descending order. Procedia - Social and Behavioral Sciences is the most prevalent journal in this
+
+Table 1 Journals in the intermodal freight system simulation literature.
+Journal Name
+Procedia — Social and Behavioral Sciences European Journal of Operational Research Journal of Transport Geography Transportation Research Part B: Methodological Transportation Research Part C: Emerging Technologies Transportation Research Part E: Logistics and Transportation Review Winter Simulation Conference Decision Support Systems Transportation Research Record 24th European Modeling and Simulation Symposium, 8th International Conference on Service Systems and Service Management, Advanced Manufacturing and Sustainable Logistics, Applications of Evolutionary Computing, Computers and Operations Research, Control Engineering Practice, European Transport (Trasporti Europei), European Transport Research Review, EUT Edizioni Università di Trieste, Expert Systems with Applications, Flexible Services and Manufacturing Journal, ICLEM 2010: Logistics for Sustained Economic development — infrastructure, information, integration, INFORMATIK 2007 — Informatik Trifft Logistik, Beitrage der. Jahrestagung der Gesellschaft fur Informatik e.V., International Journal of Physical Distribution and Logistics Management, International Journal of Transport Economics, Journal of Computational Science, Journal of the Eastern Asia Society for Transportation Studies, Eastern Asia Society for Transportation Studies, Journal of Transportation Systems Engineering and Information Technology, Networks and Spatial Economics, Proceedings of the 2011 Summer Computer Simulation Conference, Research in Transportation Economics, Simulation Modelling Practice and Theory, Statistica Neerlandica, Supply Chain Forum: An International Journal, Open Engineering, IFAC Papers OnLine, Transport Policy, Transportation Letters: The International Journal of Transportation Research, Transportation, World Electric Vehicle Journal, WSEAS Transactions on Systems, EURO Journal on Transportation and Logistics, Winter Simulation Conference, Maritime Policy and Management, Cybernetics and Information Technologies, IEEE Transactions on Automation Science and Engineering Total
+
+Count 22 3 3 4 4 3 3 2 2
+1 (43)
+89
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+407
+
+Table 2 Distribution of network modes and combinations.
+
+Modes colrule
+
+Unimodal (46%) Multimodal (11%)
+
+RO
+
+100%
+
+10%
+
+RA
+
+IWW
+
+M
+
+RO RA
+
+40%
+
+RO/RA IWW
+
+RO/RA/M
+
+20%
+
+RO/IWW
+
+RO/IWW M
+
+RO/M
+
+RO/RA/IWW/M
+
+10%
+
+RO RA A
+
+10%
+
+RO RA M IWW A
+
+10%
+
+Intermodal (43%)
+8% 3% 8% 3% 24% 11% 19% 3% 11% 11% 11%
+
+ﬁeld and accounted for 25% of the total publications in the considered period. This ﬁnding can be explained by the number of referred conference proceedings published in this journal (e.g., City Logistics and EWGT). Note that some conferences changed their policy, and their proceedings are currently part of a new journal called Transportation Research Procedia. The European Journal of Operational Research (EJOR), Journal of Transport Geography, and Transportation Research Part B also published several studies on the topic. These four journals accounted for 48% of total publications. On the other hand, in most journals, we found only a single contribution, underlying the extreme clustering of this topic. The journals appearing in Table 1 cover many areas of applications, including economics, computer science, management science, operations research, and transport engineering. This ﬁnding also shows the inter-disciplinary nature of research in the simulation of intermodal freight transportation.
+We now present an analysis of the literature according to the axes and categories of the taxonomy.
+4.1. Network description
+This subsection is dedicated to an analysis of the distribution of the literature according to the different network characteristics.
+4.1.1. Types and modes Table 2 presents the studies sorted by type of network and
+mode. The most analyzed networks are multimodal and intermodal (54%), whereas unimodal networks account for approximately 46% of the studies. All unimodal-network studies address road transportation, as simulation models are proposed to handle emissions and congestion issues in cities. The most studied combinations of modes were road–rail and road–rail–maritime transportation. Hence, roads, studied both in unimodal and multimodal networks, appear to be the most critical mode. In particular, road transportation is the most ﬂexible mode in terms of departure time and routing and is largely involved within with the ﬁrst- and last-mile activities of intermodal transportation systems (Perboli, Rosano, & Gobbato, 2016).
+4.1.2. Geographic extension Fig. 4 shows the distribution of the geographic extension of
+the networks analyzed in the selected literature. The studies principally focused on urban networks (44%) and on Smart City and City Logistics projects in particular (Benjelloun et al., 2010; Perboli et al., 2014a) in recent years. These works introduced new freight distribution models speciﬁcally designed for urban areas and characterized by complex interactions among the considered actors in the literature (Anand, Quak, van Duin, & Tavasszy, 2012; Taniguchi, Thompson, & Yamada, 2012). International and national networks
+
+Fig. 4. Distribution by geographical extension.
+made up lower percentages of the selected studies (24% and 32%, respectively).
+The ﬁgures in Table 3 conﬁrm the previous observation regarding the strong relationship between the analyzed modes and the geographic extent of the network. The studies considering unimodal road transportation constituted 79% of the urban-network literature, which was 30% of the total set of selected studies. Hence, road transportation was the dominant mode of freight distribution studied in the literature, whereas only a few works considered mode combinations (e.g., road–rail Ambrosino and Sciomachen, 2012; Luan, 2010 and road–rail–maritime networks Roorda, Cavalcante, McCabe, & Kwan, 2010).
+The studies at the national level usually considered multimodal or intermodal networks (75%) rather than unimodal networks (25%). The most studied networks were composed of the road–rail–maritime (Dimitriou & Stathopoulos, 2009; Dotoli, Fanti, Mangini, Stecco, & Ukovich, 2010; Fanti, Iacobellis, Georgoulas, Stylios, & Ukovich, 2012; Liedtke & Carrillo Murillo, 2012), road– rail–inland waterways–maritime (Li, Negenborn, & De Schutter, 2015; Samimi, Mohammadian, & Kawamura, 2010), and road– rail–inland waterways (Burgholzer, Bauer, Posset, & Jammernegg, 2013; Macharis, Caris, Jourquin, & Pekin, 2011; Macharis & Pekin, 2009) modes, with a few studies considering a unimodal road network (Anghinolﬁ, Paolucci, Sacone, & Siri, 2011; Arnäs, Holmström, & Kalantari, 2013; Dahl & Derigs, 2011; Joubert, Fourie, & Axhausen, 2010). The road–rail mode was the most analyzed network at the international level (Briano, Caballini, Mosca, & Revetria, 2010; Gromicho, Oudshoorn, & Post, 2011; Ishfaq & Sox, 2011; Sihn, Hillbrand, Meizer, Leitner, & Prochazka, 2010; Sirikijpanichkul, Van Dam, Ferreira, & Lukszo, 2007; Zhang et al., 2008), followed by the road–rail–maritime (Holmgren, Davidsson, Persson, & Ramstedt, 2012; Miller-Hooks, Zhang, & Faturechi, 2012) and road– maritime (Puettmann & Stadtler, 2010; Saeed, 2013; Wang & Meng, 2011) modes.
+4.2. Planning objectives
+This subsection analyzes the literature from the point of view of the objective of the planning process.
+4.2.1. Time horizons and decision objects Fig. 5 shows the distribution of the research efforts dedicated
+to simulating transportation systems according to the time horizon and decision object. Most papers addressed strategic planning (38%), whereas the remaining ones were split between tactical and operational problems (33% and 29%, respectively).
+
+408
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+Table 3 Cross analysis of modes and territory.
+
+Unimodal
+
+Multimodal/intermodal
+
+RO
+
+RA IWW M RO-RA RO-RA-IWW RO-RA-M RO-RA-IWW/M-A RO-RA-A RO-M RO-IWW RO-RA-IWW-M
+
+Urban
+
+30% 0% 0%
+
+0% 2%
+
+0%
+
+National
+
+5%
+
+3% 1%
+
+0% 4%
+
+3%
+
+International 0%
+
+0% 0%
+
+0% 7%
+
+1%
+
+2%
+
+0%
+
+4%
+
+1%
+
+3%
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+1%
+
+1%
+
+4%
+
+1%
+
+0%
+
+0%
+
+0%
+
+Fig. 5. Distribution of decision objects according to the time horizon.
+
+Considering the decision objects, studies addressing the planning of operations accounted for approximately 37% of the total, whereas those investigating policy and infrastructure measures covered approximately 30% and 17% of the total, respectively. Cooperation and technology were less frequently studied decision objects (approximately 10% and 7% of the total, respectively).
+Operation planning problems were principally studied at the tactical and operational levels. The papers within this category addressed the following problem classes:
+• Freight demand and freight ﬂow forecasting (Comi & Nuzzolo, 2014; Joubert et al., 2010; Nuzzolo & Comi, 2014; Russo & Comi, 2012; Zhang et al., 2008);
+• Evaluation of costs and performance associated with different transportation networks and alternative routing (Briano et al., 2010; Dekker, van Asperen, Ochtman, & Kusters, 2009; Elbert & Reinhardt, 2017; McLean & Biles, 2008; Sihn et al., 2010; Yang, Low, & Tang, 2011);
+• Dynamic resource allocation for intermodal freight transportation (Wang, Wang, & Zhang, 2017);
+• Improvement of service level and enhancement of operational eﬃciency (Anghinolﬁ et al., 2011; Sinha & Kumar Ganesan, 2011; Van Duin, Tavasszy, & Taniguchi, 2007);
+• Representation of actors and their logistics decisions (Boussier et al., 2009; Fanti et al., 2012; Page, Knaak, & Kruse, 2007; Roorda et al., 2010; Schroeder, Zilske, Liedtke, & Nagel, 2012);
+• Measurement and maximization of network resilience (Burgholzer et al., 2013; Miller-Hooks et al., 2012);
+• Vehicle routing and variants (Crainic, Mancini, Perboli, & Tadei, 2012; Crainic, Perboli, Mancini, & Tadei, 2010; Gromicho et al., 2011; Kritzinger et al., 2012; Qureshi, Taniguchi, & Yamada, 2012); and
+• Optimization of empty container allocation (Lam, Lee, & Tang, 2007).
+
+The papers comparing different policies, mostly at the tactical or strategic levels, dealt with:
+• Evaluation of new forms of e-grocery services and City Logistics measures in e-commerce (Durand & Gonzalez-Feliu, 2012; Teo, Taniguchi, & Qureshi, 2012);
+• Assessment of alternative urban freight initiatives and policies (van Duin, van Kolck, Anand, Tavasszy, & Taniguchi, 2012; Gonzalez-Feliu, Ambrosini, Pluvinet, Toilier, & Routhier, 2012; Hunt & Stefan, 2007; Suksri & Raicu, 2012; Tamagawa, Taniguchi, & Yamada, 2010; Teo, Taniguchi, & Qureshi, 2014);
+• Analysis of route choice strategies and routing policies (Orozco & Barceló, 2012; Uchiyama & Taniguchi, 2012; 2014);
+• Assessment of policy strategies to develop intermodal services (Andersen, Crainic, & Christiansen, 2009; Baindur & Viegas, 2011; Caris, Macharis, & Janssens, 2012b; Holmgren et al., 2012; Liedtke & Carrillo Murillo, 2012); and
+• Assessment of consolidation strategies and cooperation policies (Andersen et al., 2009; Caris, Macharis, & Janssens, 2012a; Luan, 2010 ).
+Infrastructure studies were mainly undertaken at the strategic level. They included the stochastic location-routing problem (Herazo-Padilla, Montoya-Torres, Munoz-Villamizar, Isaza, & Polo, 2013a), network design (Briano et al., 2010; Dimitriou & Stathopoulos, 2009; Hillbrand & Schmid, 2011), intermodal hub-and-spoke networks (Yang, Yang, & Gao, 2016), hub locations in urban multimodal networks (Ambrosino & Sciomachen, 2012; Ishfaq & Sox, 2011; Sirikijpanichkul et al., 2007; Van Dam, Lukszo, Ferreira, & Sirikijpanichkul, 2007; Vidovic´ et al., 2011; Wanitwattanakosol, Holimchayachotikul, Nimsrikul, & Sopadang, 2010), terminal locations (Macharis et al., 2011; Macharis & Pekin, 2009), and the effect of land bridges (Wang & Meng, 2011).
+A small set of papers investigated cooperation and collaboration. Horizontal cooperation was studied by Dahl and Derigs (2011); Gonzalez-Feliu, Morana, Grau Salanova, and Ma (2013);
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+409
+
+Fig. 6. Distribution according to decision makers.
+
+Gonzalez-Feliu and Salanova (2012); Liu, Yu, Li, and Han (2011), and Saeed (2013), whereas vertical collaboration between trading partners and carriers was analyzed by Chan and Zhang (2011) and Puettmann and Stadtler (2010). Caris et al. (2012a) analyzed the cooperation between inland terminals, and Wisetjindawat, Ito, Fujita, and Eizo (2014) investigated the cooperation between government agencies and logistics companies in disaster relief operations.
+The effect of technology was mainly studied at the tactical and operational levels. The technologies most frequently involved were mobile communication and in-roadway sensors (Patier, David, Chalon, & Deslandres, 2014), tracking technologies (Arnäs et al., 2013), information and communication technologies (Dotoli, Epicoco, Falagario, & Cavone, 2016; Dotoli et al., 2010; Grzybowska & Barceló, 2012; Taniguchi, Yamada, & Okamoto, 2007), and electric commercial vehicle ﬂeets (Boussier et al., 2009; Feng & Figliozzi, 2012 ).
+4.2.2. Decision makers Fig. 6 shows the distribution of papers according to the dif-
+ferent decision makers considered. Clearly, the institutional authorities’ perspective, combined with the facility and infrastructure managers’ perspective, was the most analyzed (42%), with the remaining 58% being equally split between carriers and shippers.
+The predominance of institutional authorities may be traced to their increasing involvement in addressing environmental and city-related issues. With respect to the former, note that following the ratiﬁcation of the Kyoto Protocol, institutional authorities have introduced numerous projects since 2005 to promote more environmentally responsible freight transportation, supporting intermodal and collaborative transportation systems. Regarding the latter, a key role is played by the local governments within City Logistics and Smart Cities concepts and projects aiming to reduce negative transportation impacts and improve security and quality of life (Lindholm, 2012). This ﬁnding was evidenced by the prominence given to urban transport in studies funded under major EU framework programs, such as the comprehensive policy framework on urban transport presented in the Green Paper (Commission of the European Communities, 2007), the Action Plan on Urban Mobility (Commission of the European Communities, 2009), and the Roadmap to a Single European Transport Area in the White Paper (Directorate General for Mobility & Transport, 2011). Papers
+
+Fig. 7. Trends in studies considering emission reductions
+addressing institutional authority efforts strongly focused on the freight distribution within urban areas (about 74%). They studied the introduction of new policies (approximately 48%), the interactions within the freight transportation system, and the estimation of freight ﬂow (approximately 24%).
+Papers addressing the facility and infrastructure managers’ perspectives were mainly concerned with the infrastructure and policy ﬁelds (23% and 38%) in a national context (42%). The carrier perspective was principally considered within an urban context (57%) and principally dealt with operations planning (39%) and technology (18%) issues. Finally, shippers were considered as decision makers in all three network subcategories, with the problems addressed focusing on the operations planning subcategory (35%).
+4.2.3. Objectives With respect to the simulation objectives, 49% of the papers
+addressed the reduction of operating costs, 23% addressed emission reductions, and 28% addressed the improvement of service performance. Focusing on emission reductions, the evolution in the number of studies considering the topic is interesting, as illustrated in Fig. 7, which shows a signiﬁcant increase in 2012-2013. After this peak, the number of papers explicitly dealing with the emissions reduction goes back to the same levels of the the period 2007-2010. This behavior, in our opinion, is not a sign of a less focus on emissions reduction, but is related to the introduction of a more global vision of sustainability in transportation mixing
+
+410
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+Table 4 Emission reductions in relation to the other categories.
+
+Geographic extension
+
+International 15%
+
+Modes Time horizons Decision makers Decision objects
+
+RO 70% Strategic 44% Carrier 44% Infrastructure 19%
+
+National 19%
+RA 19% Tactical 30% Shipper 19% Policy 33%
+
+Urban 67%
+IWW 4% Operational 26% Inst. Authorities 22% Cooperation 4%
+
+MA 7%
+FI Managers 15% Technology 7%
+
+Operations 37%
+
+economic, social and environmental aspects. Table 4 shows that emission reductions were considered when addressing urban areas (67%) and road transportation (70%). Institutional authorities and carriers appeared most often as decision makers in papers aimed at the environmental impacts of freight transportation (22% and 44%, respectively). The institutional authorities were particularly concerned with new policies (33%) and operations planning (37%) at the strategic and tactical levels.
+The environment impact of freight transportation was considered in a multitude of different ways. A set of papers indirectly evaluated this impact by measuring, for example, traﬃc reduction (Ambrosino & Sciomachen, 2012), road usage, traveled kilometers, the ﬁll rate of trucks, or the number of trucks needed (Arnäs et al., 2013; Durand & Gonzalez-Feliu, 2012; McLean & Biles, 2008; Muravev & Rakhmangulov, 2016; Nuzzolo & Comi, 2014). Other papers directly estimated GHG emissions; (Gonzalez-Feliu & Salanova, 2012) and (Hrusovsky, Demir, Jammernegg, & Woensel, 2016) considered emissions in CO2 equivalent units, (Hillbrand & Schmid, 2011; Holmgren et al., 2012), and (Sihn et al., 2010) measured CO2 emissions in tons, and (Tamagawa et al., 2010; Teo et al., 2012; 2014), and (van Duin et al., 2012) focused on NOx emissions.
+Emissions metrics were usually mixed with other metrics. For example, Crainic et al. (2010) proposed an optimization model for the Two-Echelon Vehicle Routing Problem (2E-VRP), whose objective function aimed at reducing generalized travel costs, composed of ﬁxed, operational, and environmental costs. In Teo et al. (2012) and Teo et al. (2014), the authors considered different performance measurements to evaluate the short-term effect of distance-based road pricing, including carrier and shipper costs; the number of trucks; the distance traveled; the number of complaints; and SPM, CO2, and NOx emissions. Similarly, (Tamagawa et al., 2010) presented a methodology for evaluating City Logistics measures considering both economic aspects (e.g., toll revenues, transport proﬁts of freight carriers, and transport costs of shippers) and environmental aspects (e.g., total NOx emissions and the number of zones in which NOx emissions exceeded the environmental limit).
+4.3. Simulation method
+This subsection focuses on the different aspects of the simulation methodology used, providing insights about the simulation types adopted in the literature and how the simulation process is mixed with optimization models.
+4.3.1. Numeric or optimization Fig. 8 presents the distribution of the studies according to the
+methods that they applied. Simulation combined with optimization was most frequently applied (69%), and numerical simulation accounted for the remaining 31% of the papers.
+Dynamic simulation was proposed in approximately 66% of the papers. Among these, 43% focused on urban areas, 41% on national areas, and 16% on international networks.
+
+Fig. 8. Distribution of the simulation methods.
+Fig. 9. Composition of studies with dynamic simulation by year.
+Fig. 9 shows the number of papers that applied dynamic simulation to intermodal freight transportation from 2007 to 2017. Conﬁrming the previous result, a large portion of the total published papers studies that applied simulation to the topic of interest (dotted line) adopted dynamic simulation models (bars). Among these papers and along the considered time period (with the exception of the years 2010 and 2016), we observe more use of dynamic simulations combined with optimization models than of numerical simulations.
+Deterministic simulation is still very present (slightly less than 50% of the studies). Yet, as illustrated in Fig. 10, this presence is currently diminishing, stochastic approaches appearing more often. Notice that the peak of 2012 corresponds to a ﬂurry of studies targeting issues in urban last mile and City Logistics.
+We complete the analysis of the simulation methods applied to intermodal freight transportation systems according to a more global vision. Table 5 presents the distribution of the literature for each simulation method resulting from the combination of the Numerical/Optimization, Static/Dynamic, and Deterministic/Stochastic approaches. The main outcome highlighted that a subset of papers
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+411
+
+Fig. 10. Number of papers with stochastic/deterministic simulations per year.
+
+Table 5 Distribution of the simulation methods.
+
+Optimization
+
+Numerical
+
+Deterministic
+
+Static Dynamic
+
+9% \ 12% 10% \ 17%
+
+Stochastic
+1% \ 10% 9% \ 30%
+
+(30%) adopted stochastic and dynamic simulations combined with optimization methods, whereas numerical simulations were mainly dynamic and deterministic (10%). Furthermore, the results that referred to static simulation pointed out that it was mainly applied as an experimental tool for validating new optimization models or procedures, either by reproducing a stochastic phenomenon or by generating hypothetical scenarios. For the latter, each generated scenario represented a static system because, once determined, it did not change during the execution of the procedure. Hence, the main role of the static simulation was to produce several combinations of the input data for testing the procedure under study. However, the low values indicate that very few models were validated by means of simulations, limiting their validity in some cases.
+Static simulation usually created scenarios by randomly generating values either from a speciﬁc distribution, which was supposed to ﬁt the real data, or by applying a Monte Carlo simulation. For example, Andersen et al. (2009) applied simulation during the experimental phase to observe the behavior of the proposed model and to analyze the impact of possible modiﬁcations in external and internal policies. In addition, starting from statistical data, the authors introduced a random number generator based on a uniform distribution to study the uncertainty about future demand that arises throughout the planning horizon. Another example comes from Yang et al. (2011), where simulation was used to represent the variability of the transit time of an intermodal route in experimental tests. Authors assumed that transit times follow a Beta distribution, which is a popular choice for modeling time distributions thanks to its versatility in deﬁning the shape of the time distribution. Several other papers applied static simulations in similar contexts (e.g., Anghinolﬁ et al., 2011; Crainic et al., 2012; Gromicho et al., 2011; Ishfaq & Sox, 2011; Kritzinger et al., 2012).
+Several papers used a Monte Carlo simulation as their main tool. Tadei, Perboli, and Perfetti (2017) proposed a deterministic approximation to the multi-path traveling salesman problem with stochastic travel costs and applied the Monte Carlo method for the validation of their approximation. The Monte Carlo simulation used random sampling and statistical modeling to estimate the distribution of travel times in the city of Turin. Similarly, (Wang & Meng, 2011) proposed a mathematical model to estimate the market share of Asian ports from a network level, considering the intermodal route choices of intermodal operators.
+
+They applied Monte Carlo simulations to estimate the port market share estimation model because of the stochastic nature of the route choice. Miller-Hooks et al. (2012) dealt with the measurement and maximization of network resilience when forecasting possible future disruptions. The authors applied a Monte Carlo simulation for the generation of disaster realizations based on assumed probability distribution functions for event occurrences and consequences. Wanitwattanakosol et al. (2010) proposed a multiple criteria decision-making model based on a combination of a fuzzy stochastic analytic hierarchy process (AHP) and data mining techniques to select a suitable freight logistics hub. The authors employed Monte Carlo simulation to handle the uncertainty in the global AHP weights and to allow the investigation of whether the differences among the decision alternatives were statistically signiﬁcant. This type of analysis provided more information for decision makers to make more precise discrimination among the competing alternatives. Finally, (Martínez-López, Munín-Doce, & García-Alonso, 2015) presented a multi-criteria decision method to identify the most suitable motorways of the sea, with speciﬁc attention paid to the freight ﬂows between France and Spain. Through a Monte Carlo simulation, the authors conducted a sensitivity analysis to evaluate the inﬂuence on the results of the forecast assumed, and they constructed a multi-criteria decision matrix.
+A subset of static simulation papers applied game theory to understand the interplay among multiple actors. Engevall and Dahlberg (2013) applied cooperative game theory for the analysis of the cost impact on different actors (municipality and shippers) in a city distribution center system under different scenarios. Liu et al. (2011) focused on behavior analysis of the competition between separate carriers in the duopoly intermodal freight transport market. A two-stage dynamic game model with complete information on cooperative investment and price competition strategies was formulated based on game theory. Saeed (2013) applied a two-stage game to ﬁnd the best form of cooperation that allowed a win-win situation for all of the actors involved. The authors considered three freight forwarders: two truck-operating freight forwarders and one freight forwarder with its own ship. The resulting best form of cooperation was that between a large truck-operating company and the ship-operating company. According to the simulation results, this cooperation should generate larger payoffs in the form of proﬁts not only to the members of the coalition but also to the freight forwarders.
+Finally, a static simulation was applied by Macharis and Pekin (2009) to show the effects of different policy measures for the stimulation of intermodal transport in Belgium by applying a location analysis model based on a geographic information system (GIS). After the creation of a GIS network connecting the port of Antwerp, intermodal terminals, and end-consumer locations using the road, rail, and inland waterways modes, the model compared the price of intermodal transport with that of unimodal road transport.
+A large subset of simulation by optimization papers considered demand models for urban freight transportation. Traditionally, demand models were developed to estimate the number of trips undertaken by people, usually back and forth between their residences and workplaces during rush hour in a city, and were based on the so-called four-step approach: 1) trip generation to determine the number of origin and destination trips in each zone; 2) trip distribution to determine the number of trips between origindestination pairs; 3) mode choice to compute the proportion of trips between origin-destination pairs by transportation mode; and 4) the assignment step, which simulated the behavior of the system by assigning the demand for origin-destination trips, eventually by mode, to the network representation, yielding the ﬂow traﬃc on the network. Applied to freight, such models involved
+
+412
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+signiﬁcantly more complex modal network representations as well as the deﬁnition of commodities groups (Crainic & Florian, 2008; Crainic, Florian, Guélat, & Spiess, 1990; Guélat, Florian, & Crainic, 1990 ).
+There is, however, a rather widespread consensus in the scientiﬁc community that, for people and, even more so, for freight, the traditional models do not suitably account for the actual decision processes generating the demand for travel. More disaggregated models are therefore proposed, which is reﬂected in the simulation literature. Thus, (Gentile & Vigo, 2013) claim that traditional approaches to estimate freight demand models seem to be more suitable for regional and national planning than for the urban context due to, among other things, the somewhat arbitrary aggregation of many different economic activities into a few broad categories. The authors proposed new generation and distribution models of freight movements in urban areas disaggregated by commodity type (e.g., fresh food, dry, frozen, and hanging garments). Comi and Nuzzolo (2014) underscored the importance of considering end-consumer choices because, according to the authors, such choices undoubtedly affect freight distribution ﬂows. Hence, they presented a modeling system to simulate urban freight ﬂows with combined shopping and restocking demand models. The set of models involved the simulation of end-consumer choices and restocking processes related to the type of retail activities. A similar observation was made by Russo and Comi (2012). They argued that goods arrive in a city to satisfy end consumer demands (pull movements), whereas, at the regional scale, the producer seeks to anticipate consumer demand, and the freight arrives on the market before it is required (push movements). Hence, the authors developed a framework for the simulation of goods movements at the urban scale to analyze the relationships between end consumers and other concerned decision makers (e.g., producers, wholesalers, and retailers). Gonzalez-Feliu et al. (2012) also developed a simulation framework using an interactive trip substitution module to model end consumer movements, the links between these movements and inter-establishment movements, and the integration of these ﬂows. In a similar vein, (Nuzzolo & Comi, 2014) argued that the existing models of urban freight demand forecasting were mainly developed to simulate only some aspects of urban freight transport and, thus, are unable to forecast all of the numerous effects of implementing urban traﬃc and transportation measures. Therefore, they presented a modeling approach that focused on the relationships among city logistics measures, actors, and choice dimensions in the form of a multi-stage model considering a discrete choice approach for each decision level. Durand and Gonzalez-Feliu (2012) focused on e-grocery and applied a simulation-by-optimization approach to three scenarios related to e-grocery distribution developments to identify and analyze the effects of new forms of proximity delivery on household shopping trips.
+The papers mentioned above focused on demand, estimating urban goods movements in an aggregated manner. However, there are several examples of micro-simulation models of urban goods movements representing explicit tours and individual shipments (Hunt & Stefan, 2007; Joubert et al., 2010; Liedtke, 2009; Wisetjindawat, Yamamoto, & Marchal, 2012). Hunt and Stefan (2007) proposed a tour-based micro-simulation of individual vehicle movements combined with a network equilibrium, which considered the congestion on links. We will further discuss (Joubert et al., 2010; Liedtke, 2009), and (Wisetjindawat et al., 2012) in the next section because they modeled freight systems using multi-agent approaches.
+A subset of papers proposed models for more extended geographical areas. Liedtke and Carrillo Murillo (2012) developed a logistics and transport market equilibrium model that, combined with a hierarchical choice model mapping the decisions of ship-
+
+pers/forwarders, covered the interactions between the demand for freight transport and the infrastructure supply, including potential investors in the intermodal infrastructure. The model was used to analyze the welfare effects of two policies that could promote intermodal services, that is, investment grants for terminal operators and the internalization of external costs. Zhang et al. (2008) developed a dynamic intermodal multi-product freight network simulation-assignment equilibrium model applied to a largescale intermodal rail network. In their model, shipper decisions were disaggregated at the individual shipment level using a dynamic micro-assignment methodology in which a joint mode, path, service, and carrier choice was made. Puettmann and Stadtler (2010) tested the idea that collaboration reduces operational costs on a chain with one multimodal operator and two carriers in charge of pre-haul and end-haul drayage. In the explored collaboration scheme, the three parties did not exchange any information and planned their own operations. However, they iteratively exchanged proposals, and the resulting costs were compared to those in the solution without coordination. The authors included stochastic demand in their scheme, which called for the adaptation of plans, because of the time lag between the departure and the arrival of orders. Vidovic´ et al. (2011) addressed the problem of optimally locating intermodal freight terminals in Serbia. They combined a multiple-assignment p-hub-network design with simulation, which was used as a tool to estimate the intermodal transport ﬂow volumes caused by the unreliability and unavailability of speciﬁc statistical data. The simulation was also used as a method to analyze, in quantitative terms, the time, economic, and environmental effects of different scenarios concerning the intermodal terminal development.
+As discussed above, dynamic simulation was proposed in a relevant proportion of papers. Several studies applied multi-agent simulation (MAS) to urban areas. Suksri and Raicu (2012); Tamagawa et al. (2010); Taniguchi et al. (2007); Teo et al. (2012); 2014), and Roorda et al. (2010) presented different methodologies to evaluate City Logistics measures combining multi-agent approaches and learning models to simulate the dynamic behavior of urban stakeholders. All of them simulated the dynamic behavior of freight carriers, retailers or shippers, residents, transport planners, and local authorities. Hence, citizens and local authorities were considered as actors and decision makers who react to carriers and shippers’ decisions. The citizens complained to the local authorities if the negative impact of freight transportation exceeded their tolerance limits, and the local authorities were accountable for the wellbeing of the residents. Their aim was to minimize the level of the residents’ dissatisfaction as well as to decide whether they should implement new urban freight distribution measures in the areas. However, there are some examples of MAS applied to urban areas that did not consider these two types of decision makers. Schroeder et al. (2012) applied micro-simulation and agent-based approaches for transport policy analysis, but they considered only two actors, transport service providers, and carriers, under different traﬃc conditions and policy measures. Other MAS applications to urban areas were presented by van Duin et al. (2012) and Page et al. (2007). van Duin et al. (2012) evaluated the dynamic usage of urban distribution centers, and Page et al. (2007) modeled city courier services to study alternative logistic structures from ecological, economic, and social points of view. Boussier et al. (2009) and Patier et al. (2014) applied MAS to model the management process of delivery area booking while also considering car drivers. Finally, (Bakhtadze et al., 2016) introduced a systematic approach to MAS supply chain dynamic organization and the management of motor vehicle traﬃc in the case of a swap body for urban and interurban transportation.
+Only one paper applied discrete event simulation to reproduce urban freight transportation, (Ambrosino & Sciomachen, 2012). In
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+413
+
+this study, the authors developed an algorithm to solve the problem of locating hubs for freight mobility in urban and suburban areas, and a discrete event simulation model implemented in Witness 2008 was applied to validate the solution under different operational scenarios. Finally, (Uchiyama & Taniguchi, 2012) and (Uchiyama & Taniguchi, 2014) proposed an evolutionary game theory approach. The approach considered a route choice model considering travel time reliability and traﬃc impediments, including traﬃc accidents.
+MAS models applied at the national and international levels were proposed by Baindur and Viegas (2011); Burgholzer et al. (2013); Holmgren et al. (2012); Joubert et al. (2010); Liedtke (2009); Samimi et al. (2010), and (Sirikijpanichkul et al., 2007). These models investigated different issues from the previous set of MAS models. Public policy evaluations were performed by Baindur and Viegas (2011) and Holmgren et al. (2012). Baindur and Viegas (2011) presented an agent-based simulation model to understand the impacts of different policy interventions proposed by the European Commission and business strategies by intermodal operators to encourage modal shifts from road to maritime-based intermodal services on a given trade corridor. Holmgren et al. (2012) developed TAPAS, a model composed of two connected layers. One layer simulated physical activities and passive entities (e.g., vehicles, production facilities, and transportation infrastructure). The other layer simulated the decision making and interactions between the actors (e.g., the transport-chain coordinator, product buyer, transport buyer, transport planner, production planner, and customer). Similarly, (Liedtke, 2009) developed a commodity transport model for a multi-national context consisting of a micro-behavior simulation with an agent-based approach assessing the effects of behavior-oriented transport policy measures while considering complex logistics reaction patterns. Burgholzer et al. (2013) analyzed the impact of disruptions in intermodal transport networks by developing a micro-simulation-based model. Samimi et al. (2010) proposed an activity-based framework of freight demand modeling in which an individual ﬁrm or a group of ﬁrms with similar characteristics is the main actor. Finally, (Joubert et al., 2010) used an agent-based approach to generate commercial activity chains to understand the effect that the inclusion of commercial vehicles has on private cars.
+More DES models were proposed for national and international settings than for cities, in particular, by Arnäs et al. (2013); Caris et al. (2012a); 2012b); Dekker et al. (2009); Dotoli et al. (2010); Fanti et al. (2012); Hillbrand and Schmid (2011); Lam et al. (2007); Macharis et al. (2011); McLean and Biles (2008); Meng and Wang (2011); Sihn et al. (2010); Sinha and Kumar Ganesan (2011), and Di Febbraro, Sacco, and Saeednia (2016). The simulations in these papers aimed to reproduce a process and the movements of orders through the physical network rather than the dynamic behavior of the decision makers. Thus, (Arnäs et al., 2013) reproduced the shipment process to analyze how in-transit services offered to customers may constitute a platform for hybrid shipment control. Caris et al. (2012b) introduced a DES model, named SIMBA, aimed to support decision making in intermodal barge waterway transport, and they used the model to analyze the behavior of the system under various network conﬁgurations. Applications of SIMBA were reported by Caris et al. (2012a) for the evaluation of the potential of cooperation mechanisms previously selected by a service network design model in a corridor network as well as by Macharis et al. (2011) for the analysis of the impact of a new intermodal barge terminal on the Belgian waterways network. McLean and Biles (2008) presented a DES model of a container liner (maritime) shipping network considering multiple service routes and schedules. Reproducing shipping activities, container ship operations, and intermodal container movements, the model aimed to evaluate the operational costs and performance as-
+
+sociated with liner shipping as well as the effect of the individual service schedules on the overall system. Focusing on the same segment of the industry, (Meng & Wang, 2011) proposed a DES model to assist in decision making for container carriers and port operators in a competitive context. Implemented in ARENA, the model yields predicted container shipment demand for each carrier and throughput for each port. Dotoli et al. (2010) focused on motor carriers and presented the timed Petri net modeling technique to describe their operations and the movements of trucks within an intermodal transportation system. The model structure was modular with a top-down approach. Each module reproduced a subsystem of the network: truck terminals, highways, railways, ports, and ships. The model was applied to evaluate the effect of the introducing a new Information and Communication Technology (ICT).
+Dekker et al. (2009) simulated a company’s supply chain with a DES model from the (stochastic) order generation process to the production and distribution processes to test the use of temporary storage offered by intermodal transshipment points for the positioning of stocks of fast-moving consumer goods. Additionally, taking a logistics-network perspective, (Hillbrand & Schmid, 2011) and (Sihn et al., 2010) designed a DES simulation and evaluation model to evaluate multimodal logistics concepts (e.g., pointto-point transportation, consolidation terminals, and milk runs) by combining individual logistics building blocks (e.g., a factory, a transshipment center, etc.). Luan (2010) presented a systemdynamic and continuous simulation model to analyze the advantages of freight consolidation. The analysis showed that freight consolidation tended to increase the capacity utilization of a single vehicle, the vehicle loading ratio, and the freight proﬁt. Note that this study included the only example of a model based on the system-dynamic approach.
+DES models were also proposed as components of more comprehensive solution methods. Thus, (Lam et al., 2007) proposed a linear approximation method under the temporal difference learning framework to address a stochastic model for a simple twoports two-voyages system. The algorithm required a discrete event simulation model for updating the predicted parameters and average cost. Herazo-Padilla, Montoya-Torres, Munoz-Villamizar, Isaza, and Polo (2013b) presented a similar approach considering the stochastic version of the location-routing problem. A hybrid solution procedure based on ant colony optimization and a discreteevent simulation was proposed. Fanti et al. (2012) inserted a DES model in a decision-support system for tactical and operational decision making within intermodal transportation networks. The DES model mimed the system and applied the optimization strategies proposed by the optimization module. The model also provided performance measures. Similarly, (Sinha & Kumar Ganesan, 2011) considered a typical container business operation problem and deployed a simulation optimization technique to analyze several opportunities to improve the overall system performance. The DES model therein measured the performance of the optimization technique based on different KPIs, including ﬂeet size, unmet demand, service level, and utilization.
+4.3.2. Simulation-optimization relationship Simulation with optimization-based iterations (SOI) was the ap-
+proach used by the largest (40%) group of studies considered in this analysis. Recall that, in the SOI approach, the optimization procedures run within a simulation framework. Accordingly, Macharis et al. (2011) evaluated different policy measures to stimulate intermodal transport in Belgium with a GIS-based simulation model, which applied Dijkstra’s algorithm to compute the shortest paths and associated transport costs from the port of Antwerp to Belgian municipalities via intermodal terminals. Wisetjindawat et al. (2014) developed an evaluation model for relief operations in response to the three most likely earthquake scenarios to affect the
+
+414
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+Aichi prefecture. The framework included four steps: initial assumptions, estimation of the level of damage, estimation of the number of victims, and delivery of relief supplies. A Vehicle Routing Problem (VRP) was applied within the last step to estimate the optimal level of resources (e.g., the number of drivers, number of trucks, and expected fuel consumption) to dedicate to the operation. Another example was proposed by Teo et al. (2014), in which an agent-based model included an exact solution method to solve the vehicle routing problem of the carriers’ delivery jobs. The model was used to evaluate the short-term effect of distance-based road pricing on the major stakeholders, including carriers, shippers, administrators, and customers. Approximately 50% of the SOI approaches were applied within a multi-agent framework to simulate the actors’ behavior (Baindur & Viegas, 2011; Burgholzer et al., 2013; van Duin et al., 2012; Liedtke, 2009; Page et al., 2007; Patier et al., 2014; Roorda et al., 2010; Samimi et al., 2010; Schroeder et al., 2012; Suksri & Raicu, 2012; Taniguchi et al., 2007; Teo et al., 2012; 2014).
+The sequential simulation-optimization approach was considered in 22% of the papers(Ambrosino & Sciomachen, 2012; Anghinolﬁ et al., 2011; Caris et al., 2012a; Crainic et al., 2012; Feng & Figliozzi, 2012; Gromicho et al., 2011; Herazo-Padilla et al., 2013a; Hrusovsky et al., 2016; Ishfaq & Sox, 2011; Kritzinger et al., 2012; Macharis et al., 2011; Miller-Hooks et al., 2012; Qureshi et al., 2012; Tadei et al., 2017; Vidovic´ et al., 2011; Wanitwattanakosol et al., 2010; Yang et al., 2011; Zhang et al., 2008). Ambrosino and Sciomachen (2012) illustrates this class of approaches. The authors considered the problem of locating hubs for freight mobility in urban and suburban areas, with an application to the freight multimodal network of the city of Genoa. The solution was validated using a discrete event simulation model. The model analyzed the freight ﬂows in the city under different operational scenarios with and without the selected platforms. A second illustration is the work of Miller-Hooks et al. (2012), which formulated the problem of measuring the network resilience level and determining the optimal set of preparedness and recovery actions by developing a two-stage stochastic program. Monte Carlo simulation was employed to generate the disaster realizations. The integer L-shaped method was then applied.
+A set of papers adopted alternate simulation-optimization techniques to analyze several opportunities and improve overall system performance (Fanti et al., 2012; Grzybowska & Barceló, 2012; Lam et al., 2007; Orozco & Barceló, 2012; Sinha & Kumar Ganesan, 2011; Sirikijpanichkul et al., 2007; Tamagawa et al., 2010). These approaches, also identiﬁed as hybrid approaches because of the complementarity of the two models, integrate a feedback loop between the optimization and simulation models, the former selecting a set of candidate variables based on the output of the latter. For example, Fanti et al. (2012) described an optimization model connected by a web service to a simulation module (implemented in ARENA). The mechanism was as follows: the optimization algorithms proposed solutions that were sent to the simulation module, which applied the proposed solutions, matching them to the current state of the system. The simulation outputs thus evaluated the effects of the proposed solutions on the system, and they were then sent back to the optimization model. Finally, the optimization model evaluated the system performance and provided a new set of candidate variables to the simulation model until the simulation outputs led to a satisfactory system performance. The set of candidate variables was selected at this point. This approach is highly interesting because it allows an automatic re-planning of values proposed by the optimization model. Furthermore, the simulation model here has two important objectives: the forecasting of system performance and the improvement of the optimization model solution. A similar approach was proposed by Sinha and Kumar Ganesan (2011). The model in this study aimed to manage container
+
+business operations with heterogeneous customer demand and service priorities under an uncertain environment. The problem was based on an optimization model where the objective function was estimated using a function of the stochastic simulation output. The optimization engine selected a set of values that were used as inputs to the simulation model. The optimization model selected the next trial solution based on the KPIs computed by the simulation until the predeﬁned satisfaction criteria were achieved or the desired level of improved output was obtained. As in the previous case, this simulation model was based on a discrete-event simulation technique to evaluate the system performance in terms of increased proﬁt and demand fulﬁllment rate under various scenarios. Sirikijpanichkul et al. (2007) developed a model for the evaluation of road-rail intermodal freight hub location decisions. The modeling process began with an analysis of potential hub location sites using a set-covering problem. The result was a set of scenarios of the candidate hub locations. The screened options were then transmitted to the land-use allocation and transport network model as input data. Next, the hub and network outputs of each option were calculated. These output data were then fed into individual stakeholders’ objective functions in the multi-objective evaluation model. The model determined if the solution was mutually satisfactory for every player by considering the results of every individual objective function. If so, the location choices became the outcome; otherwise, feedback was provided to re-select a new set of screened hub location options. The process was iteratively repeated until the ﬁnal solution was achieved.
+Finally, 30% of the papers applied simulation without any optimization procedure (Arnäs et al., 2013; Boussier et al., 2009; Briano et al., 2010; Caris et al., 2012b; Chan & Zhang, 2011; Comi & Nuzzolo, 2014; Dotoli et al., 2010; Durand & Gonzalez-Feliu, 2012; Gentile & Vigo, 2013; Gonzalez-Feliu et al., 2012; Hillbrand & Schmid, 2011; Holmgren et al., 2012; Hunt & Stefan, 2007; Joubert et al., 2010; Luan, 2010; McLean & Biles, 2008; Nuzzolo & Comi, 2014; Nuzzolo, Crisalli, & Comi, 2012; Saeed, 2013; Sihn et al., 2010; Wang & Meng, 2011; Wisetjindawat et al., 2012). One-third of these papers dealt with freight demand models for estimating urban freight transport ﬂows. They applied simulation by optimization to estimate the different O–D matrices (e.g., shopping mobility O–D matrices, restocking quantity O–D matrices, delivery O–D matrices, and restocking vehicle O–D matrices). The remaining two-thirds proposed simulation models to evaluate the effects of policy measures on the performance of the transport network (34%), compare several logistics organizations and service schedules (40%), evaluate the effects of new technologies (13%), and compare different network designs (13%). These papers applied DES in 46% of the cases and simulation by optimization in 34%.
+4.4. Scope
+We complete the literature analysis with the simulation object and objectives.
+4.4.1. Simulated object Fig. 11 presents the objects simulated in the selected literature
+and the corresponding distribution of papers. Simulation is usually applied to reproduce the behaviors and interactions between actors (47%). Approximately 22% of the studies used simulation to forecast ﬂows and 25% to reproduce scenarios. Only 6% of the studies applied simulation to represent an event.
+Behaviors and interactions were mainly simulated by dynamic simulation (84%) applying MAS (47%), DES (28%), and game theory (6%). Furthermore, behaviors and interactions were modeled by applying optimization with the assumption that each actor was rational and acted according to his objective. Hence, the majority
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+415
+
+Fig. 11. Distribution of papers according to the objects simulated.
+
+Fig. 12. Distribution of the simulation objectives.
+
+of these papers (50%) applied an SOI combination where the optimization methods were included in the simulation frameworks.
+From the geographic extension point of view, 48% of the studies in this group was concerned with urban areas, whereas the remaining 52% was split between national and international geographic coverage (33% and 20%, respectively). Focusing on the decision makers, institutional authorities were those that principally studied behaviors and interactions (44%), followed by carriers (31%) and shippers (25%). Finally, behaviors and interactions were principally considered when evaluating policies (47%), logistics services (30%), the building of infrastructure (19%), and cooperation mechanisms (19%).
+Flows were usually estimated by simulation by optimization (72%), whereas DES was used in only 28% of papers. Simulation was also usually applied alone to forecast the ﬂows. All user equilibrium models are included in this category. From the geographic extension point of view, 61% of the papers estimating ﬂows were concerned with urban areas, 33% considered the national level, and 6% had an international geographic range. Focusing on decision makers, institutional authorities were the most interested in ﬂow forecasting (68%), followed by carriers (28%) and shippers (11%). Finally, ﬂows were principally forecasted when evaluating logistics services (40%), policies (20%), and infrastructure building (18%).
+With respect to the simulation of a static scenario, the simulation represented the framework of optimization methods when various policies were applied. Hence, the optimization procedure was run once the scenario was set up. This was a typical SSO combination, which occurred in 50% of the papers simulating static scenarios. The SOI approach was applied in 17% of the cases.
+Only a few papers applied simulation to reproduce complex micro-events. For example, Andersen et al. (2009) used it to represent more accidental demand, and Orozco and Barceló (2012) randomly generated different events (e.g., new customer calls) during the simulation. Qureshi et al. (2012) presented a micro-simulationbased evaluation of an exact solution approach for the vehicle routing problem. The simulation reproduced the traﬃc network under normal conditions and conditions in which a stochastic trafﬁc incident event occurs, thereby changing the travel times. A stochastic event was considered when simulating freight distribution services (80%), and it was reproduced applying a DES and distribution approach.
+4.5. Simulation objectives
+Fig. 12 shows that most studies used simulation to compare two or more alternatives. Furthermore, 42% of the papers proposing what-if analysis investigated the behavior and interactions between several actors in the system. The what-if analysis was performed using the SOI (48%) and SIM (43%) approaches.
+In addition, 28% of the studies applied simulation to validate an optimization model, an approach, or a solution. This validation was generally performed with the SSO approach (about 53%). The simulation reproduced the scenarios, evaluating alternatives to demon-
+
+strate the eﬃciency and applicability of the proposed optimization model.
+Approximately 19% of the studies applied simulation to forecast the future behavior of an existing system. This category included all freight demand models.
+Finally, approximately 11% of the studies applied simulation to enhance a solution proposed by optimization models. The approach used to improve the solutions was the ASO approach. The feedback loop between the two models allowed the improvement of the solutions according to the simulation outputs.
+5. General trends and research directions
+This analysis included a large set of papers published in scientiﬁc journals and conferences within different disciplines. This is a conﬁrmation of the multidisciplinary nature of applications to freight transportation, involving computer science, mathematics, transportation engineering, management science, and economics. However, a concentration of the papers was published in Procedia - Social and Behavioral Sciences. The proceedings of highly important international and European conferences on transportation (City Logistics Conference and EWGT) are, in fact, published in this journal, thereby making it the reference journal for simulation applications to intermodal freight transportation. Conference papers are the main means of dissemination for the actual projects. This dichotomy and the high importance placed on regular papers disregard applications and might push young researchers to prefer theoretical papers to projects to support their careers.
+Researchers have increasingly studied the urban context as well as the environment, with most analyses having the reduction of GHG emissions as ﬁnal objective. Environmental aspects were mainly considered in urban areas , either directly or indirectly by means of generalized costs, e.g., measuring traﬃc reduction, road occupancy, and traveled kilometers in CO2 equivalent units. Only a few papers directly estimated GHG emissions by measuring CO2 or NOx emissions in tons. Furthermore, very few papers proposing a multi-criteria approach considered different metrics for the comparison of potential alternatives. It would be interesting to integrate simulation and multi-criteria analysis because of the multicriteria nature of the urban intermodal transportation system. Almost all papers proposing new policies and solutions for freight distribution within cities considered trucks or trucks and electric vans only. Hence, while intermodality appears very successful for interurban, national, and international networks, urban freight distribution seems currently to be analyzed from an unimodal, road transportation, with few, if any, interactions with the surrounding intermodal transportation.
+An interesting result is the role of institutional authorities as decision makers. They appear to be very active and interested in the improvement of freight distribution within urban areas, particularly by reducing the environmental impact. This ﬁnding may be a consequence of the direct involvement of the public sector in smart city and city logistics projects. On the other hand, the studies insist on an operational perspective, while just a few evaluate
+
+416
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+the policy impacts on the overall system over a long time horizon. Moreover, no signiﬁcant presence of public authorities as decision makers was observed in the national context.
+From a modeling point of view, dynamic simulation is the most frequently applied. This type of simulation is particularly used to reproduce both the behavior of several entities and the dynamism and interaction between them. An increasing number of studies have proposed multi-agent simulations, even if, as highlighted in the future directions, they are still lacking in terms of accuracy of behavior representation.
+Several interesting but challenging future directions for research may be identiﬁed. We focus on the following main topics:
+• Public, individual and freight transportation are currently modeled and optimized as separate systems. There is thus the need for new models, methods and software tools able to represent the complete transportation system, including new active modes, business and organizational models for freight, automated vehicles, etc. Notice that this is an open issue at the regional level as well, where research did not really advance after the ﬁrst examples of an integrated vision of the years 1990 (Crainic & Florian, 2008; Crainic et al., 1990; Crainic et al., 1994; Jourquin, B. & Beuthe, M., 2006).
+• The intermodal transportation systems, the rules and policies of the different actors, and the interactions among actors and subsystems are often described in an aggregated, simpliﬁed way. This is particularly true in terms of the network representations and in multi-agents simulations, where the level of intelligence and optimization incorporated in the agents is generally quite low (e.g., simple heuristics). This is affecting, in particular, the characteristics related to the geographical, organizational, behavioral and data sharing aspects. We believe that a crucial point for the relevance and utilization of simulation lies with the development of more detailed and ﬂexible models, as well as a better integration of simulation and optimization.
+• The complexity of the transportation systems yields large-sized simulation models, which will grow even larger and with more details when the results of the previous items will become available. This requires signiﬁcant and continuously growing computational efforts. We therefore see a research avenue with major beneﬁts in an increased exploration and exploitation of parallel computing, particularly with respect to new hardware and software high-performance computing architectures, which become more and more affordable.
+• New business and organizational frameworks, e.g., Hyperconnected systems (City Logistics, Physical Internet, synchromodality) and Logistics 4.0 are largely viewed as key concepts for the development of transportation and logistics systems (ALICE Consortium, 2015; Bektas¸ , Crainic, & van Woensel, 2017; Crainic & Montreuil, 2016). Stakeholder cooperation and the integration, synchronization, and automation of operations are at the core of these concepts and development frameworks. Yet, current studies of such systems are few and their representations are still quite simpliﬁed. More efforts are certainly required in this large ﬁeld, the ﬁrst results with a Technology Readiness Level larger than 6 being presented currently only (see Perboli, Musso, Rosano, Tadei, and Godel, 2017b for a survey of the recent results in EU FP7 and H2020 projects).
+• Few studies address policy-making processes, and there is a need for tools supporting policy makers in designing sustainable policies appropriate for freight transportation and the continuous evolution of the society (e.g., the codesign with citizens and companies of urban policies). This implies incorporating into simulation and optimization tools a managerial perspective and a representation of the business models of the various stakeholders. While such policies are currently showing their
+
+effectiveness in terms of acceptance and eﬃciency, the challenge for simulation development is to model, at the appropriate level for the tradeoff between detail and computation efﬁciency, the business models of the different actors and their interactions in terms of contracts, pricing and costing schemes and operational issues (De Marco et al., 2017; Perboli, Ferrero, Musso, & Vesco, 2017a).
+Acknowledgments
+Partial funding was provided by the Italian University and Research Ministry to the URBeLOG project under its Smart Cities and Communities programme, and by the Natural Sciences and Engineering Council of Canada (NSERC) through its Discovery Grant program. We gratefully acknowledge the support of Fonds de recherche du Québec through their infrastructure grants.
+While working on this paper, Professor Guido Perboli was the head of the Urban Mobility and Logistics Systems initiative of the CARS Interdepartmental Lab of Politecnico di Torino, while Professor Teodor Gabriel Crainic was Adjunct Professor with the Department of Computer Science and Operations Research of the University of Montreal.
+The authors want to thank Dott. Francesca Perfetti for her contribution to a previous version of this paper.
+References
+ALICE Consortium (2015). WG2 Corridors, Hubs and Synchromodality. http://www. etp- logistics.eu/?page_id=292.
+Ambrosino, D., & Sciomachen, A. (2012). Hub locations in urban multimodal networks. European Transport - Trasporti Europei, 51.
+Anand, N., Quak, H., van Duin, R., & Tavasszy, L. (2012). City logistics modeling efforts: Trends and gaps-a review. Procedia-Social and Behavioral Sciences, 39, 101–115 .
+Andersen, J., Crainic, T. G., & Christiansen, M. (2009). Service network design with management and coordination of multiple ﬂeets. European Journal of Operational Research, 193(2), 377–389.
+Anghinolﬁ, D., Paolucci, M., Sacone, S., & Siri, S. (2011). Freight transportation in railway networks with automated terminals: A mathematical model and MIP heuristic approaches. European Journal of Operational Research, 214(3), 588–594.
+Arnäs, P. O., Holmström, J., & Kalantari, J. (2013). In-transit services and hybrid shipment control: The use of smart goods in transportation networks. Transportation Research Part C: Emerging Technologies, 36, 231–244.
+Australian Research Council (2012). Excellence in Research for Australia (ERA) 2012 National Report. Technical Report. Australian Government.
+Bailey, K. (1994). Typologies and taxonomies: An introduction to classiﬁcation techniques. In Quantitative Applications in the Social Sciences. London: Sage Publications .
+Bailey, K. D. (2005). Typology construction, methods and issues. Encyclopedia of social measurement, 3, 889–898.
+Baindur, D., & Viegas, J. (2011). An agent based model concept for assessing modal share in inter-regional freight transport markets. Journal of Transport Geography, 19(6), 1093–1105.
+Bakhtadze, N. N., Karsaev, O. V., Smirnova, G. S., Sabitov, R. A., Morozov, B. M., & Elizarova, N. U. (2016). Multi-agent simulation of swap bodies application in manufacturing supply chain. IFAC Paper On Line, 49(12), 1245–1250.
+Bektas¸ , T., & Crainic, T. G. (2008). A Brief Overview of Intermodal Transportation. In G. D. Taylor (Ed.), Logistics Engineering Handbook (pp. 1–16). Taylor and Francis Group, Boca Raton, FL, USA.
+Bektas¸ , T., Crainic, T. G., & van Woensel, B. (2017). From Managing Urban Freight to Smart City Logistics Networks. In K. Gakis, & P. Pardalos (Eds.), Networks design and optimization for smart cities. In Series on Computers and Operations Research: 8 (pp. 143–188). Elsevier.
+Benjelloun, A., & Crainic, T. G. (2009). Trends, challenges, and perspectives in city logistics. Buletinul AGIR, 4, 45–51.
+Benjelloun, A., Crainic, T. G., & Bigras, Y. (2010). Towards a taxonomy of city logistics projects. Procedia - Social and Behavioral Sciences, 2(3), 6217–6228. doi:10.1016/ j.sbspro.2010.04.032.
+Bierwirth, C., & Meisel, F. (2010). A survey of berth allocation and quay crane scheduling problems in container terminals. European Journal of Operational Research, 202(3), 615–627.
+Boussier, J.-M., Cucu, T., Luminita, I., Pascal, E., Dominique, B., et al. (2009). Goods distribution with electric vans in cities: towards an agent-based simulation. World Electric Vehicle Journal, 3, 597–605.
+Briano, E., Caballini, C., Mosca, R., & Revetria, R. (2010). Using logistic redesigner (lo.r.d.) software for designing and simulating a steel supply chain. WSEAS Transactions on Systems, 9(2), 125–135.
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+417
+
+Burgholzer, W., Bauer, G., Posset, M., & Jammernegg, W. (2013). Analysing the impact of disruptions in intermodal transport networks: A micro simulation-based model. Decision Support Systems, 54(4), 1580–1586.
+Caris, A., Macharis, C., & Janssens, G. (2008). Planning problems in intermodal freight transport: Accomplishments and prospects. Transportation Planning and Technology, 31(3), 277–302.
+Caris, A., Macharis, C., & Janssens, G. (2012a). Corridor network design in hinterland transportation systems. Flexible Services and Manufacturing Journal, 24(3), 294–319.
+Caris, A., Macharis, C., & Janssens, G. (2012b). A simulation methodology for the analysis of bundling networks in intermodal barge transport. In G. Janssens, C. Macharis, & K. Sörensen (Eds.), Simulation and modelling in supply chains and logistics. Cambridge Scholars.
+Caris, A., Macharis, C., & Janssens, G. (2013). Decision support in intermodal transport: A new research agenda. Computers in Industry, 64(2), 105–112.
+Chan, F. T., & Zhang, T. (2011). The impact of collaborative transportation management on supply chain performance: A simulation approach. Expert Systems with Applications, 38(3), 2319–2329.
+Comi, A., & Nuzzolo, A. (2014). Simulating urban freight ﬂows with combined shopping and restocking demand models. Procedia-Social and Behavioral Sciences, 125, 49–61.
+Commission of the European Communities (2007). Towards a new culture for urban mobility. Technical Report. the Green Paper on urban mobility.
+Commission of the European Communities (2009). Communication from the commission to the European parliament, the council, the European economic and social committee and the committee of the regions. Technical Report. Brussels: European Commission.
+Crainic, T. G., & Florian, M. (2008). National planning models and instruments. INFOR: Information Systems and Operational Research, 46(4), 299–308.
+Crainic, T. G., Florian, M., Guélat, J., & Spiess, H. (1990). Strategic planning of freight transportation: STAN, an interactive-graphic system. Transportation Research Record, 1283, 97–124.
+Crainic, T. G., Florian, M., & Larin, D. (1994). STAN: New Developments. In Al. S. Khade, & R. Brown (Eds.), 23rd annual meeting of the western decision sciences institute (pp. 493–498). School of Business Administration, California State University, Stanislaus, CA.
+Crainic, T. G., & Kim, K. (2007). Intermodal Transportation. In C. Barnhart, & Laporte (Eds.), Transportation. In Handbooks in Operations Research and Management Science: 14 (pp. 467–537). North-Holland, Amsterdam. chapter 8.
+Crainic, T. G., & Laporte, G. (1997). Planning models for freight transportation. European Journal of Operational Research, 97(3), 409–438.
+Crainic, T. G., Mancini, S., Perboli, G., & Tadei, R. (2012). Impact of generalized travel costs on satellite location in the two-echelon vehicle routing problem. Procedia-Social and Behavioral Sciences, 39, 195–204.
+Crainic, T. G., Perboli, G., Mancini, S., & Tadei, R. (2010). Two-echelon vehicle routing problem: a satellite location analysis. Procedia-Social and Behavioral Sciences, 2(3), 5944–5955.
+Crainic, T. G., & Montreuil, B. (2016). Physical Internet Enabled Hyperconnected City Logistics. In E. Taniguchi, & R. G. Thompson (Eds.), 9th international conference on city logistics, june 2015, tenerife, spain. In Transportation Research Procedia: 12 (pp. 383–398). Elsevier.
+Dahl, S., & Derigs, U. (2011). Cooperative planning in express carrier networks – an empirical study on the effectiveness of a real-time decision support system. Decision Support Systems, 51(3), 620–626.
+De Marco, A., Mangano, G., Zenezini, G., Cagliano, A. C., Perboli, G., Rosano, M., & Musso, S. (2017). Business modeling of a city logistics ict platform. In Computer software and applications conference (compsac), 2017 ieee 41st annual: 2 (pp. 783– 789). doi:10.1109/COMPSAC.2017.76.
+Dekker, R., van Asperen, E., Ochtman, G., & Kusters, W. (2009). Floating stocks in FMCG supply chains: Using intermodal transport to facilitate advance deployment. International Journal of Physical Distribution and Logistics Management, 39(8), 632–648.
+Di Febbraro, A., Sacco, N., & Saeednia, M. (2016). An agent-based framework for cooperative planning of intermodal freight transport chains. Transportation Research Part C: Emerging Technologies, 64, 72–85.
+Dimitriou, L., & Stathopoulos, A. (2009). Optimal co-evolutionary strategies for the competitive maritime network design problem. In Applications of evolutionary computing (pp. 818–827). Springer.
+Directorate General for Mobility and Transport (2011). Roadmap to a Single European Transport Area – Towards a competitive and resource eﬃcient transport system. Technical Report. European Commission.
+Dotoli, M., Epicoco, N., Falagario, M., & Cavone, G. (2016). A timed petri nets model for performance evaluation of intermodal freight transport terminals. IEEE Transactions on Automation Science and Engineering, 13(2), 842–857.
+Dotoli, M., Fanti, M. P., Mangini, A. M., Stecco, G., & Ukovich, W. (2010). The impact of ict on intermodal transportation systems: A modelling approach by petri nets. Control Engineering Practice, 18(8), 893–903.
+van Duin, J. R., van Kolck, A., Anand, N., Tavasszy, L., & Taniguchi, E. (2012). Towards an agent-based modelling approach for the evaluation of dynamic usage of urban distribution centres. Procedia-Social and Behavioral Sciences, 39, 333–348.
+Durand, B., & Gonzalez-Feliu, J. (2012). Impacts of proximity deliveries on e-grocery trips. Supply Chain Forum: An International Journa, 13(1), 10–19.
+Elbert, R., & Reinhardt, D. (2017). Increasing capacity utilization of shuttle trains in intermodal transport by investing in transshipment technologies for non-cranable semi-trailers. In Winter simulation conference 2016 (pp. 2358–2369).
+
+Engevall, S., & Dahlberg, J. (2013). The city distribution center cost allocation problem with the municipality as a player. In Eighth international conference on city logistics .
+European Conference of Ministers of Transport (2001). Terminology on combined transport. United Nations. New York and Geneva.
+Fanti, M., Iacobellis, G., Georgoulas, G., Stylios, C., & Ukovich, W. (2012). A decision support system for intermodal transportation networks management. In 24th European modeling and simulation symposium, emss 2012 (pp. 150–155).
+Feng, W., & Figliozzi, M. A. (2012). Conventional vs electric commercial vehicle ﬂeets: A case study of economic and technological factors affecting the competitiveness of electric commercial vehicles in the usa. Procedia-Social and Behavioral Sciences, 39, 702–711.
+Figueira, G., & Almada-Lobo, B. (2014). Hybrid simulation–optimization methods: A taxonomy and discussion. Simulation Modelling Practice and Theory, 46, 118–134.
+Gambardella, L. M., & Rizzoli, A. E. (2000). The role of simulation and optimisation in intermodal container terminals. In 12th European simulation symposium and exhibition (ess 2000).
+Gentile, G., & Vigo, D. (2013). Movement generation and trip distribution for freight demand modelling applied to city logistics. European Transport Trasporti Europei, 54, 1–27.
+Gonzalez-Feliu, J., Ambrosini, C., Pluvinet, P., Toilier, F., & Routhier, J.-L. (2012). A simulation framework for evaluating the impacts of urban goods transport in terms of road occupancy. Journal of Computational Science, 3(4), 206–215.
+Gonzalez-Feliu, J., Morana, J., Grau Salanova, J.-M., & Ma, T.-Y. (2013). Design and scenario assessment for collaborative logistics and freight transport systems. International Journal of Transport Economics, 40, 207–240.
+Gonzalez-Feliu, J., & Salanova, J.-M. (2012). Deﬁning and evaluating collaborative urban freight transportation systems. Procedia-Social and Behavioral Sciences, 39, 172–183 .
+Gromicho, J. b., Oudshoorn, E., & Post, G. (2011). Generating price-effective intermodal routes. Statistica Neerlandica, 65(4), 432–445.
+Grzybowska, H., & Barceló, J. (2012). Decision support system for real-time urban freight management. Procedia-Social and Behavioral Sciences, 39, 712–725.
+Guélat, J., Florian, M., & Crainic, T. G. (1990). A Multimode Multiproduct Network Assignment Model for Strategic Planning of Freight Flows. Transportation Science, 24(1), 25–39.
+Herazo-Padilla, N., Montoya-Torres, J. R., Munoz-Villamizar, A., Isaza, S. N., & Polo, L. R. (2013a). Coupling ant colony optimization and discrete-event simulation to solve a stochastic location-routing problem. In Winter simulation conference 2013 (pp. 3352–3362).
+Herazo-Padilla, N., Montoya-Torres, J. R., Munoz-Villamizar, A., Isaza, S. N., & Polo, L. R. (2013b). Escuela internacional de ciencias económicas y administrativas, universidad de la sabana, chía (cundinamarca), colombia. In Winter simulation conference (wsc), 2013 (pp. 3352–3362). IEEE.
+Hillbrand, C., & Schmid, S. (2011). Simulation of co-operative logistics models for multimodal transportation networks. In Summer computer simulation conference 2011 (pp. 180–187). Society for Modeling & Simulation International.
+Holmgren, J., Davidsson, P., Persson, J. A., & Ramstedt, L. (2012). Tapas: A multi-agent-based model for simulation of transport chains. Simulation Modelling Practice and Theory, 23, 1–18.
+Hrusovsky, M., Demir, E., Jammernegg, W., & Woensel, T. V. (2016). Hybrid simulation and optimization approach for green intermodal transportation problem with travel time uncertainty. Flexible Services and Manufacturing Journal.
+Hunt, J. D., & Stefan, K. (2007). Tour-based microsimulation of urban commercial movements. Transportation Research Part B: Methodological, 41(9), 981–1013.
+Ishfaq, R., & Sox, C. (2011). Hub location-allocation in intermodal logistic networks. European Journal of Operational Research, 210(2), 213–230.
+Joubert, J. W., Fourie, P. J., & Axhausen, K. W. (2010). Large-scale agent-based combined traﬃc simulation of private cars and commercial vehicles. Transportation Research Record: Journal of the Transportation Research Board, 2168(1), 24–32.
+Jourquin, B., & Beuthe, M. (2006). A Decade of Freight Transport Modeling with Virtual Networks: Aquired Experiences and New Challenges. In A. Reggiani, & P. Nijkamp (Eds.), Spatial dynamics, networks and modelling (pp. 181–200). Edward Elgar Publishing, Cheltenham Glos, UK.
+Kritzinger, S., Doerner, K. F., Hartl, R. F., Kiechle, G. Ÿ., Stadler, H., & Manohar, S. S. (2012). Using traﬃc information for time-dependent vehicle routing. Procedia-Social and Behavioral Sciences, 39, 217–229.
+Lam, S.-W., Lee, L.-H., & Tang, L.-C. (2007). An approximate dynamic programming approach for the empty container allocation problem. Transportation Research Part C: Emerging Technologies, 15(4), 265–277.
+Li, L., Negenborn, R. R., & De Schutter, B. (2015). Intermodal freight transport planning - a receding horizon control approach. Transportation Research Part C: Emerging Technologies, 60, 77–95. doi:10.1016/j.trc.2015.08.002.
+Liedtke, G. (2009). Principles of micro-behavior commodity transport modeling. Transportation Research Part E: Logistics and Transportation Review, 45(5), 795–809 .
+Liedtke, G., & Carrillo Murillo, D. G. (2012). Assessment of policy strategies to develop intermodal services: The case of inland terminals in Germany. Transport Policy, 24(0), 168–178. doi:10.1016/j.tranpol.2012.06.002.
+Lindholm, M. (2012). How local authority decision makers address freight transport in the urban area. Procedia-Social and Behavioral Sciences, 39, 134–145.
+Liu, J., Yu, J.-N., Li, Y.-Z., & Han, L. (2011). A game model analysis in freight intermodal transport market. In 8th international conference on service systems and service management (icsssm) (pp. 1–5).
+
+418
+
+T.G. Crainic et al. / European Journal of Operational Research 270 (2018) 401–418
+
+Luan, K. (2010). Simulation of freight consolidation strategy based on system dynamics. Proceedings, iclem 2010: logistics for sustained economic development – infrastructure, information, integration, 4, 3616–3622.
+Macharis, C., & Bontekoning, Y. M. (2004). Opportunities for OR in intermodal freight transport research: A review. European Journal of operational research, 153(2), 400–416.
+Macharis, C., Caris, A., Jourquin, B., & Pekin, E. (2011). A decision support framework for intermodal transport policy. European Transport Research Review, 3(4), 167–178 .
+Macharis, C., & Pekin, E. (2009). Assessing policy measures for the stimulation of intermodal transport: a GIS-based policy analysis. Journal of Transport Geography, 17(6), 500–508.
+Maggioni, F., Perboli, G., & Tadei, R. (2014). The multi-path traveling salesman problem with stochastic travel costs: Building realistic instances for city logistics applications. Transportation Research Procedia, 3, 528–536.
+Martínez-López, A., Munín-Doce, A., & García-Alonso, L. (2015). A multi-criteria decision method for the analysis of the motorways of the sea: the application to the case of France and Spain on the Atlantic Coast. Maritime Policy and Management, 42(6), 608–631.
+McLean, A., & Biles, W. (2008). A simulation approach to the evaluation of operational costs and performance in liner shipping operations. In Winter simulation conference 2008 (pp. 2577–2584).
+Meng, Q., & Wang, S. (2011). Intermodal container ﬂow simulation model and its applications. Transportation Research Record: Journal of the Transportation Research Board, 2224(1), 35–41.
+Miller-Hooks, E., Zhang, X., & Faturechi, R. (2012). Measuring and maximizing resilience of freight transportation networks. Computers & Operations Research, 39(7), 1633–1643.
+Muravev, D., & Rakhmangulov, A. (2016). Environmental factors? consideration at industrial transportation organization in the seaport dry port system. Open Engineering, 6, 476–484.
+Nuzzolo, A., & Comi, A. (2014). Urban freight demand forecasting: A mixed quantity/delivery/vehicle-based model. Transportation Research Part E: Logistics and Transportation Review, 65, 84–98. https://doi.org/10.1016/j.tre.2013.12.014.
+Nuzzolo, A., Crisalli, U., & Comi, A. (2012). A system of models for the simulation of urban freight restocking tours. Procedia-Social and Behavioral Sciences, 39, 664–676.
+Orozco, J.-A., & Barceló, J. (2012). Reactive and proactive routing strategies with real-time traﬃc information. Procedia-Social and Behavioral Sciences, 39, 633–648.
+Page, B., Knaak, N., & Kruse, S. (2007). A discrete event simulation framework for agent-based modelling of logistic systems. In Informatik 2007 - informatik trifft logistik, beitrage der 37. jahrestagung der gesellschaft fur informatik: 1 (pp. 397–404).
+Patier, D., David, B., Chalon, R., & Deslandres, V. (2014). A new concept for urban logistics delivery area booking. Procedia-Social and Behavioral Sciences, 125, 99–110 .
+Perboli, G. (2016). GUEST-OR. linking lean business and OR. In 28th european conference on operation research. (pp. Poznan, Poland).
+Perboli, G., De Marco, A., Perfetti, F., & Marone, M. (2014a). A new taxonomy of smart city projects. Transportation Research Procedia, 3, 470–478.
+Perboli, G., Ferrero, F., Musso, S., & Vesco, A. (2017a). Business models and tariff simulation in car-sharing services. Transportation Research Part A. https://doi.org/ 10.1016/j.tra.2017.09.011 .
+Perboli, G., Musso, S., Rosano, M., Tadei, R., & Godel, M. (2017b). Synchro-modality and slow steaming: New business perspectives in freight transportation. Sustainability, 9(10), 1843.
+Perboli, G., Rosano, M., & Gobbato, L. (2016). Decision support system for collaborative freight transportation management: a tool for mixing traditional and green logistics.. In Ils 2016 - 6th international conference on information systems, logistics and supply chain.
+Perboli, G., Tadei, R., & Gobbato, L. (2014b). The multi-handler knapsack problem under uncertainty. European Journal of Operational Research, 236(3), 1000–1007.
+Puettmann, C., & Stadtler, H. (2010). A collaborative planning approach for intermodal freight transportation. OR spectrum, 32(3), 809–830.
+Qureshi, A. G., Taniguchi, E., & Yamada, T. (2012). A microsimulation based analysis of exact solution of dynamic vehicle routing with soft time windows. Procedia– Social and Behavioral Sciences, 39, 205–216.
+Roorda, M. J., Cavalcante, R., McCabe, S., & Kwan, H. (2010). A conceptual framework for agent-based modelling of logistics services. Transportation Research Part E: Logistics and Transportation Review, 46(1), 18–31.
+Russo, F., & Comi, A. (2012). The simulation of shopping trips at urban scale: Attraction macro-model. Procedia-Social and Behavioral Sciences, 39, 387–399.
+Saeed, N. (2013). Cooperation among freight forwarders: Mode choice and intermodal freight transport. Research in Transportation Economics, 42(1), 77–86.
+Samimi, A., Mohammadian, A., & Kawamura, K. (2010). A behavioral freight movement microsimulation model: method and data. Transportation Letters, 2(1), 53–62 .
+Schroeder, S., Zilske, M., Liedtke, G., & Nagel, K. (2012). Towards a multi-agent logistics and commercial transport model: The transport service provider’s view. Procedia - Social and Behavioral Sciences, 39, 649–663. Seventh International Conference on City Logistics which was held on June 7- 9,2011, Mallorca, Spain. doi: 10.1016/j.sbspro.2012.03.137.
+
+Sihn, W., Hillbrand, C., Meizer, F., Leitner, R., & Prochazka, M. (2010). Development of a simulation model for multimodal, cross-company logistics networks. In Advanced manufacturing and sustainable logistics (pp. 26–36). Springer.
+Sinha, S., & Kumar Ganesan, V. (2011). Enhancing operational eﬃciency of a container operator: A simulation optimization approach. In Winter simulation conference 2011 (pp. 1722–1733).
+Sirikijpanichkul, A., Van Dam, K., Ferreira, L., & Lukszo, Z. (2007). Optimizing the location of intermodal freight hubs: An overview of the agent based modelling approach. Journal of Transportation Systems Engineering and Information Technology, 7(4), 71–81.
+Stahlbock, R., & Voß, S. (2008). Operations research at container terminals: a literature update. Or Spectrum, 30(1), 1–52.
+SteadieSeiﬁ, M., Dellaert, N. P., Nuijten, W., Van Woensel, T., & Raouﬁ, R. (2014). Multimodal freight transportation planning: A literature review. European journal of operational research, 233(1), 1–15.
+Suksri, J., & Raicu, R. (2012). Developing a conceptual framework for the evaluation of urban freight distribution initiatives. Procedia-Social and Behavioral Sciences, 39, 321–332.
+Tadei, R., Perboli, G., & Perfetti, F. (2017). The multi-path traveling salesman problem with stochastic travel costs. EURO Journal on Transportation and Logistics, 6(1), 3–23 .
+Tamagawa, D., Taniguchi, E., & Yamada, T. (2010). Evaluating city logistics measures using a multi-agent model. Procedia-Social and Behavioral Sciences, 2(3), 6002–6012.
+Taniguchi, E., Thompson, R. G., & Yamada, T. (2012). Emerging techniques for enhancing the practical application of city logistics models. Procedia-Social and Behavioral Sciences, 39, 3–18.
+Taniguchi, E., Yamada, T., & Okamoto, M. (2007). Multi-agent modelling for evaluating dynamic vehicle routing and scheduling systems. Journal of the Eastern Asia Society for Transportation Studies, 7, 933–948.
+Teo, J. S., Taniguchi, E., & Qureshi, A. G. (2012). Evaluating city logistics measure in e-commerce with multiagent systems. Procedia-Social and Behavioral Sciences, 39, 349–359.
+Teo, J. S., Taniguchi, E., & Qureshi, A. G. (2014). Evaluation of load factor control and urban freight road pricing joint schemes with multi-agent systems learning models. Procedia-Social and Behavioral Sciences, 125, 62–74.
+The GUEST Initiative (2017). http://www.theguestmethod.com. Last Access: 04/10/2017.
+Uchiyama, N., & Taniguchi, E. (2012). A study of dispatcher’s route choice model based on evolutionary game theory. Procedia-Social and Behavioral Sciences, 39, 495–509.
+Uchiyama, N., & Taniguchi, E. (2014). Analysis of impacts on dispatcher’s route choice behaviour by road improvements on using a trial and error learning model. Procedia-Social and Behavioral Sciences, 125, 297–311.
+Van Dam, K., Lukszo, Z., Ferreira, L., & Sirikijpanichkul, A. (2007). Planning the location of intermodal freight hubs: An agent based approach. In 2007 ieee international conference on networking, sensing and control, icnsc’07 (pp. 187–192).
+Van Duin, J., Tavasszy, L., & Taniguchi, E. (2007). Real time simulation of auctioning and re-scheduling processes in hybrid freight markets. Transportation Research Part B: Methodological, 41(9), 1050–1066.
+Vidovic´ , M., Zecˇevic´ , S., Kilibarda, M., Vlajic´ , J., Bjelic´ , N., & Tadic´ , S. (2011). The p-hub model with hub-catchment areas, existing hubs, and simulation: A case study of serbian intermodal terminals. Networks and Spatial Economics, 11(2), 295–314 .
+Wang, H., Wang, X., & Zhang, X. (2017). Dynamic resource allocation for intermodal freight transportation with network effects: Approximations and algorithms. Transportation Research Part B: Methodological, 99, 83–112.
+Wang, X., & Meng, Q. (2011). The impact of landbridge on the market shares of asian ports. Transportation Research Part E: Logistics and Transportation Review, 47(2), 190–203 .
+Wanitwattanakosol, J., Holimchayachotikul, P., Nimsrikul, P., & Sopadang, A. (2010). Performance improvement of freight logistics hub selection in Thailand by coordinated simulation and AHP. Industrial Engineering and Management Systems, 9(2), 88–96.
+Wisetjindawat, W., Ito, H., Fujita, M., & Eizo, H. (2014). Planning disaster relief operations. Procedia-Social and Behavioral Sciences, 125, 412–421.
+Wisetjindawat, W., Yamamoto, K., & Marchal, F. (2012). A commodity distribution model for a multi-agent freight system. Procedia-Social and Behavioral Sciences, 39, 534–542.
+Yang, K., Yang, L., & Gao, Z. (2016). Planning and optimization of intermodal hub-and-spoke network under mixed uncertainty. Transportation Research Part E: Logistics and Transportation Review, 95, 248–266.
+Yang, X. b., Low, J., & Tang, L. (2011). Analysis of intermodal freight from China to Indian Ocean: a goal programming approach. Journal of Transport Geography, 19(4), 515–527 .
+Zhang, K., Nair, R., Mahmassani, H. S., Miller-Hooks, E. D., Arcot, V. C., Kuo, A., et al. (2008). Application and validation of dynamic freight simulation–assignment model to large-scale intermodal rail network: Pan-European case. Transportation Research Record: Journal of the Transportation Research Board, 2066(1), 9–20 .
+

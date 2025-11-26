@@ -1,0 +1,94 @@
+
+Skip to main content
+Cornell University
+
+In just 5 minutes help us improve arXiv:
+Annual Global Survey
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1904.09675
+
+Help | Advanced Search
+Search
+Computer Science > Computation and Language
+(cs)
+[Submitted on 21 Apr 2019 ( v1 ), last revised 24 Feb 2020 (this version, v3)]
+Title: BERTScore: Evaluating Text Generation with BERT
+Authors: Tianyi Zhang , Varsha Kishore , Felix Wu , Kilian Q. Weinberger , Yoav Artzi
+View a PDF of the paper titled BERTScore: Evaluating Text Generation with BERT, by Tianyi Zhang and 4 other authors
+View PDF
+
+    Abstract: We propose BERTScore, an automatic evaluation metric for text generation. Analogously to common metrics, BERTScore computes a similarity score for each token in the candidate sentence with each token in the reference sentence. However, instead of exact matches, we compute token similarity using contextual embeddings. We evaluate using the outputs of 363 machine translation and image captioning systems. BERTScore correlates better with human judgments and provides stronger model selection performance than existing metrics. Finally, we use an adversarial paraphrase detection task to show that BERTScore is more robust to challenging examples when compared to existing metrics. 
+
+Comments: 	Code available at this https URL To appear in ICLR2020
+Subjects: 	Computation and Language (cs.CL)
+Cite as: 	arXiv:1904.09675 [cs.CL]
+  	(or arXiv:1904.09675v3 [cs.CL] for this version)
+  	https://doi.org/10.48550/arXiv.1904.09675
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Tianyi Zhang [ view email ]
+[v1] Sun, 21 Apr 2019 23:08:53 UTC (410 KB)
+[v2] Tue, 1 Oct 2019 16:52:00 UTC (1,605 KB)
+[v3] Mon, 24 Feb 2020 18:59:28 UTC (1,608 KB)
+Full-text links:
+Access Paper:
+
+    View a PDF of the paper titled BERTScore: Evaluating Text Generation with BERT, by Tianyi Zhang and 4 other authors
+    View PDF
+    TeX Source 
+
+view license
+Current browse context:
+cs.CL
+< prev   |   next >
+new | recent | 2019-04
+Change to browse by:
+cs
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+1 blog link
+( what is this? )
+DBLP - CS Bibliography
+listing | bibtex
+Tianyi Zhang
+Varsha Kishore
+Felix Wu
+Kilian Q. Weinberger
+Yoav Artzi
+export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Connected Papers Toggle
+Connected Papers ( What is Connected Papers? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+

@@ -1,0 +1,785 @@
+Hindawi Journal of Advanced Transportation Volume 2019, Article ID 5764602, 11 pages https://doi.org/10.1155/2019/5764602
+
+Research Article The Daily Container Volumes Prediction of Storage Yard in Port with Long Short-Term Memory Recurrent Neural Network
+
+Yinping Gao ,1 Daofang Chang,1 Ting Fang,2 and Yiqun Fan3
+1Institute of Logistics Science and Engineering, Shanghai Maritime University, 201306 Shanghai, China 2School of Economics and Management, Shanghai Maritime University, 201306 Shanghai, China 3Shanghai Municipal Engineering Design Institute (Group) Co., Ltd., 200092 Shanghai, China
+Correspondence should be addressed to Yinping Gao; gaoyinping@stu.shmtu.edu.cn
+Received 16 August 2019; Accepted 5 November 2019; Published 25 December 2019
+Academic Editor: Stefano de Luca
+Copyright © 2019 Yinping Gao et al. is is an open access article distributed under the Creative Commons Attribution License, which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.
+e e ective forecast of container volumes can provide decision support for port scheduling and operating. In this work, by deep learning the historical dataset, the long short-term memory (LSTM) recurrent neural network (RNN) is used to predict daily volumes of containers which will enter the storage yard. e raw dataset of daily container volumes in a certain port is chosen as the training set and preprocessed with box plot. en the LSTM model is established with Python and Tensor ow framework.
+e comparison between LSTM and other prediction methods like ARIMA model and BP neural network is also provided in this study, and the prediction gap of LSTM is lower than other methods. It is promising that the proposed LSTM is helpful to predict the daily volumes of containers.
+
+1. Introduction
+In the times of big data, a good forecasting result is helpful to provide decision-makers with strong decision-making basis. e daily container volumes of storage yard refer to the amount of containers which enter the storage yard every day before the container ships enter the port. e prediction of daily container volumes is of great signi cance to the terminal yard operation plan and the ship loading plan. On the one hand, in the process of making the yard plan, the storage area needs to be preplanned for the container that will enter the yard. e planning of the area depends on the correct predictions of the amount of the containers entering the yard. On the other hand, during the shipment process, the storage location of containers is too centralized or decentralized, which will a ect the loading e ciency of the container ship.
+is requires an accurate prediction of the approach containers so that the yard space can be properly planned. Traditional prediction methods, such as time series prediction methods including exponential smoothing [1–4], grey prediction [5– 7], and regression analysis [8, 9], are di cult to make accurate predictions for nonlinear systems with multiple in uencing factors such as container voyage volume. Arti cial neural
+
+network (ANN) has a good ability of nonlinear approximation and adaptive self-learning. ANN can be divided into three layers which are input layer, hidden layer, and output layer respectively. e Back propagation algorithm is described as follows: by inputting training data into the neural network model, predicted data is the output, and compared with the real data. en the gap between the predicted data and the real data calculated with loss function is propagated back to the model in order to adjust the parameters which can achieve the goal of improving the accuracy of the model. ANN has been widely used in the planning and prediction of container terminals. ere have been studies shown that arti-
+cial neural networks can be used to simulate port planning problems associated with container terminals based on historical data, and the predictions can be considered as acceptable [10]. e ANN has also been established between the operational parameters and the static heeling angle, and can provide an accurate estimate of the static heeling angle in order to assess the anchor handling vessel stability [11]. In order to avoid the bottleneck and the smooth integration of container terminals in the supply chain, the ANN has been applied to predict the container dwell time, so as to help terminal operators to make daily decisions regarding stacking
+
+2
+
+Journal of Advanced Transportation
+
+policies, optimal equipment, and human resources allocation [12]. However, under the conditions of ﬁnite samples and computational units, it is impossible to simulate more complex mathematical operations, and the data characteristics of a large number of samples are selected according to the prior knowledge of a speciﬁc ﬁeld, ignoring the eﬀective use of the characteristics of the sample data itself.
+Deep learning attempts to learn in multiple levels on the basis of diﬀerent abstraction levels, instead of seeking the functional relationship between the input features and output results directly like RNN [13]. e recurrent neural network (RNN) is mainly used for the analysis and prediction of time series data. e RNN memorize the previous information and apply it to the calculation of the current output which is superior to simple neural network. at is to say, the hidden layer not only has a connection with the current input layer, but also has a connection with the hidden layer at the previous moment. However, the historical information retained by RNN decayed over time, which is called the historical gradient dissipation in the back-propagation process [14]. e vanishing/exploding gradients problem of RNN shows that it cannot be used for data modeling for longer time series. e Long Short-Term Memory (LSTM) is an improved Recurrent Neural Network (RNN) to overcome the vanishing/exploding gradients problem [15]. LSTM can learn long-term and shortterm dependence information of time series. Because neural network includes time memory unit, it is suitable for processing and predicting interval and delay events in time series.
+In this paper, a container volumes prediction model using deep learning method is proposed and applied to predict the daily volumes of containers which enter the storage yard at the container terminal. e work of this study includes the following: (1) e daily volumes of containers from 2013 to 2017 are chosen as the research dataset, and the box plot is applied to identify the outliers of all data. en the outliers are replaced with the means before and a er the outliers, instead of deleting the outliers directly. (2) e LSTM model is established with the Tensorﬂow framework and the Python. e preprocessed data is put into the established LSTM network and used to train the LSTM model. en the model is applied to predict the daily container volumes of future days. (3) e comparison between LSTM, ARIMA, and BP neural network is also given to demonstrate the superiority of LSTM when dealing with the prediction of daily container volumes.
+rough observing and training the historical data about container volumes which were transported by container ships to the container terminal, the prediction of daily container volumes is given in this study for the purpose of providing the data support when designing the yard storage plan. In the future research, the same prediction method is projected to make predictions about the volumes of containers which are transported to the storage yard by container trucks. In addition, the scheduling of yard cranes and quay cranes will be provided to complete containers entering and leaving the terminal in an eﬃcient way.
+e remainder of this paper is organized as follows. Relevant literatures are reviewed in Section 2. e detailed problem description of daily container volumes prediction is presented in Section 3, and the methodology of LSTM is
+
+provided in Section 4. e experimentation and results are given in Section 5. Conclusions and future research are summarized in the last section, Section 6.
+2. Literature Review
+ere has been some research about the prediction of container throughput. e original series of container throughput was divided into the low-frequency components and the high-frequency components, and the two components were predicted by Autoregressive Integrated Moving Average Model (ARIMA) and Support Vector Regression (SVR) respectively [16]. Chen and Chen [17] compared the prediction results of genetic programming (GP), decomposition approach (X-11), and seasonal auto regression integrated moving average (SARIMA) based on historical data from Taiwan ports and concluded that the GP model is superior to the other two methods. Zhang et al. [18] proposed a combined model composed of grey-forecast model and Logistic-growth-curve model to predict port cargo throughput and improved the accuracy of the forecast model. On electricity price forecasting, Weron [19] made a review and concluded several methods which were divided into multiagent models, fundamental models, reduced-form models, statistical models, and computational intelligence models. Cincotti et al. [20] applied three methods to predict the electricity spot-prices and veriﬁed that support vector machine had the best predictive capacity among the ARMA-GARCH, Neural Network, and Support Vector Machine. Twrdy and Batista [21] found a simple but eﬃcient model, which refers to a Markov-chain annual growth rate model, a time-series trend model, a time-series trend model with periodical terms, and a grey system model, to forecast the container throughput based on available data in the Northern Adriatic ports. However, the daily container volumes has the characteristics that are aﬀected by many factors, such as the capacity of container ships, the inland transit time of containers, and seasonal variation of freight transport. It is diﬃcult to express with a certain function relation. e data of daily container volumes is a nonlinear time series, and the time series relationship cannot be explored easily by regression and nonlinear ﬁtting. e recurrent neural network (RNN) in the deep learning domain can generate a memory state of past data when learning sequential data with inherent dependencies. In addition, the long short-term memory which is an improvement RNN can overcome the vanishing/exploding gradients problem caused by RNN.
+e LSTM has been widely used in prediction. Cortez et al. [22] proposed the prediction model for emergency event on the basis of LSTM architecture, and made a comparative analysis on the eﬀectiveness of LSTM and traditional time series. e LSTM network was applied to predict out-ofsample directional movements for the constituent stocks of the S&P 500 from 1992 until 2015 [23]. It has reached the conclusion that LSTM network is superior to memory-free classiﬁcation methods, referring to a random forest, a deep neural net, and a logistic regression classiﬁer. ere were two issues in cloud datacenter and they were solved by a workload prediction model, which was developed with LSTM by Kumar
+
+Journal of Advanced Transportation
+
+3
+
+et al. [24]. Moreover, the mean square has been reduced and the prediction has achieved high accuracy. Oehmcke et al. [25] also used LSTM and a unique time dimensionality reduction method to reduce computation time and prediction errors. Nigri et al. [26] applied LSTM architecture into the Lee-Carter model to improve the predictive accuracy of mortality. e comparison with ARIMA was also given and the superiority of LSTM was demonstrated. On the forecast of solar energy, it has been proved that LSTM outperforms a large number of alternative methods with substantial margin and an average forecast skill of 52.2% over the persistence model [27]. Chen et al. [28] made the predictions of returns in the Chinese stock market with the LSTM model, and demonstrated the LSTM is superior to the feedforward neural network model as a timeseries model. Based on LSTM model, Tian et al. [29] learned the characteristics of time-dependent and made prediction on the tra c ow. e results with LSTM outperformed than other approaches on tra c ow prediction.
+In conclusion, LSTM is a special type of RNN, and it is an RNN that adds long-term and short-term memory functions. It can maintain the durability of the RNN and enable the model to depend on it for a long time. e LSTM network was born to overcome the problem of gradient disappearance.
+en LSTM can more e ectively capture the nonlinearity and randomness of the data series, and overcome the problem of back propagation of the error through memory blocks. Moreover, LSTM can satisfy the dependence of the data source on the time series, and achieve higher prediction accuracy.
+3. Problem Description
+With China’s Belt and Road Initiative (BRI), port plays a signi cant role in the construction of the Belt and Road. It can be found that the container throughput has the growing trend in recent years. Taking a port as an example, the annual container throughput in the port was 9.18 million TEU in 2015, 9.6 million TEU in 2017, and 10.30 million TEU in 2017. Continuously increasing container throughput brings pressure to container terminals, and it is essential to manage container terminals for better operations. e management of storage yard is an important part of the entire terminal operations.
+ere are many equipment and resources in the yard, including the yard trucks, yard cranes, and container blocks. In order to improve the operational e ciency, the yard resources, and space must be planned and used rationally. In particular, before the ship enters the anchorage, the container terminal begins to implement the port gathering plan. e storage location and the storage area of containers entering the yard every day need to be planned in advance. Moreover, the area where the containers are located will directly a ect the e ciency of the ship loading operations. erefore, it is necessary to make predictions of daily container volumes for the purpose of planning the storage area, so as to be convenient for ship loading operations a er entering the port.
+In fact, the volumes of containers to be loaded are unknown before the ship enters the anchorage. One week before the ship enters the port, the terminal starts to conduct the port gathering plan for the ships that are about to enter
+
+the terminal. e container would be stopped for entry 6 hours before the closing time. In general, the sta on the yard predicts the volumes of containers entering the yard on the rst day based on historical data and experience, and formulates a yard allocation plan. e amount of containers on the second day is predicted based on the actual amount of containers that entered on the rst day. e remaining space on the rst day of the yard is used to stack the arrival containers on the second day. If the space requirement of the yard is tight, then the reserved space provided to the approaching containers is very small, which will cause the decentralization of the yard plan.
+e containers will be piled up everywhere, which is not conducive to the loading and unloading operations of the ship. If a large amount of space is reserved for the containers, it will occupy the storage space of the containers which will be loaded on the other ships, leading to an increase in the turnover rate of the container and a ecting the e ciency of the ship loading operations. erefore, predicting the daily volumes of containers that will enter the storage yard is helpful to make operation plan of the storage yard, and allocate yard space and equipment resources reasonably. Accordingly, the operational e ciency of container terminals can be improved further.
+As mentioned above, LSTM is an improvement of RNN. It can coordinate information distribution in historical memory units, and has stronger time series learning ability. Using LSTM for prediction can improve prediction accuracy and reduce errors. erefore, the daily container volumes are predicted with LSTM-RNN, for the purpose of providing decision basis for operators when making plans at container terminals.
+4. Long Short-Term Memory
+Long short-term memory (LSTM) was rst proposed by Hochreiter and Schmidhuber in 1997 [30]. LSTM is a special type of recurrent neural network (RNN) that adds long-term and short-term memory functions, while RNN is capable of processing sequence data. LSTM can maintain the persistence of RNN and enable the model to depend on it for a long time. In fact, the long-term memory information function is the own behavior of LSTM, di erent from what it learned through data training. As mentioned above, the standard RNN has a gradient disappearance problem, and LSTM is created to overcome the gradient disappearance problem. e long-term memory function is added to the neural network so that the information no longer decays. However, it will have some trouble in dealing with a huge magnitude of sequences and will be time-consuming when doing that.
+e LSTM network consist of one input layer, one or more hidden layers, and one output layer. ere are many memory cells in the hidden layers. e structure of LSTM memory cell is shown in Figure 1. e key to LSTM is cell status, with the horizontal red line running through the top of the structure.
+e cell state is similar to the conveyor belt and running from the previous block ( −1) to the current block ( ). ere is only a small amount of linear interaction and it is easy to keep the information on top. LSTM has the ability to remove or add information to the cell state through a well-designed structure
+
+4
+
+Journal of Advanced Transportation
+
+ht
+
+Ct-1
+
+X
+
+1 Forget gate
+
+ft
+
+σ
+
++ 2 Input gate
+
+3
+
+it σ
+
+X
+C~t tanh
+
+Output gate Ot
+σ
+
+tanh X
+
+Ct
+
+ht-1
+
+ht
+
+xt
+
+F
+
+1: e structure of LSTM memory cell.
+
+T 1: e symbol meanings of LSTM algorithm steps.
+
+Symbol
+ℎ , , ,ℎ, , , ,ℎ, ∼ , , ∼ ,ℎ, , , ,ℎ , , ∼,
+
+Meaning
+e vectors for the activation values of the forget gate.
+e vectors for the activation values of the input gate.
+e vectors for the cell states.
+e vectors for the candidate values.
+e vectors for the activation values of the output gate.
+e vectors for the output of the LSTM layer.
+e input vector at time .
+e weight matrices between two gates.
+e bias vectors of forget gate, input gate, candidate values,
+and output gate.
+
+called a “gate.” Gates are a way to let information pass selectively. Each memory cell in the hidden layer has three gates, forget gate, input gate, and output gate respectively. e algorithms steps of LSTM are shown as Equations (1)–(6) and meanings of symbols are given in Table 1.
+e rst step in the LSTM is to decide what information will be discarded from the cell state. is decision was done through the forget gate. e gate reads ℎ −1 and and outputs a value between 0 and 1 to each number in the cell state −1. In addition, 1 means “completely reserved,” 0 means “completely discarded.” e function is shown in Equation (1).
+
+=
+
+, + ,ℎℎ −1 + .
+
+(1)
+
+e second step is to determine what new information is
+
+stored in the cell state. is step includes two parts, as
+
+described in Equations (2) and (3). First, the sigmoid layer
+
+called “input layer” determines what value will be updated.
+
+Second, a tanh layer creates a new candidate vector, which is
+
+added to the state.
+
+=
+
+, + ,ℎℎ −1 + ,
+
+(2)
+
+= tanℎ , + ,ℎℎ −1 + .
+
+(3)
+
+e third step is to update the cell status. at is to update −1 to . e old state is multiplied with and the information will be discarded. en the new candidate is added. e process is given in Equation (4).
+
+= × −1 + × .
+
+(4)
+
+e nal step is to output. is output will be based on the cell status, but it is also a ltered version. First, a sigmoid layer runs’ to determine which part of the cell’s state will be the output. Next, the state of the cell is processed through the tanh layer in order to get a value between −1 and 1, and multiplied with the output of the sigmoid gate. e output ℎ is denoted as the following Equations (5) and (6).
+
+=
+
+, + ,ℎℎ −1 + ,
+
+(5)
+
+ℎ = × tanℎ .
+
+(6)
+
+e input gate is the selective recording of the new information into the cell state, while the forgotten gate is the selective forgetting of information in the state of the cell. e output gate is used to control the output value of the cell. rough the cooperation of these three doors, the information contained in the cells can be continuously updated and forgotten, so it is very suitable for processing time series data. More precisely, the daily volumes of the containers which will be transported to the storage yard in the future days have a great relationship with the daily volumes of the containers in the previous period.
+e predicted features of the forecast have timing information, and then the LSTM can be used to predict the daily volumes of the containers.
+rough the LSTM model, the historical data of daily container volumes is used as the input layer and divided into training sets and test sets. en the data set is standardized, processed, and split into the lower layer processing to train and test the model. e hidden layer uses multilayer LSTM cells to build a circulating neural network, and the output layer outputs the historical data of daily container volumes which has been predicted. erefore the LSTM method that has high prediction accuracy can be applied to predict the daily volumes of containers which will enter the storage yard for the future days, providing the decision basis when decision-maker made the storage yard plan in the port.
+
+5. Experimentation
+5.1. Data Preprocessing. All the experiments are performed on a computer with Intel Core i5 under the Windows 10 operating system using JetBrains PyCharm Community Edition 2017.3.1 x64. e dataset used for research in this paper is from the daily volumes of containers entering the storage yard of a certain port from 2013 to 2017. e raw dataset of the daily container volumes for ve years is drawn in Figure 2. It can be
+
+Journal of Advanced Transportation
+
+5
+
+Daily volumes of containers
+
+1800
+
+1575 1350
+
+1125 900
+
+675 450 225
+
+0
+
+01/01/2013
+
+01/01/2014
+
+01/01/2015 01/01/2016 Date
+
+Raw dataset from 2013 to 2017
+
+01/01/2017
+
+31/12/2017
+
+F
+
+2: e raw dataset of daily container volumes from 2013 to 2017.
+
+Daily volumes of containers
+
+2000
+
+1750
+
+1500
+
+1250
+
+1000
+
+750
+
+500
+
+250
+
+0
+
+2013
+
+2014
+
+2015
+
+2016
+
+Year
+
+F
+
+3: e box plot of daily container volumes from 2013 to 2016.
+
+seen that the dataset has the periodical change characteristics, but there are also some data points deviating from the most data. In the process of data collection, there are human factors such as improper operation, aging of equipment, and so on, resulting in the generation of abnormal data and a ecting the accuracy of the prediction model possibly. erefore, it is necessary to identify and deal with the abnormal data in the raw dataset before training the prediction model.
+e historical dataset from 2013 to 2016 is chosen to be the training set, and the training set is to be preprocessed. e
+rst step is to detect the abnormal data, which will a ect the experimental results. e abnormal data points are individual values in the sample dataset, whose values deviate signi cantly from the rest of the other data, also known as outliers. e common detection method is box plot, which can show the original appearance of data distribution visually. e criteria for determining outliers in box plot recognition are based on
+
+quartile and interquartile range. Outliers are de ned to be less
+
+than − 1.5 × IQR or more than + 1.5 × IQR , where
+
+the , , and IQR are lower quartiles, upper quartiles, and
+
+interquartiles range respectively. e lower quartiles means
+
+that 1/4 of all data is smaller than , while the upper quartiles
+
+means that 1/4 of all data is larger than . e interquartile
+
+range IQR represents the di erence between and , which
+
+contains half of all data. e daily container volumes of each
+
+year are ranked from the largest to the smallest, and the upper
+
+edge, the upper quartile , the median, the lower quartile
+
+, and the lower edge are calculated respectively. e values
+
+which are less than
+
+− 1.5 × IQR or more than
+
++ 1.5 × IQR can be considered as the outliers. e box
+
+plot of the daily container volumes from 2013 to 2016 is given
+
+in Figure 3.
+
+e second step is to deal with the outliers. If deleting the
+
+outliers directly, it may result in the situation of insu cient
+
+6
+
+Journal of Advanced Transportation
+
+Daily volumes of containers
+
+1800 1575 1350 1125 900 675 450 225
+0 01/01/2013
+
+01/01/2014
+
+Raw dataset Preprocessed dataset
+
+01/01/2015 Date
+
+01/01/2016
+
+31/12/2016
+
+F
+
+4: e preprocessed dataset of daily container volumes from 2013 to 2016.
+
+Daily volumes of containers
+
+1.000
+
+0.875
+
+0.750
+
+0.625
+
+0.500
+
+0.375
+
+0.250
+
+0.125
+
+0.000 01/01/2013
+
+01/01/2014
+
+Raw dataset Preprocessed dataset
+
+01/01/2015 Date
+
+01/01/2016
+
+31/12/2016
+
+F
+
+5: e normalized dataset of daily container volumes from 2013 to 2016.
+
+samples and loss of useful information. Another method is to treat the outliers as missing values and then ll them with means. In addition, these outliers are viewed as deleted and
+lled with the mean of the data before and a er one outlier in this paper. A er identi cation and processing of outliers, the preprocessed dataset is shown in Figure 4.
+e third step is to normalize the dataset. Normalization is mainly for the convenience of data processing, mapping the data within the range of 0–1. Before data analysis, it is usually necessary to normalize the data and use the standardized data for data analysis. e dataset used in this paper can be scaled to a speci ed range from 0 to 1, which can be achieved with preprocessing. MinMaxScaler class in Python, as shown in Figure 5.
+5.2. Prediction by LSTM. A er preprocessing the raw data of the daily container volumes from 2013 to 2016, the prediction
+
+experiment is implemented by using Python and Tensor ow framework. e main purpose of this paper is to predict the daily container volumes in the next few days. As show in Figure 5, the horizontal axis is the time index from January 1st of 2013 to December 31st of 2016, and the vertical axis is the volumes of containers that entered the storage yard each day in a certain port. e data of daily container volumes changes periodically on a weekly basis. According to the changing characteristics of the data set, this paper adopts a rolling forecasting method to improve the accuracy of experiments. For example, for predicting the containers volumes on December 31st, the historical data from November 1st to 7th is used as the input and the historical value of November 8th is used as the label output for the rst training. en the historical data from November 2nd to 8th are taken as the input, and the historical data of the 9th is used as the label output for the second training. e rolling prediction is performed in this way until
+
+Journal of Advanced Transportation
+
+7
+
+Daily volumes of containers
+
+1600
+
+Volumes of containers’ forecast of 2014
+
+1400
+
+1200
+
+1000
+
+800
+
+600
+
+400
+
+200 0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+
+Date
+Real dataset of 2014 Predicted dataset of 2014
+
+Volumes of containers’ forecast of 2016 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.29thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2016 Predicted dataset of 2016
+
+Daily volumes of containers
+
+Daily volumes of containers
+
+Volumes of containers’ forecast of 2015 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2015 Predicted dataset of 2015
+Volumes of containers’ forecast of 2017 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2017 Predicted dataset of 2017
+
+F
+
+6: e comparison of the real data with the predicted data by LSTM of four years.
+
+Daily volumes of containers
+
+Daily volumes of containers
+
+T 2: e prediction gap between the real values and predicted values of four years.
+
+e prediction gap
+RMSE Prediction error percentage
+
+2014 69.68 9.37%
+
+Year 2015 2016 53.62 38.70 7.98% 5.69%
+
+2017 23.83 3.77%
+
+it obtains the predicted value of December 31st. at is to say, the parameter of time step is set to be 7 in order to show the intrinsic feature of the data set. e input layer is one in the LSTM network, and the output of the LSTM network is the daily container volumes of the next period, so the number of output layer is also one. e batch size is 50, which refers there are 50 data samples to be trained in each batch.
+e LSTM model is established with two hidden layers, which have 30 hidden neurons. In addition, the number of model iterations is set as 5000. e learning rate is set as 1 × 10–4. e keep_prob function is used to handle the over tting problem. e value of keep_prob at its active level adds a “switch” to each neuron in the layer. e opening probability of the “switch” is the value de ned by keep_prob. Once the switch is closed, the output of this neuron will be blocked. erefore it can balance the importance of each
+
+2000
+
+1500
+
+1000 500
+
+0 Jan.1Jsatn.31Fsetb.28Mthar.3A1sptr.30Mthay.3J1usnt .30Jtuhl.31Asut g.3S1estp.30Othct.31Nsotv.30Dthec.31st Date Real dataset of 2017 Predicted dataset of 2017
+
+F
+
+7: e comparison of the real data with the people-predicted
+
+data of 2017.
+
+neuron’s role e ectively and reduce the risk of over tting. e activation function is sigmoid, loss function is mean_squared_ error, and optimizer parameter to AdamOptimizer.
+e total dataset should to be divided into two parts, the training set and test set respectively. e choices of the training and test set were based on multiple experiments. e data set was divided into training and test set according to di erent proportions, a er several experiments, the average value was
+
+8
+
+Journal of Advanced Transportation
+
+Daily volumes of containers
+
+1600
+
+Volumes of containers’ forecast of 2014
+
+1400
+
+1200
+
+1000
+
+800
+
+600
+
+400
+
+200 0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+
+Date
+Real dataset of 2014 Predicted dataset of 2014
+
+Daily volumes of containers
+
+Volumes of containers’ forecast of 2015 1600
+1400 1200
+1000 800
+600 400
+200 0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st Date Real dataset of 2015 Predicted dataset of 2015
+
+Volumes of containers’ forecast of 2016 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.29thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2016 Predicted dataset of 2016
+
+Daily volumes of containers
+
+Volumes of containers’ forecast of 2017 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2017 Predicted dataset of 2017
+
+F
+
+8: e prediction results with ARIMA model.
+
+Daily volumes of containers
+
+taken as the evaluation result to reduce the error. A er repeating the experimental evaluation, the average value was chosen as the evaluation result of the retention method to reduce the error. en this study chose 80% of all data as the training set and the rest of the dataset is used as the test set in order to evaluate the ability of the model to predict. e historical data of daily container volumes in 2013 is used to predict the daily container volumes of 2014, the real daily container volumes from 2013 to 2014 are used to predict the daily container volumes of 2015, the real daily container volumes from 2013 to 2015 are used to predict the daily container volumes of 2016, and the real daily container volumes from 2013 to 2016 are used to predict the daily container volumes of 2017. To compare the accuracy of the prediction data, the real data of 2017 needs to be retained and be made comparison with the predicted data by LSTM. Once the data is available, the data can be fed to the LSTM model to build a predictive model.
+A er training the LSTM model, it is used to make predictions on data, and the comparison of the real data with the predicted data is given in Figure 6. e blue line represents the values of the real data, while the red line is indicated to be the values of the predicted data.
+e prediction gap between the real values and predicted values can be indicated by RMSE and prediction error percentage, as shown in Equations (7) and (8). e , represents
+
+each predicted daily container volume and the , represents each real daily container volume. e total number of predicted value and real value is .
+
+RMSE =
+
+∑ =1
+
+,−
+
+2
+,,
+
+(7)
+
+Prediction error percentage = ∑ =1ᐈᐈᐈᐈᐈ , − , ᐈᐈᐈᐈᐈ/ , . (8)
+e prediction gap between the real values and predicted values is provided in Table 2.
+It can be found from Table 2 that the prediction gap decreases with the increase of training data set. At the beginning, only the historical data of daily container volumes in 2013 was trained to predict the daily container volumes in 2014, and the prediction gap is larger than any other data set. As for the predicted value in 2017, there is relatively less gap with the real data mainly because it is forecasted by the LSTM model which has been trained by large amount of data from 2013 to 2016. at is to say, the LSTM model can be applied to predict the daily container volumes in port and reduce the prediction gap.
+In addition, the people-predicted dataset was provided in this study which has been collected from the employees who work in
+
+Journal of Advanced Transportation
+
+9
+
+Daily volumes of containers
+
+Volumes of containers’ forecast of 2014 1600
+1400 1200
+1000 800
+600 400
+200 0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2014 Predicted dataset of 2014
+
+Daily volumes of containers
+
+Volumes of containers’ forecast of 2015 1600
+1400 1200
+1000 800
+600 400
+200 0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st Date Real dataset of 2015 Predicted dataset of 2015
+
+Volumes of containers’ forecast of 2016 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.29thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2016 Predicted dataset of 2016
+
+Daily volumes of containers
+
+Volumes of containers’ forecast of 2017 1600
+1400 1200 1000 800
+600 400 200
+0 Jan.1sJtan.31sFteb.28thMar.31Astpr.30Mthay.31Jsutn.30tJhul.31sAtug.31Sstep.30Othct.31Nstov.30tDhec.31st
+Date Real dataset of 2017 Predicted dataset of 2017
+
+F
+
+9: e prediction results with BP neural network.
+
+Daily volumes of containers
+
+the certain port. e comparison between the real data and the people-predicted data of 2017 is also provided in Figure 7.
+Compared with the people-predicted dataset of 2017, the prediction error of daily container volumes between real and people-predicted dataset is 21.22%. If without the scienti c prediction of daily container volumes, the employees in the port would make predictions on the basis of their experience, and subjective judgment, leading to a much larger prediction gap and a ecting the e ciency of the storage yard. However, the prediction made by the proposed LSTM RNN model is obtained through studying and training of the historical dataset, which is extremely essential to provide decision support for the port operation.
+5.3. Comparison between LSTM and Other Prediction
+Methods. In order to further verify the e ectiveness and e ciency of the LSTM method, the Autoregressive Integrated Moving Average (ARIMA) model and the BP neural network are used to predict the daily container volumes of 2017, which can be compared with the prediction result of LSTM. ARIMA is a method of time series prediction and is represented as ARIMA ( , , ). In the ARIMA model,
+is the autoregressive part of the model and allows us to incorporate the in uence of past values into our model, is the integrated part of the model, and is the moving average part of the model which allows us to set the error
+
+to a linear combination of the error values observed at previous time points. When applying the ARIMA model to make prediction, the grid search is used in this study to iteratively explore di erent combinations of parameters, so as to nd the value of ARIMA ( , , ). For each combination of parameters, the new ARIMA model using the SARIMA function of the stats models module in Python was established and its overall quality was evaluated. en, ( , , ) = (1, 1, 1) was used in the ARIMA model to make predictions of daily container volumes in the port, and the prediction result is given in Figure 8. With regard to the BP neural model, the similar parameters with the LSTM model are also provided. Its time step is set to be 7 and it has two hidden layers with 30 hidden neurons. e batch size is 50 and the number of model iterations is set at 5000.
+e prediction result is given in Figure 9. e prediction gap between the prediction values and
+real values of three methods is also provided in Table 3. It can be found that the prediction error of ARIMA model is becoming less mainly because the ARIMA model is based on historical data, and the more historical data collected, the more accurate the model. Compared with the ARIMA model, the RMSE and prediction error percentage of BP neural network are both lower according to the experiments.
+at is to say, the prediction accuracy of BP neural network
+is higher than the ARIMA model, which can solve the
+
+10
+Prediction gap Year ARIMA model BP neural network LSTM
+
+Journal of Advanced Transportation
+
+2014 89.67 87.94 69.68
+
+T 3: e prediction gap of three prediction methods.
+
+RMSE
+
+2015
+
+2016
+
+84.85
+
+83.11
+
+83.38
+
+80.48
+
+53.62
+
+38.70
+
+2017 78.09 77.91 23.83
+
+2014 13.00% 12.63% 9.37%
+
+Prediction error percentage
+
+2015
+
+2016
+
+12.66%
+
+12.59%
+
+12.44%
+
+12.31%
+
+7.98%
+
+5.69%
+
+2017 12.37% 11.94% 3.77%
+
+problems of traditional prediction methods. In addition, the prediction gap of the LSTM model is the lowest which means the LSTM RNN model is superior to other prediction method in predicting the daily container volumes. e LSTM RNN can solve nonlinear and local minima problems, and has stronger data learning ability and generalization ability, which can predict the trend of daily container volumes more accurately and can provide a basis for the decision-maker.
+e comparison shows that the prediction of daily container volumes which used LSTM RNN model is superior to other prediction method, and has less prediction error.
+erefore, the proposed LSTM RNN model can be applied to make predictions of daily container volumes, so as to provide decision support when managing storage yard.
+6. Conclusions
+is paper makes prediction of daily volumes of containers which will enter the storage yard in the future days. e historical dataset of daily container volumes is preprocessed by box plot, and the outliers identiﬁed are replaced with means. en the preprocessed dataset is used to train the LSTM RNN model and predict the daily container volumes. In addition, the historical dataset was chosen as the training set and used to make predictions, which also was compared with the real values of each year. More precisely, the ARIMA model and BP neural network were applied to make predictions of daily container volumes and make comparison with the prediction results of the LSTM model. e results show that the structure of the LSTM RNN can be applied to predict the daily container volumes of storage yard, and the prediction gap is lower than other prediction methods. With the prediction of container volumes using the LSTM model, it provides the data support when designing the storage plan including the location and number of containers. en the space utilization of storage yard is given an opportunity to be maximized, and the rate of turning over containers is going to be reduced as a more precise and detailed plan than before making predictions. Consequently, the ship berthing at the container terminal can be driven away a er loading containers in a fast and eﬃcient way, so as to improve the operation eﬃciency.
+Data Availability
+e authors have no right to publish the raw data of the port.
+
+Conflicts of Interest
+e authors declare that they have no conﬂicts of interest regarding the publication of this paper.
+Funding
+is work was supported by the National Natural Science Foundation of China (71602114, 71631007), Shanghai Science & Technology Committee Research Project (16040501500, 17595810300).
+References
+  [1] Robert H. Shumway and David S. Stoﬀer, Time Series Analysis and Its Applications, Springer Texts in Statistics, 2000.
+  [2] J. Z. Wang, R. L. Jia, W. G. Zhao, J. Wu, and Y. Dong, “Application of the largest Lyapunov exponent and non-linear fractal extrapolation algorithm to short-term load forecasting,” Chaos, Solitons & Fractals, vol. 45, pp. 1277–1287, 2012.
+  [3] J. Z. Wang, S. L. Zhu, W. Y. Zhang, and H. Y. Lu, “Combined modeling for electric load forecasting with adaptive particles warm optimization,” Energy, vol. 35, pp. 1671–1678, 2010.
+  [4] G. Sudheer and A. Suseelatha, “Short term load forecasting using wavelet transform combined with Holt–Winters and weighted nearest neighbor models,” International Journal of Electrical Power & Energy Systems, vol. 64, pp. 340–346, 2015.
+  [5] P. J. Brockwell and R. A. Davis, Time Series: eory and Methods, Springer, Berlin, 1991.
+  [6] K.-B. Song, Y.-S. Baek, D. H. Hong, and G. Jang, “Short-term load forecasting for the holidays using fuzzy linear regression method,” IEEE Transactions on Power Systems, vol. 20, no. 1, pp. 96–101, 2005.
+  [7] Y. Guo, E. Nazarian, J. Ko, and K. Rajurkar, “Hourly cooling load forecasting using time-indexed ARX models with twostage weighted leastsquares regression,” Energy Conversion and Management, vol. 80, pp. 46–53, 2014.
+ [8] P. Zhou, B. W. Ang, and K. L. Poh, “A trigonometric grey prediction approach to forecasting electricity demand,” Energy, vol. 31, pp. 2839–2847, 2006.
+  [9] D. Akay and M. Atak, “Grey prediction with rolling mechanism for electricity demand forecasting of Turkey,” Energy, vol. 32, pp. 1670–1675, 2007.
+[10] T. R. García, N. G. Cancelas, and F. Soler-Flores, “ e artiﬁcial neural networks to obtain port planning parameters,” Procedia – Social and Behavioral Sciences, vol. 162, pp. 168–177, 2014.
+[11] G. R. Gunnu and T. Moan, “An assessment of anchor handling vessel stability during anchor handling operations using the
+
+Journal of Advanced Transportation
+
+11
+
+method of artiﬁcial neural networks,” Ocean Engineering, vol. 140, pp. 292–308, 2017.
+[12] A. P. IoannaKourounioti and C. Tsiklidis, “Development of models predicting dwell time of import containers in port container terminals – an artiﬁcial neural networks application,” Transportation Research Procedia, vol. 14, pp. 243–252, 2016.
+[13] Yu Deng Li and Dong., “Deep Learning: Methods and Applications,” Foundations & Trends in Signal Processing, vol. 7, no. 3-4, pp. 197–387, 2014.
+[14] F. A. Gers, N. N. Schraudolph, and J. Schmidhuber, “Learning precise timing with LSTM recurrent networks,” Journal of Machine Learning Research, vol. 3, pp. 115–143, 2002.
+[15] Y. Bengio, A. Courville, and P. Vincent, “Representation learning: a review and new perspectives,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 35, no. 8, pp. 1798–1828, 2013.
+[16] M. Niu, Y. Hu, S. Sun, and Y. Liu, “A novel hybrid decompositionensemble model based on VMD and HGWO for container throughput forecasting,” Applied Mathematical Modelling, vol. 57, pp. 163–178, 2018.
+[17] S. H. Chen and J. N. Chen, “Forecasting container throughputs at ports using genetic programming,” Expert Systems with Applications, vol. 37, no. 3, pp. 2054–2058, 2010.
+[18] C. Zhang, L. Huang, and Z. Zhao, “Research on combination forecast of port cargo throughput based on time series and causality analysis,” Journal of Industrial Engineering and Management, vol. 6, no. 1, pp. 124–134, 2013.
+[19] R. Weron, “Electricity price forecasting: a review of the stateof-the-art with a look into the future,” International Journal of Forecasting, vol. 30, no. 4, pp. 1030–1081, 2014.
+[20] S. Cincotti, G. Gallo, L. Ponta, and M. Raberto, “Modeling and forecasting of electricity spot-prices: computational intelligence vs. classical econometrics,” Ai Communications, vol. 27, no. 3, pp. 301–314, 2014.
+[21] E. Twrdy and M. Batista, “Modeling of container throughput in Northern Adriatic ports over the period 1990–2013,” Journal of Transport Geography, vol. 52, pp. 131–142, 2016.
+[22] B. Cortez, B. Carrera, Y. J. Kim, and J. Y. Jung, “An architecture for emergency event prediction using LSTM recurrent neural networks,” Expert Systems With Applications, vol. 97, pp. 315– 324, 2018.
+[23] T. Fischer and K. Christopher, “Deep learning with long shortterm memory networks for ﬁnancial market predictions,” European Journal of Operational Research, vol. 270, pp. 654–669, 2018.
+[24] J. Kumar, G. Rimsha, and K. S. Ashutosh, “Long short term memory recurrent neural netwotk (LSTM-RNN) based workload foresting model for cloud datacenters,” Procedia Computer Science, vol. 125, pp. 676–682, 2018.
+[25] S. Oehmcke, O. Zielinski, and O. Kramer, “Recurrent neural networks and exponential PAA for virtual marine sensors,” in International Joint Conference on Neural Networks, IJCNN, IEEEAnchorage, AK, 14–19 May 2017.
+[26] A. Nigri, S. Levantesi, M. Marino, S. Scognamiglio, and F. Perla, “A deep learning integrated Lee–Carter model,” Risks, vol. 7, no. 1, p. 33, 2019.
+[27] S. Srivastava and S. Lessmann, “A comparative study of LSTM neural networks in forecasting day-ahead global horizontal irradiance with satellite data,” Solar Energy, vol. 162, pp. 232– 247, 2018.
+
+[28] K. Chen, Y. Zhou, and F. Dai, “A LSTM-based method for stock returns prediction: a case study of China stock market,” in Proceedings of the 2015 IEEE International Conference on Big Data (Big Data), pp. 2823–2824, Santa Clara, CA, 29 October–1 November 2015.
+[29] Y. Tian, K. Zhang, J. Li, X. Lin, and B. Yang, “LSTM-based traﬃc ﬂow prediction with missing data,” Neurocomputing, vol. 318, pp. 297–305, 2018.
+[30] S. Hochreiter and J. Schmidhuber, “Long short-term memory,” Neural Computation, vol. 9, no. 8, pp. 1735–1780, 1997.
+
+International Journal of
+Rotating Machinery
+
+Advances in
+Multimedia
+
+Engineering Journal of
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+The Scientific World Journal
+
+Hindawi Publishing Corporation hwtwtpw:/./hwinwdwaw.hii.ncodmawi.com
+
+Volume 20183
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Journal of
+Sensors
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Journal of
+Control Science and Engineering
+
+Advances in
+Civil Engineering
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Journal of
+Robotics
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Submit your manuscripts at www.hindawi.com
+
+Journal of
+Electrical and Computer Engineering
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Advances in OptoElectronics
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+VLSI Design
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+International Journal of
+Navigation and Observation
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Modelling & Simulation in Engineering
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+International Journal of
+Aerospace Engineering
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+International Journal of
+Chemical Engineering
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+International Journal of
+Antennas and Propagation
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Active and Passive Electronic Components
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Shock and Vibration
+
+Hindawi www.hindawi.com
+
+Volume 2018
+
+Advances in
+Acoustics and Vibration
+
+Hindawi www.hindawi.com
+
+Volume 2018
+

@@ -1,0 +1,233 @@
+
+Your Privacy
+
+We use cookies to make sure that our website works properly, as well as some ‘optional’ cookies to personalise content and advertising, provide social media features and analyse how people use our site. By accepting some or all optional cookies you give consent to the processing of your personal data, including transfer to third parties, some in countries outside of the European Economic Area that do not offer the same data protection standards as the country where you live. You can decide which optional cookies to accept by clicking on ‘Manage Settings’, where you can also find more information about how your personal data is processed. Further information can be found in our privacy policy .
+Accept All Cookies Manage Preferences
+Skip to main content
+
+This service is more advanced with JavaScript available
+SpringerLink
+Search
+Go to cart
+
+Menu
+Annual Privacy Forum
+
+APF 2012 : Privacy Technologies and Policy pp 41-54 | Cite as
+Privacy-Preserving Computation
+(Position Paper)
+
+    Authors
+    Authors and affiliations 
+
+    Florian Kerschbaum 
+
+Conference paper
+
+    9 Citations
+    1.7k Downloads
+
+Part of the Lecture Notes in Computer Science book series (LNCS, volume 8319)
+Abstract
+
+Private data is commonly revealed to the party performing the computation on it. This poses a problem, particularly when outsourcing storage and computation, e.g., to the cloud. In this paper we present a review of security mechanisms and a research agenda for privacy-preserving computation. We begin by reviewing current application scenarios where computation faces privacy requirements. We then review existing cryptographic techniques for privacy-preserving computation. And last, we outline research problems that need to be solved for implementing privacy-preserving computations. Once addressed, privacy-preserving computations can quickly become a reality enhancing the privacy protection of citizens.
+Keywords
+Range Query  Security Model  Secure Computation  Trust Platform Module  Homomorphic Encryption 
+These keywords were added by machine and not by the authors. This process is experimental and the keywords may be updated as the learning algorithm improves.
+This is a preview of subscription content, log in to check access.
+Preview
+
+Unable to display preview. 
+References
+
+    1.
+    Abadi, M., Morrisett, G., Sabelfeld, A.: Language-based security. Journal of Functional Programming 15(2), 129 (2005) CrossRef Google Scholar
+    2.
+    Abraham, I., Dolev, D., Gonen, R., Halpern, J.: Distributed computing meets game theory: Robust mechanisms for rational secret sharing and multiparty computation. In: Proceedings of the 25th ACM Symposium on Principles of Distributed Computing, PODC 2006 (2006) Google Scholar
+    3.
+    Agrawal, R., Kiernan, J., Srikant, R., Xu, Y.: Order preserving encryption for numeric data. In: Proceedings of the ACM International Conference on Management of Data, SIGMOD 2004 (2004) Google Scholar
+    4.
+    Almeida, J.B., Bangerter, E., Barbosa, M., Krenn, S., Sadeghi, A.-R., Schneider, T.: A certifying compiler for zero-knowledge proofs of knowledge based on σ -protocols. In: Gritzalis, D., Preneel, B., Theoharidou, M. (eds.) ESORICS 2010. LNCS, vol. 6345, pp. 151–167. Springer, Heidelberg (2010) CrossRef Google Scholar
+    5.
+    Backes, M., Maffei, M., Pecina, K.: Automated synthesis of privacy-preserving distributed applications. In: Proceedings of 19th Network and Distributed System Security Symposium, NDSS 2012 (2012) Google Scholar
+    6.
+    Balasch, J., Rial, A., Troncoso, C., Preneel, B., Verbauwhede, I., Geuens, C.: Pretp: privacy-preserving electronic toll pricing. In: Proceedings of the 19th USENIX Conference on Security, USENIX Security 2010 (2010) Google Scholar
+    7.
+    Bauer, G., Stockinger, K., Lukowicz, P.: Recognizing the use-mode of kitchen appliances from their current consumption. In: Barnaghi, P., Moessner, K., Presser, M., Meissner, S. (eds.) EuroSSC 2009. LNCS, vol. 5741, pp. 163–176. Springer, Heidelberg (2009) CrossRef Google Scholar
+    8.
+    Ben-David, A., Nisan, N., Pinkas, B.: Fairplaymp: a system for secure multi-party computation. In: Proceedings of the 15th ACM Conference on Computer and Communications Security, CCS 2008 (2008) Google Scholar
+    9.
+    Ben-Or, M., Goldwasser, S., Wigderson, A.: Completeness theorems for non-cryptographic fault-tolerant distributed computation. In: Proceedings of the 20th ACM Symposium on Theory of computing, STOC 1988 (1988) Google Scholar
+    10.
+    Berthold, O., Federrath, H., Köhntopp, M.: Project “anonymity and unobservability in the internet”. In: Proceedings of the 10th Conference on Computers, Freedom and Privacy: Challenging the Assumptions, CFP 2000 (2000) Google Scholar
+    11.
+    Binnig, C., Hildenbrand, S., Färber, F.: Dictionary-based order-preserving string compression for main memory column stores. In: Proceedings of the ACM International Conference on Management of Data, SIGMOD 2009 (2009) Google Scholar
+    12.
+    Bogdanov, D., Laur, S., Willemson, J.: Sharemind: A framework for fast privacy-preserving computations. In: Jajodia, S., Lopez, J. (eds.) ESORICS 2008. LNCS, vol. 5283, pp. 192–206. Springer, Heidelberg (2008) CrossRef Google Scholar
+    13.
+    Boldyreva, A., Chenette, N., Lee, Y., O’Neill, A.: Order-preserving symmetric encryption. In: Joux, A. (ed.) EUROCRYPT 2009. LNCS, vol. 5479, pp. 224–241. Springer, Heidelberg (2009) CrossRef Google Scholar
+    14.
+    Boneh, D., Di Crescenzo, G., Ostrovsky, R., Persiano, G.: Public key encryption with keyword search. In: Cachin, C., Camenisch, J.L. (eds.) EUROCRYPT 2004. LNCS, vol. 3027, pp. 506–522. Springer, Heidelberg (2004) CrossRef Google Scholar
+    15.
+    Camenisch, J., Van Herreweghen, E.: Design and implementation of the idemix anonymous credential system. In: Proceedings of the 9th ACM Conference on Computer and Communications Security, CCS 2002 (2002) Google Scholar
+    16.
+    Cavoukian, A., Polonetskyand, J., Wolf, C.: Smart privacy for the smart grid: embedding privacy into the design of electricity conservation. Identity in the Information Society 3(2), 275–294 (2010) CrossRef Google Scholar
+    17.
+    Cramer, R., Damgård, I.B., Nielsen, J.B.: Multiparty computation from threshold homomorphic encryption. In: Pfitzmann, B. (ed.) EUROCRYPT 2001. LNCS, vol. 2045, pp. 280–300. Springer, Heidelberg (2001) CrossRef Google Scholar
+    18.
+    Damgård, I., Geisler, M., Krøigaard, M., Nielsen, J.B.: Asynchronous multiparty computation: theory and implementation. In: Jarecki, S., Tsudik, G. (eds.) PKC 2009. LNCS, vol. 5443, pp. 160–179. Springer, Heidelberg (2009) CrossRef Google Scholar
+    19.
+    Danezis, G., Livshits, B.: Towards ensuring client-side computational integrity (position paper). In: Proceedings of the ACM Cloud Computing Security Workshop, CCSW 2011 (2011) Google Scholar
+    20.
+    Dingledine, R., Mathewson, N., Syverson, P.: Tor: the second-generation onion router. In: Proceedings of the 13th USENIX Conference on Security, USENIX Security 2004 (2004) Google Scholar
+    21.
+    Dwork, C.: Differential privacy. In: Proceedings of the 33rd International Colloquium on Automata, Languages and Programming (2006) Google Scholar
+    22.
+    Gentry, C.: Fully homomorphic encryption using ideal lattices. In: Proceedings of the 41st ACM Symposium on Theory of Computing, STOC 2009 (2009) Google Scholar
+    23.
+    Gentry, C., Halevi, S.: Implementing gentry’s fully-homomorphic encryption scheme. In: Paterson, K.G. (ed.) EUROCRYPT 2011. LNCS, vol. 6632, pp. 129–148. Springer, Heidelberg (2011) CrossRef Google Scholar
+    24.
+    Goldreich, O.: The Foundations of Cryptography. Basic Applications, vol. 2. Cambridge University Press (2004) Google Scholar
+    25.
+    Goldreich, O., Micali, S., Wigderson, A.: How to play any mental game. In: Proceedings of the 19th ACM Symposium on Theory of Computing, STOC 1987 (1987) Google Scholar
+    26.
+    Goldwasser, S., Micali, S., Rackoff, C.: The knowledge complexity of interactive proof systems. SIAM Journal of Computing 18(1), 186–208 (1989) CrossRef zbMATH MathSciNet Google Scholar
+    27.
+    Gordon, S.D., Katz, J.: Rational secret sharing, revisited. In: De Prisco, R., Yung, M. (eds.) SCN 2006. LNCS, vol. 4116, pp. 229–241. Springer, Heidelberg (2006) CrossRef Google Scholar
+    28.
+    Halpern, J., Teague, V.: Rational secret sharing and multiparty computation: Extended abstract. In: Proceedings of the 36th ACM Symposium on Theory of Computing, STOC 2004 (2004) Google Scholar
+    29.
+    Hart, G.W.: Nonintrusive appliance load monitoring. Proceedings of the IEEE 80(12), 1870–1891 (1992) CrossRef Google Scholar
+    30.
+    Heck, W.: Smart energy meter will not be compulsory. NRC Handelsblad (April 2009), http://www.nrc.nl/international/article2207260.ece/Smart_energy_meter_will_not_be_compulsory
+    31.
+    Henecka, W., Kögl, S., Sadeghi, A.-R., Schneider, T., Wehrenberg, I.: Tasty: tool for automating secure two-party computations. In: Proceedings of the 17th ACM Conference on Computer and Communications Security, CCS 2010 (2010) Google Scholar
+    32.
+    Heydt-Benjamin, T.S., Chae, H.-J., Defend, B., Fu, K.: Privacy for public transportation. In: Danezis, G., Golle, P. (eds.) PET 2006. LNCS, vol. 4258, pp. 1–19. Springer, Heidelberg (2006) CrossRef Google Scholar
+    33.
+    Huang, Y., Evans, D., Katz, J., Malka, L.: Faster secure two-party computation using garbled circuits. In: Proceedings of the 20th USENIX Conference on Security, USENIX Security 2011 (2011) Google Scholar
+    34.
+    Izmalkov, S., Micali, S., Lepinski, M.: Rational secure computation and ideal mechanism design. In: Proceedings of the 46th IEEE Symposium on Foundations of Computer Science, FOCS 2005 (2005) Google Scholar
+    35.
+    Jamieson, A.: Smart meters could be ‘spy in the home’. Telegraph (UK) (October 2009), http://www.telegraph.co.uk/finance/newsbysector/energy/6292809/Smart-meters-could-be-spy-in-the-home.html
+    36.
+    Jawurek, M., Johns, M., Kerschbaum, F.: Plug-in privacy for smart metering billing. In: Fischer-Hübner, S., Hopper, N. (eds.) PETS 2011. LNCS, vol. 6794, pp. 192–210. Springer, Heidelberg (2011) CrossRef Google Scholar
+    37.
+    Kerschbaum, F.: Adapting privacy-preserving computation to the service provider model. In: Proceedings of the International Conference on Privacy, Security, Risk and Trust, PASSAT 2009 (2009) Google Scholar
+    38.
+    Kerschbaum, F.: Automatically optimizing secure computation. In: Proceedings of the 18th ACM Conference on Computer and Communications Security, CCS 2011 (2011) Google Scholar
+    39.
+    Kerschbaum, F., Schaad, A.: Privacy-preserving social network analysis for criminal investigations. In: Proceedings of the 7th ACM Workshop on Privacy in the Electronic Society, WPES 2008 (2008) Google Scholar
+    40.
+    Lisovich, M.A., Mulligan, D.K., Wicker, S.B.: Inferring personal information from demand-response systems. IEEE Security and Privacy 8(1), 11–20 (2010) CrossRef Google Scholar
+    41.
+    Lysyanskaya, A., Triandopoulos, N.: Rationality and adversarial behavior in multi-party computation. In: Dwork, C. (ed.) CRYPTO 2006. LNCS, vol. 4117, pp. 180–197. Springer, Heidelberg (2006) CrossRef Google Scholar
+    42.
+    Malkhi, D., Nisan, N., Pinkas, B., Sella, Y.: Fairplay – a secure two-party computation system. In: Proceedings of the 13th USENIX Conference on Security, USENIX Security 2004 (2004) Google Scholar
+    43.
+    Naehrig, M., Lauter, K., Vaikuntanathan, V.: Can homomorphic encryption be practical? In. In: Proceedings of the 3rd ACM Cloud Computing Security Workshop, CCSW 2011 (2011) Google Scholar
+    44.
+    Paillier, P.: Public-key cryptosystems based on composite degree residuosity classes. In: Stern, J. (ed.) EUROCRYPT 1999. LNCS, vol. 1592, pp. 223–238. Springer, Heidelberg (1999) CrossRef Google Scholar
+    45.
+    Popa, R.A., Redfield, C.M.S., Zeldovich, N., Balakrishnan, H.: Cryptdb: protecting confidentiality with encrypted query processing. In: Proceedings of the 23rd ACM Symposium on Operating Systems Principles, SOSP 2011 (2011) Google Scholar
+    46.
+    Rial, A., Danezis, G.: Privacy-preserving smart metering. In: Proceedings of the 10th ACM Workshop on Privacy in the Electronic Society, WPES 2011 (2011) Google Scholar
+    47.
+    Schröpfer, A., Kerschbaum, F.: Forecasting run-times of secure two-party computation. In: Proceedings of the 8th International Conference on Quantitative Evaluation of Systems, QEST 2011 (2011) Google Scholar
+    48.
+    Schröpfer, A., Kerschbaum, F., Müller, G.: L1 – an intermediate language for mixed-protocol secure computation. In: Proceedings of the 35th IEEE Computer Software and Applications Conference, COMPSAC 2011 (2011) Google Scholar
+    49.
+    Shi, E., Bethencourt, J., Chan, T.-H.H., Song, D., Perrig, A.: Multi-dimensional range query over encrypted data. In: Proceedings of the IEEE Symposium on Security and Privacy, SP 2007 (2007) Google Scholar
+    50.
+    Shoham, Y., Tennenholtz, M.: Non-cooperative computation: boolean functions with correctness and exclusivity. Theoretical Computer Science 343(1-2), 97–113 (2005) CrossRef zbMATH MathSciNet Google Scholar
+    51.
+    Sultanem, F.: Using appliance signatures for monitoring residential loads at meter panel level. IEEE Transactions on Power Delivery 6(4), 1380–1385 (1991) CrossRef Google Scholar
+    52.
+    Sweeney, L.: k-anonymity: A model for protecting privacy. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems 10(5) (2002) Google Scholar
+    53.
+    Van Dijk, M., Juels, A.: On the impossibility of cryptography alone for privacy-preserving cloud computing. In: Proceedings of the 5th USENIX Workshop on Hot Topics in Security, HotSec 2010 (2010) Google Scholar
+    54.
+    Yao, A.C.: Protocols for secure computations. In: Proceedings of the 23rd Annual Symposium on Foundations of Computer Science, FOCS 1982 (1982) Google Scholar
+
+Copyright information
+© Springer-Verlag Berlin Heidelberg 2014
+About this paper
+
+Cite this paper as:
+    Kerschbaum F. (2014) Privacy-Preserving Computation. In: Preneel B., Ikonomou D. (eds) Privacy Technologies and Policy. APF 2012. Lecture Notes in Computer Science, vol 8319. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-54069-1_3
+
+    DOI https://doi.org/10.1007/978-3-642-54069-1_3
+    Publisher Name Springer, Berlin, Heidelberg
+    Print ISBN 978-3-642-54068-4
+    Online ISBN 978-3-642-54069-1
+    eBook Packages Computer Science Computer Science (R0)
+
+    Reprints and Permissions
+
+Privacy-Preserving Computation
+Cite paper
+Buy options
+Actions
+Buying options
+
+Chapter
+    EUR   24.95
+    Price excludes VAT (Taiwan (R.O.C.))
+
+    DOI: 10.1007/978-3-642-54069-1_3
+    Chapter length: 14 pages
+    Instant PDF download
+    Readable on all devices
+    Own it forever
+    Exclusive offer for individuals only
+    Tax calculation will be finalised during checkout
+
+Buy Chapter
+
+eBook
+    EUR   37.44
+    Price includes VAT (Taiwan (R.O.C.))
+
+    ISBN: 978-3-642-54069-1
+    Instant PDF download
+    Readable on all devices
+    Own it forever
+    Exclusive offer for individuals only
+    Tax calculation will be finalised during checkout
+
+Buy eBook
+
+Softcover Book
+    EUR   46.00
+    Price excludes VAT (Taiwan (R.O.C.))
+
+    ISBN: 978-3-642-54068-4
+    Dispatched in 3 to 5 business days
+    Exclusive offer for individuals only
+    Free shipping worldwide
+    Shipping restrictions may apply, check to see if you are impacted .
+    Tax calculation will be finalised during checkout
+
+Buy Softcover Book
+Learn about institutional subscriptions
+
+Over 10 million scientific documents at your fingertips
+Academic Edition
+
+    Home
+    Impressum
+    Legal information
+    Privacy statement
+    California privacy statement
+    How we use cookies
+    Manage cookies/Do not sell my data
+    Accessibility
+    FAQ
+    Contact us
+    Affiliate program
+
+Springer Nature
+
+© 2020 Springer Nature Switzerland AG. Part of Springer Nature .
+
+Not logged in Not affiliated 122.118.163.95

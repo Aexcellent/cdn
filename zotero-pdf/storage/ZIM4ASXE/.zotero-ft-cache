@@ -1,0 +1,2806 @@
+Computers & Industrial Engineering 141 (2020) 106296 Contents lists available at ScienceDirect
+Computers & Industrial Engineering
+journal homepage: www.elsevier.com/locate/caie
+
+Transshipment operations optimization of sea-rail intermodal container in T seaport rail terminals
+Baicheng Yana,b,⁎, Xiaoning Zhua, Der-Horng Leeb, Jian Gang Jinc, Li Wanga,⁎
+a School of Traffic and Transportation, Beijing Jiaotong University, Beijing 100044, China b Department of Civil and Environmental Engineering, National University of Singapore, Singapore 117576, Singapore c School of Naval Architecture, Ocean and Civil Engineering, Shanghai Jiao Tong University, Shanghai 200240, China
+
+ARTICLE INFO
+Keywords: Sea-rail intermodal transportation Seaport rail terminal Transshipment operation Rolling horizon approach
+
+ABSTRACT
+This paper tackles the sea-rail transshipment operation problem of seaport rail terminals, which includes two key sub-problems involved in sea-rail intermodal container transportation, namely train schedule template and transshipment plan of inbound containers. With limited resources and time constraints, operators need to decide the placed-in and taken-out time of trains to coordinate with vessels’ unloading time and the transshipment plan of inbound containers (i.e. the amount of containers that are transshipped between different vessels and trains in each time slot) to maximize the number of direct-transshipment containers while minimizing the storage time and dwell time of inbound containers. The problem is formulated as an integer programming model, and a tailored rolling horizon approach with the adaptive horizon and backtracking strategy is proposed. The performance of the algorithm is verified by a set of instances. The results suggest that the handling capacity of rail-mounted gantry cranes shows a more significant effect on the performance of transshipment operation than other factors. The negative effect caused by insufficient handling capacity could be alleviated by methods like prolonging the feasible service time of trains and enhancing the operational capacity of shunting engines.
+
+1. Introduction
+As sea-rail intermodal container transportation (SRICT) is receiving increasing attention because of its cost and environmental advantages, many countries are propelling the industry and investing in seaport rail terminals to enhance the connectivity between shipping and railway transportation. One of the main problems needed to be studied is how to transfer containers between vessels and trains effectively. After being discharged from vessels, inbound containers can be loaded on trains directly or stacked in the yard temporarily, namely the direct-transshipment mode and the indirect-transshipment mode. At the same time, outbound containers coming with loaded trains also need to be discharged.
+For comparison, in traditional transshipment ports, the directtransshipment model between vessels could save yard resources but require contingent berthing time of vessels, whereas the indirecttransshipment model could relieve the contingent vessel berthing time restriction but consume yard storage and incur yard transportation cost (Liu, Lee, Zhang, & Chu, 2016). Similarly, we believe that, in SRICT,
+
+with limited resources and increasing throughput of containers, the direct-transshipment mode could also help to improve the operation efficiency of terminals. However, to apply the direct mode in practice, two problems need to be solved. First, how to synchronize the schedule plan of trains and the operation plan of vessels? Second, how to make full use of various resources to improve the efficiency of transshipment operations?
+Therefore, to address the concerns, one of the main focuses of SRICT is to set up a tactical schedule template that determines the service time of trains. Vacca, Bierlaire, and Salani (2007) studied the transshipment efficiency in traditional maritime terminals and mentioned that the efficiency of a transshipment hub could be improved by taking into account the peculiarities of transshipment flows when the arrival time of feeders are not known in advance but can be decided by the terminal. In SRICT, it could also be an effective way for terminal operators to determine or suggest the service time of trains based on the operation resources of terminals. Thus, the schedule template of trains can coordinate with the shipping schedule and discharge plan of vessels.
+Another focus of SRICT is to determine a transshipment plan of
+
+⁎ Corresponding authors at: School of Traffic and Transportation, Beijing Jiaotong University, Beijing 100044, China (B. Yan and L. Wang). E-mail addresses: baichengyan@foxmail.com (B. Yan), xnzhu@bjtu.edu.cn (X. Zhu), dhl@nus.edu.sg (D.-H. Lee), jiangang.jin@sjtu.edu.cn (J.G. Jin),
+liwang@bjtu.edu.cn (L. Wang).
+https://doi.org/10.1016/j.cie.2020.106296 Received 4 May 2019; Received in revised form 12 November 2019; Accepted 14 January 2020 Available online 17 January 2020 0360-8352/ © 2020 Elsevier Ltd. All rights reserved.
+
+B. Yan, et al.
+inbound containers specifying the number and handling time of inbound containers. In a seaport railway terminal, the key objective of the transshipment plan is to load more containers directly while shortening the total dwell time of containers in terminals. The inbound containers are exchanged between vessels and trains directly and indirectly. Although the advantage of direct transshipment is obvious, it is still hard to load all inbound containers directly in practice. The transshipment of inbound containers stacked in yards should also be considered to avoid long storage time. For outbound containers, they usually need to be stacked in yards before loading operations for the need of some other operations, such as customs inspections.
+In practice, the aforementioned two problems are decided by different decision entities. The schedule template of trains is one of the key inputs in the decision of a transshipment plan. However, this sequential way of planning the seaside operations often hinders obtaining sufficient resource utilization and service quality at low cost (Meisel & Bierwirth, 2013). On the one hand, the performance of the transshipment plan is highly influenced by the schedule template of trains since the latter determines the temporal distribution of transport capacities to some extent. On the other hand, the schedule plan of trains is also influenced by the transport requirements of containers, e.g. the direction and unloading plan of inbound containers. The storage time of containers is also a key indicator to evaluate the performance of the schedule template in practice. Thus, we believe that optimizing them jointly could in favor of a more effective plan.
+Specifically, this paper addresses the transshipment plan optimization problem arising in SRICT, which contains the following key decisions: (1) determining placing-in and taking-out time of trains; (2) determining the number of inbound containers loaded on trains; (3) determining the number of outbound containers discharged from trains. It is worth to mention that the problem proposed in this study is not restricted to a specific sea-rail intermodal container terminal. The proposed model is not related to specific layouts of container terminals and terminal operators can apply our problem in practice with their own shipping schedule.
+The main contribution of this paper is twofold: firstly, a transshipment operation planning problem arising in SRICT is proposed, in which the optimization of train schedule template and transshipment plan of inbound containers are integrated; secondly, a rolling horizon approach with the adaptive horizon and backtracking strategy is proposed to solve the problem. The remainder of this paper is organized as follows. Section 2 reviews related papers in the literature. Section 3 gives a detailed description of the transshipment operation planning problem. The problem is formulated as an integer programming model in Section 4. In order to solve the problem effectively, a rolling horizon approach with adaptive horizon length and backtracking strategy is proposed in Section 5. Computational experiments are conducted in Section 6, and the conclusion is made in Section 7.
+2. Literature review
+Although SRICT receives increasing attention, to our knowledge, just a few studies have focused on the sea-rail transshipment operations in intermodal container transportation. Thus, in this section, some recent studies which are most relevant to our research topic are summarized.
+2.1. Container transshipment operation
+The management of container terminal operations requires addressing several challenging decision problems at various planning levels from strategic (e.g., terminal layout design), tactical (e.g., berth template design, yard template design) to operational (e.g., berth
+
+Computers & Industrial Engineering 141 (2020) 106296
+allocation, crane scheduling) (Jin, Lee, & Hu, 2015). Numerous researches have been conducted on the optimization of operation in container terminals, and there are serval survey papers that can be referred. Readers can refer to Steenken, Voß, and Stahlbock (2004), Stahlbock and Voß (2008) and Bierwirth and Meisel (2010) for a comprehensive review of relevant literature. In this sub-section, we focus on literature related to container transshipment operations and feeder vessel management.
+The tactical berth allocation and storage space assignment problems arising in seaport container terminal have been well studied (Iris, LallaRuiz, Lam, & Voß, 2018; Li & Sheng, 2016; Wang, Zhen, Wang, & Laporte, 2018; Xiang, Liu, & Miao, 2018; Zhen, 2015; Sheng, Meng, & Li, 2019; Xiang, Liu, & Miao, 2017). However, just a few of them have taken the direct transshipment of containers between vessels into consideration, which could influence the traditional operation plan greatly. Liu et al. (2016) proposed a bi-objective integer model to optimize the tactical berth allocation and the tactical yard allocation jointly, which aims to minimize the total transport distance of containers and the violation of the vessels’ expected turnaround time windows. The proposed model comprehensively addresses the import, export and transshipment tasks involved in container terminal and both direct and indirect transshipment are incorporated. Non-dominated sorting genetic algorithm is used to solve the problem and obtain approximate Pareto front solutions. Zeng, Feng, and Chen (2017) emphasized the influence caused by direct-transshipment operations and developed a mixed-integer model that optimizes the berth allocation and storage space assignment problem based on the direct-transshipment operation. For indirect-transshipment containers, Ma, Chung, Chan, and Cui (2019) also studied the berth and yard planning problem in transshipment terminals with a multi-continuous berth layout. Zhen (2015) presented a yard template planning problem in transshipment terminals, in which un-uniform vessels’ periodicities are considered. In the research aforementioned, the transshipment plan between vessels is assumed to be determined, and the terminal operators only need to determine whether transfer them directly.
+Another stream of research that is underlined is the feeder vessel management problem, a vessel to vessel transfer plan management problem that arises in transshipment container terminals like Singapore. This problem is a combination of the berth allocation problem and yard storage allocation problem, which further takes container transshipment plans between vessels and some other requirements into consideration. To our knowledge, this problem is first proposed by Lee and Jin (2013), which aims to take proactive action and determine the service time for feeders and the storage allocation plan simultaneously. The problem is formulated as a mixed-integer programming model and solved by a memetic heuristic algorithm. Then, Jin et al. (2015) improved the model of this problem and formulated the problem as a set covering model by integrating the berth template and yard template into the service plan of feeders. As the set covering problem can be solved effectively by column generation method, an enhanced column generation method was proposed to solve the problem. Emde and Boysen (2016) also studied the feeder boat management problem. They took the berth allocation problem arising in transshipment terminals and took the cargo flow between mother and feeder vessels into consideration by ensuring that the weighted number of late containers from feeder vessels does not exceed a given upper bound.
+2.2. Multimodal container transportation
+Besides the optimization of handling operations, some studies have been done on multimodal transportation. SteadieSeifi, Dellaert, Nuijten, Van Woensel, and Raoufi (2014) presented a structured
+
+2
+
+B. Yan, et al.
+overview of the existing studies related to multimodal transportation, where the existing literature is divided into three categories, namely traditional strategic, tactical, and operational levels of planning. However, most of existing studies focused on the network design problem (Alumur, Kara, & Karasan, 2012; Merakli & Yaman, 2016; Wang & Meng, 2017) and a limited number of studies focused on the transshipment operation of containers in sea-rail intermodal container terminals. Xie and Song (2018) first proposed a container pre-staging problem arising in seaport rail terminal. The problem is formulated into a stochastic dynamic programming and different uncertain scenarios are considered. The computational result shows that apply pre-staging operation in sea- rail intermodal container transportation can significantly reduce the cost involved. Gillen and Hasheminia (2018) conducted an empirical analysis on the seaport transportation network with simulation model using practical data of a port in Canada. The results suggest that in sea-rail intermodal container transportation increasing the vessel size has an adverse effect on the operation of container terminals and, on the contrary, increasing the service frequency of trains is the best way to improve operational efficiency of ports. Hu, Wiegmans, Corman, and Lodewijks (2019) studied the integration of inter-terminal transportation (ITT) involved in sea-rail intermodal transportation, in which the schedule plan of the ITT fleet, including trucks and trains, and rail-mounted gantry crane (RMG) are jointly optimized with the target of maximizing the number of containers that are delivered. The results suggest that a flexible train timetable could be in favor of a better transportation plan, in which more containers could be delivered.
+2.3. Train loading and rail-rail transshipment problem
+The train loading problem is a complex problem arising in practice, in which the loading plan of trains is optimized to make full use of the space of trains. Upadhyay, Gu, and Bolia (2017) investigated the double-stack container train loading problem in sea-rail intermodal transportation in India. They formulated the problem with two objectives: maximizing profit and minimizing tardiness. Ambrosino, Bramardi, Pucciano, Sacone, and Siri (2011) first proposed a train loading problem arising in seaport rail terminal, which aims to make full usage of train spaces while minimizing the re-handling operations in the storage yard. Then, Ambrosino and Siri (2015) compared different methods to solve the problem and found that a method based on sequential train loading initial solution can solve the problem more efficiently.
+Besides the literature aforementioned, another important stream of studies related to this research is the train scheduling problem in the rail-rail transshipment yard. This problem was first proposed by Boysen, Jaehn, and Pesch (2011), in which, for a given train-train transfer plan, the processing sequence of trains is optimized. In his study, the transfer relationship between trains is determined, and transshipment operations have to be completed in one time slot. Thus, deadlocks may occur when the arrival time of two trains is not matched, and the train that arrives early needs to revisiting the handling yard after the end of the decision epoch. The main target of the problem is to transfer more containers between trains directly and diminish the number of revisiting trains.
+To our best knowledge, the transshipment operation between vessels and trains has not been well studied. Comparing to the literature mentioned above, this paper makes the following contributions. First, the transshipment plan and train schedule template are optimized jointly since, in SRICT, the schedule plan of trains is highly influenced by the transport demand of cargos. Second, a hybrid operation mode of the RMG is considered. For each train, the loading and unloading
+
+Computers & Industrial Engineering 141 (2020) 106296
+operations are conducted simultaneously, and train capacity changes dynamically. Last, several capacity constraints are considered, and the influence of them on the performance of the transshipment plan is analyzed.
+3. Problem description
+This paper tackles the transshipment operation planning problem arising in SRICT, which integrate the optimization of trains’ schedule template and transshipment plan of inbound containers. The problem is discussed in detail in this section.
+3.1. An overview of transshipment operation
+Trains’ schedule template and transshipment flow of containers are two key problems involved in transshipment operation. Before further discussion, the following terms are defined as follow:
+• Transshipment operation: transshipment operation in this study refers to the operations related to the transshipment of inbound containers between inbound vessels and trains and the unloading operation related to outbound containers.
+• Train scheduling template: train scheduling template refers to the placing-in and taking-out time of trains over a given decision epoch, which determines the service time of trains.
+• Transshipment plan: The transshipment plan specifies the number of inbound containers that are loaded on trains in each time slot, in which both direct-transshipment and indirect-transshipment are included, as well as the number of outbound containers that are discharged from trains.
+In the sea-rail transshipment operation problem, with limited resources, i.e. number of handling lines, handling capacity of RMGs and operation capacity of shunting engines, and service time constraints, i.e., unloading time window of vessels and feasible service time of trains, terminal operators need to determine the placed-in and takenout time of trains, the number of inbound containers that are transshipped for each vessel-train pair as well as the amount of outbound containers that are unloaded from trains in each time slot. The objective of transshipment operation is twofold, namely maximizing the number of direct transshipped containers and minimizing the storage time of all inbound containers. Following the approach used in Zhu, Crainic, and Gendreau (2014), we propose a two-layer structure to descript the transshipment operations in SRICT, in which the problem is divided into schedule template layer and transshipment flow layer. Three typical cases of transshipment operation that involves direct transshipment of inbound containers are illustrated in Fig. 1. The number on the bottom of each layer represents the index of the time slot.
+In the first case, marked by i1-i2-i3-i4, the train is loaded with containers from one vessel only, which are transshipped directly. In this type of service, the schedule template of trans needs to coordinate with the unloading time of vessels, and it is usually adopted when there are enough inbound containers to the corresponding direction left on vessels. In the second one, marked by i5-i6-i7-i8-i9, the train is designated to serve two vessels that arrive in different time slots. After being loaded with containers directly transshipped from the vessel (j5-j6), the train is held on handling lines to serve another vessel that arrives later (j8-j9). Operators are more likely to use this type of service when the train spaces are not been fully used. Nevertheless, as the handling line is occupied by the train for a longer time, the schedule plan of other trains may be influenced. Besides that, the study of Sun and Schonfeld (2016) shows that holding decisions for correlated vehicles may lead to delay
+
+3
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 1. An illustration of the transshipment operation in SRICT.
+
+Fig. 2. An illustration of the train schedule template.
+
+propagation in transport network. In the third case, marked by i10-i11i12-i13, both direct and indirect transshipment of inbound containers are loaded. The train is placed-in at seven to load indirect transshipped containers that are discharged from vessel (j12-j13), which has left at six. Then, it is held in handling yard for direct transshipped containers discharged from vessel (j15-j16).
+It can be noticed that compared with using indirect-transshipment mode only, when the direct-transshipment mode is included, the schedule template of trains would be highly influenced by vessels’ unloading time window, denoted as [tvv, tv¯v ]. Trains need to be placed-in within the time window and taken-out timely to release resources. Moreover, terminal operators also need to synchronize schedule
+
+template of trains and discharging operation of vessels to shorten the service time of trains, which makes the transshipment plan more complicated. On the contrary, indirect-transshipment mode gives operators more flexibility to determine the schedule of trains. The trains need to arrive at port no earlier than ev and discharging operation of vessels and loading operation of trains can be determined separately.
+3.2. Train schedule template
+With the limited number of handling lines and operation capacities, terminal operators need to determine the service time of trains and improve the efficiency of transshipment operation. In this study, two
+
+4
+
+B. Yan, et al.
+types of trains are involved, namely loaded trains (IL) and empty trains (IE). For empty trains, inbound containers to the corresponding direction are loaded, and trains are not allowed to leave without inbound containers. However, loaded trains would leave handling yard empty after all unloading operations are completed, which is denoted as reallocated empty trains. Normally, two types of handling operations are mostly used in practice, conducting loading operations after unloading operations (separate operation mode) or conducting loading and unloading operations simultaneously (hybrid operation mode). Comparing with the hybrid mode, the separate operation mode would reduce the complexity of operations at the cost of reducing operation efficiency. Besides, trains would wait in the handling yard for a long time, especially when a tactical level problem is studied. Therefore, we assume that the hybrid operation mode is applied, which makes the problem more complicated.
+Furthermore, the design of the trains’ schedule template should also take the requirements of railway operations into consideration. In this paper, we assume that trains are organized as block trains, which means that they need to departure before a certain time slot as long as they are loaded with inbound containers. To be specific, the trains are only available within the feasible service time, which is denoted as [ei, li]. The feasible service time represents the earliest time that trains can be placed-in and the latest time that they should be taken-out. For empty trains, the earliest available time is mainly influenced by rolling stock scheduling. Empty trains cannot be used until they are released by other stations. For loaded trains, the earliest available time is determined by the schedule plan of trains.
+Note that the feasible service time of trains only controls the basic schedule requirement of trains. Shortening the dwell time of trains in the handling yard could help to decrease the railway’s operation cost further and leave more flexibility for railway operators to adjust the transport plan of intermodal containers in the hinterland area.
+
+Computers & Industrial Engineering 141 (2020) 106296
+However, in practice, it is hard for terminal operators to evaluate the cost of train’s dwell time directly. In this paper, we replace it with the dwell time of the containers on trains. For example, if 10 containers are loaded and stay on trains for 2 time slots, the total dwell time of them is 20 time slots.
+An example of the schedule plan is shown in Fig. 2, in which a schedule plan of eleven trains over five time slots is illustrated, and a handling yard with four handling lines is used. As shown in the example, each train is designated to a specific direction. Inbound containers corresponding to the direction of trains can be unloaded. Here, we assume that trains are taken-out at the end of each time slot and placed-in at the beginning. Furthermore, for a given decision epoch, two special types of trains should be noticed. The first one is the trains that stay on handling lines at the beginning, such as i_1, i_2 and i_3. The other one is the trains that do not leave in the current decision epoch, such as i_9, i_10 and i_11. For loaded trains of the second type, the discharging operations do not need to be completed in this decision epoch and can be postponed to the following horizon.
+3.3. Transshipment flow of containers
+Three types of transshipment flow between vessels and trains are illustrated in Fig. 3. Usually, the outbound containers are transshipped indirectly because they need to arrive at port several days before the arrival of corresponding vessels. This requirement is known as the closing date. Containers that arrive early need to be stacked in yards first and transferred to apron according to the loading plan of vessels. Therefore, in this paper, only the first stage of the transshipment operation of outbound containers is considered, where, with limited resources, the number of outbound containers discharged in each time slot is determined.
+To be specific, with a given schedule plan of trains, for inbound
+
+Fig. 3. General layout and transshipment flow for SRICT. 5
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+containers, terminal operators need to determine how many of them should be discharged from the vessel and which train they should be loaded on in each time slot. For outbound containers, terminal operators need to determine the number of outbound containers that are discharged from trains in each time slot. Note that the specific unloading sequence of inbound containers is not considered in this paper as well as the detailed operation time. It is reasonable to determine the number of containers only in a tactical problem. Actually, the transshipment plan obtained here provides a basis for determining the specific unloading plan of inbound containers, in which the location of containers on vessels and the operation time of quay cranes should be further considered.
+For inbound containers, both direct and indirect-transshipment mode are considered. We assume that all inbound containers left in vessels at the end of the unloading time window are discharged together and stacked in storage yards. It means that, for inbound vessels, the indirect-transshipment mode is not used until the end of unloading time. Although the direct-transshipment mode is not widely used in practice, it is technically feasible, and more cost-effective and timesaving comparing with indirect-transshipment mode because operations related to yards are avoided. In practice, the cost of receiving and retrieving operations usually accounts for a great proportion of the total operation cost. According to the toll charges standards given by Shanghai International Port Corporation, customers need to pay another $170 if they want to make an additional movement of a 20ft container in the container yard. Though direct-transshipment mode shows significant advantages, when the time window of trains and various capacity constraints are considered, it is hard for operators to transfer all inbound containers directly. A proportion of inbound containers would be stacked in the storage yard before hinterland transportation. Therefore, in operations, the storage time of containers should also be taken into consideration.
+3.4. Capacity constraints
+The performance of the transshipment plan is influenced by various types of factors, such as the capacity of facilities, number of handling equipment and deployment profile of equipment. Here, the following types of capacity constraints are taken into consideration.
+• The number of handling lines: the number of handling lines determines the maximum number of trains that can stay in the handling yard simultaneously. The results of later experiments show that increasing handling lines allows trains to wait in handling lines for a longer time, and inbound containers are more likely to be transshipped directly.
+• The operation capacity of shunting engines: the operation capacity of shunting engines determines the number of trains that can be placed-in and taken-out in each time slot. Normally, locomotives are decoupled from trains in handling operations. As a result, trains cannot leave by themselves. The capacity is mainly determined by the operation plan of connected railway marshaling stations.
+• The handling capacity of RMGs: handling capacity of RMGs refers to the number of containers that can be handled, both loading and unloading, in each time slot. In practice, the handling capacity of RMGs is influenced by many factors, such as the number of RMGs and the operation scheme of RMGs.
+4. Model formulation
+4.1. Model description and assumptions
+In this section, the transshipment operation optimization problem is formulated as an integer programming model. The decision horizon is further divided into several time slots, three hours each, which is the time span of the stage plan used in China’s railway operations. To
+
+simplify the model, the vessel that contains containers to directions is replaced by a set of vessels with containers to one direction, denoted as virtual vessels. The unloading time of these vessels is the same as the original one. For example, if vessel V_1 is loaded with inbound containers to 4 directions, then the vessel is replaced by four virtual vessels, namely V_1_1, V_1_2, V_1_3 and V_1_4, and each of the virtual vessel has the same unloading time window as vessel V_1. This assumption is reasonable since, in the transshipment plan, we only need to decide how many containers should be discharged from vessels in each time slot and, thus, vessels could be treated independently.
+Vessel with containers to different directions is presented as a group of vessels with containers of different directions. Another important assumption is that the handling capacity of quay cranes is sufficient, and all outbound containers left on vessels can be unloaded before the end of the unloading time. In the proposed model, container groups are treated as the basic unit of transshipment operation.
+The main parameters of the model are as follows (see Table 1).
+
+4.2. Objective functions
+
+Normally, the main objective in transshipment operation to shorten the total dwell time of containers, including the storage time of containers before being loaded on trains, illustrated as Eq. (1), and the dwell time of them on trains, shown as Eq. (2). The reason that we
+
+Table 1 The table of key parameters and decision variables.
+
+Sets
+
+Definitions
+
+I IL IE Iv
+V T Tv1
+Tv2
+Tt
+Index i v t
+Parameters N Cv Ci bi
+[ei, li] [tvv, tv¯v ] G loc capi0
+capi Ni
+cap_rmg
+Variables [tsi, tei] ait zit xit wvti
+uit
+
+the set of trains I = IL IE the set of loaded trains that need to be unloaded first the set of empty trains that can be loaded directly the set of trains that can transport container groups from vessel v, vV
+the set of vessels the set of time slots, T = {t0, t0 + 1, , |T|} the set of time slots before the leaving of vessel v, Tv1 = {t0, t0 + 1, , tv¯v }, v V ; if the vessel has left, let Tv1 = ; the set of time slots after the leaving of vessel v, Tv2 = {max(tv¯v + 1, t0), , |T|}, v V the set of time slots before time slot t , namely Tt = {t0, t0 + 1, , t}, tT
+Definitions index of trains, i I index of vessels, v V index of time slot, t T
+Definitions the total number of container groups the number of container groups on vessel v, v V the number of container groups on train i, i I
+{0, 1}, 1 if train i has been in handling yard in the first time slot, iI
+the feasible service time of train i, i I the unloading time window of vessel v, v V
+the number of handling lines the operation capacity of shunting engines the loading capacity of train i at the beginning of decision epoch, iI
+the capacity of train i, i I the number of inbound containers that have been loaded on train i at the beginning of the decision epoch, i I the handling capacity of RMGs
+Definitions the time span that train i stays in the handling yard
+{0, 1}, 1 if train i is placed in handling yard in time slot t {0, 1}, 1 if train i is taken out from handling yard in time slot t {0, 1}, 1 if train i is in handling yard in time slot t the number of container groups that are transshipped from vessel v to train i in time slot t the number of container groups unloaded from train i in time slot t
+
+6
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+introduce the dwell time of containers into the model is that minimizing the dwell time of containers could shortening the dwell time of trains in yards, which would help to reduce the railway transportation cost.
+
+storage =
+v V i Iv
+(|T| tv¯v )
+
+t Tv2 wvti (t tv¯v ) +
+
+( v V Cv
+
+) i Iv
+
+t T wvti
+
+(1)
+
+( ) dwell =
+
+iI
+
+t T xit Ni +
+
+vV
+
+t Tt wvti
+
+(2)
+
+The total dwell time can be further divided according to the state of vessels. Here, we use V1 to represent the set of vessels that need to be handled within the decision horizon (t0 tv¯v |T|), and V2 to represent the set vessels that have left (tvv < t0). Thus, the total dwell time can be represented using Eq. (3a), which is reformulated as Eq. (3b). The second and third parts of Eq. (3b) represent the time saving caused by transferring containers stacked in yards and the last part means the time deduction obtained by vessel train direct transshipment (VTDT) containers. Let Dit = t Tt xit, which can be regarded as the dwell time of trains till time slot t.
+
+v V1 i Iv t Tv2 wvti (t tv¯v ) + v V2 i Iv t T wvti (t tv¯v )
+
+( + v V Cv
+
+) i Iv t T wvti (|T| tv¯v )+
+
+( ) i I t T xit Ni + v V t Tt wvti
+
+(3a)
+
+= v V Cv (|T| tv¯v ) + i I v V2 i Iv t T wvti (|T|
+v V1 i Iv t Tv2 wvti ( |T| t v V1 i Iv t Tv1 wvti ( |T|
+
+t T Ni xit t Dit) Dit ) tv¯v Dit)
+
+(3b)
+
+Based on the equations above, we can notice that minimizing the total dwell time of inbound containers only could not guarantee more directly-transshipped containers in some instances. The inbound containers that are discharged from vessels with earlier leaving time would get more chances to be transshipped directly due to more dwell timesaving. To be specific, in each time slot t, containers in storage yard would be handled prior to those on vessels in berth (t¯vv t) to decrease the total dwell time of all containers.
+To underline the benefit of directly-transshipment, we introduce a new objective of maximizing the number of VTDT containers into our model. We take both of them into consideration in this study to make full use of operation capacities and avoid too much storage time. Here, we replace the objective of maximizing the number of VTDT containers by minimizing the number of those that are indirectly transshipped, which can be calculated by Eq. (4).
+
+( num_indirect = v V Cv
+
+i Iv
+
+) t Tv1 wvti
+
+(4)
+
+4.3. Mathematical model
+
+4.3.1. Objective The model is formulated to minimize the number of containers that
+cannot be transferred directly and the total storage time of container groups. The objective of the model is represented as a convex combination of them, shown as Eq. (5).
+
+obj = min ·num_indirect + (1 )(storage + dwell)
+
+(5)
+
+4.3.2. Constraints
+
+ei
+
+( t T t·ait
+
+1
+
+) t T ait M, i I
+
+(6)
+
+( tei li 1
+
+) t T ait bi M, i I
+
+(7)
+
+t T ait + bi 1, i I
+
+(8)
+
+t T zit
+
+t T ait + bi, i I
+
+(9)
+
+( li |T| 1 + 1
+
+t T ait + bi
+
+) t T zit M 0, i I
+
+(10)
+
+tsi = tei =
+
+t T t·ait + bi t0, i I
+
+( t T t·zit +
+
+t T ait + bi
+
+) t T zit |T|, i I
+
+(11) (12)
+
+( tsi tei + (1 bi ) t T zit 1
+
+) t T ait bi M, i I
+
+(13)
+
+xit =
+
+1, tsi t tei, i 0, otherwise
+
+I
+
+(14)
+
+i I xit G, t T
+
+(15)
+
+i I (ait + zit) loc, t T
+
+tT
+
+i Iv wvti Cv, v V
+
+(16) (17)
+
+t T uit Ci, i IL
+
+(18)
+
+( ) t T uit Ci
+
+t T zit 1 M, i IL
+
+v V wvti + uit xit M 0, i Iv, t T
+
+t [t0,tvv)
+
+i Iv wvti = 0, v V
+
+t T i I Iv wvti = 0, v V
+
+t [t0,t ]
+
+v V wvti
+
+t [1,t ] uit + capi0 , i IL Iv, t T
+
+v V t T wvti capi0 0, i IE Iv
+
+(19) (20) (21) (22) (23) (24)
+
+v V i Iv wvti + i IL uit cap_rmg, t T
+
+(25)
+
+ait; zit; xit {0, 1}, i I, t T
+
+(26)
+
+tsi; tei; wvti +, i I, v V , t T
+
+(27)
+
+uit
+
++, i IL, t T
+
+(28)
+
+The constraints of the model are divided into two groups. The first group is the constraints related to the schedule template, from constraint (6) to (16), which controls the service time of trains. The second part is task-related constraints, from constraint (17) to (25), which control the transshipment plan of container groups between vessels and trains.
+To be specific, constraint (6)–(7) ensure placing-in and taking-out operations should be conducted within the feasible service time of trains. Constraint (8) and (9) indicate that trains can enter the handling yard no more than once. The trains that can leave in the successive decision epoch are allowed to stay in the handling yard until the last
+
+7
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 4. Four scenarios with different handling requirements for trains.
+
+time slot, which is controlled by constraint (10). The starting and ending time of train occupation, namely tsi and tei, are calculated as constraint (11) and (12). Note that if train i is not received, we have tsi = 0 and tei = 0. Constraint (13) controls the minimum staying time for trains. In our case, the minimum staying time is set to be two time slots, which means that, for trains that arrive during the decision epoch (bi = 0), the placing-in and taking-out operations cannot be conducted in the same time slot. For trains staying in the handling yard at the beginning of the decision epoch (bi = 1), the minimum staying time is set to be one time slot. The state of trains is indicated as constraint (14). Constraint (15) controls the maximum number of trains that can be handled simultaneously. Similarly, the capacity constraint caused by the operation capacity of shunting engines is illustrated by constraint (16).
+For the constraints related to the transshipment plan, constraint (17) controls the total number of container groups that can be discharged from vessels. The sum of container groups unloaded from trains is controlled by constraint (18) and (19). For loaded trains that departure in decision epoch, all unloading tasks must be completed before leaving. Constraint (20) indicates that container groups can only be loaded on or discharged from trains while they are staying in the handling yard. Constraint (21) means that the discharging operations can only be conducted within the service time of vessels. Constraint (22) controls that containers can only be loaded on trains to the corresponding direction. For loaded trains, the number of containers that can be loaded in each time slot should not exceed the available space of trains, which is shown as constraint (23). Similarly, constraint (24) controls the number of container groups that can be loaded on trains. The number of container groups that are handled in each time slot should not exceed the handling capacity of RMGs, which is shown as constraint (25). The non-negative and integrality constraints for
+
+decision variables are shown as constraint (26)–(28). Moreover, it is worth to mention that, when the operation capacity of shunting engines is larger than the number of handling lines, namely loc G, constraint (15) is relaxed because we have xit = 1 when ait = 1 or zit = 1.
+
+4.4. Reformulation
+
+To solve the model effectively using commercial solver, the piecewise constraint (14) should be modified. Here, we linearized constraint (14) by replacing it with the following constraints. To be specific, constraints (29) ensures that, when tsi t0 + 1, for all t {t |t0 t tsi 1, t T} (left side), we have xit = 0. Moreover, when tsi = t0 the constraint (30) is satisfied for all xit, t T . Similarly, constraint (31) controls the value of xit on the right side, t {t |t tei, t T}. The function of constraint (11)–(13) and (29)–(31) is shown as Fig. 4.
+
+(t tsi) + (1 xit)M 0, i I, t T
+
+(29)
+
+(t tei) + (xit 1)M 0, i I, t T
+
+(30)
+
+t T xit = tei tsi +
+
+t T ait + bi , i I
+
+(31)
+
+Besides, it can be noticed that the model is nonlinear because of Eq. (2). To linearize it, we introduce a new decision variable into the model, denoted as Nit, which represents the number of inbound containers that are loaded on train i till time slot t. The relation between Nit and wvti is illustrated as constraint (32)–(34) and Eq. (2) can be reformulated as Eq. (35).
+
+Nit xit
+
+vV
+
+i Iv wvti
+
+(32)
+
+8
+
+B. Yan, et al.
+
+Fig. 5. An illustration of rolling decision horizon. Nit Ni + v V i Iv wvti (1 xit )capi Nit Ni + v V i Iv wvti + (1 xit )capi dwell = i I t T Nit
+
+(33) (34) (35)
+
+4.5. Computational complexity
+Considering a special case of the transshipment operation optimization that consists of only one time slot, in which a feasible scheduling plan of trains is given. In this case, the capacity constraints related to the number of handling lines and shunting engines are relaxed. The resulting problem is to decide the transshipment plan of containers with the RMGs’ handling capacity constraint and train capacity constraint. The absolute value of the coefficient of wvti in the objective corresponds to profit for different transshipment mode of containers. In this case, the main purpose of the problem is to determine the transshipment plan of containers to maximize the total profit, which is equivalent to a Bounded Knapsack Problem with the capacity constraints caused by trains’ spaces and handling capacity of RMGs. The above transformation has shown the reduction of the Bounded Knapsack Problem to a particular case of the proposed transshipment operation optimization problem. Therefore, this problem is a NP-hard problem, because the Bounded Knapsack Problem is known to be NP-hard.
+5. Rolling horizon based algorithm
+To solve the problem effectively, we use a tailored rolling horizon approach, in which the problem is decomposed into a group of subproblems with shorter decision epoch. In preliminary experiments, we found that some sub-problems are infeasible when the classic rolling horizon approach is applied. To solve this problem, based on the characters of the problem, we propose a rolling horizon approach with adaptive horizon length and backtracking strategy (RHAAB). An illustration of the classic rolling horizon approach is shown as Fig. 5.
+5.1. An illustration of the infeasible cases of sub-problem
+According to preliminary experiments, the infeasibility of sub-problems is mainly caused by an unreasonable operation plan of the previous decision epoch, in which too many unloading operations are postponed to successive decision horizons to be completed. As shown in the model, all outbound containers need to be unloaded before leaving, and a minimum service time of two time slots is required. In some cases, with limited resources, it is hard to complete all unloading operations within the time limit and, thus, an infeasible sub-problem would be caused.
+An example of the infeasible sub-problem is given in Fig. 6, in which Train_2, Train_4, Train_6 and Train_7 are loaded trains. As shown in Fig. 6(a), only one time slot can be assigned to Train_7 before its latest leaving time, whereas at least two time slots are needed. Thus, the optimum plan in the preceding decision epoch leads to an infeasible
+
+Computers & Industrial Engineering 141 (2020) 106296
+sub-problem. The reason for this lies in that the handling operation of Train_6 is held to wait for available handling lines. One feasible solution to this problem is bringing forward the handling operation of Train_5 and Train_6, so that the handling lines are released earlier to leave enough handling time for Train_7, which is illustrated in Fig. 6(b). In other words, more tasks related to previous time slots should be included.
+5.2. Rolling horizon approach with adaptive horizon length and backtracking strategy
+The main idea of RHAAB is to use a backtrack strategy to solve a new sub-problem that contains more time slots and related tasks when an infeasible sub-problem is encountered. Fig. 7 gives an explanation of how the RHAAB works. When an infeasible sub-problem is encountered (sub-problem_0), the algorithm applies backtrack strategy, adjusts the length of decision epoch and adds tasks related to the preceding time slot to original sub-problem (sub-problem_1). By doing this, the transshipment plan of previous time slots could be changed since more tasks are considered. As long as the original problem is feasible, at least one feasible solution could be found by backtracking and adjusting the length of decision epoch. This proposition can be easily proved by a special case that extends the horizon to the first time slot of original problem. Moreover, it is obvious that, if a sub-problem that includes the first time slot is infeasible, the original problem is infeasible. Therefore, the special case of the first sub-problem is excluded. As the precondition of the proposed algorithm, the feasibility of original problem can be checked by a state-of-the-art solver.
+The procedure of the RHAAB is shown as Fig. 8, where is the length of the decision horizon. t0 and te are the index of the first and last time slot of sub-problem. As shown in the figure, when the sub-problem is infeasible, the backtracking strategy is applied, and one more preceding time slot is added to the sub-problem until a feasible sub-problem is found. As the length of the decision horizon affects the efficiency of algorithm significantly, it is reset to be for later subproblems after a feasible sub-problem is found.
+Another problem that influences the performance of the proposed algorithm is the length of the decision horizon for each sub-problem. It is obvious that a sub-problem with a longer decision horizon is more time-consuming. However, taking more resources and tasks into consideration would favor the predictive power of the future and result in solution closer to the optimal one. To solve the original problem within reasonable computational time, a limit is set for the computational time of sub-problems. If an optimal solution cannot be found within time limit, the solver is terminated and output the best solution that is found within time limitation.
+5.3. Modification for rolling horizon approach
+As aforementioned in Section 4.2, two types of vessels are included in each sub-problem, namely V1 and V2, which are distinguished by the end of their service time. According to previous experiments, we found that the scale of sub-problems would increase gradually with the running of the algorithm since the scale of V2 would increase gradually. According to preliminary experiments, we found that it is hard to transfer all inbound containers before the ending of vessels’ service time, and, as a result, more vessels are involved in successive subproblems. It can be seen that, when the scale of group V2 increases by 1, the scale of wvti increases by | |·|Iv|, where | | and |Iv| represents the time span of sub-problems and the number of available trains corresponding to the vessel.
+To shorten the computational time of sub-problems, we should
+
+9
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 6. An illustration of the infeasible case of the sub-problem.
+
+Fig. 7. An illustration of RHAAB.
+
+control the scale of sub-problems. The total storage time can be divided into two parts, namely storage = storagev1 + storagev2, where storagev1 and storagev2 are the storage time related to vessels in group V1 and V2 respectively. The value of storagev2 can be calculated as follow.
+
+10
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 8. The rolling horizon approach with adaptive horizon length and backtracking strategy.
+
+storagev2 = (1 (1
+
+{)
+
+v V2
+
+i Iv
+
+t T wvti (t
+
+) v V2 Cv (t0 tv¯v )
+
+|T|) +
+
+} v V2 Cv (|T| t0) +
+(36)
+
+As can be seen, for vessels in group V2, the ending time of their unloading operations, namely tv¯v , shows no influence on trains’ schedule plan as well as the transfer plan of containers, since the second part of the equation is a constant. Thus, for each direction, inbound containers from vessels in group V2 are identical, and we can replace V2 with |D| virtual vessels, denoted as VD. In this case, the scale of subproblems would reduce due to fewer vessels. To be specific, vessels in V2 are classified according to the direction of inbound containers loaded on them and replaced by a set of vessels that are different in directions only. The following parameters are added to sub-problems.
+
+D the set of inbound containers’ directions; dv the direction of inbound containers discharged from vessel v; vd the dummy vessel to direction d; Cv the number of inbound containers left in storage yards discharged from vessel v; Cvd the number of inbound containers in storage yard to direction d
+at the beginning of the horizon;
+
+Table 2 The parameters of instances.
+
+G
+
+loc
+
+cap_rmg
+
+capi
+
+Group_1
+
+3
+
+3, 4
+
+15, 30, 45, 60
+
+8
+
+Group_2
+
+4
+
+3, 4
+
+15, 30, 45, 60
+
+8
+
+Group_3
+
+6
+
+3, 4, 5, 6
+
+15, 30, 45, 60
+
+8
+
+Group_4
+
+8
+
+3, 4, 5, 6, 7, 8
+
+15, 30, 45, 60
+
+8
+
+V2d the set of vessels in group V2 to direction d, V2d = {v v V2, dv = d}; VD the set of virtual vessels, VD = {vd1, vd2, , vd |D|};
+
+Hence, storagev2 is re-formulated as Eq. (37), where wvtdi represents the number of inbound containers to direction d that are loaded on train i in time slot t. Moreover, constraint (16) is divided into two parts, shown as constraint (38) and (39), which control the sum of inbound containers that can be transshipped. Constraint (40) illustrate the relationship between Cv and Cvd. As can be seen, instead of determining the transshipment plan of vessels in V2 individually, the number of inbound containers to different directions are considered together. It is obvious that the modified sub-problem has the same optimum value as the original one and all transshipment plan for vessels in V2 that satisfiesconstraint (41) can be treated as an optimal solution to sub-problem.
+
+objv2 = (1 (1
+
+( ) )
+
+vd Vd
+
+i Iv t T wvtdi (t |T|) + Cd (|T| t0) +
+
+) v V2 Cv (t0 tv¯v )
+
+(37)
+
+wvti Cv , v V1
+t T i Iv
+
+wvtd i
+t T i Ivd
+
+Cvd,
+
+vd Vd
+
+(38) (39)
+
+Cvd =
+
+Cv ,
+
+v V2d
+
+vd VD
+
+(40)
+
+wvtdi =
+
+wvti,
+
+v V2d
+
+vd VD
+
+(41)
+
+6. Computational experiments
+In this section, several groups of computational experiments are conducted to verify the effect of the algorithm we proposed. Then, the performance of the transshipment plan in different scenarios is analyzed, which differentiate in handling capacities and length of feasible service time of trains. The algorithm is coded in Python. Gurobi 8.0.1 is used to solve sub-problems. All the computational experiments are conducted on a PC with 2.5 GHz CPU and 8 GB RAM.
+6.1. Test instances
+Table 2 shows the detailed information of four groups of parameters that are used. The cap_rmg refers to the handling capacity of RMGs per time slot. Normally, an RMG can handle about 25 containers in one hour. The capacity of the train is set to be 8 container groups, including five 40 ft containers each, which is the average length of container trains in China. As the direct transfer of inbound containers is underlined in this paper, we have = 0.9 in the following instances. All computational experiments in this section are conducted using three sets of data. The main information of them is shown in Table 3. As aforementioned, vessels are loaded with inbound containers to different directions.
+6.2. Performance of RHAAB in medium-scale instances
+In this sub-section, the solution quality and algorithm efficiency of RHAAB are tested. Firstly, Data_2 is used to test the solution quality of RHAAB in different scenarios, and Data_3 is used to verify the efficiency of the algorithm. In the first set of experiments (Data_2), we set the length of the horizon to be 10 time slots. The time limitation for the sub-problems is set to 50 s. For commercial solver, a time limitation of
+
+11
+
+B. Yan, et al.
+
+Table 3 Brief information of data sets.
+Time slots
+
+Data_1
+
+16
+
+Data_2
+
+32
+
+Data_3
+
+56
+
+Vessels
+32 48 112
+
+Loaded trains
+16 35 80
+
+Empty trains
+18 34 74
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Inbound container groups
+285 461 1232
+
+Outbound container groups
+114 206 507
+
+1500 s is given and, we record the gap between the lower and upper bound when the solver is stopped by time limitation.
+The results of this set of experiments are shown in Appendix A, where GAP_RHAAB represents the gap between the solution of Gurobi and RHAAB. Besides the value of the objective function, we also record some key indicators, including the number of directly-transshipped containers (VTDT), the storage time of inbound containers (ST), the dwell time of containers on trains (Dwell). In this section, we use the results of Gurobi as the benchmark, though the solver did not find an optimal solution within the time limit in some cases. As can be seen, the gap between the upper and lower bound is less than 5% in all instances, which is acceptable in practice.
+According to the results, the tailored rolling horizon approach performs well in most instances (GAP_RHAAB < 5%). The instances whose value of GAP_RHAAB is greater than 5% are shown in Table 4. We found that fewer containers are directly-transshipped in the plan obtained by RHAAB, and the dwell time of containers is also smaller. The reason is probably that when the dwell time of containers is considered, trains are more likely to be taken out early to shorten the dwell time of containers. As a result, trains are more likely to be taken-out with fewer containers instead of staying in the handling yard and waiting for later containers (see the loading rate in Table 5). This problem can be solved by considering more information to enhance the predictive power of the algorithm. To be specific, we set the time span of sub-problems to 12 time slots and calculate the instances whose gap is greater than 5% again. The results are shown in Table 5, in which LR represents the loading rate of trains. It can be noticed that the solution quality of RHAAB is significantly improved, as well as the loading rate of trains.
+6.3. Performance of RHAAB in large-scale instances
+The performance of RHAAB on large scale instances is tested using
+
+Data_3, in which a transshipment plan of 28 vessels (112 dummy vessels) over 56 time slots is optimized. This set of data is simulated based on practical data. The number of vessels that begin and finish unloading operations in each time slot is illustrated in Fig. 9. Twelve instances are used to verify the performance of RHAAB in large scale case, where the time limit of Gurobi is set to be 1500 s. The best solutions found within the time limitation are output as well as the gap between the upper and lower bound. For RHAAB, the time span of sub-problems is set to 12 time slots ( = 12) and a time limit of 30 s is given.
+The experiment results are shown in Table 6. As can be seen, the tailored rolling horizon approach performs well in the 12 instances. It takes RHAAB less time to find a solution while the solution quality is acceptable. In some instances, the proposed algorithm finds a better solution with less time consumption. Besides, it can be noticed that the computational time of RHAAB varies greatly among instances. The reason for this is that, firstly, it is hard for the solver to get an optimum solution within the time limit for each sub-problem. As at least 46 subproblems need to be solved in each instance, it would increase the time consumption greatly when some sub-problems are stopped by time limitation. Secondly, some sub-problems need to be solved repeatedly when the backtracking strategy is applied, which could also increase the computational time significantly.
+6.4. The influence of considering dwell time of containers in the objective
+In this section, we are going to analyze what influence could be caused by considering the dwell time of containers in the objective function using Data_1, in which Gurobi was used to get the optimum solutions. Besides, to avoid the influence of the service time of trains, we set ei = 1 and li = 16 for all trains. The total dwell time of inbound containers loaded on trains, the number of directly-transshipped containers, the average dwell time of trains, and the total dwell time of trains for all the 56 instances are shown in Fig. 10. As can be seen, by
+
+Table 4 Computational results of RHAAB for Data_2 ( = 10).
+
+loc
+
+G
+
+RMG
+
+Gurobi
+
+ST
+
+VTDT
+
+3
+
+8
+
+45
+
+4
+
+4
+
+45
+
+3
+
+8
+
+30
+
+3
+
+6
+
+45
+
+4
+
+4
+
+60
+
+3
+
+3
+
+45
+
+3
+
+3
+
+60
+
+4
+
+4
+
+30
+
+3
+
+6
+
+60
+
+3
+
+4
+
+60
+
+3
+
+3
+
+30
+
+4
+
+3
+
+45
+
+4
+
+3
+
+30
+
+4
+
+3
+
+60
+
+605
+
+390
+
+41
+
+432
+
+668
+
+389
+
+598
+
+390
+
+46
+
+432
+
+835
+
+374
+
+832
+
+374
+
+41
+
+432
+
+599
+
+390
+
+693
+
+379
+
+837
+
+374
+
+837
+
+374
+
+836
+
+374
+
+835
+
+374
+
+*GAP = [(2) − (1)]/(1) × 100%.
+
+Dwell
+537 463 493 544 458 409 412 463 535 452 407 407 408 409
+
+OBJ(1)
+178.1 76.5 180.9 178.1 76.5 202.7 202.7 76.5 177.3 188.3 202.7 202.7 202.7 202.7
+
+RHAAB
+ST
+595 78 660 642 99 998 956 118 706 845 1066 998 1064 1083
+
+VTDT
+376 432 374 376 431 369 363 430 374 364 365 356 362 355
+
+Dwell
+521 469 485 497 457 407 407 457 503 445 403 409 405 408
+
+OBJ(2)
+188.1 80.8 192.8 190.4 82.6 223.3 224.5 85.4 199.2 216.3 233.3 235.2 236 244.5
+
+GAP
+5.61% 5.62% 6.58% 6.91% 7.97% 10.16% 10.75% 11.63% 12.35% 14.87% 15.10% 16.03% 16.43% 20.62%
+
+12
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Table 5 Computational results of RHAAB for Data_2 ( = 12).
+
+loc
+
+G
+
+RMG
+
+Gurobi
+
+OBJ(1)
+
+LR
+
+3
+
+8
+
+45
+
+4
+
+4
+
+45
+
+3
+
+8
+
+30
+
+3
+
+6
+
+45
+
+4
+
+4
+
+60
+
+3
+
+3
+
+45
+
+3
+
+3
+
+60
+
+4
+
+4
+
+30
+
+3
+
+6
+
+60
+
+3
+
+4
+
+60
+
+3
+
+3
+
+30
+
+4
+
+3
+
+45
+
+4
+
+3
+
+30
+
+4
+
+3
+
+60
+
+178.1 76.5 180.9 178.1 76.5 202.7 202.7 76.5 177.3 188.3 202.7 202.7 202.7 202.7
+
+100.00% 96.71% 98.50% 100.00% 96.71% 98.96% 98.96% 96.71% 100.00% 99.49% 98.96% 98.96% 98.96% 98.96%
+
+*GAP = [(2) − (1)]/(1) × 100%.
+
+RHAAB( = 10)
+
+OBJ(2)
+
+GAP
+
+188.1 80.8 192.8 190.4 82.6 223.3 224.5 85.4 199.2 216.3 233.3 235.2 236 244.5
+
+5.61% 5.62% 6.58% 6.91% 7.97% 10.16% 10.75% 11.63% 12.35% 14.87% 15.10% 16.03% 16.43% 20.62%
+
+LR
+84.32% 93.01% 83.47% 82.63% 92.80% 79.24% 79.24% 92.80% 81.36% 80.51% 78.39% 77.54% 77.54% 77.54%
+
+RHAAB( = 12)
+
+OBJ(2)
+
+GAP
+
+182.8 79.5 188.5 185.7 77.4 217.8 217.8 77.7 185.3 192.9 217.9 217.8 217.9 217.8
+
+2.64% 3.92% 4.20% 4.27% 1.18% 7.45% 7.45% 1.57% 4.51% 2.44% 7.50% 7.45% 7.50% 7.45%
+
+LR
+84.75% 93.01% 83.47% 84.32% 93.43% 80.93% 80.93% 93.43% 84.32% 82.63% 80.93% 80.93% 80.93% 80.93%
+
+considering the dwell time containers on trains, the performance of the transshipment plan can be significantly improved, since the total dwell time of containers reduces greatly, as well as the dwell time of trains. At the same time, the total storage time of containers increases slightly in some instances. It is reasonable because the trains would be taken-out earlier when the dwell time is considered. It is worth to mention that, according to our experiments, the number of VTDT containers almost keeps unchanged when the dwell time of containers is added into the objective.
+6.5. The influence of capacity-related parameters
+In this sub-section, the impacts of capacity-related parameters are analyzed. Firstly, the influences of cap_rmg and loc are analyzed using parameters in Group_4. The results are shown in Fig. 11, where the value of objective, the number of VTDT containers, the storage time, and the dwell time are selected as key indicators to evaluate the performance of transshipment operation in different scenarios.
+As can be seen, both increasing cap_rmg and loc have positive effects on transshipment operation. To be specific, when the handling capacity of RMGs increases from 15 to 30, both VTDT containers and total storage time decrease significantly. Nevertheless, the further increase of cap_rmg shows no effect on the performance of the transshipment operation, which means that the handling capacity of RMGs is adequate.
+
+Hence, no benefit would be obtained by enhancing the handling capacity. A similar trend is observed when the operation capacity of shunting engines is improved.
+Note that no further reduction of storage time is achieved when loc increases from 4 to 5, but more inbound containers are directly transshipped. It is reasonable because trains could be taken out more quickly if the handling operations are completed. As a result, more trains could be handled within the decision epoch. It can also be proved by the increase of containers’ dwell time when then handling capacity of RMGs and shunting engines increases. Meanwhile, we also find that, for each level of loc, increasing the cap_rmg could help to shorten the dwell time of trains further. For example, when loc = 8 and cap_rmg = 15, trains stay in yards for 3.61 time slots on average, but the value decreases to 3.12 when the handling capacity increases to 60. Furthermore, we also find that, when the handling capacity of RMGs is inadequate (cap_rmg = 15), the improvement of the operation capacity of shunting engines shows little effect on the performance of the transshipment plan, but decreasing the average dwell time of trains.
+Then, we analyze the influence of the capacity of handling yard using the instances that loc = 4. The computational results are shown in Fig. 12. The results report that using more handling lines shows a positive effect on the performance of transshipment operation since more trains could be handled with the increase of handling lines. Meanwhile, instead of being taken-out quickly to make space for subsequent
+
+Fig. 9. The starting and ending distribution time of vessels’ unloading operations. 13
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Table 6 Computational results of RHAAB for Data_1.
+
+No.
+
+loc
+
+G
+
+RMG
+
+Gurobi OBJ(1)
+
+TIME(2)
+
+1
+
+3
+
+2
+
+3
+
+3
+
+3
+
+4
+
+3
+
+5
+
+3
+
+6
+
+4
+
+7
+
+4
+
+8
+
+4
+
+9
+
+4
+
+10
+
+5
+
+11
+
+5
+
+12
+
+6
+
+3
+
+15
+
+4
+
+30
+
+4
+
+60
+
+6
+
+60
+
+8
+
+30
+
+3
+
+45
+
+4
+
+30
+
+6
+
+30
+
+8
+
+30
+
+6
+
+30
+
+8
+
+30
+
+6
+
+30
+
+2522.2 1766.1 1762.4 1734.9 1728.1 1799.0 1127.7 1100.0 1041.7 523.3 470.2 300.3
+
+1500 1500 1500 1500 1500 1500 1500 1500 1500 1500 1500 1500
+
+*OBJ_Gap = [(3) − (1)]/(1) × 100%; Time_Gap = [(4) − (2)]/(2) × 100%.
+
+operations, they could wait in the yard for a longer time to load more VTDT containers and, thus, the train spaces could be more fully used.
+For example, in the instances that G = 3 and cap_rmg = 30, a total of 24 trains are served, and the average dwell time of trains is 2 time slot. Meanwhile, if we add two more tracks, 32 trains are handled in the
+
+GAP
+0.10% 0.47% 0.50% 0.59% 0.32% 0.43% 5.08% 79.97% 2.77% 57.18% 4.98% 18.78%
+
+RHAAB
+OBJ(3)
+2593.2 1811.5 1809.5 1789.6 1769.2 1841.8 1165.8 1091.3 1065.6 516.7 472 273
+
+TIME(4)
+668 942 827 751 868 686 1205 1341 1360 1370 1364 1360
+
+OBJ_Gap
+2.82% 2.57% 2.67% 3.15% 2.38% 2.38% 3.38% −0.79% 2.29% −1.26% 0.38% −9.09%
+
+Time_Gap
+−55.48% −37.21% −44.85% −49.96% −42.18% −54.28% −19.71% −10.61% −9.34% −8.66% −9.11% −9.36%
+
+optimal plan with the average dwell time of 3.43 time slot. At the same time, the loading rate of trains increases slightly, from 7.92 containers per train to 8 containers per train. Besides, it can be noticed that the action of deploying more handling lines performs better when the handling capacity of RMGs is sufficient.
+
+Fig. 10. A comparison between the instances that taking and not taking dwell time into consideration. 14
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 10. (continued)
+
+6.6. Analysis of loading rate
+
+6.7. Sensitivity to the length of service time
+
+Another concern we would like to address here is the loading rate of trains. With limited resources, it is possible that in some cases, trains would be taken-out empty of with a few container groups to make space for the following trains. In this sub-section, two sets of instances with 6 and 8 handling lines are used to evaluate the average loading rate of trains in different scenarios. We use two indicators to evaluate the utility of train spaces, namely the average loading rate of trains and the number of the re-allocated trains, in which the re-allocated train is the loaded trains that are taken-out empty after unloading operations. The results are shown in Table 7.
+According to the results, train spaces are fully used in instances with sufficient handling capacities (cap_rmg ≥ 30). On the other hand, if the handling capacity of RMG is insufficient, the number of containers that can be transshipped in each time slot is limited. Hence, it is hard to make full use of train spaces as serval trains are handled at the same time. Besides, it can be observed that some loaded trains are taken-out empty in these instances, especially when the operation capacity of shunting engines is enhanced. As the direction of trains is given, taking out trains soon after discharging operations could make space for successive trains and help to improve the efficiency of transshipment operations.
+
+To investigate the model’s sensitivity of the length of trains’ time window, 10 groups of instances with different time window lengths are tested. The earliest arrival time of trains is generated randomly and fixed. The latest leaving time is put off to prolong the service time of trains. Table 8 shows the value of the objective function of different cases. Fig. 13 illustrates the change of storage time as well as dwell time of containers as the feasible service time increases. As can be seen, with given capacities, a longer time window is in favor of a better plan and could provide terminal operators with more flexibility to determine the allocation of resources.
+To be specific, prolonging the feasible service time achieves a better result in cases with limited RMG handling capacity, e.g. set_1, set_3, set_5 and set_9. In these cases, the influence of lacking the handling capacity of RMGs is alleviated by a longer service time of trains because trains could wait in the handling yard for longer time to make full use of trains space. It can also be noticed that, if the service time of trains is long enough, the influence of handling capacities would be diminished. Thus, it could be an effective method to improve performance of transshipment operations if it is hard to deploying more handling equipment.
+Based on the results above, it can be concluded that compared with using more handling lines or deploying more shunting engines, the handling capacity of RMGs is more likely to be the main bottleneck of
+
+15
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 11. Computational results of Data_1 (G = 8).
+
+the whole process of transshipment operations. The performance of transshipment operations would be improved by the other two methods as the handling capacity of RMGs is adequate. Moreover, prolonging the service time of trains also helps to improve the performance of the transshipment plan, which, we think, is a more effective and economical method. In practice, this can be realized by optimizing the deployment profile of RMGs, optimizing the operation area of RMGs (Boysen, Fliedner, & Kellner, 2010), and optimizing the operation sequence of tasks. Furthermore, using more handling lines is in favor of longer dwell time of trains to transship more inbound containers directly. Terminal operators are also able to make better use of the rolling stock resources as well as the train spaces. Hence, it would be a preferable choice for seaport rail terminals to construct more handling lines especially when trains with more wagons are used, such as heavy haul trains, to take full advantage of the capacity of trains and increase the proportion of VTDT containers.
+7. Conclusion
+This paper has studied the transshipment operation optimization problem that arises in seaport rail terminals, in which schedule template of trains and transshipment plan of containers are included. Instead of stacking all inbound containers in the storage yard before loading them on trains, a direct-transshipment mode is considered.
+
+Meanwhile, unloading operations of trains are also considered, and a hybrid operation mode is applied. The problem is formulated as a mixed-integer problem with the objective of maximizing the number of VTDT containers and reducing the storage time and dwell time of inbound containers. A rolling horizon approach with adaptive horizon length and backtracking strategy is used to solve the problem. Several sets of computational experiments are conducted on medium and largescale instances to verify the performance of the proposed algorithm. The computational results suggest that the proposed algorithm solves large-scale cases with less computational time with promising results. Furthermore, several sets of small-scale instances that differ in the value of capacity-related parameters are used to analyze the influence of different types of capacity.
+The results of experiments shows that first, it is necessary to take the dwell time of containers into consideration, by which the dwell time of trains and the corresponding contaienrs could reduce significantly. Second, the handling capacity of RMGs shows a more significant effect on the performance of transshipment operation. The insufficient handling capacity of RMGs is more likely to leads to the waste of train spaces as well as the utility of loaded trains. The results also show that terminal operators could alleviate the negative effect of lacking handling capacities by prolonging the feasible service time of trains or enhancing the operation capacity of shunting engines to take-out the reallocated empty trains soon after unloading operations. Based on these
+
+16
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+Fig. 12. Computational results of Data_1 (loc = 4).
+
+Table 7 Loading rate and number of re-allocated empty trains.
+
+RMG
+
+15
+
+G=6
+
+G=8
+
+Average loading rate
+
+loc
+
+3
+
+7.41
+
+7.87
+
+4
+
+7.00
+
+6.63
+
+5
+
+7.00
+
+6.63
+
+6
+
+6.63
+
+7.00
+
+7
+
+–
+
+7.00
+
+8
+
+–
+
+6.63
+
+Number of re-allocated trains
+
+loc
+
+3
+
+7
+
+8
+
+4
+
+11
+
+11
+
+5
+
+13
+
+11
+
+6
+
+11
+
+12
+
+7
+
+–
+
+11
+
+8
+
+–
+
+11
+
+30
+G=6
+8.00 7.84 7.97 7.97 – –
+0 0 0 0 – –
+
+G=8
+8.00 8.00 7.97 7.97 7.97 7.97
+0 0 0 0 0 0
+
+45
+G=6
+8.00 8.00 7.97 7.97 – –
+0 0 0 0 – –
+
+G=8
+8.00 8.00 7.97 7.97 7.97 7.97
+0 0 0 0 0 0
+
+60
+G=6
+8.00 8.00 7.97 7.97 – –
+0 0 0 0 – –
+
+G=8
+8.00 8.00 7.97 7.97 7.97 7.97
+0 0 0 0 0 0
+
+17
+
+B. Yan, et al.
+
+Table 8 Sensitivity analysis of trains’ visiting time window length.
+
+Index
+
+loc
+
+G
+
+RMG
+
+set_1
+
+3
+
+set_2
+
+3
+
+set_3
+
+3
+
+set_4
+
+3
+
+set_5
+
+3
+
+set_6
+
+3
+
+set_7
+
+4
+
+set_8
+
+4
+
+set_9
+
+5
+
+set_10
+
+6
+
+3
+
+15
+
+3
+
+30
+
+4
+
+15
+
+4
+
+30
+
+6
+
+15
+
+8
+
+30
+
+4
+
+30
+
+6
+
+30
+
+8
+
+15
+
+6
+
+30
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+The length of feasible service time of trains
+
+5
+
+6
+
+7
+
+233.9 224.8 225.1 224.8 225.1 224.8 207.8 207.8 224.2 207.8
+
+225 224.8 217.1 216.8 217.1 216.8 207 207 209.7 207
+
+208.5 201 201.4 201 201.4 201 201 201 201.4 201
+
+8
+201.3 201 201.3 201 201.3 201 201 201 201.3 201
+
+9
+201.2 201 201.2 201 201.2 201 201 201 201.2 201
+
+Fig. 13. Computational results of various length of the time window.
+
+results, some suggestions are put forward to improve the performance of transshipment operations in seaport rail terminals.
+
+Acknowledgement
+
+This study has been substantially supported by the National Key R&
+
+Appendix A. Computational results of RHAAB for Data_2 ( = 10)
+
+loc
+
+G
+
+RMG
+
+Gurobi
+
+ST
+
+VTDT
+
+Dwell
+
+Gap
+
+4
+
+6
+
+45
+
+37
+
+436
+
+458
+
+0.14%
+
+4
+
+6
+
+60
+
+40
+
+436
+
+455
+
+0.14%
+
+6
+
+6
+
+30
+
+41
+
+436
+
+449
+
+0.00%
+
+5
+
+6
+
+45
+
+41
+
+436
+
+449
+
+0.00%
+
+5
+
+6
+
+60
+
+37
+
+436
+
+453
+
+0.00%
+
+6
+
+6
+
+45
+
+37
+
+436
+
+453
+
+0.00%
+
+4
+
+8
+
+45
+
+40
+
+436
+
+450
+
+0.00%
+
+5
+
+8
+
+30
+
+41
+
+436
+
+449
+
+0.00%
+
+5
+
+8
+
+45
+
+37
+
+436
+
+453
+
+0.00%
+
+7
+
+8
+
+30
+
+37
+
+436
+
+453
+
+0.00%
+
+8
+
+8
+
+30
+
+40
+
+436
+
+450
+
+0.00%
+
+8
+
+8
+
+45
+
+41
+
+436
+
+449
+
+0.00%
+
+8
+
+8
+
+60
+
+40
+
+436
+
+450
+
+0.00%
+
+6
+
+8
+
+45
+
+37
+
+436
+
+453
+
+0.00%
+
+6
+
+8
+
+30
+
+37
+
+436
+
+453
+
+0.00%
+
+4
+
+8
+
+60
+
+41
+
+436
+
+449
+
+0.00%
+
+6
+
+6
+
+60
+
+40
+
+436
+
+450
+
+0.00%
+
+5
+
+8
+
+60
+
+37
+
+436
+
+453
+
+0.00%
+
+7
+
+8
+
+60
+
+41
+
+436
+
+449
+
+0.00%
+
+D Program of China (Grant No. 2016YFE0201700), National Natural Science Foundation of China (Grant No. 71771149), National Natural Science Foundation of China (Grant No. 71601142).
+
+Obj
+72 72 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5 71.5
+
+RHAAB
+
+ST
+
+VTDT
+
+Dwell
+
+Obj
+
+44
+
+436
+
+455
+
+72.4
+
+41
+
+436
+
+458
+
+72.4
+
+41
+
+436
+
+453
+
+71.9
+
+40
+
+436
+
+454
+
+71.9
+
+44
+
+436
+
+450
+
+71.9
+
+40
+
+436
+
+454
+
+71.9
+
+45
+
+436
+
+449
+
+71.9
+
+44
+
+436
+
+450
+
+71.9
+
+44
+
+436
+
+450
+
+71.9
+
+44
+
+436
+
+450
+
+71.9
+
+40
+
+436
+
+454
+
+71.9
+
+40
+
+436
+
+454
+
+71.9
+
+44
+
+436
+
+450
+
+71.9
+
+40
+
+436
+
+454
+
+71.9
+
+40
+
+436
+
+454
+
+71.9
+
+40
+
+436
+
+455
+
+72
+
+44
+
+436
+
+452
+
+72.1
+
+40
+
+436
+
+456
+
+72.1
+
+44
+
+436
+
+452
+
+72.1
+
+GAP_RHAAB
+0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.56% 0.70% 0.84% 0.84% 0.84%
+
+18
+
+B. Yan, et al.
+
+5
+
+6
+
+30
+
+4
+
+6
+
+30
+
+4
+
+8
+
+30
+
+3
+
+4
+
+30
+
+6
+
+8
+
+15
+
+6
+
+6
+
+15
+
+4
+
+8
+
+15
+
+5
+
+8
+
+15
+
+7
+
+8
+
+15
+
+8
+
+8
+
+15
+
+3
+
+6
+
+15
+
+4
+
+6
+
+15
+
+5
+
+6
+
+15
+
+3
+
+8
+
+15
+
+4
+
+4
+
+15
+
+6
+
+8
+
+60
+
+7
+
+8
+
+45
+
+3
+
+8
+
+60
+
+3
+
+4
+
+45
+
+3
+
+4
+
+15
+
+3
+
+6
+
+30
+
+4
+
+3
+
+15
+
+3
+
+3
+
+15
+
+3
+
+8
+
+45
+
+4
+
+4
+
+45
+
+3
+
+8
+
+30
+
+3
+
+6
+
+45
+
+4
+
+4
+
+60
+
+3
+
+3
+
+45
+
+3
+
+3
+
+60
+
+4
+
+4
+
+30
+
+3
+
+6
+
+60
+
+3
+
+4
+
+60
+
+3
+
+3
+
+30
+
+4
+
+3
+
+45
+
+4
+
+3
+
+30
+
+4
+
+3
+
+60
+
+37
+
+436
+
+41
+
+436
+
+41
+
+436
+
+703
+
+380
+
+1421
+
+297
+
+1421
+
+297
+
+1421
+
+297
+
+1421
+
+297
+
+1421
+
+297
+
+1421
+
+297
+
+1423
+
+297
+
+1421
+
+297
+
+1421
+
+297
+
+1423
+
+297
+
+1421
+
+296
+
+41
+
+436
+
+37
+
+436
+
+591
+
+389
+
+694
+
+379
+
+1434
+
+296
+
+671
+
+389
+
+1461
+
+295
+
+1461
+
+295
+
+605
+
+390
+
+41
+
+432
+
+668
+
+389
+
+598
+
+390
+
+46
+
+432
+
+835
+
+374
+
+832
+
+374
+
+41
+
+432
+
+599
+
+390
+
+693
+
+379
+
+837
+
+374
+
+837
+
+374
+
+836
+
+374
+
+835
+
+374
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+453
+
+0.00%
+
+71.5
+
+45
+
+436
+
+451
+
+72.1
+
+0.84%
+
+454
+
+0.14%
+
+72
+
+40
+
+436
+
+462
+
+72.7
+
+0.97%
+
+449
+
+0.00%
+
+71.5
+
+40
+
+436
+
+458
+
+72.3
+
+1.12%
+
+460
+
+0.16%
+
+189.2
+
+753
+
+380
+
+459
+
+194.1
+
+2.59%
+
+309
+
+0.00%
+
+320.6
+
+1507
+
+297
+
+309
+
+329.2
+
+2.68%
+
+309
+
+0.00%
+
+320.6
+
+1509
+
+297
+
+309
+
+329.4
+
+2.74%
+
+309
+
+0.00%
+
+320.6
+
+1509
+
+297
+
+309
+
+329.4
+
+2.74%
+
+309
+
+0.00%
+
+320.6
+
+1509
+
+297
+
+309
+
+329.4
+
+2.74%
+
+309
+
+0.00%
+
+320.6
+
+1509
+
+297
+
+309
+
+329.4
+
+2.74%
+
+309
+
+0.00%
+
+320.6
+
+1509
+
+297
+
+309
+
+329.4
+
+2.74%
+
+322
+
+0.16%
+
+322.1
+
+1511
+
+297
+
+324
+
+331.1
+
+2.79%
+
+309
+
+0.00%
+
+320.6
+
+1511
+
+297
+
+309
+
+329.6
+
+2.81%
+
+309
+
+0.00%
+
+320.6
+
+1511
+
+297
+
+309
+
+329.6
+
+2.81%
+
+322
+
+0.16%
+
+322.1
+
+1511
+
+297
+
+325
+
+331.2
+
+2.83%
+
+312
+
+0.00%
+
+321.8
+
+1523
+
+296
+
+308
+
+331.6
+
+3.05%
+
+449
+
+0.00%
+
+71.5
+
+45
+
+434
+
+449
+
+73.7
+
+3.08%
+
+453
+
+0.00%
+
+71.5
+
+44
+
+434
+
+450
+
+73.7
+
+3.08%
+
+534
+
+0.00%
+
+177.3
+
+625
+
+381
+
+498
+
+184.3
+
+3.95%
+
+451
+
+0.00%
+
+188.3
+
+701
+
+372
+
+460
+
+196.2
+
+4.20%
+
+324
+
+0.12%
+
+324.3
+
+1565
+
+294
+
+312
+
+338
+
+4.22%
+
+490
+
+0.00%
+
+180.9
+
+691
+
+384
+
+503
+
+188.7
+
+4.31%
+
+333
+
+0.18%
+
+328.8
+
+1604
+
+292
+
+316
+
+344.1
+
+4.65%
+
+333
+
+0.24%
+
+328.8
+
+1604
+
+292
+
+318
+
+344.3
+
+4.71%
+
+537
+
+0.00%
+
+178.1
+
+595
+
+376
+
+521
+
+188.1
+
+5.61%
+
+463
+
+4.31%
+
+76.5
+
+78
+
+432
+
+469
+
+80.8
+
+5.62%
+
+493
+
+0.00%
+
+180.9
+
+660
+
+374
+
+485
+
+192.8
+
+6.58%
+
+544
+
+0.00%
+
+178.1
+
+642
+
+376
+
+497
+
+190.4
+
+6.91%
+
+458
+
+4.18%
+
+76.5
+
+99
+
+431
+
+457
+
+82.6
+
+7.97%
+
+409
+
+0.00%
+
+202.7
+
+998
+
+369
+
+407
+
+223.3
+
+10.16%
+
+412
+
+0.00%
+
+202.7
+
+956
+
+363
+
+407
+
+224.5
+
+10.75%
+
+463
+
+4.58%
+
+76.5
+
+118
+
+430
+
+457
+
+85.4
+
+11.63%
+
+535
+
+0.00%
+
+177.3
+
+706
+
+374
+
+503
+
+199.2
+
+12.35%
+
+452
+
+0.00%
+
+188.3
+
+845
+
+364
+
+445
+
+216.3
+
+14.87%
+
+407
+
+0.00%
+
+202.7
+
+1066
+
+365
+
+403
+
+233.3
+
+15.10%
+
+407
+
+0.00%
+
+202.7
+
+998
+
+356
+
+409
+
+235.2
+
+16.03%
+
+408
+
+0.00%
+
+202.7
+
+1064
+
+362
+
+405
+
+236
+
+16.43%
+
+409
+
+0.00%
+
+202.7
+
+1083
+
+355
+
+408
+
+244.5
+
+20.62%
+
+References
+Alumur, S. A., Kara, B. Y., & Karasan, O. E. (2012). Multimodal hub location and hub network design. Omega, 40(6), 927–939.
+Ambrosino, D., Bramardi, A., Pucciano, M., Sacone, S., & Siri, S. (2011). Modeling and solving the train load planning problem in seaport container terminals. In Automation science and engineering (CASE), 2011 IEEE conference on (pp. 208–213). IEEE.
+Ambrosino, D., & Siri, S. (2015). Comparison of solution approaches for the train load planning problem in seaport terminals. Transportation Research Part E: Logistics and Transportation Review, 79, 65–82.
+Bierwirth, C., & Meisel, F. (2010). A survey of berth allocation and quay crane scheduling problems in container terminals. European Journal of Operational Research, 202(3), 615–627.
+Boysen, N., Fliedner, M., & Kellner, M. (2010). Determining fixed crane areas in rail–rail transshipment yards. Transportation Research Part E: Logistics and Transportation Review, 46(6), 1005–1016.
+Boysen, N., Jaehn, F., & Pesch, E. (2011). Scheduling freight trains in rail-rail transshipment yards. Transportation Science, 45(2), 199–211.
+Emde, S., & Boysen, N. (2016). Berth allocation in container terminals that service feeder ships and deep-sea vessels. Journal of the Operational Research Society, 67(4), 551–563.
+Gillen, D., & Hasheminia, H. (2018). Empirical analysis and simulation modeling of a Canadian seaport transportation network. Journal of Supply Chain and Operations Management, 16(1), 17–35.
+Hu, Q., Wiegmans, B., Corman, F., & Lodewijks, G. (2019). Integration of inter-terminal transport and hinterland rail transport. Flexible Services and Manufacturing Journal, 807–831.
+Iris, Ç., Lalla-Ruiz, E., Lam, J. S. L., & Voß, S. (2018). Mathematical programming formulations for the strategic berth template problem. Computers & Industrial Engineering, 124, 167–179.
+Jin, J. G., Lee, D. H., & Hu, H. (2015). Tactical berth and yard template design at container transshipment terminals: A column generation based approach. Transportation Research Part E: Logistics and Transportation Review, 73, 168–184.
+Lee, D. H., & Jin, J. G. (2013). Feeder vessel management at container transshipment terminals. Transportation Research Part E: Logistics and Transportation Review, 49(1), 201–216.
+Li, Z. C., & Sheng, D. (2016). Forecasting passenger travel demand for air and high-speed
+
+rail integration service: A case study of Beijing-Guangzhou corridor, China. Transportation Research Part A: Policy and Practice, 94, 397–410. Liu, M., Lee, C. Y., Zhang, Z., & Chu, C. (2016). Bi-objective optimization for the container terminal integrated planning. Transportation Research Part B: Methodological, 93, 720–749. Ma, H. L., Chung, S. H., Chan, H. K., & Cui, L. (2019). An integrated model for berth and yard planning in container terminals with multi-continuous berth layout. Annals of Operations Research, 273(1–2), 409–431. Meisel, F., & Bierwirth, C. (2013). A framework for integrated berth allocation and crane operations planning in seaport container terminals. Transportation Science, 47(2), 131–147. Merakli, M., & Yaman, H. (2016). Robust intermodal hub location under polyhedral demand uncertainty. Transportation Research Part B: Methodological, 86, 66–85. Sheng, D., Meng, Q., & Li, Z. (2019). Optimal vessel speed and fleet size for industrial shipping services under the emission control area regulation. Transportation Research Part C: Emerging Technologies, 105, 37–53. https://doi.org/10.1016/j.trc.2019.05.038 in this issue. Stahlbock, R., & Voß, S. (2008). Operations research at container terminals: A literature update. OR Spectrum, 30(1), 1–52. SteadieSeifi, M., Dellaert, N. P., Nuijten, W., Van Woensel, T., & Raoufi, R. (2014). Multimodal freight transportation planning: A literature review. European Journal of Operational Research, 233(1), 1–15. Steenken, D., Voß, S., & Stahlbock, R. (2004). Container terminal operation and operations research-a classification and literature review. OR Spectrum, 26(1), 3–49. Sun, Y., & Schonfeld, P. (2016). Holding decisions for correlated vehicle arrivals at intermodal freight transfer terminals. Transportation Research Part B: Methodological, 90, 218–240. Upadhyay, A., Gu, W., & Bolia, N. (2017). Optimal loading of double-stack container trains. Transportation Research Part E: Logistics and Transportation Review, 107, 1–22. Vacca, I., Bierlaire, M., & Salani, M. (2007). Optimization at container terminals: Status, trends and perspectives. Tech. Rep. TRANSP-OR 071204, Transport and Mobility Laboratory, EPFL. Wang, X., & Meng, Q. (2017). Discrete intermodal freight transportation network design with route choice behavior of intermodal operators. Transportation Research Part B: Methodological, 95, 76–104. Wang, K., Zhen, L., Wang, S., & Laporte, G. (2018). Column generation for the integrated berth allocation, quay crane assignment, and yard assignment problem. Transportation Science. Xiang, X., Liu, C., & Miao, L. (2017). A bi-objective robust model for berth allocation
+
+19
+
+B. Yan, et al.
+
+Computers & Industrial Engineering 141 (2020) 106296
+
+scheduling under uncertainty. Transportation Research Part E: Logistics and Transportation Review, 106, 294–319. Xiang, X., Liu, C., & Miao, L. (2018). Reactive strategy for discrete berth allocation and quay crane assignment problems under uncertainty. Computers & Industrial Engineering, 126, 196–216. Xie, Y., & Song, D. P. (2018). Optimal planning for container prestaging, discharging, and loading processes at seaport rail terminals with uncertainty. Transportation Research Part E: Logistics and Transportation Review, 119, 88–109.
+
+Zeng, Q., Feng, Y., & Chen, Z. (2017). Optimizing berth allocation and storage space in direct transshipment operations at container terminals. Maritime Economics & Logistics, 19(3), 474–503.
+Zhen, L. (2015). Tactical berth allocation under uncertainty. European Journal of Operational Research, 247(3), 928–944.
+Zhu, E., Crainic, T. G., & Gendreau, M. (2014). Scheduled service network design for freight rail transportation. Operations Research, 62(2), 383–400.
+
+20
+

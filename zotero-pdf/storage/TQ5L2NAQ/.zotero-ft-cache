@@ -1,0 +1,506 @@
+The current issue and full text archive of this journal is available on Emerald Insight at: www.emeraldinsight.com/0263-5577.htm
+
+IMDS 117,7
+1376
+Received 30 September 2016 Revised 11 November 2016 31 March 2017 Accepted 5 April 2017
+
+Decision support systems for sustainable logistics: a review
+and bibliometric analysis
+Fahham Hasan Qaiser, Karim Ahmed, Martin Sykora and Alok Choudhary
+School of Business and Economics, Loughborough University, Loughborough, UK, and
+Mike Simpson
+Management School, University of Sheffield, Sheffield, UK
+
+Abstract
+Purpose – Decision making in logistics is an increasingly complex task for organizations as these involve decisions at strategic, tactical and operational levels coupled with the triple-bottom line of sustainability. Decision support systems (DSS) played a vital role in arguably solving the challenges associated with decision making in sustainable logistics. The purpose of this paper is to explore the current state of the research in the domain of DSS for logistics while considering sustainability aspects. Design/methodology/approach – A systematic review approach using a set of relevant keywords with several exclusion criteria was adopted to identify literature related to DSS for sustainable logistics. A total of 40 papers were found from 1994 to 2015, which were then analyzed along the dimensions of publishing trend, geographic distribution and collaboration, the most influential journals, affiliations and authors as well as the key themes of identified literature. The analysis was conducted by means of bibliometric and text mapping tools, namely BibExcel, gpsvisualizer and VOSviewer. Findings – The bibliometric analysis showed that DSS for sustainable logistics is an emerging field; however, it is still evolving but at a slower pace. Furthermore, most of the contributing affiliations belong to the USA and the UK. The text mining and keyword analysis revealed key themes of identified papers. The inherent key themes were decision models and frameworks to address sustainable logistics issues covering transport, distribution and third-party logistics. The most prominent sustainable logistics issue was carbon footprinting. Social impact has been given less attention in comparison to economic and environmental aspects. The literature has adequate room for proposing more effective solutions by considering various types of multi-criteria decision analysis methods and DSS configurations while simultaneously considering economic, environmental and social aspects of sustainable logistics. Moreover, the field has potential to include logistics from wide application areas including freight transport through road, rail, sea, air as well as inter-modal transport, port operations, material handling and warehousing. Originality/value – To the best of the authors’ knowledge, this is the first systematic review of DSS for sustainable logistics using bibliometric and text analysis. The key themes and research gaps identified in this paper will provide a reference point that will encourage and guide interested researchers for future study, thus aiding both theoretical and practical advancements in this discipline.
+Keywords Sustainability, Logistics, Systematic review, Bibliometric analysis, Decision support system,
+Text visualization
+Paper type Literature review
+
+Introduction Logistics is vital to the success of supply chains and inevitably linked with the overall organizational performance. The activities may involve freight transport, materials handling, storage and inventory management. Logistics has the potential of bringing
+
+Industrial Management & Data Systems Vol. 117 No. 7, 2017 pp. 1376-1388 © Emerald Publishing Limited 0263-5577 DOI 10.1108/IMDS-09-2016-0410
+
+This research has been made available through the European Union EuropeAid-funded Project “EU-India Research & Innovation Partnership for Efficient and Sustainable Freight Transportation (REINVEST),” Contract Number: R/141842. The contents of this publication are the sole responsibility of the authors of this paper and can in no way be taken to reflect the views of the European Union.
+
+tremendous impact on local as well as global trade by aiming to supply the right items at the right place and right time. In the past two decades, there has been a growing concern for environmental and social impacts of logistics besides economic aspects. In this regard, the term “green logistics” and “sustainable logistics” has been used by organizations and academic researchers.
+According to Chang and Qin (2008), “The green logistics refers to plan, control, management and implementation of the logistics system through the advanced logistics technology and environmental management, aiming to reduce the pollutant emission.” Zhao et al. (2009) further explained that “the meaning of green logistics is to improve resource utilization, reduce resource consumption and waste, and minimize environmental pollution when implementing logistics activities, through rational planning, optimize resource allocation and use environmental technology.” Mckinnon et al. (2012) defined “green logistics” as the study of the environmental effects of all the activities involved in logistics in both forward and reverse directions. Sbihi and Eglese (2010) suggested that “green logistics is concerned with producing and distributing goods in a sustainable way, taking account of environmental and social factors.”
+The most widely accepted definition of sustainable development was given by the World Commission on Environment and Development which is concerned with the fulfillment of the needs of the present without compromising the ability of future generations to meet their own needs (WCED, 1987). Elkington (1997) suggested the consideration of three closely interrelated economic, ecological (environmental) and social aspects of sustainability in a “triple-bottom line.” The scope of sustainability in supply chain and logistics has also been borrowed from these concepts. However, there is still a lack of consensus among researchers over a unified definition of green and sustainable logistics, and both of these terms have been used interchangeably in the literature with a different implied scope. Moreover, the formal definition of “sustainable logistics” is relatively scarce in literature compared to “green logistics.” It is evident that environmental issues are extensively addressed in the literature in comparison to that of social issues, which is partially covered under green logistics. The lack of research addressing social issues in sustainable logistics gives the field a direction to develop further considering sustainability in logistics as a whole giving equal importance to economic, environmental and social aspects. In the context of this study, we are limiting our scope to those papers that have addressed economic as well as at least either the environmental or social dimension of sustainability.
+Given the situation, it is now increasingly difficult for organizations to make logistical decisions at strategic, tactical and operational levels in line with the triple-bottom line of sustainability. Much of the research work and initiatives were carried out to make logistics more sustainable. In this regard, and in other subject areas, decision support systems (DSS) in logistics may help companies to make fast and more effective decisions.
+There exist many definitions of DSS in the literature. In fact, DSS is highly context sensitive as it means different things to different people (Turban and Turban, 2007). Gorry and Morton (1971) defined DSS as “the interactive computer-based systems, which help decision makers utilize data and models to solve unstructured problems.” As the chosen subject area is comparatively new, the scope of the study is further expanded from the given DSS definition and also includes DSS frameworks and models as well as review articles that may contribute toward developing a DSS. This also involves papers addressing logistics issues alongside their focus on supply chain.
+This paper is an attempt to conduct a systematic literature review of DSS for sustainable logistics, which reveals the existing state of research in this area and provides researchers and organizations with a direction to develop this field further. The remainder of this paper is organized as follows: the methodology is discussed in the next section followed by initial data analysis and statistics, bibliometric analysis, discussion section and finally the conclusion.
+
+DSS for sustainable
+logistics
+1377
+
+IMDS 117,7
+1378
+
+Methodology According to Fink (1998), “A literature review is a systematic, explicit, and reproducible design for identifying, evaluating, and interpreting the existing body of recorded documents.” Systematic literature reviews are different from conventional narrative reviews in that they are more transparent and reduce bias in literature search and summarize them objectively (Petticrew and Roberts, 2006). A three-step process for the systematic literature review is described below, which was adapted from Fahimnia et al. (2015):
+(1) Choosing appropriate search terms: a total of 45 keywords were identified by the authors through a brainstorming process. A four-level keyword assembly structure is used to gather all relevant literature where the first three levels with 37 keywords set inclusion criteria; however, the fourth level with eight keywords sets exclusion criteria. The assembly structure is given in Table I. The first level contains keywords belonging to DSS; however, levels 2 and 3 contain all the appropriate keywords related to logistics and sustainability, respectively. The fourth-level keywords are intended to filter out areas related to city logistics, municipal waste collection, pipeline and electricity distribution which are irrelevant and excluded from this study.
+(2) Initial search results and delimitation: the authors have chosen Scopus, which is the largest abstract and citation database of peer-reviewed research literature delivering a comprehensive overview of the world’s research output in the field of science, technology, medicine, social sciences, and arts and humanities (Elsevier, 2016a). It covers over 20,000 peer-reviewed journals (Elsevier, 2016b) including those published by Elsevier, Emerald, Inderscience, Informs, Springer and Taylor and Francis. One limitation of Scopus is the limited access to the publications before 1996. However, given the emerging nature of our research area, it is unlikely to have a significant impact on our findings. Initially, the first three levels of keywords were employed in the title, abstract and keywords search of the Scopus database. The search result returned a total of 367 articles until the end of 2015. The initial search result was further reduced gradually by using fourth-level keywords followed by excluding health sciences papers and considering only journal articles in the English language. These limitations reduced the total number of papers to 97. Afterward, final shortlisting of papers was carried out by the relevance of individual papers, given the context of this research, which provided the final 40 papers to be analyzed. Given the limited
+
+Table I. Four-level keywords assembly structure
+
+Context keywords: (“Decision support” OR “DSS” OR “Expert System” OR “knowledge based system” OR “knowledge management system” OR “Model based system” OR “Data based system” OR “Data management system” OR “Communication based system” OR “Document based system” OR “Decision Management System” OR “web tool” OR “Analytics system”) AND
+Logistics keywords: (logistics OR “freight transport” OR “freight transportation” OR “Inventory management” OR “material handling” OR “port handling” OR warehousing OR warehouse OR “distribution network” OR “distribution centre” OR “reverse logistics” OR “transportation mode” OR intermodal OR multimodal) AND
+Sustainability keywords: (sustainable OR sustainability OR Green OR greenhouse OR “GHG” OR Carbon OR emission OR “environmental impact” OR “Social impact” OR “socioeconomic”) AND NOT
+Out of scope keywords: ( “Water distribution” OR “Water Infrastructure” OR “Pipe aging” OR “City Logistics” OR “grid” OR “solid waste” OR “waste disposal” OR “waste collection”)
+
+number of publications in this area, the authors have also considered those manuscripts which were accepted and made available online in 2015 but due for publication in 2016. The step-by-step exclusion criteria and the resulting number of papers are given in Table II.
+(3) Data analysis: an inductive approach has been used for data analysis. The analysis is performed in the following sections as initial data statistics, bibliometric analysis and text visualization. BibExcel is used for the purpose of bibliometric analysis. The analysis includes author, affiliation and keyword statistics. Moreover, gpsvisualizer.com is used for mapping affiliations on their frequency. In addition, VOSviewer is used for the network analysis of title and abstract text of shortlisted papers.
+
+DSS for sustainable
+logistics
+1379
+
+Initial data statistics The Scopus database classifies the shortlisted papers into a number of subject areas. The top ten subject fields are given in Table III. Some of the papers are mentioned in more than one field, as classified by Scopus. Furthermore, the publishing trend is shown in Figure 1, which shows the number of papers plotted against years. The first paper appeared in 1994 by Fischer (1994). He pointed out the potential of artificial intelligence (AI) principles and techniques in a geographic information system environment for applications including land-use planning, distribution logistics, etc. Afterward, the field is revived in 2001 following a long gap of seven years. Since 2001, there is an overall increasing trend of publications with some peaks and troughs. The publications have relatively increased in the past three years; however, the absolute frequency is still low. It is also observed that the 40 papers were published in 32 different journals. The top five journals that have published more than one paper and shared a total of 12 papers representing 30 percent of all articles are shown in Table IV.
+
+Search criteria
+First three levels keywords search Exclusion of fourth-level keywords Exclusion of health sciences subject area Limitation to only journal papers (excluding conference papers, book series, commercial publications, etc.) Limitation to English language papers Exclusion of out of scope papers through manual screening
+
+No. of papers
+
+367 299 248
+
+98
+
+92
+
+Table II.
+
+40
+
+Stepwise delimitation
+
+Subject area
+Engineering Business, management and accounting Decision sciences Environmental science Social sciences Computer science Economics, econometrics and finance Energy Mathematics Agricultural and biological sciences
+
+No. of papers
+16 14 13 12 11 6 5 4 4 2
+
+Table III. The top ten subject areas
+
+Number of Papers 1994 1995 1996 1997 1998 1999 2000 2001 2002 22000034 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015
+
+IMDS
+
+12
+
+117,7 10
+
+8
+
+1380
+
+6
+
+4
+
+2
+
+Figure 1.
+
+0
+
+Publishing trend
+
+Year
+
+Table IV. Top five journals
+
+Journal
+
+Publication year No. of
+2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 papers
+
+International Journal of
+
+Production Economics
+
+Transportation Research
+
+Part D: Transport and
+
+Environment
+
+International Journal of
+
+Logistics Management
+
+European Journal of
+
+Operational Research
+
+1
+
+Journal of Cleaner
+
+Production
+
+Total
+
+1
+
+22
+
+4
+
+1
+
+1
+
+2
+
+11
+
+2
+
+1
+
+2
+
+1
+
+1
+
+2
+
+1
+
+2 3 5 12
+
+The selected papers are classified into three categories, based on their focus on certain dimensions of sustainability, namely economic and environmental (ENV ), economic and social (SOC), and economic, environmental and social (SUS). Table V shows the differentiation of these papers and their organization in descending order of authors based on publication year. It is revealed that 27 papers addressed both ENV aspects; however, interestingly only one paper focused on SOC dimensions. The trend of incorporating all the three dimensions of sustainability started relatively late with a total of only 12 intermittent publications since 2007.
+Bibliometric analysis This section mainly presents the analysis of authors, keywords and affiliations. Identifying the key researchers and universities across the globe will help scholars, students and organizations to conduct research with relevant researchers at various universities (Fahimnia et al., 2015). In this regard, BibExcel is used for this purpose which extracts and analyzes bibliographic data. The data of shortlisted papers that includes author name, affiliation, journal, paper title, abstract, publication year are exported from Scopus in RIS format which is compatible with BibExcel.
+
+Authors and years
+
+ENV SOC SUS Authors and years
+
+ENV SOC SUS
+
+Fischer (1994)
+
+X
+
+Muñoz et al. (2013)
+
+X
+
+Freire et al. (2001)
+
+X
+
+Xifeng et al. (2013)
+
+X
+
+Meade and Sarkis (2002)
+
+X
+
+Kannegiesser et al. (2014)
+
+X
+
+Mellor et al. (2002)
+
+X
+
+Kengpol et al. (2014)
+
+X
+
+Ballis and Golias (2004)
+
+X
+
+Soysal et al. (2014)
+
+X
+
+Ayoub et al. (2007)
+
+X Sukumara et al. (2014)
+
+X
+
+Dey and Ramcharan (2008)
+
+X Tang et al. (2014)
+
+X
+
+Frombo et al. (2009)
+
+X
+
+Ting et al. (2014)
+
+X
+
+Liu and Wang (2009)
+
+X
+
+Zhao et al. (2014)
+
+X
+
+Wadhwa et al. (2009)
+
+X
+
+Boutkhoum et al. (2015)
+
+X
+
+Byrne and Ryan (2010)
+
+X
+
+Boonsothonsatit et al. (2015)
+
+X
+
+Menou et al. (2010)
+
+X Bortolini et al. (2015)
+
+X
+
+Ramani et al. (2010)
+
+X
+
+Karthik et al. (2015)
+
+X
+
+Agusdinata et al. (2011)
+
+X
+
+Kengpol and Tuammee (2016)
+
+X
+
+Adhitya et al. (2011)
+
+X
+
+Kristianto et al. (2015)
+
+X
+
+Krikke (2011)
+
+X
+
+Lam and Lai (2015)
+
+X
+
+Macharis et al. (2011)
+
+X Liljestrand et al. (2015)
+
+X
+
+Ogawa et al. (2011)
+
+X
+
+Meneghetti et al. (2015)
+
+X
+
+Mallidis et al. (2012)
+
+X
+
+Norlund and Gribkovskaia (2015) X
+
+Albrecht et al. (2013)
+
+X Tiwari et al. (2015)
+
+X
+
+DSS for sustainable
+logistics
+1381
+Table V. Sustainability dimensions of selected papers
+
+Author influence The data of all authors were extracted from those 40 papers and the frequency of authors was observed. It is revealed that out of 149 authors only two authors, Kengpol and Tuammee, have had their papers published more than once. These authors are also found to be the only key paired authors. They belong to King Mongkut’s University of Technology North Bangkok having their papers published in International Journal of Logistics Management and International Journal of Production Research in 2014 and 2016, respectively. This finding can be taken as the very beginning stage of collaboration among scholars. However, there is a need for more collaboration of scholars from different regions, universities and subject areas to enrich this field of study.
+Affiliation statistics Likewise, based on authors’ data, the affiliation data are extracted with respect to each author from RIS file using BibExcel. The city names are obtained from each affiliation where the organization is located. Using city information and its frequency, the geographical distribution of affiliations is mapped with gpsvisualizer.com; a free online utility that creates customizable maps and profiles from GPS data and addresses, and is presented in Figure 2.
+The size of red spot reflects the contribution of each organization (city) associated with those 40 papers. It is apparent that greater density is found in three regions across the globe, which are the eastern part of USA, the Western Europe and the Far East. Table VI presents top contributing countries along with their respective number of papers. It is apparent that the USA is the most active country in this research area, followed by European (UK and Italy), and finally the Far Eastern region. Conversely, there are only four top affiliations which contributed to more than one paper as shown in Table VII. It is pertinent to note that despite the USA being the most active country in this particular field, Purdue University is interestingly the only one among the top four affiliations.
+Furthermore, Table VIII shows international collaboration in the 40 papers of our study. It reveals that the top four collaborations are either with USA or UK. This could be attributed to the possibility that the authors from Far East or Europe may be pursuing their
+
+IMDS 117,7
+1382
+
+Figure 2. Geographical location of contributing organizations (using gpsvisulaizer.com)
+
+Table VI. Top 12 contributing countries
+
+Country
+USA UK Italy Finland Germany China
+
+No. of papers
+18 9 6 5 4 4
+
+Country
+Hong Kong Thailand Singapore Netherlands India Belgium
+
+No. of papers
+3 3 3 3 3 3
+
+Organization
+
+Table VII. Top four contributing organizations
+
+Purdue University Loughborough University Lappeenrannan Teknillinen Yliopisto King Mongkut’s University of Technology
+
+Location
+USA UK Finland Thailand
+
+No. of papers
+3 2 2 2
+
+Table VIII. International collaboration
+
+Country 1
+China Spain Switzerland China
+
+Country 2
+USA USA USA UK
+
+No. of papers
+2 2 2 2
+
+terminal research degrees from US or UK universities. However, at this moment, this would require further investigation to validate this assumption.
+Keyword statistics The keywords belonging to each paper were extracted from the RIS file using BibExcel. Table IX shows a list of 16 out of 70 keywords from 40 papers, which appeared at least twice.
+
+Similarly, Table X presents the list of most popular words appearing in the paper title. Though the frequency of keywords is limited to cover a broader scope, it is inferred from the top most words found in both tables that the current research is about helping organizational managers to solve logistical issues with the objective of reducing environmental impact. Moreover, certain decision-making approaches were also traced such as AHP, DEA and simulation. To further validate this inference and to explore this further through the text used in these studies, text mining was carried out based on the texts appearing in the titles and abstract of shortlisted papers.
+Text network visualization The texts from titles and abstracts of papers were exported in comma-separated value file format and used as input for text mining using VOSviewer software to explore the text pattern presented in Figure 3. The size of circles and text visibility are proportional to the occurrence of words. The text visualization also shows links between terms that are appearing together. A total of 1,462 terms were found by the software out of which 156 words were selected to be mapped that appeared at least three times, although the data have certain noise and are not enough to perform rich analysis and clustering. However, the text visualization highlights the inferences made from the keywords analysis. Most of the papers are primarily concerned with proposing a model, framework, approach or decision support tool to solve logistics issues with a focus on reducing cost and environmental impact including the carbon footprint.
+However, it can be seen that social impact is given less attention in the existing body of research. Moreover, analytic hierarchy process as multi-criteria decision analysis (MCDA) approach has been used for prioritizing criteria or factors for decision making. Simulation term was also witnessed in the visualization map that might have been used for both organizations and policy makers in green logistics. It is inferred that the main areas
+
+DSS for sustainable
+logistics
+1383
+
+Words
+Decision Support Systems Carbon Footprint Analytic Hierarchy Process (AHP) Supply Chain Sustainability Decision Support System Supply Chain Management Sustainable Logistics
+
+Frequency
+5 4 3 3 3 3 3 2
+
+Words
+Simulation Biomass Quantitative Risk Assessment (QRA) Decision Support Environmental Reverse Logistics Carbon Dioxide Emissions Data Envelopment Analysis (DEA)
+
+Frequency
+2 2 2 2 2 2 2 2
+
+Table IX. The most popular keywords in papers
+
+Words
+Decision Logistics Support Supply System Chain Sustainable Case Framework
+
+Frequency
+13 12 11 11 8 8 7 7 7
+
+Words
+Approach Transport Design Development Study Model Operations Analysis Green
+
+Frequency
+6 6 5 5 4 4 4 4 4
+
+Table X. The most popular words in paper titles
+
+IMDS 117,7
+1384
+Figure 3. Text visualization using VOSviewer
+focused on sustainable logistics are transport, distribution and third-party logistics. Decision-making approaches addressed problems which are weakly connected to the network thus providing an opportunity to study the field in detail to explore the models and solution methods.
+Conclusions, limitations and future directions This paper presents a systematic review and bibliometric analysis of literature about DSSs for sustainable logistics. It is pertinent to note that the state of research in this area is still in its infancy and requires swift advancement given the dynamics of business environments. We have used bibliometric and visualization tools to analyze journal paper data and have drawn the following conclusions from this study: first, the publication trend in this area has been rising since 2013; however, the absolute frequency of these publications is still low. Second, there are only two top contributing authors in this area who are also found to be the only paired authors. Third, the only influential journal in this area is International Journal of Production Economics, which published four papers in the last two years. Fourth, the geographic distribution of contributing affiliations is focused at the eastern part of North America, Western Europe and Asia. Fifth, the top collaborating organizations are either within the USA or the UK. Sixth, the keyword statistics and text visualization reveal that certain models, systems and frameworks have been proposed to solve logistical issues concerning sustainability but the research area is partially covered regarding various DSS configurations as well as different types of problems within logistics.
+
+Like any other research study, this paper also comes with certain limitations. Besides journal articles, conference papers could also have been included in the study and further analysis could also be performed including citation, co-citation, page rank analysis and data clustering. Moreover, content analysis may also be effective in order to identify the nature of models, issues, sustainability dimensions and technologies employed. This study is conducted on the basis of papers obtained from Scopus, which is considered to be a comprehensive database. However, there is a possibility of gathering more relevant journal articles by exploring other databases as well, such as Google Scholar, the Web of Science, etc. The methodology used in this paper reveals only the trend at a macro level including publication trend, key affiliations, authors and journals. It does not interpret the knowledge contained in these papers. A more comprehensive systematic bibliometric and content analysis can be carried out to validate the results of our findings and to develop thorough understanding by including literature from other databases, including conference papers.
+The findings of this paper have both academic and practical implications. The current set of findings, affirming DSS in sustainable logistics is an emerging field, will initiate accelerated development of this area including freight transport through road, rail, sea, air as well as inter-modal transport, port operations, material handling and warehousing. The geographic distribution of researchers and affiliations working in this field will help other interested researchers to identify and collaborate with them. Given the diversified nature of DSS, researchers may seek the utility of different types of DSS including knowledge-based systems, model-based systems, communication-based systems and databased systems or a hybrid of these. The research area has also the potential of validating the usage of AI approaches and/or various MCDA models or a combination of them to complement the result. Moreover, there is room for researchers to realize the need of simultaneously covering SUS aspects of sustainability in order to take into account the concerns of all stakeholders while developing a DSS. Consequently, the resulting DSS will help logistics managers in making effective decisions to make the operations profitable as well as to have a broad and long-term positive impact on the environment and society.
+The implications from findings together with the limitations of this study further open new research avenues for future studies. This review is part of an ongoing project exploring this emerging field and will consider above limitations in future work.
+
+DSS for sustainable
+logistics
+1385
+
+References
+Adhitya, A., Halim, I. and Srinivasan, R. (2011), “Decision support for green supply chain operations by integrating dynamic simulation and LCA indicators: diaper case study”, Environmental Science and Technology, Vol. 45 No. 23, pp. 10178-10185.
+Agusdinata, D.B., Fry, D.N. and Delaurentis, D.A. (2011), “Policies to deal with multimodal transport emissions: a system-of-systems approach”, Transportation Planning and Technology, Vol. 34 No. 2, pp. 109-123.
+Albrecht, S., Brandstetter, P., Beck, T., Fullana-I-Palmer, P., Grönman, K., Baitz, M., Deimling, S., Sandilands, J. and Fischer, M. (2013), “An extended life cycle analysis of packaging systems for fruit and vegetable transport in Europe”, International Journal of Life Cycle Assessment, Vol. 18 No. 8, pp. 1549-1567.
+Ayoub, N., Martins, R., Wang, K., Seki, H. and Naka, Y. (2007), “Two levels decision system for efficient planning and implementation of bioenergy production”, Energy Conversion and Management, Vol. 48 No. 3, pp. 709-723.
+Ballis, A. and Golias, J. (2004), “Towards the improvement of a combined transport chain performance”, European Journal of Operational Research, Vol. 152 No. 2, pp. 420-436.
+
+IMDS 117,7
+1386
+
+Boonsothonsatit, K., Kara, S., Ibbotson, S. and Kayis, B. (2015), “Development of a generic decision support system based on multi-objective optimisation for green supply chain network design (GOOG)”, Journal of Manufacturing Technology Management, Vol. 26 No. 7, pp. 1069-1084.
+Bortolini, M., Faccio, M., Ferrari, E., Gamberi, M. and Pilati, F. (2015), “Fresh food sustainable distribution: cost, delivery time and carbon footprint three-objective optimization”, Journal of Food Engineering, Vol. 174, pp. 56-67.
+Boutkhoum, O., Hanine, M., Tikniouine, A. and Agouti, T. (2015), “Multi-criteria decisional approach of the OLAP analysis by fuzzy logic: green logistics as a case study”, Arabian Journal for Science and Engineering, Vol. 40 No. 8, pp. 2345-2359.
+Byrne, P.J. and Ryan, P. (2010), “Simulation, a support for sustainable logistical decision-making in complex supply chains”, International Journal of Computer Aided Engineering and Technology, Vol. 2 No. 4, pp. 356-370.
+Chang, Q. and Qin, R. (2008), “Analysis on development path of Tianjin green logistics”, International Journal of Business and Management, Vol. 3 No. 9, pp. 96-98.
+Dey, P.K. and Ramcharan, E.K. (2008), “Analytic hierarchy process helps select site for limestone quarry expansion in Barbados”, Journal of Environmental Management, Vol. 88 No. 4, pp. 1384-1395.
+Elkington, J. (1997), Cannibals with Forks: The Triple Bottom Line of 21th Century Business, Capstone, Oxford, p. 402.
+Elsevier (2016a), “About Scopus”, available at: www.elsevier.com/solutions/scopus (accessed October 15, 2016).
+Elsevier (2016b), “Measuring a journal’s impact”, available at: www.elsevier.com/authors/journalauthors/measuring-a-journals-impact (accessed October 15, 2016).
+Fahimnia, B., Tang, C., Davarzani, H. and Sarkis, J. (2015), “Quantitative models for managing supply chain risks: a review”, European Journal of Operational Research, Vol. 247 No. 1, pp. 1-15.
+Fink, A. (1998), Conducting Research Literature Reviews, Sage Publications, Thousand Oaks, CA.
+Fischer, M.M. (1994), “From conventional to knowledge-based geographic information systems”, Computers, Environment and Urban Systems, Vol. 18 No. 4, pp. 233-242.
+Freire, F., Thore, S. and Ferrão, P. (2001), “Life cycle activity analysis: logistics and environmental policies for bottled water in Portugal”, OR Spektrum, Vol. 23 No. 1, pp. 159-182.
+Frombo, F., Minciardi, R., Robba, M., Rosso, F. and Sacile, R. (2009), “Planning woody biomass logistics for energy production: a strategic decision model”, Biomass and Bioenergy, Vol. 33 No. 3, pp. 372-383.
+Gorry, G.A. and Morton, M.S. (1971), “A framework for management information systems”, Sloan Management Review, Vol. 12 No. 1, pp. 55-70.
+Kannegiesser, M., Günther, H.-O. and Gylfason, O. (2014), “Sustainable development of global supply chains – part 2: investigation of the European automotive industry”, Flexible Services and Manufacturing Journal, Vol. 26 Nos 1-2, pp. 48-68.
+Karthik, B., Raut, R.D., Kamble, S.S., Kharat, M.G. and Kamble, S.J. (2015), “Decision support system framework for performance based evaluation and ranking system of carry and forward agents”, Strategic Outsourcing, Vol. 8 No. 1, pp. 23-52.
+Kengpol, A. and Tuammee, S. (2016), “The development of a decision support framework for a quantitative risk assessment in multimodal green logistics: an empirical study”, International Journal of Production Research, Vol. 54 No. 4, pp. 1020-1038.
+Kengpol, A., Tuammee, S. and Tuominen, M. (2014), “The development of a framework for route selection in multimodal transportation”, International Journal of Logistics Management, Vol. 25 No. 3, pp. 581-610.
+Krikke, H. (2011), “Impact of closed-loop network configurations on carbon footprints: a case study in copiers”, Resources, Conservation and Recycling, Vol. 55 No. 12, pp. 1196-1205.
+Kristianto, Y., Gunasekaran, A. and Helo, P. (2015), “Building the ‘Triple R’ in global manufacturing”, International Journal of Production Economics, Vol. 183, Part C, pp. 607-619.
+
+Lam, J.S.L. and Lai, K.H. (2015), “Developing environmental sustainability by ANP-QFD approach: the case of shipping operations”, Journal of Cleaner Production, Vol. 105, pp. 275-284.
+Liljestrand, K., Christopher, M. and Andersson, D. (2015), “Using a transport portfolio framework to reduce carbon footprint”, International Journal of Logistics Management, Vol. 26 No. 2, pp. 296-312.
+Liu, H.T. and Wang, W.K. (2009), “An integrated fuzzy approach for provider evaluation and selection in third-party logistics”, Expert Systems with Applications, Vol. 36 No. 3, pp. 4387-4398.
+Mckinnon, A., Browne, M. and Whiteing, A. (2012), Green Logistics: Improving the Environmental Sustainability of Logistics, Kogan Page Publishers, London, p. 392.
+Macharis, C., Caris, A., Jourquin, B. and Pekin, E. (2011), “A decision support framework for intermodal transport policy”, European Transport Research Review, Vol. 3 No. 4, pp. 167-178.
+Mallidis, I., Dekker, R. and Vlachos, D. (2012), “The impact of greening on supply chain design and cost: a case for a developing region”, Journal of Transport Geography, Vol. 22, pp. 118-128.
+Meade, L. and Sarkis, J. (2002), “A conceptual model for selecting and evaluating third-party reverse logistics providers”, Supply Chain Management, Vol. 7 No. 5, pp. 283-295.
+Mellor, W., Wright, E., Clift, R., Azapagic, A. and Stevens, G. (2002), “A mathematical model and decision-support framework for material recovery, recycling and cascaded use”, Chemical Engineering Science, Vol. 57 Nos 22-23, pp. 4697-4713.
+Meneghetti, A., Dal Borgo, E. and Monti, L. (2015), “Decision support optimisation models for design of sustainable automated warehouses”, International Journal of Shipping and Transport Logistics, Vol. 7 No. 3, pp. 266-294.
+Menou, A., Benallou, A., Lahdelma, R. and Salminen, P. (2010), “Decision support for centralizing cargo at a Moroccan airport hub using stochastic multicriteria acceptability analysis”, European Journal of Operational Research, Vol. 204 No. 3, pp. 621-629.
+Muñoz, E., Capón-García, E., Laínez, J.M., Espuña, A. and Puigjaner, L. (2013), “Considering environmental assessment in an ontological framework for enterprise sustainability”, Journal of Cleaner Production, Vol. 47, pp. 149-164.
+Norlund, E.K. and Gribkovskaia, I. (2015), “Modal split in offshore supply network under the objective of emissions minimization”, Transportation Research Part D: Transport and Environment, Vol. 35, pp. 160-174.
+Ogawa, H., Masui, T. and Yamada, T. (2011), “Development of a decision support system for selecting transportation mode considering CO 2 emissions”, Journal of Japan Industrial Management Association, Vol. 62 No. 3, pp. 117-124.
+Petticrew, M. and Roberts, H. (2006), Systematic Reviews in the Social Sciences, Blackwell Publication, Malden, MA.
+Ramani, K., Ramanujan, D., Bernstein, W.Z., Zhao, F., Sutherland, J., Handwerker, C., Choi, J.K., Kim, H. and Thurston, D. (2010), “Integrated sustainable life cycle design: a review”, Journal of Mechanical Design, Transactions of the ASME, Vol. 132 No. 9, pp. 0910041-09100415.
+Sbihi, A. and Eglese, R.W. (2010), “Combinatorial optimization and green logistics”, Annals of Operations Research, Vol. 175 No. 1, pp. 159-175.
+Soysal, M., Bloemhof-Ruwaard, J.M. and Van Der Vorst, J.G.A.J. (2014), “Modelling food logistics networks with emission considerations: the case of an international beef supply chain”, International Journal of Production Economics, Vol. 152, pp. 57-70.
+Sukumara, S., Faulkner, W., Amundson, J., Badurdeen, F. and Seay, J. (2014), “A multidisciplinary decision support tool for evaluating multiple biorefinery conversion technologies and supply chain performance”, Clean Technologies and Environmental Policy, Vol. 16 No. 6, pp. 1027-1044.
+Tang, L., Meng, Y., Wang, G., Chen, Z.L., Liu, J., Hu, G., Chen, L. and Zhang, B. (2014), “Operations research transforms Baosteel’s operations”, Interfaces, Vol. 44 No. 1, pp. 22-38.
+Ting, S.L., Tse, Y.K., Ho, G.T.S., Chung, S.H. and Pang, G. (2014), “Mining logistics data to assure the quality in a sustainable food supply chain: a case in the red wine industry”, International Journal of Production Economics, Vol. 152, pp. 200-209.
+
+DSS for sustainable
+logistics
+1387
+
+IMDS 117,7
+1388
+
+Tiwari, M.K., Chang, P.C. and Choudhary, A. (2015), “Carbon-efficient production, supply chains and logistics”, International Journal of Production Economics, Vol. 164, pp. 193-196.
+Turban, E. and Turban, E. (2007), Decision Support and Business Intelligence Systems, Pearson Prentice Hall, Upper Saddle River, NJ.
+Wadhwa, S., Madaan, J. and Chan, F.T.S. (2009), “Flexible decision modeling of reverse logistics system: a value adding MCDM approach for alternative selection”, Robotics and ComputerIntegrated Manufacturing, Vol. 25 No. 2, pp. 460-469.
+WCED (1987), World Commission on Environment and Development, Our Common Journey, Oxford University Press, Oxford.
+Xifeng, T., Ji, Z. and Peng, X. (2013), “A multi-objective optimization model for sustainable logistics facility location”, Transportation Research Part D: Transport and Environment, Vol. 22, pp. 45-48.
+Zhao, P., Liu, J. and He, L. (2009), “Study on the development of modern green logistics in China”, International Conference on Innovation Management Wuhan China, IEEE, Los Alamitos, CA, December 8-9, pp. 43-46.
+Zhao, R., Liu, D. and Li, Q. (2014), “Decision support system design for rail transport of hazardous materials”, Proceedings of the Institution of Civil Engineers: Transport, Vol. 167 No. 4, pp. 217-231.
+Corresponding author Fahham Hasan Qaiser can be contacted at: f.h.qaiser@lboro.ac.uk
+
+For instructions on how to order reprints of this article, please visit our website: www.emeraldgrouppublishing.com/licensing/reprints.htm Or contact us for further details: permissions@emeraldinsight.com
+

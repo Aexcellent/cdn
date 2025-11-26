@@ -1,0 +1,789 @@
+logistics
+Article
+Travel Time Prediction in a Multimodal Freight Transport Relation Using Machine Learning Algorithms
+Nikolaos Servos 1,*, Xiaodi Liu 1, Michael Teucke 2 and Michael Freitag 2,3 1 Bosch Connected Industry, Robert Bosch Manufacturing Solutions GmbH, Leitzstrasse 47, 70469 Stuttgart, Germany; taylorkkxiaodiliu@gmail.com 2 BIBA—Bremer Institut für Produktion und Logistik GmbH, University of Bremen, Hochschulring 20, 28359 Bremen, Germany; tck@biba.uni-bremen.de (M.T.); fre@biba.uni-bremen.de (M.F.) 3 Faculty of Production Engineering, University of Bremen, Badgasteiner Straße 1, 28359 Bremen, Germany * Correspondence: nikolaos.servos@de.bosch.com
+Received: 18 November 2019; Accepted: 23 December 2019; Published: 25 December 2019
+Abstract: Accurate travel time prediction is of high value for freight transports, as it allows supply chain participants to increase their logistics quality and eﬃciency. It requires both suﬃcient input data, which can be generated, e.g., by mobile sensors, and adequate prediction methods. Machine Learning (ML) algorithms are well suited to solve non-linear and complex relationships in the collected tracking data. Despite that, only a minority of recent publications use ML for travel time prediction in multimodal transports. We apply the ML algorithms extremely randomized trees (ExtraTrees), adaptive boosting (AdaBoost), and support vector regression (SVR) to this problem because of their ability to deal with low data volumes and their low processing times. Using diﬀerent combinations of features derived from the data, we have built several models for travel time prediction. Tracking data from a real-world multimodal container transport relation from Germany to the USA are used for evaluation of the established models. We show that SVR provides the best prediction accuracy, with a mean absolute error of 17 h for a transport time of up to 30 days. We also show that our model performs better than average-based approaches.
+Keywords: logistics; supply chain management; multimodal freight transports; travel time prediction; machine learning
+
+1. Introduction
+An accurate travel time prediction is of high value for freight transports, as it allows supply chain participants to increase their logistics quality [1–3]. A material planner at the receiving plant can identify delayed deliveries in advance, and forecasts of material stocks can be optimized through this. Furthermore, a plant can adjust its capacities in time, e.g., staﬀ or machinery, and increase its eﬃciency. Logistic service providers beneﬁt in the same way. At warehouses, ports, or other hubs, capacities concerning staﬀ, ramps, forklifts, etc. can be scheduled accordingly. Consequently, manufacturers and logistic service providers can enhance their eﬃciency, optimize their processes, and increase planning accuracy [1,3,4].
+Generally speaking, a supply chain involves all collaborative operations by all involved companies to transform raw materials into the ﬁnal product. This includes activities such as sourcing raw materials, manufacturing, assembly, and distribution to the end customer. To do so, logistics for the handling, transport, and storage of materials is required. While logistics deals with the operational level, supply chain management deals with the planning and management of supply chains. Logistics also
+
+Logistics 2020, 4, 1; doi:10.3390/logistics4010001
+
+www.mdpi.com/journal/logistics
+
+Logistics 2020, 4, 1
+
+2 of 22
+
+includes the task to provide information between the various stages in the supply chain. Usually, a number of companies or organizations are responsible for the transport. Especially in multimodal transports with various transshipment points, these conditions make the supply chain signiﬁcantly more complex. [5] This work focuses on estimating travel time accurately in multimodal transports. Accurate travel time estimates are important for eﬃcient management of transport operations and logistics in supply chains.
+For travel time estimation, a continuous monitoring of freight transports is required, e.g., by using mobile sensors attached to transported goods [6]. At the same time, achieving the required transparency is one of the most challenging tasks in logistics [7]. Travel time prediction is also diﬃcult, as many factors, such as weather, traﬃc, vehicle, route, or transport relation inﬂuence it [8].
+Currently, the majority of the published literature deals with passenger transportation, such as bus arrival times or highway travel times, rather than freight transports. Hereby, only rides with a duration of up to two hours are considered, which is not applicable to freight transports [9,10]. For travel time estimation, the authors use average-based approaches [11,12], Kalman ﬁlters [13–17], or machine learning (ML) algorithms (see Section 2). Furthermore, in their research, the route and stops are known in advance.
+As per [9], only ML algorithms can adequately deal with complex and dynamic behavior during transports. ML has the ability to deal better with complex and non-linear relationships between predictors and can process complex and noisy data [10]. The literature also conﬁrms this statement, as ML approaches usually perform better than average-based approaches [18–20]. Despite this situation, ML has only been applied in a minority of recent publications dealing with travel time prediction in freight transports [1,2,21,22].
+In the forecasting of multimodal freight transports based on real-time tracking data, only very limited research has been conducted, which mainly uses average-based approaches [23]. Consequently, this paper focuses on the evaluation of ML for long term forecasting to predict travel times of multimodal freight transports. Tracking data is generated by sensors, which are attached to the transported goods. The sensor data is transmitted with a low frequency in longer periods of 30 min, due to a small battery coverage. Except for the origin and destination, no further information concerning the exact route and trans-loading points are available beforehand. Finally, we can show that machine learning algorithms can adequately predict travel time under the given constraints. In our use-case, support vector regression (SVR) provides the best prediction accuracy, with a mean absolute error of 17 h for a transport time of up to 30 days. We also show that our model performs better than average-based approaches.
+We organize the rest of the paper as follows: In Section 2, we provide an overview of literature dealing with travel time estimation using machine learning to identify the research gap. Section 3 describes the selected learning algorithms and the framework of this work. Section 4 presents the use-cases and the collected tracking data, which will be processed and transformed in Section 5. Section 6 describes the process of creating the prediction model. The results are evaluated and compared to average-based models in Section 7. In Section 8, we conclude the paper and suggest further work in this ﬁeld.
+2. Literature Review
+In this paper, we evaluate the capability of machine learning algorithms to predict the travel time in multimodal transports. Most research in this realm has been conducted on travel time prediction for segments of streets or highways and bus rides. Only a minor part of the research is related to freight transports or similar applications.
+The authors of [24] use data from loop detectors and a global positioning system (GPS) to determine speed, occupancy, and volume of cars on highways, and include previous transport times to predict travel times on a four-mile stretch of highway. They use artiﬁcial neural networks (ANNs) as a learning algorithm. Similarly, the authors of [25] only include loop detectors and use support
+
+Logistics 2020, 4, 1
+
+3 of 22
+
+vector machines to estimate travel time on highway segments of up to 350 km. Ref. [26] identiﬁes random forests (RF) as the best approach for predicting travel times on urban street segments using GPS data from 300 probe vehicles. In a similar use-case to ref. [24], the authors of [27] evaluate a gradient boosting method and RF for travel time estimation on highway segments and show that the gradient boosting method performs best. The authors of [8] also show that gradient boosting provides a good prediction. The authors also evaluate diﬀerent features based on GPS data. They establish that including the speed between two transmissions increases prediction accuracy by 5%. The authors of [28] evaluate deep neuronal networks using 12 months of GPS data and the previous 12 travel times as features. Even for a 131 km stretch, their approach results in a mean absolute error (MAE) of 3.25 min. The above approaches do not consider any end-to-end transport relations as with freight transports. In addition, exact advance knowledge of the route and a high frequency of GPS measurements are required, or side-based approaches such as loop detectors are used.
+Considering bus travel time prediction, nearly all authors, such as [18,29–33], use ANNs in their research. In all cases, the route is known in advance and is separated based on the bus stops. Most of the approaches only diﬀer when considering the evaluated use-case and the used features. Usually, features such as the time of departure, public holidays, dwelling time at bus stops, current travel time, distance to destination, and average speed are used. Similarly, the authors of [20] also apply ANNs to tramways. The authors of [31] identify ANNs as a better approach than k-nearest neighbors (kNN), while the authors of [34] show that support vector regression (SVR) performs better. The authors of [35] use a multilinear regression for prediction. To consider all previous stops in their model, the authors add the cumulated number of stops and dwelling time. In contrast to the previous approaches, the bus ride is related to an origin and destination considering an end-to-end transport relation including stops, similar to freight logistics. However, the authors have not considered that many stops within supply chains are often unknown to supply chain participants and can diﬀer between transports using the same transport relation. Furthermore, their approaches require a high number of rides and assume a high frequency of GPS measurements.
+The authors of [2] apply SVR on milk run freight transports. They comment that SVR can better generalize information than neuronal networks. Hereby, the stops of the milk run are known in advance. Their prediction model achieves an accuracy of three minutes. However, it requires 1800 rides for training. The authors of [36] consider random forests (RF) as a reasonable algorithm to predict aircraft arrival times. Flight related data such as delays, origin, destination, position, weather data, and data from the air traﬃc control have been taken to consideration. The authors can prove that their estimation is better than the one provided by air traﬃc control. The authors of [1] apply neuronal networks and SVR to predict the time of arrival of container transports. The timestamp, distance to destination, and geo-coordinates have been chosen as features, as well as weather information. The authors show that SVR performs better than ANNs and that weather data does not have a signiﬁcant inﬂuence on the transport time. Finally, the authors of [21] evaluate kNN, SVR, and RF for arrival time prediction of open-pit trucks. Hereby, a site-based approach is used. The position is only measured at a few discrete nodes of the route network, and no GPS data is used. RF provides the best prediction results.
+The literature review shows that none of the identiﬁed research has yet been conducted on multimodal transports with the transported goods themselves being equipped with a sensor instead of the transport vehicle. Furthermore, the research has also not yet considered the scenario where transported goods are equipped with sensors with a small battery coverage that are consequently transmitting position data with a low frequency, in this case every 30 min, in comparable distances. The concluding algorithm has to be capable of deriving a good prediction with a lower amount of data. In addition, the case of the route being unknown has not been considered in the research.
+
+Logistics 2020, 4, 1
+
+4 of 22
+
+3. Methodology
+The following chapter provides a description of applied machine learning algorithms and the corresponding parameters of models based on the knowledge from the literature review. A framework of the proposed approach is also presented.
+3.1. Choice of Learning Algorithms
+This research will select extremely randomized trees (ExtraTrees), adaptive boosting (AdaBoost) and support vector regression (SVR) as representative algorithms for modelling, according to the results of the literature review. All three algorithms are capable of adapting to complex systems and are robust in dealing with complex and small data sets. They have shown superior performance in previous research with low processing time [1,2,25,37].
+Support vector machine (SVM) is a classiﬁcation technique based on the concept of supervised learning. It aims to ﬁnd the decision boundary between data points and separate them by an optimally derived hyperplane maximizing margin [25] (pp. 277–278). SVM is applied to regression problems as SVR. Brieﬂy speaking, SVR deﬁnes a weight for each variable of the model and learns the behavior of the data through a training and testing process. The kernel trick is applied to ﬁnd a nonlinear decision boundary by creating a much higher dimension of new features transformed from existing features [38] (pp. 282–284). A common and well performing kernel function for travel time prediction is the radial basis function (RBF) [39] (p. 216). The other two hyper-parameters, ε and C, are important for structuring a decision boundary. While the parameter, ε, describes an insensitive loss function that penalizes prediction residuals larger than the value speciﬁed by it, C describes the tolerance towards prediction errors as a regularization parameter [40] (pp. 68–73).
+SVR models have shown plausible performance in recent research due to their good ability to generalize data and guarantee global minima compared to other methods. The processing time can also be low, given the constraints of a small data size and high problem complexity [25,39]. For these reasons, SVR is chosen as one of the algorithms in our study.
+Extremely randomized trees (ExtraTrees) is a tree-based ensemble method for both classiﬁcation and regression problems. The basic principle behind ExtraTrees is to randomly create a number of diﬀerent trees (n_estimators) with randomly chosen features. This process minimizes the variance of the prediction results [41] (pp. 3–4). In this study, regularization parameter, random_state, is also considered, which initiates the random number generator to randomize characteristics in trees [42] (p. 619).
+Adaptive boosting (AdaBoost) is one of the most widely used boosting approaches, based on the concept of combining weak and inaccurate learners, mostly decision trees, to a strong and accurate learner. In regression problems, AdaBoost acts as a meta-estimator, which uses a weighted sum of prediction errors for a number of regressors to increase performance. These weights on the dataset are subsequently updated based on the prediction errors of the previous regressor. Important hyper-parameters of this method are the number of estimators (n_estimators) after which the algorithm will stop and the learning_rate that determines the degree of the weight adjustment [43].
+According to [21,44], both ExtraTrees and AdaBoost are used for travel time prediction and have shown reasonable results with low errors. With the support of previous practical success, we also chose these two methods to build our prediction model.
+3.2. Framework
+In this research, the framework has been derived from the theory of knowledge discovery in databases (KDD) data mining process ﬂow [45] (pp. 72–73) and is shown in Figure 1.
+
+Logistics 2020, 4, x FOR PEER REVIEW
+
+5 of 22
+
+on the results, the best model is selected. (8) Finally, the best machine learning model is compared to
+
+coLmogmistiocsn2l0y20u,s4e, d1 average-based approaches.
+
+5 of 22
+
+FiFgiugruer1e.1F.rFarmaemweowrokruksuesdefdofrotrratrvaevletlimtime perperdeidctiicotino.n.
+ThTehedepsrcorpiboesdedapapproroacahchh, awshbicehenisabpapsleieddounsitnhge hPiystthoorincawl titrhackJuinpgytderatnaootefbtoraonks. pTohrtes uinsetdhe clcuosntesriidnegreadndusper-ecdaiscetidonesaclrgiboeridthimn sSehcatvioenb4e.e1n, inmvpollevmesenetiegdhtusstienpgst:h(e1)mRaeclheivnaenltibdratray fsocrikmit-oldeaerllnin. g
+is selected and cleansed to eliminate outliers. (2) Then, a train and test set splitting is performed. 4.TUhseet-eCstasseetarnepdrDesaetnatsGuennkenroawtionndata that is used to evaluate the performance of the developed models,
+whiIlne tthheistrcahinapsteetrr,eopurersuensets-ckansoewannddatthaeussyesdtefomr turaseindintgo tthreacmkotdheelst.r(a3n)sTpoorintecdludgoeoindfsorismbatriioenflyon intthroedrouuceted,.aTchluesgteenrienrgataepdpdroaatachisisalussoeddetsocirdibeendti.fy stops and trans-loading points. Only the train set is
+used to identify the clusters. (4) Finally, features, which are considered as relevant, are derived from the 4.t1r.aUcksien-CgadsaetDa easncdripthtieonclustering results based on domain knowledge and literature. (5) In the modelling
+phase, diﬀerent methods have been used to select features and to derive diﬀerent experiments as featIunrethsiusbusseet-sc.a(s6e),Trheaenl-,liffoerdeaatcahdeexrpivereidmfernotmanadmleualrtniminogdaallgsouripthpmly,cghraidinseeaxrtcehndainndgcfrroosms vBarleidmaetinon inwGitehrmﬁvaenytratoinVaanndcevailnidtahteioUnnsiettesdhSatvaetebsehenasubseedenfourspeda.raTmruectekrs,tutrnaiinngs., (a7n)dThsheipmsocdaerlrsyaoreutﬁnthaelly intcelsutdededantrdanesvpaolrutast.eTdh, ecopnrsoicdeesrsinisgsthhoewenxpineriFmigeunrtes 2a.nFdirlseta, rtnhiengreaqlugiorreidthgmoso.dsBaasreedpoacnktehdeirnetsoualts, cotnhteabineesrt matoadceol nistaseinleecrtefrde.ig(8h)tFsitnaatilolyn, tohfeableosgt imstaiccshsineervliecaernpirnogvmidoedr einl iBs rceommepna.rHedertoeacfotemr,mitownliyllubseed piacvkeerdaguep-bbaysetdruacpkparonadchtreasn. sported to the port of Bremerhaven. After storing the container at the port’s cTohnetdaiensecrriybaerddafpoprrsoeavcehrhalasdbayeesn, tahpepcloiendtauisnienrgiPs ytrtahnosnpworitthedJubpyyvteersnseoltetobothoek.pTohrteoufsCedhcalrulesstetorinng viaantdheprpeodritctoifonNaolrgfoolrkit.hImn sChhaavrleesbteoenn, itmhepcleomnteaninteedr uisslionagdtehde monatcohainteraliibnrdarryivsincigkitto-leaatrrna.in yard in Bessemer, with several unknown intermediate stops. There, it is picked up by truck and transported to4i.tsUfsine-aCl adseestainnadtiDonatianGVeannecrea.tHioenreby, it should be noted that the actual stops during transport are not limited to the stops previously described. More stops can occur during the transport that have not beeInn kthnioswcnhabpytemr,oostuorfutshee-csauspepalyndchtahine psyasrtteicmipaunstesd. Tthoetrtoatcakl ttrhaenstrpaonrstptaokrteesdbegtowoedesnis22barniedﬂy 30indtaroyds.uced. The generated data is also described.
+4.1. Use-Case Description
+In this use-case, real-life data derived from a multimodal supply chain extending from Bremen in Germany to Vance in the United States has been used. Trucks, trains, and ships carry out the included transports. The process is shown in Figure 2. First, the required goods are packed into a container at a container freight station of a logistics service provider in Bremen. Hereafter, it will be picked up by truck and transported to the port of Bremerhaven. After storing the container at the port’s container yard for several days, thFiegucoren2ta. Tinreanrsipsotrrtapnrsopceosrsteodf thbeycvoensssideelrteodtuhsee-pcaosret. of Charleston via the port of Norfolk. In Charleston, the container is loaded onto a train driving to a train yard in Bessemer, 4.w2.iDthastaevGeernaelruatnioknnoanwdnDinestcerrimpteiodniate stops. There, it is picked up by truck and transported to its ﬁnal desFtionuarttioyn-thinreVeapnaclele. tHs ehraevbey,bietesnhdouisltdribbeutneodteadmtohnagt tsheeveanctcuoanl tsationpesrdshuirpinmgetnrtasn.sTphoorsteaprealnleottslhimaviteed beteontheequstiopppsepdrweviitohuaslhyydbersidcrsibeendso. rMsoyrsetesmto,passcsahnoowcncuirndFuigriunrget3h,efotrraanpspeorirotdthoaftsheavveennwoteebkeesnfokrntohwe n by most of the supply chain participants. The total transport takes between 22 and 30 days.
+
+port’s container yard for several days, the container is transported by vessel to the port of Charleston via the port of Norfolk. In Charleston, the container is loaded onto a train driving to a train yard in Bessemer, with several unknown intermediate stops. There, it is picked up by truck and transported to its final destination in Vance. Hereby, it should be noted that the actual stops during transport are not limited to the stops previously described. More stops can occur during the transport that have Logisticnso2t02b0e,e4n, 1known by most of the supply chain participants. The total transport takes between 22 and6 of 22 30 days.
+FigFuigreur2e. 2T.rTarnasnpspoortrtpprroocceessss ooff tthheeccoonnssididereerdedusues-cea-scea.se.
+4.2. D4a.2ta. DGaetnaeGraentieornatiaonndaDndesDcersicprtiipotnion FourtFyo-uthrtrye-ethpreaellpeatsllehtasvheavbeebeneednidsitsrtirbiubuteteddaammoonngg sseevveennccoonntatianienresrhsiphmipemntesn. tTsh.oTshe opsaelleptaslhleatvsehave
+been beeqeunipeqpueidppweditwh iathhayhbyrbidridsesennssoorrssyysstteemm,,aassshsohwown inn iFnigFuirgeu3r, efo3r,afpoerraiopdeorfisoedveonfwseevekesnfowretheeks for the puLropgiostsices 2o0f20t,r4a, cxkFOinRgP.ETERhReEreVfIEoWre, each pallet within the container has been equipped with6aofs2e2nsor. The sepnusroproisse aosf stroaccikaitnegd. Twhietrheftorraen, sepacohrtparellleattwedithininfothremcaotnitoaninferrohmasabelaebneelqautitpapcehdewdittoh athseenpsaolre. tTthee, e.g., the sersieanlsonruims absesro.cTiahteids ‘wpiatihritnragnpsproorctersesl’atiesdpienrffoorrmmaetidonwfriothmaaslcaabnel. aTthtaechseednstorthise mpaeleatstue,rein.gg., qthueality relatedserdiaaltan,usmubcehr.aTshhisum‘paidiritnyg apnrodcetessm’ pisepraetruforrem, eadndwittrhanassmcaints. Tthhies sdeantsaortoisgemtheaesruwrinitghqiutsaliItDy via Bluetoroetlhatelodwdeantae,rsguych(BaLsEh).uTmhiednit,ythaendsetnesmopr edraattaurise,traanndsmtraitntsemdittos athdisevdiacteactaolgleedthaergwatiethwaitys, IwDhviciah has been aBtltuaecthoeodtholonwtheenecrognyt(aBiLnEe)r. aTnhdeni,sthreecseeinvsionrgdathtaeissetrnasnosrmditatetad atot aa dperveidceeﬁcanlleedd iangtaetrevwaal.y,Dwuheictho the long trhaans sbpeoenrtaattnadchaedreosntrtihcetecdonbtaatinteerryanlidfei,ssreencesiovrinmgethaseusreenmsoerndtastaaraet arepcreeidveefdinaedndinttrearvnaslm. Dituteedtoonly every to3hn0elymloeinnvge. rtTyrha3ne0sgpmaotirnetw.aTnahdyeatghraeetnestwraiadcytdesdthgebenaotat-epdrdoyssliigtfieeo,on-spiennogssiotdrioamntaienatgosudtrhaetemaretenoctetshivaereerdercseeecineviesvdoerdsdeananstdoarutrdsaainntsagmuGistitPneSdg and transmGiPtsS tahned dtraatnasmtoittshteheBdoastcahtoIothTeCBloosuchd,IoaTcCenloturdal, adacetantcralol udadtasyclsotuedms,ytshteromu, gthhrotuhgehgtlhoebgallosbyasl tem for mosybsitleemcofmormmuonbiilceactioomnms u(GniScMati)onnset(wGSoMrk).nIeftwnoorkG.SIMf nocoGnSnMecctoionnneicstiaovnaiislaabvlaei,latbhlee,stehnessoernsdoarta is buﬀerdedataonistbhueffgearetedwoanythtoeggeattheweraywtiothgetthheerGwPiSthdtahteaGuPnStidl aatacounnntielcaticoonnnfoercttiroannfsomr tirsasniosmn iisssiaovnaiislable again.avAalilatbralensamgaitnt.edAldl atrtanissmsittoterdeddiantathise sctlooruedd finorthlaetecrloruedtrifeovr allataenrdreatnriaevlyasl ias.ndThaenaglaytseisw. Tayhse can also bgeauteswedaystcaatnioanlsaorybewuistehdﬁsxtaetdiongaeroy-cwoitohrdfiixneadtegse.o-Dcouordiningatehse. Denurdinogftehaecehndtroafnesapcohrttr,atnhsepolrint,k to the trathnesplionrktetodthuentirtalnosapdoritsedreumniotvloeaddaius troemmoavteicdaalluytoumsiantigcaBllLyEusviniag tBhLiEs tvyiaptehiosftystpaetioofnsatartyiognaatreyway. This pgroatceewssayis. Tdheisscprriboceedssaiss‘duens-cpriabierdinags’.‘un-pairing’.
+
+FiguFirgeu3r.eA3.rAchrcitheictetcutruereoof fththeeuusseedd tracckkiinnggssyystsetmem. .
+
+BasedBaosnedthoen pthrevpiroeuvsiolyusdlyesdcersicbreibdedsyssytsetmem, ,ththee ccollecctteeddddaatataatatrttibriubtuesteasrearsehoswhnowinnTianblTea1b.le 1.
+
+The syTstheemsypsrtoemvidpersovaitdaebslea otafbtlreacokfitnragctkriancgestrfaocreseafochr euanciht ulonaidt lboeatdwbeeetwn ethene pthaeirpinagirianngdaunnd-upna-iprianigrinevgents.
+
+events.
+
+Table 1. Collected tracking data from the tracking system.
+
+Table 1. Collected tracking data from the tracking system.
+
+Column Column StartUGS/EtnaanitrtedtULGw/lEooanaaansfitytdtedtrUwlIIoaoDDpacafkyddtiraInIaDtDgceking LLaasttitUupddea, tloengitude LaTtietumdpee,rlaotnugreit,uhduemidity
+
+Description Description UUnniqiquueeididenentitfiiﬁeerroof fppaairiereddtrtarannspspoortrtuunnititloloaadd PPUaaUiUnriinrninqiiingqxugueatieanimdndiddeeuneounntfint-ftipi-ﬁrepaaerainrroisirofnmifntgritgsarUsanUinnsonimsnximxiittniittmtiitmmniengeigilgnliignassaetesetcecewocownoandanydysdss Unix tiGmeeoo-lfotcraatniosnmoisfstihoenlianstmuiplldisaetceonds QualiGtyeroe-llaotceadtidonatoafotfhseelnassotruopfdlaatset update
+
+Temperature, humidity
+
+Quality related data of sensor of last update
+
+Apart from the sensor data, information considering the origin and destination location in the form of a geo-fence is provided. The geo-fence consists of a geo-coordinate and a radius.
+
+5. Data Pre-Processing
+
+Logistics 2020, 4, 1
+
+7 of 22
+
+Apart from the sensor data, information considering the origin and destination location in the form of a geo-fence is provided. The geo-fence consists of a geo-coordinate and a radius.
+
+5. Data Pre-Processing
+
+In this chapter, two major tasks in the research will be presented: Data cleansing and feature
+
+engineering. Since GPS data can often be quite noisy, data pre-processing is required to increase the
+
+quality of the used data. Further, relevant features are derived from the cleansed data in order to build
+
+an accurate prediction model.
+
+Logistics 2020, 4, x FOR PEER REVIEW
+5.1. Data Cleansing
+
+7 of 22
+
+5.1. DAafttaeCr aleaqnusainligtative analysis of the sensor data, the data is cleansed based on the following rules:
+
+After a qualitative analysis of the sensor data, the data is cleansed based on the following rules: • If the test pairings have no GPS transmissions falling within its destination geo-fence, they will be
+• rIef mthoevteedst. pTahiirsinmgesahnasvtehantothGePgSotordansshmavisesinoenvsefrarleliancghewditthhienditesstdinesattiinoant.ion geo-fence, they will
+• Ibfetrraenmsomviesdsi.oTnhsishmaveeanaslathtiatut dtheeagnodoldosnhgaitvuedneesveetrtroea0c◦h, tehdetthreandsemstiisnsaitoinonw. ill be removed and • iIgf ntroarnedsmaissistioimnsphliaevs ethaelaabtisteundcee aonfda GloPnSgistiugdneals.et to 0°, the transmission will be removed and • Wignhoilreesdtoarsinigt itmhepclioenstathineearbssaetnthcee poof ratsGaPnSdsaitgontahle.r intermediate stops, outliers have been detected. • TWohidileensttiofyrinoguttlhieersc,otnhteaisnpeeresdabt etthweepeonrttswaoncdonasteoctuhteivreinstteorpms ehdaisatbeeestnopuss,edo,uwtliheircshheaxvceeebdeeedn
+1d2e0tekcmtepdh. Tino tihdiesnctaifsye.oCuatlsieer1s,inthFeigsupreeed4 sbheotwweseonntewooutcloienrsewchuetirveethsteosppsehedasebxeceeendussmedo,rewthhiacnh 1e2x0cekemdepdh 1to20thkempprheviinouthsiasncdasfeo.llCoawsein1gitnraFnisgmuriess4iosnh.oAwtsthoenesaomuteliteimr we,htehreestpheeesdpbeeetdweexecneethdes tmraonrsemthisasnio1n2s0bkemfopreh atondthaeftperretvhieouosutalniedr fioslsloigwniinﬁgcatnratlnysmsmisasliloenr,. wAitththae sspameeedtbimeleo,wth5e ksmpepehd. IbnetCwaeseen2 tohfeFtigraunrsem4,istswiooncsobnesfeocruetiavnedouatfltieerrsthheavoeubtleieern idsestiegcnteifdic, awnhtliychsmaraelrleerla, twiviethly aclospseeetdo ebaeclohwoth5ekr.mTphhe. sIpneCedasbeet2woefenFitghueroeu4t,litewrsoiscobnelsoewcu5tivkemopuht,lwierhsilheathvee sbpeeeenddtoettehcetepdr,ewvihoiucshaanrde froelllaotwivienlgy tcrlaonssemtoisesiaocnhaogtahienr.eTxcheeedspse1e2d0 bkemtwphe.enAsthbeefoourtel,iethrse isspbeeeldowbef5okremapnhd, awftheirlethteheoustplieeerds itsobtheleopwre5vkiomupsha.nTdhfeoltlroawnsimngistsriaonnssmidisesniotinﬁeadgaaisnoeuxtcleieerdssb1a2s0edkmonphth.eAdsebsecfroibree,dthruelseps eheadvebebfeoerne raenmdoavfetedr, athseshoouwtlnieirns Fisigbuerleow4. 5 kmph. The transmissions identified as outliers based on the • Adessocnrilbyetdherutrlaensshpaovret ibtseeelnf srheomuoldvebde,caosnsshidoewrendi,ndaFtiaguproein4t.s other than the last transmission in the • oArsigoinnlgyetoh-efetnrcaenaspnodrtthietsﬁerlfstshtroaunlsdmbisescioonnsinidtehreedde, sdtaintaatpiooningtesoo-tfhenercethaarne rtehme olavsetdt.raTnhsims siistsuioatnioinn itshsehoorwigniningFeoig-ufernec4e, aCnadseth3.e first transmission in the destination geo-fence are removed. This situation is shown in Figure 4, Case 3.
+
+Figure 4. Data cleansing of the raw data.
+In addition, one has to consider that we have received tracking data from a number of pallets per container. To avoid using the data from the same ride several times in the trainingg andd tesstt sett,, only the tracking data of one pallet perr trraannssppoorrtt iiss ccoonnssiiddeerreedd..
+55..22.. CClluusstteerriinngg ffoorr RRoouuttee IIddeennttiifﬁiccaattiioonn
+AAss pprreevvioiouusslylymmenetniotinoende,do,uoruarpparpoparcohaicshonislyobnalsyedbaosnedreaoln-timreealt-rtaimckeintgradcaktianfgrodmattahefrmoamtertihael ﬂmoawte.riTahl ifslomwe.aTnhsitshmatenaonsinthfoartmnaotiionnfoarbmoauttiotnhearboouuttetahnedropuotsesiabnled sptoopsssibolretsrtaonpss-looardtrinangsp-looiandtsinigs apvoainiltasbilse.avTahiluasb,let.oTihnuclsu, dtoe irnoculutedeinrfoourmteaitniofonrminattihoenpinretdhiectpiornedmicotidoenl,mthoodseel, ltohcoasteiolnoscahtiaovnes thoabvee itdoebnetiiﬁdeedntbifaiseeddboansetdheongetohedgaetaopdraotvaipdreodv.iTdoedd.oTsood, ao cslou,satecrliunsgtearlignograitlhgmoriitshrmeqiusirreeqdutihreadt ctahnatdceaanl deal with geo data and noise without knowing the number of clusters. A suitable and proven algorithm for this purpose is density based spatial clustering of applications with noise (DBSCAN), [46] (p. 39) and [47].
+Similar to [46] (p. 39), before applying the clustering algorithm on all tracking data, potential stop points are determined to decrease noise in the identified clusters. In a previously performed
+
+Logistics 2020, 4, 1
+
+8 of 22
+
+with geo data and noise without knowing the number of clusters. A suitable and proven algorithm
+
+for this purpose is density based spatial clustering of applications with noise (DBSCAN), [46] (p. 39)
+
+and [47].
+
+Similar to [46] (p. 39), before applying the clustering algorithm on all tracking data, potential stop
+
+points are determined to decrease noise in the identiﬁed clusters. In a previously performed experiment,
+
+a gateway had been attached to a container, which was standing at the same position for two days.
+
+Hereby, noise of up to 300 m has been identiﬁed in the GPS data. Similarly, only tracking points with
+
+a distance smaller than 300 m either to the previous or next transmission are chosen for clustering.
+
+This rule applies to all points, P1 to P7. Further, to identify only signiﬁcant stops, at least four
+
+consecutive points have to be identiﬁed, with a distance below 300 m between each other on a ride.
+
+TLohgisstircus 2le02a0p, 4p, lxieFsOoRnPlEyEtRoRpEoViInEWts P1 to P5. This circumstance is shown in Figure 5.
+
+8 of 22
+
+Figure 5. Identifﬁication of potential stop points.
+BBeeffoorree aappppllyyiinnggtthheeDDBBSSCCAANNalaglgoorirtihthmm, a, atrtarianiinnignganadndtestet sstetsestpslipttliinttginigs riesqrueiqruedir,eads,tahsettheesttseestt rseept rreespernetssedntastaduatnakunnokwnnowtonthtoe mthoedmeloadnedl asnhdouslhdounoldt bneotcobnesciodnesreiddetroedidteonitdifeyntthifeyctlhuestcelruss.tTerhse. Ttehset steesttisseatlissoarlseolervealnevt afnort feovraeluvaaltuioantiopnurppuorspeoss,ews,hwichhicahrearpeeprfeorrfomremdedininSeScetciotinon7.7.AAssssoommee ffeeaattuurreess ddeeppeenndd oonn vvaalluueessooffpprerevvioiouussddataatapopionitnstisnina taratnraspnsoprto,rtth,ethdeatdaaitsaspislistpblyitubnyitulonaitdloaandd nanodt bnyodt abtya dtraatnastmraisnssimonis. sSioomn.eSpormeveiopurseveixopuesriemxpenertsiminenthtsisinretsheiasrrcehsehaarvcehshhaovwenshqouwitensqmuaitlel psmreadlilcptiroendeicrtrioorns ewrhroerns hwahveinnghdavaitnagpdoiantatspoofinthtse osfamthee usanmitelouanditilnoathdeintrathineitnrgaiannindgteasntddtaetsat sdeatt.aInsetth. iIsnstthuidsys,tutwdyo, ttwraonstrpaonrstps oorutst oouf tseovf esnevienntiontatol thaal vheavbeeebneernanradnodmolmylcyhcohsoesnenasasthtehetetsetsitninggddaatatasseet.t.FFininaalllyly,, oonnllyy tthhee ttrraaiinniinngg sseett iiss uusseedd ffoorr tthhee iiddeennttiiﬁficcaattiioonn ooff cclluusstteerrss..
+FFoorr pprreeddiiccttiioonn,, DDBBSSCCAANN rreeqquuiirreess ttwwoo ppaarraammeetteerrss ttoo cchheecckk iiff ddaattaa ppooiinnttss aarree ppaarrtt ooff aa cclluusstteerr oorr oouuttlliieerrss:: mmiinnPPooiinnttssaannddε.ε.ε εis itshethme amxiamxiummudmisdtainstcaenocfeaopf oainptotiontantootahneor tthoebretocobnesicdoenresdidaesretdheassatmhee cslaumsteerclaunsdtemr iannPdoimntisnrPeofienrtsstroetfheersmtointihmeumminreimquuimredrenquumirbeedr nouf mpobinertsobfeploowinttshebedlioswtantcheeodfiεsttaonbcee ionf tεhetonbeeigihnbtohrehonoeidg.hIbfothrhisoaopdp. Ilifetshtios aapdpaltiaesptooinat,dtahtiasppooiinntt, itshmis aprokiendt iassma acrokreedpoasinat caonrde tphoeinptoainntds itnhethpeoninetisghinbotrhheonoedigahrebomrharokoeddaarsebmoaarrdkeerdpaosinbtosa. rBdoetrhptoyipnetss.oBfoptohintytspaerseopfaprtoionfttshaerseapmaertcloufstthere, bsaumt oencllyusftreorm, bucot roenplyofirnotms ccaonreapdodiintitosncaalnpaodidnittsiobneaal dpdoiendtstobeaacdludsetdert.o Tahcluuss,taerll. Tidheunst,iaﬁleldidbeonatirfdieedr pbooianrtdsearrepoteisnttesdafroer tceosrteedpofionrtscaosrewpeolli.nTtshiasspwroeclels. sTfhoirsapcrloucsetessr ifsocraarriceludsotenruinsticlaarlrliebdoaorndeurnptoilinatlsl hbaovaredbeerepnotiensttsedha. vTehbenee, nthteesnteexdt. uTnhmena,rtkheedndeaxttaupnominatrkisedtesdtaetda fpooriantcoisretepstoeidntf.oIrfathciosrpeopionitnits. aIfctohries ppooiinntt wisitahctohreesppeociniﬁtewdinthumthbeerspoefcpifoieindtsnbuemlobwerthoef dpiositnatnscebeolfoεw, itthceredaitsetsaancneewofcεlu, sittecrrweaittehsfuarntheewr bclouasrtdeerrwpiothinftusrttohebrebteosatredde.rOptohienrtws tioseb, ethteespteodin. tOisthmerawrkiseed, athseanpooiunttliiesrm. arked as an outlier.
+FFoorr ccoonnssiiddeerriinngg ssiiggnniiﬁficcaanntt cclluusstteerrss,, mmiinnPPooiinnttss hhaass bbeeeenn sseelleecctteedd aass 1100.. TToo cchhoooossee aann aaddeeqquuaattee vvaalluuee ffoorr εε,, aa ccaallccuullaattiioonn bbaasseedd oonn aa 1100--NNNN--DDiissttaannccee ggrraapphh,, aass sshhoowwnn iinn FFiigguurree 66,, iiss pprrooppoosseedd [[4477]] ((pp.. 223300))..TThhee101-0N-NNN-D-Disitsatnacnecerefreerfsertso tthoethdeistdainsctaenocfeeaocfhepaochintptooinitts t1o0tihtsn1e0arthestnneaeirgehstbonre.iBghybsoorr.tiBngy tshoertiidnegntthiﬁeeiddednistitfainedcedsiisntaanscceesndininagscoernddeirn, gthoergdrearp, hthiengFriagpuhrein6 Fhiagsubreee6nhcaosnsbtereunctceodn. sTtrhuecdteidst.aTnhcee vdaislutaenocfetvhaelukeneoef itshechkonseeeniasschεoesqeunaalisngε 4e1q6umal.ing 416 m.
+The algorithm results in 14 clusters, which is equivalent to the real number of stops. Figure 7
+shows the identiﬁed clusters. One should note that a few clusters are quite close to each other in the
+ﬁgure. The number indicates the overlapping clusters. One can see that the ports in Charleston and
+Bremerhaven have been identiﬁed as clusters. One can also identify that in Norfolk stops happen in
+two terminals. To decrease complexity in the further modelling steps, only clusters that are visited
+
+boarder points are tested for core points as well. This process for a cluster is carried on until all boarder points have been tested. Then, the next unmarked data point is tested for a core point. If this point is a core point with the specified number of points below the distance of ε, it creates a new cluster with further boarder points to be tested. Otherwise, the point is marked as an outlier.
+For considering significant clusters, minPoints has been selected as 10. To choose an adequate vLaogluiseticfso2r02ε0,,4a, 1calculation based on a 10-NN-Distance graph, as shown in Figure 6, is proposed9[o4f72]2 (p. 230). The 10-NN-Distance refers to the distance of each point to its 10th nearest neighbor. By smorotirnegthtahne oidnecnetaifrieedcodnissitdanerceeds,isnoatshcaetnediignhgt oclrudsetre,rtshreemgraaipnh. TinheFipgoutreent6iahlasstobpeepnoicnotnssotrfuthcteedte.sTt hseet dairsetatnhceenvaaslsuigenoefdthtoe tkhneesee iesigchhot scelunsatesrsε. equaling 416 m.
+
+Logistics 2020, 4, x FOR PEER REVIEW
+
+9 of 22
+
+Bremerhaven have been identified as clusters. One can also identify that in Norfolk stops happen in
+two tFeirgmuriena6.ls1.0T-NoNd-eDcirsetaansceecgormapphlteoxiidtyenitnifyththeefvuarltuheeorfmthoedmeallxiinmgusmtedpisst,aonncelyofcalupsotienrtstothaantoathreer vtoisited moreFbiteghucaornens6oi.dn1ec0re-eNdaNraes-Dcthoisentsasanidmceergecrldau,pstsheortot(hεi)dafteonertitigfhyhetdhceelnuvssaittlyeurebsaorsfeedtmhseapimant.aiaxTlihmceluupsmtoedtreiinnsgttaionafclaesptoopfplaicpatoioiinnnttsstwooiaftnhtohntehoietsreest set are tth(oDebnBeSacCsosAniNgsind) eaedrlgeotdoraitshhmtehs.eeseaimghetcclulustsetre(r𝜀s). for the density based spatial clustering of applications with
+noise (DBSCAN) algorithm.
+
+The algorithm results in 14 clusters, which is equivalent to the real number of stops. Figure 7 shows the identified clusters. One should note that a few clusters are quite close to each other in the figure. The number indicates the overlapping clusters. One can see that the ports in Charleston and
+
+FFiigguurree 77.. RReessuulltteedd cclluusstteerrss ooff tthhee cclluusstteerriinngg aallggoorriitthhmm..
+55..33.. FFeeaattuurree EEnnggiinneeeerriinngg aanndd DDaattaa TTrraannssffoorrmmaattiioonn
+AAccccoorrddiinngg ttoo tthhee lliitteerraattuurree rreevviieeww aanndd bbuussiinneessss ccoonntteexxtt,, tthhee rraaww ddaattaa hhaass bbeeeenn ttrraannssffoorrmmeedd iinnttoo ffeeaattuurreess tthhaatt aarree aassssuummeedd ttoo bbee rreelleevvaanntt wwhheenn mmooddeelllliinngg ttrraavveell ttiimmeess.. OOuurr aaiimm iiss ttoo ddeessccrriibbee tthhee bbeehhaavviioorr ooff ttrraavveell ttiimmee bbaasseedd oonn tthhee ttrraacckkiinngg ddaattaa wwiitthhoouutt aaddddiinngg ffuurrtthheerr ddaattaa iinnppuutt.. TThhee ddeetteerrmmiinneedd ffeeaattuurreess ccaann bbee ccaatteeggoorriizzeedd aass ffoolllloowwss..
+FFeeaattuurreess ccoonnssiiddeerriinngg tthhee ddeeppaarrttuurree ttiimmee rreellaattee ttoo tthhee ttiimmeessttaammpp bbaasseedd oonn tthhee llaasstt ttrraannssmmiissssiioonn iinn tthhee oorriiggiinn ggeeoo--ffeennccee.. TThhiissttiimmeessttaammpphhaassbbeeeennttrraannssffoorrmmeeddinintotohhoouurrooffththeeddaayy,,tthheettiimmeeooffddaayy,, ddeeppaarrttuurree mmoonntthh,,aannddddeeppaarrtuturereddayayofotfhtehewweeekekininnunmuemriecrailcafol rfmor,mso, sthoatthaaltgaolrgitohrmithsmcasncparnopcersoscethses tdhaetadpatraopperrolpye[r2l]y. [2].
+FFuurrtthheerr,, ffeeaattuurreess rreellaattee ttoo tthhee aaccttuuaall ssttaattuuss ooff tthhee rrididee.. TThheessee ffeeaattuurreess pprroovviiddee iinnffoorrmmaattiioonn ccoonnssiiddeerriinngg tthhee ttiimmee,, tthhee ccuurrrreenntt ppoossiittiioonn,, aanndd tthhee ccuurrrreenntt nnuummbbeerr ooff ttrraannssmmiissssiioonnss [[22]]..
+CCoommmmoonn fefeaatuturersesusuesdebdy bayuthaourtsh,osrusc,hsausc[h2,1a1s,2[32],,1r1e,p23re],sernetptrheesreenltattiohne troeolaritgioinnatnod odreisgtiinnaatinodn dcoenstsiindaetrioinngcdoinsstiadnecrein, tgimdies,taanncde,avtiemraeg, aensdpeaevde.raTgheestpimeeed.toThtheetidmesetitnoatthioendeissthineraetiboyntihsehfeeraetbuyrethtoe fperaetduircet,taospitreisdiocnt,lyaskintoiswonnalyftekrnaorwrinvaalftaetrtahreridveasltiantatthioend.estination.
+TToo ddeessccrriibbee tthhee cchhaarraacctteerriissttiiccss ooff aa rriiddee wwiitthhoouutt ttrraaﬃfficc iinnffoorrmmaattiioonn,, ffeeaattuurreess ssuucchh aass aavveerraaggee ssppeeeedd,, ddiissttaannccee,, aanndd ttiimmee ttoo tthhee pprreevviioouuss ttrraannssmmiissssiioonn hhaavvee bbeeeenn ccaallccuullaatteedd.. BBaasseeddoonntthhoosseeffeeaattuurreess,, ccoouunntteerrss hhaavvee bbeeeenn ddeetteerrmmiinneedd ccoonnssiiddeerriinngg tthhee ssppeeeedd bbeettwweeeenn ttwwoo ttrraannssmmiissssiioonnss ttoo ddeessccrriibbee tthhee ddrriivviinngg bbeehhaavviioorr.. BBeessiiddeess,, tthhee nnuummbbeerr ooff ssttooppss aanndd tthhee ccoorrrreessppoonnddiinngg lleennggtthh ooff aallll ssttooppss aatt aa ggiivveenn
+time have also been taken into account, using similar procedures as [35]. The calculation happens
+before applying the clustering, as described in Section 5.2.
+Similarly, features considering the number of visited clusters and the total length of cluster stops
+have been determined. To consider the route in the prediction model, the previously visited cluster and the route path from the destination to the current point have been identified.
+As we also assume that public holidays have a significant influence on the travel time, we have
+
+Logistics 2020, 4, 1
+
+10 of 22
+
+time have also been taken into account, using similar procedures as [35]. The calculation happens before applying the clustering, as described in Section 5.2.
+Similarly, features considering the number of visited clusters and the total length of cluster stops have been determined. To consider the route in the prediction model, the previously visited cluster and the route path from the destination to the current point have been identiﬁed.
+As we also assume that public holidays have a signiﬁcant inﬂuence on the travel time, we have added features considering the day class of the departure day, the current day, and the next ﬁve days. The day of the week is classiﬁed into weekday, Saturday or bridge day, and Sunday or public holiday, [33] (p. 2) and [37] (p. 151).
+Similar to [36], the created features can also be associated to diﬀerent data sources for further evaluation. Table 2 shows the determined data sources.
+
+Table 2. Description of determined data sources.
+
+Data Source Tracking system (T&T)
+Country (Coun) Day Class (DC) Clustering (Cl)
+
+Description
+Features derived from tracking data without complex transformations and further data sources
+Country derived from a geo-coding application programming interface (API) based on geo coordinates
+Features considering the day class derived from the country and information considering public holidays
+Features derived from the clustering
+
+Finally, Table 3 gives an overview of the developed features, with the assigned data source in the column data. Furthermore, the features have been marked as categorical (Cat) or continuous. As categorical features are not ordinally scalable, they have to be encoded into numerical features. This means that each characteristic of each categorical feature is transformed into a binary numerical value. As many features are created by this procedure, which increases the model complexity, we have not applied the encoding procedure on the PastRoutePath. Instead, we have created one binary feature per cluster, which determines if a cluster has already been visited, or not.
+
+Table 3. Developed features categorized into continuous and categorical and their domain.
+
+Feature
+
+Description
+
+Cat.
+
+AbsoluteDistanceToPrevious
+
+Absolute distance in kilometers from the previous position to the position.
+
+No
+
+AvgSpeedPrevious
+
+Average speed from current transmission to
+
+previous transmission as quotient of
+
+No
+
+AbsoluteDistanceToPrevious and DrivenTimePrevious.
+
+CounterAvgSpeed0_1, CounterAvgSpeed1_30, CounterAvgSpeed30_60 and CounterAvgSpeed_above_60
+
+Counter of the number of AvgSpeedPrevious from departure to the current transmission from 0 to 1 kmph, 1 to 30 kmph, 30 to 60 kmph, and over 60 kmph No derived from the data. Those features are based on business knowledge to represent traﬃc conditions.
+
+CounterStops
+
+Number of detected stops. A stop is detected only if at least four data points with a distance below 300 m after No
+each other are detected.
+
+Current_DayOfWeek
+
+Day of the current transmission from 1 to 7.
+
+No
+
+Current_DayClass
+
+Day class of current transmission; 1: working day, 2: Saturday or bridge day, 3: Sunday or public holiday.
+
+No
+
+Current_Lat and Current_Long Latitude and longitude of the current transmission. No
+
+Current_MonthOfYear
+
+Month from 1 to 12 of the current transmission.
+
+No
+
+Data T&T T&T
+T&T
+T&T T&T DC T&T T&T
+
+Logistics 2020, 4, 1
+
+11 of 22
+
+Table 3. Cont.
+
+Feature Current_TimeCategory
+Current_TimeInHours
+CurrentCountry CurrentGeofenceLocation
+DayClassTomorrow Departure_DayClass
+Departure_DayOfWeek Departure_MonthOfYear
+Departure_TimeCategory
+Departure_TimeInHours DestinationAbsoluteDistance DestinationBearingToPosition
+DestinationDrivenTime DrivenTimePrevious LastGeofenceLocation LastRoutePart
+PastActualDistanceToOrigin
+PastAvgAbsoluteSpeed
+PastDrivenTimeToOrigin QuantityDayClass2_nextday5 QuantityDayClass3_nextday5
+StandingTimeClusterInc StatusOfRide
+TotalDurationOfStops TotalLengthOfClusterStop
+
+Description
+
+Cat.
+
+Period of the current transmission depending on the desired time interval. For example, a 2-h interval No means that there are 12 intervals.
+
+Hour represented as number between 0 to 23.99 of the current transmission.
+
+No
+
+Country based on the current position encoded according to ISO-3166 ALPHA-3 (3-letter encoding) Yes
+using a geo-coder API.
+
+ID of the currently identiﬁed cluster, otherwise -1. Yes
+
+Tomorrow’s day class based current timestamp.
+
+No
+
+Departure day class based on the last transmission in the origin; 1: working day, 2: Saturday or bridge day, 3: No
+Sunday or public holiday.
+
+Departure day from 1 to 7 based on the last transmission in the geo-fence of the origin.
+
+No
+
+Month of departure from 1 to 12 based on the last transmission in the geo-fence of the origin.
+
+No
+
+Time of departure based on the last transmission in the geo-fence of the origin and depending on the desired No
+time interval. See also Current_TimeCategory.
+
+Hour of departure from 0 to 23 based on the last transmission in the geo-fence of the origin.
+
+No
+
+Absolute distance in kilometers from the position to the destination.
+
+No
+
+Direction from 0◦ to 360◦ from the point of the destination in which the unit load currently is located.
+
+No
+
+Time in hours from the current transmission to the destination. Variable to predict.
+
+No
+
+Time in hours from the previous transmission to the current transmission.
+
+No
+
+ID of the last visited cluster.
+
+Yes
+
+Route considering the identiﬁed clusters until the current transmission.
+
+Yes
+
+Sum of absolute distances between the transmitted positions in kilometers.
+
+No
+
+Average speed from departure at the origin until the
+
+current transmission as a quotient of PastActualDistanceToOrigin and
+
+No
+
+PastDrivenTimeToOrigin.
+
+Time in hours from departure at the origin until the current transmission.
+
+No
+
+Number of Saturdays or bridge days and Sundays or public holidays in the next ﬁve days.
+
+No
+
+Standing time at the current cluster at a given time. No
+
+Status of current transmission. ‘Origin’ for being at the starting point, ‘Driving’ for being in transport, ‘Stop’ Yes
+or ‘Destination’ for being at the destination.
+
+Sum of the length of all stops at a given time.
+
+No
+
+Sum of the length of all stops at a cluster at a given time.
+
+No
+
+Data T&T
+T&T
+Coun Cl DC DC
+T&T T&T
+T&T
+T&T T&T T&T T&T T&T
+Cl Cl T&T
+T&T
+T&T DC Cl T&T T&T Cl
+
+Logistics 2020, 4, 1
+
+12 of 22
+
+6. Modelling
+The following section deals mainly with the choice of relevant features in Section 6.1 and the hyper-parameters of the model in Section 6.2. Therefore, the cleansed and pre-processed data have already been divided into a training and a test set (see Section 5.2). The test set is relevant for evaluation purposes, which is performed in Section 7. For the modelling phase, only the training set is used.
+6.1. Feature Selection
+Based on a rough descriptive analysis of the processed data with the generated features, we are aware that not all features exert a positive and strong impact on travel time prediction. This makes feature selection highly important for this study before s modelling begins. According to [48], in this study we only consider ﬁlter methods, as these methods are generally less time consuming. Furthermore, easily interpretable metrics are used, and the feature selection can be performed independently from the training process. Finally, the aim of this chapter is to determine diﬀerent experiments considering diﬀerent combinations of features to apply to the machine learning algorithms. Therefore, ﬁve ﬁlter methods have been applied in our study:
+• An easily interpretable method is one that uses a variance threshold. Features with a variation below a certain cut-oﬀ value have been removed. Therefore, for each feature, we identify the value with the highest frequency and divide it by the number of data points to calculate the percentage. In our study, features with at least 90% of their instances remaining constant are removed, and the threshold is set to 0.9 [49] (p. 509).
+• F-regression runs an F test for each feature (regressor), relevant for travel time prediction apart from the target. Therefore, the variance of each feature and the target is calculated. The ratio provides the F value, which is then transformed into a p-value using the F probability distribution. Consequently, the p-value scores the individual eﬀect of each regressor [50] (p. 629).
+• The mutual information method considers non-linear dependencies as well as linear relationships by calculating the distance between the probability distributions of two features [51] (pp. 175–178). A feature selection procedure has been conducted by ranking the calculated mutual information of each feature.
+• As per [48], the feature selection based on the ReliefF algorithm provided a superior performance in previous research. The applied algorithm considers feature interaction and is implemented in a way so that both continuous and categorical features can be processed. The algorithm calculates weights for each features, which are used for ranking them. Therefore, for a number of iterations, a random instance of all feature, which represents a row in the data, is chosen. For this chosen instance, the instances with the nearest hit and miss are identiﬁed based on the Manhattan distance. Finally, a diﬀ-function is used to calculate the weight for each feature by subtracting it from the weight of the previous iteration. In the ﬁrst iteration, the weight is set to zero. A higher weight means a better feature based on the ReliefF algorithm [48] (p. 487).
+• Correlation based feature selection (CFS) is another well-known ﬁlter method, which calculates the correlation between predictor and target and then ﬁlters out features with a correlation below a given threshold [52] (pp. 361–362).
+Figure 8 presents the overall structure of experiments created based on the selected ﬁlter methods. For F-regression, mutual information and ReliefF, features are ranked with certain scoring metrics and are subsequently selected for modelling as top 10, 15, and 20. For CFS, features have been ﬁltered with three predeﬁned thresholds for a moderate (0.5), high (0.7), and very high (0.9) correlation based on [53]. The use of all features has also been considered as an experiment. The application of those ﬁlter methods using diﬀerent thresholds, as well as the use of all features for modelling, leads to 14 experiments.
+
+LoLgoigsitsitciscs20220200, ,44, ,xxFFOORRPPEEEERRRREEVVIIEEWW
+
+1133oof f2222
+
+Laoapgppisptliilccisca2at0it2oi0on,n4o,o1ffththoosseeffiilltteerrmmeetthhooddss uussiinngg ddiiffffeerreenntt tthhrreesshhoollddss,, aass wweellll aass tthhee uusseeooffaallllffeeaatuturre1es3sofoffo2r2r mmooddeelllilningg, ,leleaaddssttoo1144eexxppeerriimmeennttss..
+
+FFFiiggiguuurreere88.8. .RRReeesssuuulltltitininnggg eeexxxpppeeerrriiimmmeeennntttsss bbbaaassseeeddd ooonnn aapppplliieedd fﬁilltteerr mmeetthhoodddsss (((CCCFFFSSS::: CCCooorrrrrreeelllaaatttiioioonnnbbbaaassseeedddffefeeaaatuttuurerree sseesleleeleccttciitooionnn))..).
+TTToooeexexxtteetennndddtthhtheeevvvaaarrriieieetttyyyooofffooouuurrrrrreeessseeeaaarrrccchhh,,, tthhee ffeeaattuurreess ooff tthhee ddaattaaa sssooouuurrrccceeesssdddeeessscccrrriiibbbeeedddiininnTTTaaabbblellee222hhhaaavvveee bbbeeeeennnaaasssssiiggignnneeedddttotoottthhhrrreeeeeedddaaatttaaadddooommmaaaiiinnnsssbbbaaassseeedddoonnththeeccoommpplelxeixtiytyrerqqeuquiuirrieerddedttootoccoocmmomppuupttueettethhetehmme.m.TT.hheTehaaiemimaiimsis itsototeoexxpeplxolporleroeirfiefthitfheethddeaatdtaaasstoaouusrrocceuesrsciinensfflluiuneeﬂnnucceeentthhceee ttrhaevetrlatvimeletpimreedpicrteiodnic..tTTiohhnee.ffiiTrrsshtteddoﬁomrmsataiidnnorrmeeffeaerirnssoronenflyelyrtsotoothnthelye tToTrartachkcekiniTngrgascsykysistnetgemmsy((TsTt&&eTmT))(ffTeea&attuTur)reefsse,,awwtuhhrieiccshh, cwcaahnnicehascilaynbeeaesnilydebreiveenddfferrrooimmvetdthheferdodmaattaat..hTTehhdeeastseaec.coonTndhdeddosoemmcoaainnidn dfufourmtrhtaheiernrifniuncrcltulhudederessinffecealauttudurereesssfdedaeetrruiivvreeedsddffreroormimveAdAPPfrIso,mcoAnPsiIds,ercionngsitdheericnooguunnthttrreyycaoanunddntprpyuubbalnliicdc hhpooulilbdidlaiacyyshs,o,wlwihdhiaciychhs, wininhclciucluhddeienacalduddddietiitoiaondnadalilticocoonsstatsls caoannsdtds aiinnnttdeeggirnraattetiigoornnateioffnoretﬀ. oFritn. aFlilny,altlyh,ethllaeasslttaseetxxeppxeeprrieimmriemennettnftfuufrurtthrhteherreraadaddddsdssthtthheee ccllcuulussttseeterririnninggg,,,wwwhhhiicicchhhiisissbbbaaassseeedddooonnnmmmooorrreeecccooommmpppllleeexx aanndd ttiimmee--ccoonnssuummiinngggppprrroooccceeessssssiiinnnggg...TTToooeeeaaaccchhhdddaaatattaadddooommmaaainiinn, ,, tthhtheeeppprreervevviiooiouuusslslyylydddeesescscrcriribbiebededd114144eexexpxppeereirrmiimmeenentnsttssaraaerreapappplielide.dT. Thhisislelaedads stotoo424422exeepxxeppreeirmriimmeneetnnsttsisniintnotttoaotltaa(lsl(e(seseeeFeiFgFiugigrueur9ere). T99)h.)e.TThnheuemnnubumemrbboeerfrfoeofafftfeueaartetuusrreienssiFinnigFFuiiggrueur8reer88erfreeerffeserrtssotothtehefefaetautruersesshshoowwnnniniinnTTTaababblellee333aaafftfteteerrreeennncccooodddiininnggg...AAAlllllthtthhooossseee eexexxpppeeerriirmmimeeennnttsstswwwiillilllbbbeeeﬁffininnaaallllylyyaaappppppllliiieeedddtttooottthhheeettthhhrreeee sseelleecctteedd mmaacchhiinnee llleeeaaarrrnnniiinnngggaaalllgggooorrriiittthhhmmmsss...
+
+FFFiiiggguuurrreee999...AAAlllllleeexxxpppeeerrriiimmmeeennntttsss cccooonnnsssiiidddeeerrriiinnnggg dddeeettteeerrrmmmiiinnneeeddd dddaaatttaaadddooommmaaaiiinnnsss...
+toitcccFf2afhhehoaccFf2a0nfoaeateoarl0nuoodrecaetflfudrsfnueuctfesrecenueuTOath,arelexclneTaatoterublqtooxlnaeuda,utetusoausalugedmetscrrdstgswhemedeeroeetgcewhdpeneotesarnaidipetotsltcriwasibhnsttmenhltiwynhooiameonhe,gdaaoen,anonovgioisfanoedffsflfirfesvtfryefsftrieevehtueiaadtiae0eaqnncaaoadeamrqt.neohucrg9,iftufoeauaa,ifutfheeob,eafarteepbtnearsenatehnttfanonapehtechhneossctcuefssencle.auafeyceie.rycddtethttrffderuhttohhoedrPaeoohhoorfeerrotliasferen1ieaessqenmesesee4vsriatuntsrdanoenhtDahooceheeh,coln,nohdlneaxernohecemlclcilvplelyacovdvflyaoedfleayepaeneealpnaaonirnciaaxpncsnipnsithbfTctshibpmcluigdluoetoidioeioietmehrneereviswevrsedneeodrnecoieereemioTniflittneif1n1nun0snh0o.n44egt.gtdO.fesf9ahFg9ahnoeoehi,letr,eiiltetnxrxlrnhlgiohtxstgpghpehe.euewpememixexeeeennTnrtednrdprprheoorgfhgfiiieaareiremedsmdiiii1dmeettnrnrsneet0aaTqiqieeheeflmelmF&uenulnlseeddeniiiahttenenerregTootmssteeannsnongguu,mmddssncwctutocrrhhssyyisiaaeoessn.n.ofsofitiistueieTi8Tnnnwhw,stsraatn,thhghfeahhttittnioantliwenutiwnueareessriffycirlcrvrnoenomoleeml,eeleeaua.ufar.sxdFsxsFeneFte,dcF,pdeuipauaiathaigiiagfeiylgftenrgnnfonutcuourederussughrcsigrrriaramrhlmerfteettaedttehoeteashuha8esha8eaar1asaa1r,nsec,dnett0ceatnt,0bahtahhotTf,saTsfdefsosdsfmeo&hened&heriudfoarunnod2aeaaToesmtaTwesca0tituiwa,cctuniaea,ntahancrclfsucrcgsueiehwioogdehtrtonadstuhhsehodaeuhhtteodawsenaeulmaaenahnllmawsrtsrltrestra.irtaaefebrnybaaiefvcbeFisysteednig,seoaheueodne,aumeoutdelrncfoautdnwtlmnenauawstomeravcaystlserexcsafhyceateeeaofsthaiuudcorloshnirmcoeolilrhnsaraaalhacetfseawanasnphvttteowsnnseeeshvdc.leeenws.,dddeneeee.,, in 12 experiments. Further, basic features considering the distances to origin and destination as well as driven time to origin, which are often used in the literature, are identiﬁed as relevant. In addition, the self-developed counter of the average speed has been considered several times. Features considering the country or day class have been identiﬁed as less important for travel time prediction. However, some of them are still treated as important features for some feature selection methods.
+
+Logistics 2020, 4, 1 Logistics 2020, 4, x FOR PEER REVIEW
+
+14 of 22 14 of 22
+
+Figure 10. Top 20 selected features out of 14 experiments in the domain of the T&T, country, day class, aFnidguclrues1te0r.iTnogpfe2a0tuserleesc.ted features out of 14 experiments in the domain of the T&T, country, day class, and clustering features.
+
+6.2. Validation and Parameter Tuning
+
+One can assume that PastDrivenTimeToOrigin is the most relevant feature, since it has been selecTthede fionll1o2weixnpgeprihmaesnetds.eFalusrwthiethr, cbhaosiocsfineagtuthreesbceosnt spiadrearminegtetrhseodfitshtaenacpeps ltioedorliegairnnainngdadlgesotriinthatmiosn aansdwexepllearsimdernivtes.nStiinmcee wtoeohraigdina,rwathhiecrhsamraellonftuenmubesredofinunthiteloliatdersa, tcurores,s-avraeliiddaetniotinfieisdaapsprlieeldevoanntt.hIen oardigdinitaiol ntr,atihneinsgeldf-adteavseelto. pTehdecuonuint ltoeardosf tahree aavgaeirnagseplsipt einetdohﬁavsebreaenndcoomnstirdaeinreindgsaenvdervaal ltiidmaetiso.nFesaettus rines ocrodnesridtoerbinetgtetrhechceocukntthrye ovradliadyitcylaosfsthhaevcehboeseenn ipdaernatmifieetderass. lTeshseirmebpyo,rptaanratmfoertterravtuenl tinimgedperﬁendeiscttihoen. pHroocwesesvteor,cshoomoseeotfhtehpeamraamreetsetirlsl wtreitahtetdheabs eimstpporertdaincttifoenataucrceusrafocrysfoomr aenfeaaptpulrieedselleeacrtnioinngmaelgthooridths.m using the validation dataset. Since each algorithm has many parameters, as described in Section 3.1,
+
+o6n.2ly. Vthaleidmatoiosnt arenldevPaanratmpeaterramTuenteinrsg are considered. The selected range of these features has been selected based on previously conducted experiments. The used parameters and corresponding values for eacThhelefaorlnloinwginaglgpohriathsemdaeraelsswhoitwhnchinooTsaibnlge t4h.e best parameters of the applied learning algorithms and experiments. Since we had a rather small number of unit loads, cross-validation is applied on the
+
+original training daTtaabsleet4..TChheousennitplaoraadmsetaerres aangdaidnesﬁpnleidt irnatnogefitvoearpapnldyogmridtrsaeainrcihn.g and validation sets
+
+in order to better check the validity of the chosen parameters. Thereby, parameter tuning defines the
+
+process to chooseLtehaernpianrgamAlegtoerristhwmith the best prediction accuracy Pfoarraamneateprpslied learning algorithm
+
+using the validation dataset. Since each algorithm has many paramKeertneerls,=a‘srbdf’escribed in Section 3.1,
+
+only the moSsutprpeolretvVaencttopr aRreagmreestseiorns (aSrVeRc)onsidered. selected based on previously conducted experiments.
+
+TTεhh=ee[0usC.es0=el0e1dc[,0tp0e.0.ad10r]1a,r,ema5vn.ee0gnt0eel1yr]s,ossafptneltipdht iesncisotzeoerr3f0ee0.s0avp2tauolrnueedssinhgasvableueens
+
+for eachElxetarrenminelgy aRlagnodroitmhimzedarTeresehso(wExntrianTrTeaebs)le 4.
+
+n_estimators = [1, 10], step size 1 random_state = [6, 18], step size 1
+
+AdaptivTeabBloeo4st.iCngho(AsednapBaoroasmt)eters
+
+and
+
+defined rna_negsetitmoaatpoprsly=g[r1i,d1s0e]a, srctehp. size 1 learning_rate = [0.0001, 1.0001], step size
+
+0.025
+
+Learning Algorithm
+
+Parameters
+
+vseaalurceThso, htshaeeslembcteoSetduhnepelcpooiospnrttdtirmauVicane(tSlceeVtpddoa.R.rrT)RaFhmoeegrevrteeaasrlciscdhioamtntrioabininnsianettgioiss𝜀netfth=oea[rn0nCe.d0ua0=csfh1eo[d,0ra0.lt0e.go10ao]1ccK,rh,aieet5lvchrp.un0emon0elsa1llsaty]=ien,bsds‘tlprhtebeeleipfcxt’popismrneieztrdboiemiic3n0te0.ai0notv2itno,analaucsoecosfu-crpaaaclrlyeadmbagesrteieddr
+
+on the meanExatbrseomluetley eRraronrdo(MmAizEed, sTeereSeesction 7.1). nT_heesntitmhaetaovrser=a[g1e, 1o0v]e,rstaelpl ﬁsvizeeM1 AEs of the ﬁve
+
+validation sets per pa(rEaxmtreateTrrecoesm) bination is calculaterda.nTdhoemp_asrtaamtee=te[r6,c1o8m],bsinteaptiosinz,ew1hich returns the
+
+best
+
+averagAe MdaApEti,vies
+
+Bthoeonstcinhgos(eAndfaoBr othoestc)orrelesparonnidnnign__gersamttiemo=dae[t0lo.ir0ns0a=0c1[c,1o1,r.1d000a]0n, 1sc]te,ewspteistpihzes[i41z5e]
+
+(pp. 247–248). 0.025
+
+Logistics 2020, 4, 1
+
+15 of 22
+
+7. Evaluation
+This chapter presents the evaluation results from all experiments by conducting meaningful comparisons and analysis through the results. Therefore, the test set is used to consider data that have not been seen by the model before. Section 7.1 evaluates the results based on the machine learning algorithms, while Section 7.2 compares the best machine learning model to average-based approaches.
+
+7.1. Evaluation of Machine Learning Models
+In this section, prediction results obtained from the testing phase based on data considering diﬀerent feature combinations and various machine-learning algorithms have been compared and evaluated. Models created by SVR, ExtraTrees, and AdaBoost have been evaluated using mean absolute error (MAE) and root mean square error (RMSE), two of the most common evaluation metrics [1], to estimate the performance of each model.
+The MAE calculates how close the predictions are to the actual outcome in terms of the Manhattan distance. It is simply the average of all prediction diﬀerences and is located on the same scale that the data is measured on [1] (p. 9). Equation (1) deﬁnes how the MAE is calculated. Parameter n is the number of observed data points in the test set.
+
+MAE
+
+=
+
+1 n
+
+n
+i=1 actuali − predictioni .
+
+(1)
+
+Since the MAE is based on the mean error, there is a certain chance that it understates the impact
+
+of large, but infrequent, errors. To adjust such large and rare errors, we also calculate the RMSE.
+
+The RMSE squares the diﬀerences before the mean is calculated and then takes the square root of the
+
+mean, as shown in Equation (2). Through this, a measure of the size of the error that gives more weight
+
+to the large but infrequent errors is achieved. The RMSE also provides information about the variance
+
+of errors of a model. The larger the diﬀerence between RMSE and MAE, the more inconsistent the
+
+error size.
+
+RMSE =
+
+1 n
+
+n
+
+2
+actuali − predictioni
+
+(2)
+
+i=1
+
+Based on the previously described metrics, Table 5 shows the results of the best conducted experiment per learning algorithm. The overall best result has been obtained by SVR using the ReliefF method for ﬁltering, with a MAE of 16.91 h and RMSE of 22.7 h. The result is surprisingly good if we consider the small training set of ﬁve transports and a transport time of up to 30 days. The result of AdaBoost is still quite close to the SVR, while ExtraTrees has a signiﬁcantly bad prediction accuracy, with 43.66 h.
+
+Table 5. Best prediction results of each machine learning algorithm (MAE: Mean absolute error, RMSE: Root mean square error).
+
+Model ExtraTrees AdaBoost
+SVR
+
+Data Domain T&T + Day Class + Country + Clustering
+T&T
+T&T + Day Class + Country
+
+Experiment
+Variance threshold 0.9
+Variance threshold 0.9
+ReliefF Top 20
+
+MAE 43.66 h 18.78 h 16.91 h
+
+RMSE 54.61 h 31.00 h 22.70 h
+
+Best Parameters
+n_estimators: 12 random_state: 14
+n_estimators: 14 learning_rate: 0.9251
+C: 4.801 ε: 0.01
+
+The same results can also be observed in Figure 11, where the MAE is shown in relation to the actual driven distance. One can see that the MAE of ExtraTrees is much larger than the other two. At the same time, AdaBoost and SVR provide a low prediction error. While AdaBoost provides a better prediction at the beginning, the prediction error of SVR decreases. At the end of the ride, one can also
+
+SVR
+
+T&T + Day Class+ Country
+
+ReliefF Top 20
+
+16.91 h 22.70 h
+
+C: 4.801 ε: 0.01
+
+The same results can also be observed in Figure 11, where the MAE is shown in relation to the Loagcisttuicasl2d02r0i,v4e, n1 distance. One can see that the MAE of ExtraTrees is much larger than the other t1w6 oof.2A2 t
+the same time, AdaBoost and SVR provide a low prediction error. While AdaBoost provides a better prediction at the beginning, the prediction error of SVR decreases. At the end of the ride, one can also seseeeththaattththeeeerrrroorrooffSSVVRRiinnccrreeaasseess aaggaaiinn ttoo 1122 hh aannddAAddaaBBoooossttttoo2244hh. .UUsusaulalyll,yi,tiitsiseaesaiseiretrotommakaekaen aancaccucruarteatperperdeidctiicotinonclcolsoesrertotoththeeddeesstitninaatitoionn. .TThheerreeaassoonn ffoorr tthhiiss cciirrccuummssttaannccee lliieessiinnththeevvarayryiningg nnuummbbererofoufnuknnkonwonwsntopstsobpestwbeeetwn etheenptohret opfoCrthaorfleCsthoanralensdtotnheatnradinthyeartdraininBeysasredmienr, Basesdseesmcreibr,edas indeSseccrtiiboned4.i1n, Swehctiicohnin4.c1r,ewasheiscthhienccoremapselesxtihtye coofmthpeletrxaivtyelotfimtheeptrraevdeiclttiiomne. Aprneodtihcetirorne.aAsonnotchoeurldreaalssoon bceoauqlduiatlesolobnegastqoupitoevleornagtstthoeptroavienryaatrtdheintrBaeinssyemaredricnloBseestsheemﬁenr acllodseestthineaftiinoanl. destination.
+
+FFigiguurere11.1.DDisitsatanncecebbaaseseddcocommppaarirsiosonnoof fththeebbesetstmmooddeleslsppererlelaeranrnininggalaglgoroirtihthmm. .
+InInTTabalbele6,6o,noenecacnanalasolsosesee,eth, tahtabtabsaesdeodnotnhethaevaevraegraegMe AMEAaEndanRdMRSMESoEveorvaelrl aelxlpeexrpimereimntesnStVsRSVisR inisdeinpdenepdendt oenf thoefetxhpeeerixmpenritms aendtsdaantad ddoamtaaidnosmthaeinbsestht epebrefostrmpeinrgfolremarinignglealrgnoinrigthamlg. oTrhitehMm.ATEhse aMre AquEisteasrteabqluei,twe istthabMleA, Ewsiitnh aMraAnEgseionf 1a6r.a9n1gtoe 4o7f.9156.h9,1atnod4S7V.9R5ahls, oanpdroSvVidResa,lwsoithpr3o1v.7id8ehs,,twheitlhow31e.s7t8 ahve, rthageeloMwAeEst. aInvsetreaagde, tMheArEe.suInltssteoafdE,xtthraeTrreeseuslatsnodfAEdxatrBaoTorsetehsaavnedaAsidganBiﬁocoasntthhaivgehearsaigvnerifaigcaenMt AhiEghoefr aabvoevrea1g0e0Mh,AdEespofiteabthoevego1o0d0 phr,eddiecstpiointeetrhroer goof oodneporfedthiceteioxnpeerrimroernotsf woniteh oAfdtahBeooesxtp. eFruimrthenertsmworiet,h aAvedraBgeooMstA. FEusrathreernmeaorrley, tahveesramgeeMwAhEens acoremnpeaarrilnygththeesMamAeEws hbetnwceoemnpthareindgattahdeoMmAaEinssb, esotwtheeant nthoe sidgantiaﬁcdaonmt iaminpsr, osvoemtheantt noof thsiegnpirfeicdaicnttioinmapcrcouvreamcyencat nocf utrhreenptlryedbiecteixopnecatcecdurwachyencanddciunrgrefuntrltyhebre deaxtapescotuerdcewshtoenthaedTd&inTg dfuarttah. er data sources to the T&T data.
+
+Logistics 2020, 4, 1 Logistics 2020, 4, x FOR PEER REVIEW
+
+17 of 22 17 of 22
+
+TTaabbllee 66.. PPrreeddiiccttiioonn EErrrroorr ccoommppaarriissoonn ccoonnssiiddeerriinngg ddaattaa ddoommaaiinnss..
+
+Data Domain T&T data
+T&T data, country and day class
+T&T data, country, day class and clustering
+Over all data domains
+
+Statistic
+Average Minimum Maximum Standard Dev Average Minimum Maximum Standard Dev Average Minimum Maximum Standard Dev Average Minimum Maximum Standard Dev
+
+SVR MAE RMSE 31.00 38.88 21.87 27.49 47.95 56.74 7.59 9.09 31.56 41.54 16.91 22.70 47.95 74.85 8.24 13.60 32.78 42.31 18.37 25.47 47.95 64.44 8.65 11.48 31.78 40.91 16.91 22.70 47.95 74.85 8.20 11.63
+
+ExtraTrees MAE RMSE 108.39 119.94 50.27 58.91 125.43 134.81 18.07 18.50 109.47 122.16 63.43 75.69 123.60 138.18 14.65 14.64 107.63 119.56 43.66 54.61 128.39 138.67 20.00 20.18 108.50 120.55 43.66 54.61 128.39 138.67 17.73 17.96
+
+AdaBoost MAE RMSE 103.67 113.83 18.78 28.40 119.05 131.40 24.70 27.21 101.80 116.15 19.29 30.39 116.92 133.14 24.11 25.03 101.55 115.65 19.29 32.39 114.97 130.34 23.75 24.12 102.34 115.21 18.78 28.40 119.05 133.14 24.21 25.51
+
+77..22.. CCoommppaarriissoonn ttoo AAvveerraaggee--BBaasseedd AApppprrooaacchheess
+
+FFoorr ffuurrtthheerr eevvaalluuaattiioonn,, aa ccoommppaarriissoonn ttoo ccuurrrreenntt aapppprrooaacchheess sshhoouulldd bbee ppeerrffoorrmmeedd.. AAss ttoo tthhee lliitteerraattuurree,,uussuuaallllyyaaccoommppaarrisisoonntotoaavvereargage-eb-absaesdedapapprporaocahcehseissipsepreforfromrmede,dw, hwichhicihs aislsaolsaopapplipcalibclaebtloe tthoethcue rcruernrternetsreeasrecahr.cThh. Terheefroerfeo,rteh,ethfoellfoowlloinwgindgeﬁdneiftiinointisoanrseairnetrinodtruocdeudc:ed:
+
+•• WWeeaarreeaasssusummininggthtahtatt ttratnrasnpsoprtosrthsavheavbeeebneeconmcopmletpelde.tejdd. e𝑗tedrmetienremsionnees sopneecisﬁpcetcriafincsptroarntswpoitrht
+
+••
+•• •• • • •
+
+WoAAEnw𝐴𝐴𝐸W𝐴j fT=uTT𝑇𝑇𝑇𝑇eiettTm𝑇𝑇𝑇𝐷TTrha1ajajj,,l:,b,,::insil::j:A.:eAsoAsEA=.EroAmc.cascs1cto,ttcstuatit…utifustsiu.msamuaustasatltrilamula.olaa+TlTtTmnntTteerTeir+ss1armdarden1mavaovijTvesTevfneiiaerlsrseotljtsalashhTlfTtivvaThteTeoiDihesmenmieincmlemlenutseteTTphnheertoioiaoeuhremmoforfefmetcftfnnteetuhurcrtutbtarrooaeurretmeaanrfnfrrrcennsarotstbunoersprsnpferaapftnposotrlrnnottyoprerrrlsastrotrnyoaopptntjfjtrn.bo.oojsjttstspbrfrrfwmrertrtasoaoorjenijirnvtmmsratashssevnpnjmid.eitotdodrrdi=ntraasfrftsnnstrrar1woiospsnoa,mmmmesinn.trp.ssihit.ssttoprr,rsspra𝑖oaaniitooennrn=jfrtnn.sssomfmp1triioro,ttirpia…soorsnrsptsetti𝑛sirjohhodp.enee.nidoTcddriithi.ct.ieeeotssin𝑗nott.ii.ninnT.daahettiietooennnrm..𝑖 indeestetrhme innuems btheer
+
+• • •
+
+AE𝐸TT𝑇A𝐴Djj,,i:::
+
+AEscttiumalatTeidmTeiomf eDoefpAarrtruivrealoof ftrtarannssppoortrtj.j Estimated Time of Arrival of transport j
+
+and and
+
+from from
+
+transmission transmission
+
+i. i.
+
+The easiest approach is to use the moving average for travel time estimation, without updating
+
+it basTehdeoenastiheestcauprrpernotacphosisititoonuosef tthhee tmraonvsipnograt.vIenratgheisfcoarster,atvheel taivmeeraegsetimtraavtieolnt,imweithoof ualtlucpodmaptilnegteidt
+
+btraasnesdpoonrtst,hAe TcuTrarvge,nits pcoaslcituiloanteodf tahnedtruasnesdpoforrt. pInretdhiicsticoans.eA, tsheonaevecraangeseteraivnelEtqimuaetioofna(ll3)c,oAmTpTleavtgeids
+
+terqaunisvpaolerntst, tAoTtThaevge,sitsimcaaltceudlatrtaedvealntidmuesferdomforthperefidrisctttiorann. sAmsisosnioencaatnthseeeoirnigEinq,uEaTtiTont+1,(13. )T, hAeTaTrarvigvaisl
+
+etiqmueiviaslethnetntoctahlceuelsattiemdaatesdthtreasvueml tiomfedferpoamrttuhreeﬁarnsdt taravnersamgiesstiroanvealt ttihmeeo,raigsisnh, oEwTTnt+in1,1E. qTuhaetiaornriv(4a)l.
+
+tTimhues,isththeeenstcimalactueldatteidmaesotfhaerrsiuvmal iosfndoetpuaprdtuarteedanddurainvegrtahgeettrraanvseplotritm. e, as shown in Equation (4).
+
+Thus,
+
+the
+
+estimated
+
+time
+
+of
+
+arrival
+
+is
+
+not
+
+updated
+
+during 1
+
+thet
+
+transport.
+
+ETTtE+TE1T,1Tt=+A1,t1A+=1T,Ai=TTAaTvTgaDv=gt=+1t1+t ATjTtAjaAvTgTTTj j
+
+(3) (3) (4)
+
+The authors of [12] are also coEnTsAidte+r1i,ni=g AthTeDmt+o1v+ingATavTearvagge. However, in comparison to t(h4e)
+
+previTohues aauptphroorascohf t[h1e2y] aarreeaclsoonsciodnesridnegritnhge tpheercmenotvaigneg oafvethraegceo. mHpolwetedvedr,isintacnocme pofartihseoncutorrtehnet ptrraenvsipouorst,ap𝑑p,roa,c.hAtsheiny oaurer ucosen-sciadseer,insignctehethpeerrocuentetaigsenotf kthneowconmapnldettehde ddiissttaance ocafnthvearcyurfreonmt transport,tdop,ttr+a1n,i.spAosrti,nthoeurcuursree-nctalsye,cosimncpelettheedrdoiusteaniscen, o𝑑t kn,o,wisndainvdidtehdebdyistthaencaevecarangveadryistfaronmce torvaenrspaollrtctoomtrpalnestepdorttr,atnhsepcourrtrse,n𝑑tly c.omThpelepteedrcdeinstangeceo, df tt+h1e,i,riesmdaivinidinedg bdyistthaencaevetroagtheedidsetasnticneatoivoenr, 1 − 𝑑 , , , is used in Equation (6) to predict the remaining travel time by multiplying it with the
+
+Logistics 2020, 4, 1
+
+18 of 22
+
+all completed transports, davg. The percentage of the remaining distance to the destination, 1 − dp,t+1,i, is used in Equation (6) to predict the remaining travel time by multiplying it with the moving average, ATTavg from Equation (3). Finally, the estimated travel time is again summed up with the time of departure to calculate the estimated time of arrival, ETAt+1,i.
+
+dp,t+1,i
+
+=
+
+dt+1,i davg
+
+(5)
+
+ETTt+1,i = 1 − dp,t+1,i ∗ ATTavg
+
+(6)
+
+ETAt+1,i= ATDt+1 + ETTt+1,i
+
+(7)
+
+In [23], the prediction is based on the current transmission and position of a transport. To estimate the travel time, all transmissions of previous transports within a sensitivity radius are identiﬁed, together with their actual travel times to the destination. The average of all travel times of the identiﬁed transmissions is then used to estimate travel time for the current transport based on its current position.
+In [11], the prediction of travel time is based on a predicted speed, vpred,i, of the current transport at the current transmission, i, derived from the distances to the origin, dO,i and destination, dD,i. The formula is shown in Equation (8). Hereby, vavg stands for the average speed from previous rides at the transport relation, and vP,i−1 stands for the speed to the previous transmission. In Equation (9), the predicted speed, vpred, is then used to calculate the estimated travel time by multiplying it with the distance to the destination, dD,i.
+
+vpred,i
+
+=
+
+vavg ∗ dO,i + vP,i−1 ∗ dD,i dO,i + dD,i
+
+(8)
+
+ETTt+1,i = vpred,i ∗ dD,i
+
+(9)
+
+Table 7 compares the results of the presented average-based approaches to the SVR as the best-derived model from the previous section. The results show that travel time prediction based on machine learning algorithms is considerably more accurate. In particular, the SVR algorithm has a prediction error that is signiﬁcantly lower than the average-based approaches. Still, the average based approach is quite close to the prediction of the SVR, especially if considering the RMSE.
+
+Table 7. Prediction results of the average-based approaches compared to the SVR.
+
+Model
+Our model Moving average
+[12] [23] [11]
+
+MAE
+16.91 h 24.03 h 79.48 h 45.41 h 224.84 h
+
+RMSE
+22.70 h 24.03 h 94.90 h 54.27 h 247.86 h
+
+Figure 12 presents the MAE based on the distance to destination and proves that the SVR model performs best. Instead, [11,12] have a signiﬁcantly high MAE. The moving average comes closest to the results of the SVR model and can be identiﬁed by the constant line, as predictions are not actualized during the ride. The approach of [23] also proves a good prediction accuracy. Just at the end of the ride, the error increases signiﬁcantly. Here, a good prediction error is of high importance. While evaluating those results, one should also consider that the high errors of the average-based approaches occur because of the use of a sporadic transmission in a 30-min interval, a low amount of data, and the absence of information about the trans-loading points.
+
+Logistics 2020, 4, 1 Logistics 2020, 4, x FOR PEER REVIEW
+
+19 of 22 19 of 22
+
+FiFgiugruere121.2C. CoommppaarrisisoonnooffSSVVRR aass tthhee bbeesstt mmooddeellttooththeeaavveerargage-eb-absaesdedapapprporaocahcehs.es.
+8. 8C.oCnocnluclsuisoinosns
+InItnhitshsitsusdtyu,dwye, whaevehapvredpicrteeddicttreadvetlrativmelestiomfems uolftimuodltaiml tordanalsptroarntsspuosrintsguthsienmg athcheinmealcehairnneing algleoarritnhinmgsaElgxotrraitThrmeess,EAxtdraaTBroeoes,t,AandadBSoVosRt,. AanmdoSnVgRt.hAe mthorenegatphpe ltihedreme apchpilnieedlemaarnchiningeallegaorrniitnhgms, SVaRlghoaristhamchsi,eSvVedR thhaes baechstiepveerdfotrhme abnesctepienrfeosrtmimaantcienginthesetitmraavteinlgtitmhee.trDavepeletnimdien.gDoenpetnhdeienxgpoenritmheent, theexppreerdimicteinotn, tehreroprrerdeiacctihoenseurprotrore1a7chheosvueprtao t1r7anhsopvoerrtatitmraensopfourtptitmo e30ofduapytso. 3In0 dadaydsi.tiIonna,dwdieticoonu, ld showwe cthoautldbasshiocwfeathtuatrebsadsiicrefectaltyurdeesrdivieredctflryomderthiveedtrafrcokmingthdeattraa,cwkiinthgoduattaa,dwdiinthgofuutrathdedriningffourrmthaetrion coninsfiodremriantgiotnhecocnosuindterryinogrtphuebcloiuc nhtorlyidoarypsu, ballircehadolyidparyosv,iadlereaadgyoopdropvrieddeicatgioono.dTphreedoitchteiornd.aTthaedootmhearins dodnaotat idmopmraoivnes tdhoenroetsuimltps rsoigvneitﬁhcearnetsluy.ltCs soingsniidfiecrainntglyt.hCeolonwsidaemrinougntht eolfotwranamspoourntst aonf tdratnhsepcoormtspalnedxity oalfstTtohhheeoeucsSoDttVupmedeRspripelfmeiodtxoreimsdtutyehsploeapafvlrltsyeehoqrecauohsguitareuteip-ndmbe,iaerewfsdnoeetrsdmutthoapsippnpaplkvryroeotcvrhahaiacdagthieente-h,baswe.apseeersdetthdimaiinpcaktpitortiohonnaatbcrhtaehesseesu.deltssotinamredataqitouanitarevessauailtlaitssbflaaercetforqoruymi.teToshnaeltyiSsVfaaRcstmomrayoll.del
+nuDmebsepriotef ttrhanesrpeoqrutsi,rtehmeeanptprtooapchrosvhiodueldabpereevdailcutaiotendbwaistehdmoonredtraatnasapvoartislatbolfeurftrhoemr coonnlfyirma tshmeall nurmesbuelrtsoafntrdanexsapmoritnse, thhoewapapvaroilaacbhilisthyoouflddabtea einvfalulueantceeds wthiethpmredoricetitoranns.spInoratdsdtiotifounr,ththeer acopnpﬁroramchthe ressuhlotus ladnbde eaxpapmlieindetohfouwrthaevratirlaanbsipliotyrt orefldataiotansin, aﬂsutehnecteims ethbeehparveidoircotifotnrasn. sIpnoartdsdciatniovna,rtyhaenadpopthroear ch shofeualtdurbees ampipglhietdbetorefluervtahnetr. tAradndsitpioonrtarleelxaptieornims,eanststhceoutilmd ealbsoehbaevcioonrdouf cttreadnswpiothrtns ecwancvoamrbyinanatdioontsher feaotfurfeesatmuirgehs.t bFeorreilnesvtaanntc.eA, dAddiatiBoonoasltexapnderiEmxetrnatTs rceoeusldpraolsvoidbee caonndimupctoerdtawnciteh snceowrecotombfiilnteartioonust of feautunrimesp. oFrotarnint sfetaantucree, sA. dFuaBrtohoesrtdaantda sEoxutrrcaeTsr,eseuscphroavs iwdeeaatnheimr, pcoourtldanaclesoscboereevtoalﬁulatteerdo, uast utrnainmsppoorrttsant feabtyurveess.sFeul hrtihgehrlyddateapseonudrocenst,hseucwheasthwereacothnedri,tcioonusldonaltshoebheigehvasleuaa. tAeds ,thase trimanesporerdtsicbtiyonveascsceulrhaicgyhly deopfemndulotinmtohdeawl teratnhseprorctosnhdigithiolynsdeopnetnhdes hoinghthseerao.uAtes, tahme teitmhoedpcroeudlidctbioenimacpcluemraecnyteodf mtouplrteimdioctdal tratnhsepfourttusrheigrohulytedpeaptehn. dTsheonprthedeircotiuonte,reasmulet tchooudldcothueldn bbe iamdpdleedmaesnatefdeatotuprerefdoircththe etrfauvteulretimroeute papthr.edTihcteiopnr.ediction result could then be added as a feature for the travel time prediction.
+AnAonthotehrehrihgihglhylyrerleelvevaannt taassppeeccttiisstthhee ccoonstructioonnooffaapprroodduucctitviveeddigiigtiatlatlrtarvaevletlimtime perpedreicdtioctnion sersveircveictehtahtaitmimplpelmemenentstsththeemmeeththooddss eexxaammiinneedd iinn tthhiiss ppaappeerr ffoorr rreeaallllififeeuussaagge.e.AnAnapapprpoproripartieate arcahrictheictteucrteuraendanidnfriansfrtraustcrtuucrteufroer fsoernssoenr sdoartadgaetanegreantieornat,icoonl,leccotilolenc,tiaonnd, panrodcepsrsoincegsshiansgtohabse tdoeﬁbneed. Ondeebfiingedch. aOllneengbiegrcehsuallltesnfgroemresthueltsfafcrtomthatthde afatac,t wthhaitcdhaitsag, ewnheircahteisdgloencaelrlayteadndlohcaalslytoanbde thraasnstombiteted ovterralnasrmgeittdeidstoavnecresla, rwgielldbisetarencceeisv, ewdililnbbearteccheeivseadndinwbailtlcphoesteanntdialwlyilnl pototiennctliuadlley anlol tthinectlruadnesmallistshieons of tornaensumniistsliooands.oTf honisefuacntitmloaakde.sTthhies fparcet-mpraokceesssthinegporef-tphreocdeastsainmgoorfethcoemdaptlaemx.oArencoothmeprlcehx.aAllennogtheewr ill becthhaellreen-gtreawiniilnl gbeotfhteherem-troadineilnbgaosef dthoenmnoedwelcboamsepdleotnednerwidecsominpalenteitderraidtievseinpraoncietsesr.ative process.
+
+Logistics 2020, 4, 1
+
+20 of 22
+
+Author Contributions: Conceptualization, N.S., M.T., and M.F.; data curation, N.S. and X.L.; formal analysis, N.S. and X.L.; investigation, N.S. and X.L.; methodology, N.S.; resources, N.S., X.L., M.T., and M.F.; supervision, N.S.; validation, N.S., X.L., and M.T.; visualization, N.S. and X.L.; writing—original draft, N.S. and X.L.; writing—review and editing, M.T. and M.F. All authors have read and agreed to the published version of the manuscript.
+Funding: This research was funded by the German Federal Ministry for Economic Aﬀairs and Energy (BMWi), grant number 01MA16004.
+Conﬂicts of Interest: The authors declare no conﬂict of interest.
+References
+1. Parolas, I.; Tavasszy, L.; Kourounioti, I.; van Duin, R. Predicition of Vessels’ estimated time of arrival (ETA) using machine learning: A port of rotterdam case study. In Proceedings of the 96th Annual Meeting of the Transportation Research, Washington, DC, USA, 8–12 January 2017; pp. 8–12.
+2. Masiero, L.P.; Casanova, M.A.; de Carvalho, M.T.M. Travel time prediction using machine learning. In Proceedings of the 4th ACM SIGSPATIAL International Workshop on Computational Transportation Science, Chicago, IL, USA, 1 November 2011; Thakuriah, P., Ed.; ACM: New York, NY, USA, 2011; pp. 34–38.
+3. Teucke, M.; Broda, E.; Börold, A.; Freitag, M. Using Sensor-Based Quality Data in Automotive Supply Chains. Machines 2018, 6, 53. [CrossRef]
+4. Lin, H.-E.; Taylor, M.A.P.; Zito, R. A review of travel-time prediction in transport and logistics. In Proceedings of the 6th Eastern Asia Society for Transportation Studies (EASTS) Conference, Bangkok, Thailand, 21–24 September 2005; pp. 1433–1448.
+5. Zijm, H.; Klumpp, M.; Regattieri, A.; Heragu, S. Operations, Logistics and Supply Chain Management: Deﬁnitions and Objectives. In Operations, Logistics and Supply Chain Management; Zijm, H., Klumpp, M., Regattieri, A., Heragu, S., Eds.; Springer: Cham, Germany, 2019; pp. 27–42.
+6. Sommerfeld, D.; Teucke, M.; Freitag, M. Identiﬁcation of Sensor Requirements for a Quality Data-based Risk Management in Multimodal Supply Chains. Procedia CIRP 2018, 72, 563–568. [CrossRef]
+7. Farahani, P.; Meier, C.; Wilke, J. Digital Supply Chain Management. 2020 Vision: Whitepaper. Available online: https://www.sap.com/documents/2017/04/88e5d12e-b57c-0010-82c7-eda71af511fa.html (accessed on 17 November 2019).
+8. Li, X.; Bai, R. Freight Vehicle Travel Time Prediction Using Gradient Boosting Regression Tree. In Proceedings of the 15th IEEE International Conference on Machine Learning and Applications (ICMLA), Anaheim, CA, USA, 18–20 December 2016; IEEE: Piscataway, NJ, USA, 2016; pp. 1010–1015.
+9. Vlahogianni, E.I.; Karlaftis, M.G.; Golias, J.C. Short-term traﬃc forecasting: Where we are and where we’re going. Transp. Res. Part C Emerg. Technol. 2014, 43, 3–19. [CrossRef]
+10. Altinkaya, M.; Zontul, M. Urban bus arrival time prediction: A review of computational models. Int. J. Rec. Technol. Eng. 2013, 2, 164–169.
+11. Singla, L.; Bhatia, P. GPS based bus tracking system. In Proceedings of the 2015 International Conference on Computer, Communication and Control (IC4), Indore, India, 10–12 September 2015; IEEE: Piscataway, NJ, USA, 2015; pp. 1–6.
+12. Cˇ elan, M.; Lep, M. Bus-arrival time prediction using bus network data model and time periods. Future Gener. Comput. Syst. 2018. [CrossRef]
+13. Kwon, J.; Petty, K. Travel time prediction algorithm scalable to freeway networks with many nodes with arbitrary travel routes. Transp. Res. Rec. 2005, 1935, 147–153. [CrossRef]
+14. Shalaby, A.; Farhan, A. Prediction Model of Bus Arrival and Departure Times Using AVL and APC Data. J. Public Transp. 2004, 7, 41–61. [CrossRef]
+15. Chen, M.; Liu, X.; Xia, J.; Chien, S.I. A Dynamic Bus-Arrival Time Prediction Model Based on APC Data. Comput.-Aided Civ. Infrastruct. Eng. 2004, 19, 364–376. [CrossRef]
+16. Vanajakshi, L.; Subramanian, S.C.; Sivanandan, R. Travel Time Prediction under Heterogeneous Traﬃc Conditions Using Global Positioning System Data from Buses. IET Intell. Transp. Syst. 2009, 3, 1–9. [CrossRef]
+17. Chien, S.I.-J.; Kuchipudi, C.M. Dynamic Travel Time Prediction with Real-Time and Historic Data. J. Transp. Eng. 2003, 129, 608–616. [CrossRef]
+18. Fan, W.; Gurmu, Z. Dynamic Travel Time Prediction Models for Buses Using Only GPS Data. Int. J. Transp. Sci. Technol. 2015, 4, 353–366. [CrossRef]
+
+Logistics 2020, 4, 1
+
+21 of 22
+
+19. Yu, B.; Lam, W.H.K.; Tam, M.L. Bus arrival time prediction at bus stop with multiple routes. Transp. Res. Part C Emerg. Technol. 2011, 19, 1157–1170. [CrossRef]
+20. Zychowski, A.; Junosza-Szaniawski, K.; Kosicki, A. Travel Time Prediction for Trams in Warsaw. In Proceedings of the 10th International Conference on Computer Recognition Systems (CORES), Polanica Zdroj, Poland, 22–24 May 2017; Kurzynski, M., Wozniak, M., Burduk, R., Eds.; Springer International Publishing: Cham, Germany, 2018; pp. 53–61.
+21. Sun, X.; Zhang, H.; Tian, F.; Yang, L. The Use of a Machine Learning Method to Predict the Real-Time Link Travel Time of Open-Pit Trucks. Math. Probl. Eng. 2018, 2018, 4368045. [CrossRef]
+22. Servos, N.; Teucke, M.; Freitag, M. Travel Time Prediction for Multimodal Freight Transports using Machine Learning. In Proceedings of the 23th International Conference on Material Handling, Constructions and Logistics (MHCL), Vienna, Austria, 18–20 September 2019; Kartnig, G., Zrnic´, N., Bošnjak, S., Eds.; University of Belgrade Faculty of Mechanical Engineering: Belgrade, Serbia, 2019; pp. 223–228.
+23. Heywood, C.; Connor, C.; Browning, D.; Smith, M.C.; Wang, J. GPS tracking of intermodal transportation: System integration with delivery order system. In Proceedings of the 2009 IEEE Systems and Information Engineering Design Symposium, Charlottesville, VA, USA, 24 April 2009; Louis, G.E., Crowther, K.G., Eds.; IEEE: Charlottesville, VA, USA, 2009; pp. 191–196.
+24. Kisgyörgy, L.; Rilett, L.R. Travel Time prediction by Advanced Neural Network. Periodica Polytech. Ser. Civ. Eng. 2002, 46, 15–32.
+25. Wu, C.-H.; Ho, J.-M.; Lee, D.T. Travel-Time Prediction with Support Vector Regression. IEEE Trans. Intell. Transp. Syst. 2004, 5, 276–281. [CrossRef]
+26. Šemanjski, I. Potenial of Big Data in Forecasting Travel Times. Promet-Traﬃc Transp. 2015, 27, 515–528. [CrossRef]
+27. Zhang, Y.; Haghani, A. A gradient boosting method to improve travel time prediction. Transp. Res. Part C Emerg. Technol. 2015, 58, 308–324. [CrossRef]
+28. Siripanpornchana, C.; Panichpapiboon, S.; Chaovalit, P. Travel-time prediction with deep learning. In Proceedings of the 2016 IEEE Region 10 Conference (TENCON), Marina Bay Sands, Singapore, 22–25 November 2016; IEEE: Piscataway, NJ, USA, 2016; pp. 1859–1862.
+29. Jeong, R.; Laurence, R.R. Bus arrival time prediction using artiﬁcial neural network model. In Proceedings of the 7th International IEEE Conference on Intelligent Transportation Systems, Washington, WA, USA, 3–7 October 2004; IEEE: Piscataway, NJ, USA, 2004; pp. 988–993.
+30. Pan, J.; Dai, X.; Xu, X.; Li, Y. A Self-learning algorithm for predicting bus arrival time based on historical data model. In Proceedings of the 2012 IEEE 2nd International Conference on Cloud Computing and Intelligence Systems, Hangzhou, China, 30 October–1 November 2012; Li, D., Yang, F., Ren, F., Wang, W., Eds.; IEEE: Piscataway, NJ, USA, 2012; pp. 1112–1116.
+31. Dong, J.; Zou, L.; Zhang, Y. Mixed model for prediction of bus arrival times. In Proceedings of the 2013 IEEE Congress on Evolutionary Computation (CEC), Cancún, Mexico, 20–23 June 2013; IEEE: Piscataway, NJ, USA, 2013; pp. 2918–2923.
+32. Treethidtaphat, W.; Pattara-Atikom, W.; Khaimook, S. Bus Arrival Time Prediction at Any Distance of Bus Route Using Deep Neural Network Model. In Proceedings of the 20th International Conference on Intelligent Transportation Systems, Mielparque Yokohama in Yokohama, Kanagawa, Japan, 16–19 October 2017; IEEE: Piscataway, NJ, USA, 2017; pp. 988–992.
+33. Zhang, J.; Gu, J.; Guan, L.; Zhang, S. Method of predicting bus arrival time based on MapReduce combining clustering with neural network. In Proceedings of the IEEE 2nd International Conference on Big Data Analysis (ICBDA), Beijing, China, 10–12 March 2017; IEEE: Piscataway, NJ, USA, 2017; pp. 296–302.
+34. Yang, M.; Chen, C.; Wang, L.; Yan, X.; Zhou, L. Bus Arrival Time Prediction using Support Vector Machine with Genetic Algorithm. Neural Netw. World 2016, 26, 205–217. [CrossRef]
+35. Patnaik, J.; Chien, S.; Bladikas, A. Estimation of Bus Arrival Times Using APC Data. J. Public Transp. 2004, 7, 1–20. [CrossRef]
+36. Kern, C.S.; de Medeiros, I.P.; Yoneyama, T. Data-driven aircraft estimated time of arrival prediction. In Proceedings of the 9th Annual IEEE International Systems Conference (SysCon), Vancouver, BC, Canada, 13–16 April 2015; IEEE: Piscataway, NJ, USA, 2015; pp. 727–733.
+
+Logistics 2020, 4, 1
+
+22 of 22
+
+37. Kee, C.Y.; Wong, L.-P.; Khader, A.T.; Hassan, F.H. Multi-label classiﬁcation of estimated time of arrival with ensemble neural networks in bus transportation network. In Proceedings of the 2nd IEEE International Conference on Intelligent Transportation Engineering (ICITE), Singapore, 1–3 September 2017; IEEE: Piscataway, NJ, USA, 2017; pp. 150–154.
+38. Cortes, C.; Vapnik, V. Support-Vector Networks. Mach. Learn. 1995, 20, 273–297. [CrossRef] 39. Barbour, W.; Martinez Mori, J.C.; Kuppa, S.; Work, D.B. Prediction of arrival times of freight traﬃc on US
+railroads using support vector regression. Transp. Res. Part C Emerg. Technol. 2018, 93, 211–227. [CrossRef] 40. Awad, M.; Khanna, R. Support Vector Regression. In Eﬃcient Learning Machines: Theories, Concepts, and
+Applications for Engineers and System Designers; Awad, M., Khanna, R., Eds.; Apress: Berkeley, CA, USA, 2015; pp. 67–80. 41. Geurts, P.; Ernst, D.; Wehenkel, L. Extremely randomized trees. Mach. Learn. 2006, 63, 3–42. [CrossRef] 42. Kadiyala, A.; Kumar, A. Applications of python to evaluate the performance of decision tree-based boosting algorithms. Environ. Prog. Sustain. Energy 2018, 37, 618–623. [CrossRef] 43. Schapire, R.E. Explaining AdaBoost. In Empirical Inference; Schölkopf, B., Luo, Z., Vovk, V., Eds.; Springer: Berlin/Heidelberg, Germany, 2013; pp. 37–52. 44. Van der Spoel, S.; Amrit, C.; van Hillegersberg, J. Predictive analytics for truck arrival time estimation: A ﬁeld study at a European distribution centre. Int. J. Prod. Res. 2017, 55, 5062–5078. [CrossRef] 45. Swamynathan, M. Mastering Machine Learning with Python in Six Steps. A Practical Implementation Guide to Predictive Data Analytics Using Python; Apress: New York, NY, USA, 2017. 46. Yang, J.; Xu, J.; Xu, M.; Zheng, N.; Chen, Y. Predicting Next Location Using a Variable Order Markov model. In Proceedings of the 5th ACM SIGSPATIAL International Workshop on GeoStreaming (IWGS), Dallas, TX, USA, 4 November 2014; Zhang, C., Basalamah, A., Hendawi, A., Eds.; ACM: New York, NY, USA, 2014; pp. 37–42. 47. Ester, M.; Kriegel, H.-P.; Sander, J.; Xu, X. A density-based algorithm for discovering clusters in large spatial databases with noise. In Proceedings of the 2nd International Conference on Knowledge Discovery and Data Mining (KDD), Portland, OR, USA, 2–4 August 1996; Simoudis, E., Han, J., Fayyad, U., Eds.; AAAI Press: Palo Alto, CA, USA, 1996; pp. 226–231. 48. Bolón-Canedo, V.; Sánchez-Maroño, N.; Alonso-Betanzos, A. A review of feature selection methods on synthetic data. Knowl. Inf. Syst. 2013, 34, 483–519. [CrossRef] 49. He, X.; Cai, D.; Niyogi, P. Laplacian score for feature selection. In Proceedings of the 19th Advances in Neural Information Processing Systems (NIPS) Conference, Vancouver, BC, Canada, 5–10 December 2006; Weiss, Y., Schölkopf, B., Eds.; MIT Press: Cambridge, UK, 2006; pp. 507–514. 50. Omer Fadl Elssied, N.; Ibrahim, O.; Hamza Osman, A. A Novel Feature Selection Based on One-Way ANOVA F-Test for E-Mail Spam Classiﬁcation. Res. J. Appl. Sci. Eng. Technol. 2014, 7, 625–638. [CrossRef] 51. Vergara, J.R.; Estévez, P.A. A review of feature selection methods based on mutual information. Neural Comput. Appl. 2014, 24, 175–186. [CrossRef] 52. Hall, M.A. Correlation-based Feature Selection for Discrete and Numeric Class Machine Learning. In Proceedings of the 7th International Conference on Machine Learning (ICML), San Francisco, CA, USA, 29 June–2 July 2000; pp. 359–366. 53. Mukaka, M.M. A guide to appropriate use of Correlation coeﬃcient in medical research. Malawi Med. J. 2012, 24, 69–71.
+© 2019 by the authors. Licensee MDPI, Basel, Switzerland. This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license (http://creativecommons.org/licenses/by/4.0/).
+

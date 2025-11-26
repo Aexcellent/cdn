@@ -1,0 +1,496 @@
+i An update to this article is included at the end
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176 Contents lists available at ScienceDirect
+Journal of Rail Transport Planning & Management
+journal homepage: http://www.elsevier.com/locate/jrtpm
+
+Estimating the demand for rail freight transport in Pakistan: A time series analysis
+Muhammad Zamir Khan *, Farzana Naheed Khan
+School of Economics, Quaid-i-Azam University, Islamabad, Pakistan
+
+ARTICLE INFO
+Keywords: Rail freight transport demand ECM Johansen co-integration Gross value added Ton-kilometers
+
+ABSTRACT
+The empirical knowledge of the demand for rail transport is vital for making effective decisions regarding rail transport planning and management. To this objective, this paper provides an empirical analysis of rail freight transport demand in Pakistan using annual time series data from 1972 to 2017. The Johansen’s co-integration and error-correction model is used to estimate short and long-run elasticities. The results show that both aggregate economic activity (gross value added) and freight rate are the most significant determinants of rail freight demand in Pakistan. In particular, the long-run elasticities of rail freight demand with respect to freight rate and economic activity are À 0.39 and 0.84 while in the short-run, these elasticities are À 0.28 and 0.51, respectively. Moreover, the long-run cross price elasticity of rail freight demand is significant and positive, which implies that road and rail transport are substitutes for freight. The speed of adjustment coefficient, based on error correction model, indicates that rail freight transport ad­ justs at a moderate rate to restore long-run equilibrium relationship, with about 53% of the adjustment takes place in the first year.
+
+1. Introduction
+At macro level, freight mobility plays an important role in a country’s competitiveness, economic growth and regional connectivity. A well-established transport system facilitates the smooth freight movements in a cost-efficient manner from origins to destinations. There exist a number of modes such as road, rail, air and pipelines to handle such freight movements. However, road and rail are the two basic modes of carrying most of the country’s inland freight transport (see, for example, Ramanathan, 2001; Shen et al., 2009). In general, railway has a potential advantage over road transport, in terms of long haul and mass scale traffic movements (passenger and freight). Besides, rail transport also contributes less significantly towards environmental degradation in comparison to road transport (Chapman, 2007; Givoni et al., 2009; Nelldal and Andersson, 2012). A country’s effective railway transport system facilitates com­ merce and trade, reduces transportation costs and road congestion, promotes national integration and rural development (Government of Pakistan, 2013).
+Rail freight demand is an important component of rail operations. The demand for rail freight transport services are derived in nature just like the demand for many other inputs such as labor, energy etc. by the firms. Freight transport is usually considered as an input to the production process of firms and it is derived from the demand for goods spatially differentiated from the locations of production. The two important determinants of demand for rail freight transport are economic activity and price, among other factors
+
+* Corresponding author. E-mail addresses: zamirqau@gmail.com (M.Z. Khan), farzanakhan@qau.edu.pk (F.N. Khan).
+https://doi.org/10.1016/j.jrtpm.2019.100176 Received 3 May 2019; Received in revised form 29 November 2019; Accepted 28 December 2019 Available online 10 January 2020 2210-9706/© 2020 Elsevier Ltd. All rights reserved.
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+(see, for instance, the studies of FitzRoy and Smith, 1995; Productivity Commission, 2006). The main objective of rail freight transport demand analysis is to identify the main factors that affect rail freight demand, which can further be used for rail transport planning and demand management. Empirically derived elasticity estimates provide valuable information to policymakers, transport planners, public agencies and transport operators and can help them to evaluate various policy options regarding the control of growth in future rail freight transport, modal shift or emissions reductions. Furthermore, an accurate assessment of empirical rail freight transport demand model is crucial for making various policy decisions such as price regulations, subsidies and taxes.
+The empirical literature on rail freight transport dates back to the 1960s. However, the studies of rail freight demand are relatively scarce in comparison to passenger demand studies. This has motivated and attracted the interest of researchers and academicians towards the analysis of rail freight demand and indeed some of the studies pertaining to freight demand are available. Most of the existing studies are often criticized on two grounds such as (i) Aggregate data bias and (ii) endogeneity bias (Wijeweera et al., 2014). Aggregate data bias occurs when data on total flows by modes at regional or national level is used while the information on selected freight commodities, routes and modes is ignored. On the other hand, endogeneity bias or problem arises due to the existence of possible simultaneity between freight transport and freight rate. Ignoring these endogenous relationships between price and quantity on rail freight demand may potentially bias the results. Some of the recent studies incorporate the possible feed-in-effects between freight rate and freight demand in their analysis of rail freight demand (see, for example, Kulshreshtha et al., 2001; Wijeweera et al., 2014). However, such empirical attempts are totally missing for a developing country like Pakistan, where rail transport has been the primary mode of handling most of freight transport.
+To the best of our knowledge, this is the first attempt of investigating the demand for rail freight transport in Pakistan. So, the objective of present study is to provide short-run and long-run elasticities of rail freight transport demand in Pakistan using annual time series data from 1972 to 2017. In order to obtain elasticities, we utilize standard multivariate time series method such as Johansen co-integration and error correction model. The estimation results show that freight rate and economic activity are significantly related to rail freight demand in both short and long-run. Moreover, the long-run rail freight demand is also positively related to the trucking cost, which means that road and rail freight transport are substitutes.
+The organization of the paper is as follows. A brief overview of rail freight transport in Pakistan is provided in the next section. Section 2 contains a survey of literature on rail freight demand whereas Section 3 deals with methodology and data. Results of the study are presented and discussed in Section 4. Finally, Section 5 concludes the study.
+
+1.1. An overview of rail freight transport in Pakistan
+
+The Pakistan Railway (PR) is a national, state-owned enterprise of Pakistan, founded in 1861 and headquartered in Lahore. It works under the Ministry of Railways which is responsible for planning, administrating the passenger locomotive services, regulating the railway companies, industries and associated organizations. The PR facilitates the movement of both passenger and freight transport throughout the country. It connects coastal ports (Karachi Port and Bin-Qasim Port) and dry ports to the interior parts of the country. It also generates revenues from the movement of various commodities such as petroleum oil, wheat, coal, fertilizer, cement, industrial and imported goods, etc. However, due to diversion of resources to the expansion of road network, the performance of Pakistan railway has declined over time. Therefore, its share of inland passenger traffic reduced from 41% to 10% and 73%–4% for freight traffic (Government of Pakistan, 2009). Recognizing the importance of rail for transport, the Government of Pakistan, in its vision 2025, has planned to increase the share of rail transport from 4% to 20% (Planning Commission, 2014).
+The performance of rail freight transport in Pakistan during the last two decades from 1997–98 to 2016–17 is provided in Table 1. Rail freight transport is measured in both total tons (millions) and ton-kilometers (millions). PR has carried a total of 5.97 million tons and 4447.3 million ton-kilometers of freight in 1997–98, which, although not consistently, has increased to 7.23 million tons and 6187.3 million ton-kilometers after a decade. The improvement in most of this period was due to the development projects imple­ mented by PR to improve its services (Government of Pakistan, 2008).1
+However, the performance of PR began to slow down after 2008, particularly from 2010 to 2013. PR has endured the worst crisis during this period, owing to the over-aged infrastructure, lack of locomotives and rolling stock. As a result, the number of freight trains from ports has dropped from 96 to merely 1 per day (Government of Pakistan, 2012). Besides, the number of terrorist attacks on PR has substantially increased from 2010 to 2013 (South Asia Terrorism Portal, 2018). Consequently, the amount of freight carried by PR declined sharply from 7.23 million tons in 2007–08 to 1.01 million tons in 2012–13, and also from 6187.3 to 419.3 in terms of million ton-kilometers. Since then, PR has adopted a number of strategies (increasing freight trains from ports, improvements in dry ports, etc.) to increase rail freight transport (Pakistan Railway, 2018). As a result, rail freight, measured in both tons and ton-kilometers, has considerably increased to 5.63 tons and 5031 ton-kilometers, respectively, in 2016–17.
+Table 2 provides information regarding rail freight transport (measured in thousand tons and thousand ton-kilometers) of five major commodities in Pakistan over the period 2012–13 to 2016–17. In addition, each commodity’s share in total rail freight transport (measured in thousand tons) is also given. In general, data indicates that most of the commodities show healthy growth (ton-km) over the period 2013–2017. However, share of only three commodities (Coke & coal for public, petroleum oil and container traffic) has generally increased during the five year period while the shares of others (departmental commodities, cements) have declined.
+Finally, we have provided a comparison of total costs (billion rupees) and revenues (billion rupees) of PR in Fig. 1 over the period
+
+1 Allocations for PR has increased from Rs. 3 billion in 2000–01 to Rs. 11.65 billion in 2007–08. The development projects of PR include rehabilitating and manufacturing of diesel electric engines (Japan International Cooperation Agency, 2004).
+2
+
+M.Z. Khan and F.N. Khan
+
+Table 1 The performance of Rail freight sector in Pakistan during the period 1998–2017.
+
+Rail Freight
+
+1997–98
+
+2002–03
+
+Freight carried (Million tons) Freight (T-km)a (Million) Average kilometer carried by a ton Freight Wagons (no.s) Locomotives (no.s)
+
+5.97 4447.3 745.8 24275 611
+
+6.18 4819.8 779.8 23460 577
+
+Data Source: Pakistan Railway (Railway yearbook, various issues). a T-km represents ton-kilometers.
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+2007–08
+7.23 6187.3 855.3 18638 555
+
+2012–13
+1.01 419.3 412.74 16635 493
+
+2016–17
+5.63 5031 893.65 16085 455
+
+Table 2 Rail freight transport of five major commodities for period 2013–2017.
+
+Commodities
+
+Ton & Ton-kilometers (thousands) of a commodity
+
+2012–13
+
+2013–14
+
+2014–15
+
+2015–16
+
+2016–17
+
+Departmental commoditiesa Petroleum & other hydro-carbon oils (non-dangerous)b Container traffic Coal & Coke for public Cement
+
+Tons % share Ton-km Tons % share Ton-km Tons % share Ton-km Tons % share Ton-km Tons % share Ton-km
+
+524 52% 20,634,2 115 11% 10,297,3 57 5.61% 64,236 –
+–
+–
+159 15.6% 25,809
+
+752 47% 30,981,4 305 19% 28,706,8 50 3.11% 57,585 161 10% 20,570,8 160 9.9% 22,018
+
+734 20% 25,725,2 668 19% 57,954,8 524 14.56% 60,045,5 596 16.5% 74,176,8 255 7.1% 31,121,9
+
+821 16% 25,056,1 857 17% 77,723,1 1003 20.06% 11,4675,2 881 17.23% 10,504,01 283 5.7% 35,384,3
+
+1036 18% 33,473,7 829 15% 65,435,3 846 15.03% 96,163,0 1301 23.14% 15,460,12 239 4.2% 29,681,0
+
+a Include coal, coke and patent fuel for railways (including H.S.D and durance oil) plus railway material and stores. b Represents petroleum and hydro-carbon oils (non-dangerous i.e., having flashing point at above 76 FAHR (includes diesel & furnace oil).
+
+1998–2017. Moreover, earnings of PR are further classified into passenger & freight earnings (billion rupees). The graph shows huge disparity in expenditures and earnings. In particular, PR has experienced a budget surplus from 1997–98 to 2002–03, which turned into a significant deficit of 18 and 10 billion (rupees) during 2012–13 and 2016–17, respectively. Moreover, rail freight earnings were similar to passenger earnings in 1997–98 but decreased gradually overtime due to less favorable treatment of freight transport as compared to passenger transport (NTRC and JICA, 2006).2 As a result, freight earnings decreased to 2 billion (rupees) in 2012–13 from 6.13 billion (rupees) in 2007–08. Recognizing its importance for rail earnings, PR has planned different strategies to provide rail freight a more balanced treatment with passenger transport (Pakistan Railway, 2018).3 In addition, as the PR gradually recovers from crisis in 2011, freight earnings have increased to 12.42 billion (rupees) in 2016–17, with 5 year annual compound growth rate of 22% from 2012–13 to 2016–17.
+2. Survey of literature
+The demand for freight transport has remained the focus of many empirical studies in the later part of the twentieth century. The empirical studies can be classified into several different ways. For example, Winston (1983) categorizes the empirical studies in two broad groups namely the aggregate or dis-aggregate demand models, which depend on the availability of data for estimation. The basic unit of observation in aggregate models is aggregate share of particular transport mode at a specific geographic location whereas dis-aggregate models involve the choice of particular transport mode by an individual decision maker (shipper) for a given shipment size. Regan and Garrido (2001) and Marcos and Martos (2012) summarize three approaches of modelling freight transport demand such as microeconomic models, econometric models and network-based models. The microeconomic models are based on the theory of firm, where firm’s demand for transport service is treated as a demand for an input to the production process of a firm. The econometric models investigate the cause and effect relationships between freight demand and its determinants. On the other hand, network models use the optimal combinations of routing and (freight) traffic assignment, on a given network, to achieve network equilibrium (balancing supply-demand).
+
+2 NTRC and JICA stands for National Transport Research Centre and Japan International Cooperation Agency, respectively. 3 Long-term agreements were signed with different companies for transporting cement, coal and high-speed diesel. Moreover, the carriage ca­ pacity of freight and freight productivity (in terms of loading freight wagons) has also increased over last five years.
+3
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+Fig. 1. The financial position of rail transport in Pakistan during 1998–2017.
+In a review article, De Jong et al. (2004) categorize existing freight transport demand models on the basis of traditional four-step passenger transport modelling (Production & Attraction, Distribution, Modal split and Assignment). The Production & Attraction, Distribution and Modal split models are equally important part of other freight demand models, which further depend on the type of data used for analysis. Both Production & Attraction and Distribution models can be classified on the basis of aggregate data. In general, gravity-type models are available for Distribution models. The Production & Attraction models are further divided into four types such as trend and time series models, system dynamics models, zonal trip-rate models and input-output models. On the other hand, modal split models are the dis-aggregate models in which the allocation regarding freight flows to different modes (road, railway, inland waterway and combined transport) is determined. Modal split models are based on dis-aggregate (micro level) data at an individual level and are further categorized into aggregate modal split models, elasticity based models, neo-classical economic models, econometric direct demand models, dis-aggregate modal split models, multi-modal network models and micro-simulation approach. Similar reviews of literature regarding freight transport modelling have also been offered in the following studies (Ben-Akiva et al., 2013; Chow et al., 2010; Nuzzolo et al., 2013; Tavasszy and De Jong, 2013).
+The literature on freight transport demand is diverse in nature as it involves the choices of several decision makers (shipper, carrier (s), freight forwarder, and receiver) in the process of freight movements. So, we provide a brief survey of some previous aggregate rail freight demand studies using time series data.
+In one of the earliest studies, Rao (1978) studies rail freight transport demand in Canada using simultaneous equations framework. The study’s main objective is to quantify the effect of macroeconomic activity and inter-modal competition on rail freight demand. For that, he constructs a model for each commodity containing three simultaneous stochastic equations plus an identity to constitute a system. The first two equations in the system represent demand side while third equation is of supply. The dependent variables in demand equations are volume (measured in million tons) of commodity carried by railway and average rail length of haul (measured as miles per ton) while dependent variable in remaining third supply equation consists of rail freight rates (measured as average rail revenue per ton mile). In order to estimate the model using annual time series data from 1958 to 1973, two econometric methods such as ordinary least square (OLS) and two-stage least square (2SLS) are adopted. The results show that both export-share and commodity outputs are two significant determinants of rail freight demand, with estimated short-run output elasticity of rail freight demand is closer to unity. Similarly, the short-run inter-modal competition from trucking industry solely depends on the distance component of rail demand.
+Oum (1979) formulates a derived demand model for Canadian intercity freight transport, based on three modes of transport such as railway, highway and waterway carriers, considering freight transport services as an intermediate input to the production and dis­ tribution sectors of the economy. Hence, in doing so, the study investigates freight transport demand by allowing the inter-modal competition between different modes (rail, highway and waterway) of freight transport in a more comprehensive manner. In order to obtain the own-price and substitution elasticities, he estimates transport demand functions derived from translog transport cost functions for three modes (railway, highway and waterway) using maximum likelihood (ML) method of estimation. Annual aggregate time series data is used for the period 1945–1974. The study finds that initially both Canadian rail and trucking freight transport demand are less sensitive to their respective freight rates whereas such responsiveness increases over time albeit being inelastic. On the other hand, freight demand for waterway services is relatively more sensitive to its freight rate at the start and also remains stable over
+4
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+time. Regarding the elasticities of substitution, study also reveals that railway and waterway carriers are complementary till 1955 but become more competitive thereafter. Moreover, relationship between railway and waterway carriers turns out to be highly compet­ itive throughout the period of investigation.
+Fitzsimmons (1981) employs an ad-hoc model to analyze competition between rail and barge transport for United States grain transport. The main variables of the study are rail volumes, barge and rail rates and use of domestic grain (output). The ordinary least square method is adopted for estimating log-linear model. Estimated output, own price (rail-rate) and cross-price (truck-rate) elas­ ticities of rail grain transport are 0.740, À 1.21 and 2.43, respectively.
+Lewis and Widup (1982) follow an approach similar to Oum (1979) but within the U.S context. The study develops a derived transport demand model using translog transport cost function for motor carrier shipments of two modes (rail and road). An important feature of the study is that it incorporates eight ‘quality of service’ variables into the analysis and uses annual data for single com­ modity such as assembled automobiles from 1955 to 1975. Using different static and dynamic specifications, the estimated price elasticities of rail are larger than those of trucking in absolute value. In particular, the estimated price elasticity of trucking is between À 0.52 and À 0.57, and that of rail is between À 0.92 and À 1.08. However, regarding quality of service variables, study finds that transit time is the only significant variable while cross price elasticities for both modes such as trucking and rail reveals that they are competitive.
+In a different study, Wilson et al. (1988) investigate the markets of rail and road transport for wheat shipments in the United States. For that, the authors built a model in which both supply and demand functions are treated as a system of behavioral equations. The results are obtained using three-stage-least-square (3SLS) method on monthly data from 1973:7 to 1983:6. The findings of the study suggest that rail rates are more strongly affected by the factors representing competition from trucks (such as availability of rail cars, technological improvement and fuel prices) than by the rail costs. Moreover, all price elasticities pertaining to rail transport are elastic, and those of trucking largely depends on the availability of rail cars.
+Miljkovic et al. (2000) construct a model of rail freight and barge market to assess the factors having major impact on rail and barge rates for export-bound grain from Midwest Illinois to Mexican Gulf exporting ports. Their model consists of a system of four equations plus two identities, with first two equations being supply and demand for barge industry whereas second pair represents the supply and demand equations for rail industry. Three stage least square (3SLS) method is used on an annual data from 1980 to 1995 to estimate the model’s parameters. The results based on demand equations show that both modes (rail and barge) are strong substitutes, and that no significant relationship exists between transport rates and export-related variables. Similarly, the direct relationship between price and quantity is significant only in the supply equation of rail. A major limitation of the study is that it fails to identify the single most important factor for transport (rail and barge) rates due to the interactive nature of demand and supply processes.
+Mitchell (2010) analyzes the Australian intercapital non-bulk freight demand based on three modes road, rail and air. For esti­ mation, the study uses two different flexible functional forms such as (1) a generalized translog cost function and (2) an aggregate linear logit expenditure share system. The data for estimation covers a period of 1973–2001. The study adopts full information maximum likelihood estimation method (FIML) to derive model’s parameters. However, the estimates derived from the above functional forms produce quite different results. In particular, the translog model not only violates the principle of concavity4 but also reports, for many cases, the larger estimated short-run own and cross-price elasticities than their long-run values. On the other hand, linear logit model outperforms the translog model in both of these respects that not only estimated short-run own and cross-price elasticities are smaller than their long-run counterparts but also that concavity holds for linear logit model. Therefore, results derived from linear dynamic logit model suggests that in short-run, Australian non-bulk road freight demand is relatively inelastic across all corridors (short, medium and long-distance routes),5 and also remains relatively inelastic in long-run for short and medium routes. The results regarding non-bulk rail freight demand are quite similar to non-bulk road freight demand except that estimated elasticities, on average, are relatively larger for rail freight demand than road freight demand. Finally, non-bulk inter-capital sea freight is elastic and more responsive to medium and long-distance routes.
+Babcock and Gayle (2014) examines the U.S (as well as the east and the west regions) railroad grain transportation demand for major commodities such as wheat, soybeans and sorghum during 1980–2010. The authors adopt a two-region spatial equilibrium model, an approach developed by Yu and Fuller (2005). The main variables of study are grain transport (measured as thousands of tons) by rail, rail freight price (measured as rail revenue per ton), grain production (soybeans, corn, wheat and sorghum), barge rates (to represent cross price elasticity of railroad grain transport demand). The study incorporates two estimation methods. In addition to ordinary least squares (OLS), the generalized method of moments (GMM) principle is also adopted to take care of possible feed in effects from rail freight rate to railroad grain transportation. A formal statistical test suggests that rail freight price is endogenous variable. Three variables such as railroad diesel fuel price, railroad labor cost and number of covered hopper railcars are used as instruments for own price in regression. The findings based on generalized method of moments (GMM) imply that railroad grain transport demand is significantly determined by all the explanatory variables considered above. The own price, elasticity of grain output and cross-price elasticity of railroad grain transport are À 1.23, 0.95 and 0.48, respectively.
+Studies on freight demand tend to produce a wide range of price and output elasticities and hence make it difficult for researchers to generalize the results of different studies. In addition to the primary studies, some analysts also review the previous econometric studies on rail and road freight transport demand to have consensus on the possible range of elasticities (see, for example, Clark et al.,
+
+4 The principle of concavity implies that translog cost function is concave in input prices. 5 The short-distance intercapital corridor consists of less than 1200 km while medium-distance is between 1200 km and 1800 km. Moreover, the long-distance route is greater than 1800 km.
+5
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+2005; Oum et al., 1990, 1992; Winston, 1983; Zlatoper and Austrian, 1989). In their review of road and rail freight market elasticities, Oum et al. (1990) examine 17 freight studies from Asia-pacific, UK and North America and report estimates pertaining to all major commodity groups and grains only. According to their survey, price elasticities regarding all commodities are in a range of-0.60 to À 1.52, whereas those of grains are between À 0.52 and À 1.18. The analysts also provide the possible reasons for obtaining a wide range of elasticities in existing literature. These are intensity of inter-modal competition between different modes, differences in geographic locations and time horizons, degree of aggregation in markets and use of different functional forms (Oum et al., 1992).
+Rail freight transport demand studies, based on time series data, are generally aggregate in nature and incorporate few broad macroeconomic variables for estimation. Recent studies employ multivariate time series econometric methods such as co-integration and vector autoregressive models to analyze aggregate freight transport demand (Kulshreshtha et al., 2001; Ramanathan, 2001; Wijeweera et al., 2014). Ramanathan (2001) examines long-run association between the performance of Indian transport sector using two-step Engle-Granger co-integration and error correction model. An aggregate passenger and freight transport activity of three modes road, rail and air is added together to develop a separate econometric model for both passenger and freight transport. Using annual data for period 1956–1989, study finds that long-run freight demand is determined by the industrial production and price index. The estimated long-run output and price elasticities of freight transport are 1.183 and À 0.188 while their values in the short-run are 0.994 and 0.072, respectively. The error correction term shows that ton-kilometers adjust 40% in the first year to restore its long-run equilibrium.
+A major limitation of Ramanathan’s study is presumption of existence of at most one co-integrating vector even for multi variables case and also does not treat the possible endogeneity of explanatory variables well. Kulshreshtha et al. (2001) recognize these issues in their analysis of freight transport demand for Indian railways. They employ the Johansen co-integration and error correction model on annual time series data for period 1960–1995. The empirical results show that a unique long-run co-integration relationship exists among rail freight demand, freight-rate and GDP. The long-run output and price elasticities of rail freight demand are 0.86 and À 0.20 while the short-run elasticities are smaller than their long-run values. Furthermore, the system corrects itself within 3 years from any short-run disequilibrium through the adjustments in GDP and freight transport demand while price variable (real freight rate) behave weakly exogenous with respect to the system.
+Wijeweera et al. (2014) apply the concept of Vector Autoregressive (VAR) model on an annual data for the period 1970–2011 to examine the effect of business cycle (GDP), freight rate and international trade (nominal exchange rate) on non-bulk Australian rail freight demand, treating all variables symmetrically (endogenous). The results derived from impulse response functions (IRF) and forecast error variance decompositions reveal that two most important determinants of rail freight demand are freight rate and variation in Australian dollar. In particular, a depreciation of Australian dollar promotes rail freight demand in Australia. Moreover, authors also find that, in the long-run, there exists negative and significant association between freight-rate and rail freight demand whereas the effect of GDP on Australian non-bulk rail freight demand is negative albeit insignificant.
+Few studies employ several econometric methods for freight demand estimation and analyze the differences in estimation results (Chung and Kang, 2015; Shen et al., 2009). Shen et al. (2009) utilize six econometric models to derive empirical estimates of output elasticities for both aggregate road plus rail freight transport as well as for different commodity groups and compare elasticities using different econometric techniques. These econometric models are traditional ordinary least square (OLS) regression model, partial adjustment model (PAM), reduced auto-regressive distributed lag (ADL) model, unrestricted vector auto-regressive (VAR) model, time varying parameter (TVP) model and structural time series (STS) model. The authors find some variation in resulting coefficients (elasticities) derived from various techniques. The estimated long-run output elasticities range from 0.720 to 1.485. The study also compares the forecasting performance of all models using Mean Absolute Prediction error (MAPE) criteria and finds that no single model outperforms others in all situations.
+Andersson and Elger (2012) investigate empirical relationship between Swedish freight transport (aggregate as well as for each specific mode such as road, rail, and sea) and economic activity (GDP, industrial production, imports and exports) at three different time horizons (short-run, medium-run and long-run) using annual time series data for the period 1996 to 2007. The study adopts Engle, (1974) band spectrum regression as a method of estimation. According to this model, each variable is first decomposed into different components (short, medium and long-run) and then a different model is estimated for each time horizon. The results indicate that all variation (volatility) in freight demand from short to medium-run is mainly driven by temporary changes in exports and imports while GDP remains insignificant. However, in long-run, GDP coupled with freight demand exert a significant positive impact on freight transport demand for all transport modes. The long-run income elasticities, for different transport modes, vary between 0.9 and 2.6.
+
+2.1. Previous studies on rail freight transport in Pakistan
+
+Although some empirical freight transport studies exist for Pakistan, none of them have investigated the issue of demand for rail freight transport properly. For instance, Beenish et al. (2016) explore the nexus between railways freight performance (measured as goods transported) and economic growth (GNI growth-rate) in Pakistan for period 1980–2012. The study employs Johansen co-integration and error correction test based on Fully Modified Ordinary Least Square (FIML) to estimate the existence of stable long-run relationship between above stated variables. The results indicate that a stable long-run relationship exists between rail freight performance and economic growth and also that only economic growth (GNI growth-rate) responds to short-run deviations to re-establish long-run equilibrium relationship whereas freight performance remains weakly exogenous to the system. Moreover, Granger causality test indicates that weak uni-directional causality runs from economic growth to rail freight performance.
+In a different perspective, Choudhary et al. (2009) treat road & rail transport activity as transport infrastructure and analyze freight transport infrastructure in Pakistan using Porter’s (1980) framework for time series data from 1990 to 2008. The forecasting freight
+
+6
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+transport demand (road, rail and aggregate) until 2030 based on historical trend analysis reveals that road freight demand will likely to grow continuously at an annual growth rate of 6.2%–7.2% provided that the GDP growth rate remains 6% or above. According to the freight projections, the share of road freight transport will remain a major and dominant mode with a share of 95% in terms of freight movement while share of rail freight transport will continue to remain at 5% or less in future.
+
+3. Methodology and data related issues
+
+The variable definitions and data related issues will be explained in the next section while details about econometric model for rail freight demand will be provided thereafter.
+
+3.1. Variables and Data Sources
+
+Our objective is to analyze the major determinants of rail freight demand using time series data. Different indicators can be used to represent rail freight demand such as (1) freight moved by its weight (measured in thousand or million tons) and (2) freight moved by both its weight and distance covered (measured by ton-kilometers). We measure rail freight demand by ton-kilometers, which is a more appropriate measure of freight demand. Many empirical rail freight studies have used ton-kilometer or ton-miles as a measure of rail freight transport demand (see, for example, Kulshreshtha et al., 2001; Rao, 1978; Wijeweera et al., 2014). We focus on the major factors affecting rail freight demand in Pakistan.
+Freight Rate: Rail freight demand, like demand for many other products, is a function of its own price, which is rail freight rate. Rail freight rate is the rate charged by rail authorities for moving freight (measured as ton-kilometers) from its origins to destinations. Since time series data on actual rail freight rate is not available for Pakistan, we use a proxy of rail freight rate as average-rate-chargedper-ton-per-kilometer. It can be derived by taking ratio of total annual rail freight earnings to total annual ton-kilometers performed by rail freight. The expected sign of the coefficient associated with freight rate is negative (as per law of demand).
+Gross Value Added (GVA): Since freight transport can also be perceived as an input or cost in production process, it can also be related to economic activity. There are number of indicators that can be used to represent aggregate economic activity. These are gross domestic product (GDP), gross value added (GVA) and industrial production. All three indicators have been used in aggregate empirical freight transport studies for economic activity (Andersson and Elger, 2012; Kulshreshtha et al., 2001; Shen et al., 2009). However, gross value added (GVA) quantifies the value added to goods and services produced and represent the contribution to the economy by producers or wider industry. The gross values added (GVA) by goods producing sector is more closely related to goods movements than GDP. So, therefore, we measure the economic activity by making use of gross value added (GVA), which can be a better measure of aggregate domestic production activities.
+International Trade: Trade variable is included in our model to capture the impact of goods movements with other trading countries on rail freight demand in Pakistan. Theoretically, an increase in trade with other countries is likely to increase aggregate freight demand in Pakistan, including rail freight. Some of existing aggregate empirical rail freight studies have also incorporated trade variable in their analysis (see, for example, Andersson and Elger, 2012; Wijeweera et al., 2014) We measure international trade as sum of imports and exports of Pakistan and expressed in local currency units (million rupees).
+Fuel Price: Trucking is the main competitor of rail freight in Pakistan. However, time series data regarding trucking rates are not available. Therefore, fuel price, particularly the price of high-speed diesel is used as an approximation for trucking costs. So, fuel price is used to measure the cross-price elasticity of rail freight transport. The previous studies have estimated the cross-price elasticity of rail freight transport (FitzRoy and Smith, 1995; Oum, 1989) The expected sign of fuel price is positive and is measured in rupees/liter.
+In addition, many service quality indicators such as route coverage, frequency and reliability are also highly relevant to rail freight transport. However, the absence of long time series data on these variables limits their use in our analysis.
+The time series data on ton-kilometers and average revenue per-ton-per-kilometer is taken from various issues of Pakistan Railway Yearbook (PRY). The data regarding fuel (diesel) price is obtained from various issues of Pakistan Energy Yearbook (PEY). The data related to international trade and gross value added (GVA) is taken from the Handbook of Statistics on Pakistan Economy (2015).
+
+3.2. Econometric model
+
+Our theoretical model of rail freight demand is given as follows:
+TKMt ¼ fðF Rt; GVAt; Tradet; Fuel PricetÞ
+Symbols TKM F_R GVA
+
+(3.1)
+Variables
+Ton-kilometer Freight-rate Gross value added
+
+Rail freight demand model in equation (3.1) is only a theoretical (mathematical) model. For estimation, an empirical log-log specification of equation (3.2) can be written as follows:
+
+lnTKMt ¼ ∅0 þ ∅1lnðF RtÞ þ ∅2 lnðGVAtÞ þ ∅3 lnðTradetÞ þ ∅4 lnðFuel PricetÞ þ ut
+
+(3.2)
+
+7
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+Here ut is the error-term of estimated model. The ∅i’s parameters represent the long-run elasticities of rail freight demand. Since we are dealing with time series data, it is suitable to first consider the stationarity properties of all variables before selecting any appropriate econometric method. Many aggregate time series variables, in most cases, follow non-stationary behavior (stochastic trend). However, ignoring non-stationarity, in a regression model, may provide spurious relationships and invalid statistical inferences (Lin and Brannigan, 2003; Shrestha and Bhatta, 2018). The stationary or non-stationary behavior of a time series is generally verified on the basis of unit root tests. Two popular unit root tests are augmented Dickey-Fuller (ADF) test and Phillip-Perron (PP) test, proposed by Dickey and Fuller (1979) and Phillips and Perron (1988). The null hypothesis of both ADF and PP tests are based on the assumption that the underlying series (variable) is non-stationary while the series is stationary in alternative hypothesis. A variable will be considered non-stationary if the test statistic of both ADF and PP tests happens to be greater than the relevant critical values associated with these tests. For appropriate statistical analysis, the non-stationary series can be transformed to a stationary process through differencing, which depends on the integrated order of a non-stationary series. However, when all variables in a regression model are non-stationary with same order of integration (integrated of order one e-g. I(1)), then time series econometric literature suggests for testing the co-integration relationship between them. The basic idea of co-integration is that if a linear combination of non-stationary variables is stationary, then variables are cointegrated. The two common tests of co-integration are two-step Engle-Granger test and system based Johansen co-integration test, proposed by Engle and Granger (1987) and Johansen (1988). We choose Johansen co-integration and vector error correction model to estimate both long and short-run elasticities of rail freight demand. The choice of Johansen’s system based method is more appropriate in case of multi variables. In general, at most ‘k-1’ co-integrating relationships may exist for ‘k’ number of variables in a system. However, testing ‘k-1’ co-integrating relationships for ‘k’ variables is not possible in Engle-Granger co-integration test. Moreover, Johansen co-integration test may also be superior over Engle-Granger test when feedback effects from price (freight rate) are important for decisions regarding the demand for rail freight transport (Kulshreshtha et al., 2001). Johansen’s co-integration procedure is based on following steps: First, an unrestricted reduced form vector autoregressive (VAR) model, containing all variables (such as ton-kilometers, freight rate, gross value added, international trade and fuel price), will be estimated for various lags and then a model with optimal lag length will be determined using some information criterion. Two most useable criterions, Schwarz information criterion (SIC) and Akaike information criterion (AIC), will be used. Second, Johansen proposed two likelihood ratio tests as trace statistic (λtrace) and maximum-eigenvalue statistic (λmax) to determine the existence and number of co-integrating relationships. For ‘k’ variables, the trace statistic proceeds sequentially by testing the null hypothesis of exactly ‘r’ co-integrating vectors (where r ¼ 0, 1, 2, …., k) against a more general alternative hypothesis of testing more than ‘r’ co-integrating vectors until we fail to reject the null. Maximum-eigenvalue test is similar to trace statistic except for the alternative hypothesis. The alternative hypothesis in maximum-eigenvalue statistic tests for exactly ‘r þ 1’co-integrating vectors instead of testing a general more than ‘r’ co-integrating vectors. If both likelihood ratio tests provide evidence in favor of existence of unique co-integration relationship, then long-run relationship among the determinants of rail freight demand is provided by equation (3.2) whereas ∅i’s are treated as long-run elasticities. Finally, error correction model is used to capture the short-run dynamics of model. The short-run error correction model of rail freight demand is given by the following equation:
+
+Xl1
+
+Xl2
+
+Xl3
+
+Xl4
+
+Xm
+
+ΔlnTKMt ¼ b0 þ λECTtÀ 1 þ b1iΔlnF RtÀ i þ b2iΔlnGVAtÀ i þ b3iΔlnTradetÀ i þ b4iΔlnFuel pricetÀ i þ ciΔlnTKMtÀ i
+
+i¼0
+
+i¼0
+
+i¼0
+
+i¼0
+
+i¼1
+
+þ et
+
+(3.3)
+
+Where Δ represents the 1st difference operator,
+ECTtÀ 1 ¼ lnTKMtÀ 1 À ð∅1lnðF RtÀ 1Þ þ ∅2 lnðGVAtÀ 1Þ þ ∅3 lnðTradetÀ 1Þ þ ∅4lnðFuel PricetÀ 1ÞÞ
+λ represents the error correction term such that À 1 < λ < 0, otherwise short-run deviations from long-run equilibrium relationship will not converge back to the equilibrium as time elapses. In that case, it makes short-run error correction model inconsistent with longrun. Moreover, the significance of error correction term further reinforces the long-run co-integration relationship. Parameters l1, l2, l3, l4 and m are the optimal lags to be selected so as to make residuals et white-noise whereas others b10, b20, b30, and b40 are treated as short-run elasticities of rail freight demand.
+
+4. Results and discussion
+
+The pre-requisite of Johansen co-integration analysis is to first check for time series properties of each individual series. To provide consistency to the results, we employ two unit root tests namely augmented Dickey-Fuller (ADF) and Phillips-Perron (PP) test on each individual series to determine the order of integration and results are provided in Table 3. As both tests performed on each variable, the null hypothesis of unit root at level cannot be rejected except for the trade, where the null of unit root is marginally rejected at 10% level of significance. However, null hypothesis of unit root is significantly rejected when applied to the first difference of each series. Consequently, it can be concluded that all the variables are integrated of order one e-g. I(1) processes.
+
+8
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+Table 3 Unit root tests.
+Variable
+T_KM F_R GVA Trade PHSD
+
+ADF
+Levels
+À 2.09 (2) À 1.70 (0) À 2.19 (0) À 2.66***(0) À 1.27 (1)
+
+First difference
+À 5.87* (1) À 5.07* (0) À 5.09* (0) À 6.05* (0) À 5.62* (0)
+
+Phillips-Perron (pp)
+Levels
+À 2.13 À 1.67 À 2.04 À 2.73*** À 1.12
+
+First difference
+À 3.05* À 4.93* À 5.14* À 6.25* À 5.63*
+
+Result
+I[1] I[1] I[1] I[1] I[1]
+
+Notes: Both ADF and PP tests involve regression with intercept only. Each variable is converted in natural log form. The lag lengths are decided on the basis of Schwarz information Criterion (SIC) and optimal lag length for ADF test is given in parentheses. ***,** and * Indicates rejection of null hypothesis of unit root at 10%, 5% and 1% level of significance. The values in square-brackets represent the order of integration.
+
+Since all variables are integrated of order one, it is meaningful to consider the long-run co-integration relationship between them with the help of Johansen co-integration test. First, an unrestricted vector autoregressive model (VAR) is estimated by considering all variables (ton-kilometers, freight rate, gross value added, trade and fuel price) as endogenous. Since rail freight has sharply declined for period 2010 to 2013, an exogenous dummy variable is also included in Johansen co-integration test to capture the outliers associated with the period 2010–2013. We generate dummy variable by using a value of ‘1’ in these four years from 2010 to 2013 and ‘0’ in all remaining years. The optimal lags are selected by estimating an unrestricted vector autoregressive model. Ignoring an optimal lag length may result in non-Gaussian residuals which can further invalidate the inferences. Table 4 provides the optimal lag length based on four different criterions. Majority of criterions suggest an optimal lag length of 2, except Schwarz information criterion (SIC). So, we select an optimum lag length of 2, given that our data is on annual basis. Moreover, at lag 2, the residuals from unrestricted vector autoregressive model are free from problems of serial correlation, heteroscedasticity and non-normality.
+After selecting an optimal lag, we have performed the Johansen multivariate co-integration test to determine the existence and number of co-integration relationships. The results of Johansen co-integration analysis, based on two tests such as Trace statistic (represented by λtrace) and Maximum Eigen-value statistic (λmax value) along with 95% critical values are provided in Table 5. In comparison, testing for no co-integration or r ¼ 0 against at most one co-integrating vector, both values of λtrace and λmax are greater than their 5% critical values. However, further null hypothesis of one co-integrated vector against an alternative hypothesis of two or more co-integrated vectors cannot be rejected by the both tests. Hence both tests provide evidence in favor of the existence of unique long-run relationship.
+We now move to the discussion regarding long-run elasticities of rail freight demand after having established a single long-run relationship represented by single co-integrating vector given in the last row of Table 5.
+In order to interpret the long-run relationship, we need to reverse the sign of coefficients provided by the co-integrating vector.6 The first determinant of rail freight demand is freight rate (F_R), which has a significant negative relationship with rail freight demand, confirming the law of demand. The long-run elasticity of rail freight demand with respect to freight rate is À 0.39, which is quite inelastic. It means that all else equal if rail authorities increase the freight rate by 10%, as a result, the demand for rail freight transport will decrease by 3.9%, which is less than the increase in average freight rate in percentage term. This relationship is significant at 5% level. It implies that rail management can increase its freight revenues by increasing average freight rate without reducing much of its freight, due to the inelastic nature of price elasticity of rail freight demand.
+Some earlier empirical studies on aggregate rail freight demand have also estimated a significant but low freight price effect. For example, Kulshreshtha et al. (2001) analyze rail freight demand for Indian railways and find that own price (freight rate) elasticities are significant, with coefficient of elasticities are in a range of À 0.099 to À 0.287, for all samples used in the study. Wijeweera et al. (2014) estimate Australian non-bulk rail freight demand with the help of vector auto-regressive (VAR) model and the results show that freight rate exerts a negative significant effect on rail freight demand.
+The effect of economic activity (measured as gross values added (GVA) on rail freight demand is positive and the relationship is also significant at 1% level. The result, in terms of elasticity, can be interpreted as follows; a 10% increase in gross value added (GVA) will produce 0.84% increase in rail freight demand. The relationship between gross value added and rail freight demand is relatively more sensitive and elastic. Our results are, in general, similar to the existing empirical literature of aggregate rail freight studies that the relationship between rail freight demand and economic activity (different indicators) is positive and significant. For example, Kul­ shreshtha et al. (2001) observe a positive and significant effect of GDP on aggregate rail freight demand for India, with GDP elasticity varies between 0.83 and 0.91. Ramanathan (2001) also find that the long-run elasticity of aggregate (air, rail and road) freight
+
+6 Johansen’s test reports the long-run relationship in terms of co-integrating vector β. If we assume that a unique co-integration relationship exists, the long-run rail freight demand equation (3.2) can be written as: lnTKMt À ∅0 À ∅1lnðF Rt Þ À ∅2 lnðGVAt Þ À ∅3 lnðTradet Þ À ∅4 lnðFuel ​ Pricet Þ ¼ ut or in vector-form βxt ¼ ut where β ¼ ½1; À ∅0; À ∅1; À ∅2; À ∅3; À ∅4� is the long-run co-integrating vector normalized to ton-kilometers (1st variable) and xt ¼ ½TKMt; F Rt; GVAt; Tradet; Fuel ​ Pricet�’ is the vector of variables. The left-side of above equation represents linear combination of non-stationary variables (ton-kilometers, freight-rate, gross-value-added, trade and fuel-price) that should be stationary for co-integration to exist. Since all long-run elasticities (∅i’s) in co-integrating vector β are estimated by using all exogenous variables on left-side of equation with opposite sign, their signs should be reversed to restore the long-run rail freight demand equation (3.2).
+9
+
+M.Z. Khan and F.N. Khan
+
+Table 4 Optimal Lag selection criteria using Unrestricted VAR model.
+
+Lag
+
+LR
+
+0
+
+NA
+
+1
+
+384.0072
+
+2
+
+39.4220a
+
+3
+
+26.2439
+
+4
+
+19.6517
+
+LR: sequential modified LR statistic (each test at 5% level). AIC: Akaike information criterion. SC: Schwarz information criterion. HQ: Hannan-Quinn information criterion.
+a Indicates lag order selected by the criterion.
+
+AIC
+À 0.1210 À 10.1958 À 10.3357a À 10.2097 À 10.0245
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+SC
+0.2969 À 8.7330a À 7.8280 À 6.6571 À 5.4271
+
+HQ
+0.0311 À 9.6631a À 9.4225 À 8.9160 À 8.3530
+
+Table 5 Johansen Co-integration using λmax and λTrace Tests (intercept and no trend in CE).
+
+Null Hypothesis
+
+Alternative Hypothesis
+
+λTrace Test
+
+Eigenvalue
+
+λTrace Value
+
+r¼0 r�1 r�2 r�3
+
+r >0 r >1 r >2 r >3
+
+0.6736 0.4411 0.2861 0.1674
+
+93.6300 47.7177 23.8590 10.0358
+
+λmax Test
+
+Eigenvalue
+
+λmax Value
+
+r¼0 r¼1 r¼2 r¼3
+
+r ¼1 r ¼2 r ¼3 r ¼4
+
+0.6736 0.4411 0.2861 0.1674
+
+45.9123 23.8587 13.8231 7.5123
+
+Co-integrating Equation: Normalized co-integrating coefficients
+
+Variable
+
+TKM
+
+F_R
+
+GVA
+
+Co-efficient
+
+1
+
+0.39** (0.18)b
+
+À 0.84* (0.19)
+
+a Note: r denotes the number of co-integrating relationships. b Values in parentheses are standard errors. *, **, and,*** represents significance at 1% and 5% and 10% level, respectively.
+
+5% critical value
+76.9327 54.0790 35.1927 20.261
+34.805 28.588 22.299 15.892
+Trade 0.38 (0.24)
+
+Prob.
+0.001* 0.163 0.471 0.636
+0.001* 0.179 0.478 0.2491
+PHSD À 0.25*** (0.14)
+
+Table 6 Estimation results of short-run vector error correction model of Rail freight demand in Pakistan.
+
+Variables
+
+Coefficient
+
+Standard errors
+
+D(log(F_R)) D(log(GVA)) D(log(Trade)) D(log(PHSD ))
+D(log(TKM(-1))) ECTt-1 Constant Dummy effect Model’s diagnostics F-statistic Durbin-Watson Residuals diagnostics Breusch-Godfrey LM Test Harvey Heteroscedasticity Test ARCH Test Jarque-Bera Test
+
+À 0.28* 0.51* À 0.30 0.16 0.32* À 0.53* À 0.01 À 0.75
+32.20 2.09
+1.68 1.81 0.001 2.65
+
+0.13 0.21 0.20 0.11 0.10 0.054
+0.13
+[0.00]
+[0.11] [0.08] [0.96] [0.26]
+
+Notes: values in square brackets represents p-values. The estimation of short-run model is done using 1st difference and lag of 1st difference. Breusch-Godfrey LM test and auto-regressive conditional heteroskedastic test involve one lag. *, **, *** Represent the level of significance at 1%, 5% and 10%, respectively.
+
+10
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+transport with respect to industrial output is 1.18. Similarly, Shen et al. (2009) use six econometric models to estimate the relationship between UK aggregate (road plus rail) freight
+transport demand and industrial production. The results indicate that long-run production elasticity of road plus rail freight, based on four econometric models, is greater than 1. We also find that international trade and rail freight are negatively related. However, the observed relationship is not significant at conventional levels.
+On the other hand, the cross price elasticity of rail freight demand with respect to trucking cost (fuel price) is 0.25, which is statistically significant at 10% level. In particular, a 10% increase in trucking cost is associated with an increase in rail freight demand by 2.5%. The variation in rail freight demand with respect to trucking cost is quite inelastic. It implies that road and rail are substitutes in handling domestic inland freight transport. However, the effect of trucking cost (fuel price) on rail freight is less dominant because trucking provides relatively more reliable, certain, flexible and door-to-door services as compared to rail. FitzRoy and Smith (1995) also estimate the impact of trucking cost (diesel price) on the demand for rail freight transport of fifteen European countries. Their results show that rail freight elasticity of trucking cost is 0.93, which is statistically significant at 10% level of significance.
+
+4.1. Discussion on the short-run elasticities of rail freight demand in Pakistan
+After discussing the long-run elasticities of rail freight demand in Pakistan, we now consider the short-run error correction model of rail freight demand. To measure the long-run relationships, an optimal lag length of 2 is selected. Since all variables are used in differenced form to estimate the short-run parameters, the optimal lag 1 is used for error correction model. The results are reported in Table 6. All coefficients corresponding to the first difference of right side variables are treated as short-run elasticities.
+The short-run elasticities are significantly lower than the long-run elasticities. Moreover, all short-run elasticities are also statis­ tically significant, except for trade and fuel price. In particular, the freight rate and production elasticities of rail freight, in short-run, are À 0.28 and 0.51, respectively. Both elasticities are highly significant at 1% level of significance. However, short-run cross price elasticity is positive but insignificant. It implies that an increase in cost of trucking, in short-run, will not induce the road shippers to substitute rail for their shipments. This may happen due to different factors, such as uncertainty associated with rail operations, limited capacity (freight wagons and locomotives) and less flexibility. The dummy variable is negative and highly significant at 1% level. Since it is used to capture the outliers in rail freight, its significance provides further justification of its use in the rail freight model.
+An important feature of short-run rail freight demand equation is the error-correction term ECTt-1, which matters for the stability of long-run model of rail freight demand. The value of error correction term is À 0.53 and is significant at 1% level. It shows that, for any last period deviations (errors) from long-run relationship, short-run adjustment in rail freight demand takes place in such a way that 53% of the deviation from long-run equilibrium is corrected in the following period to restore the long-run equilibrium relationship.
+We now discuss the overall performance of short-run rail freight demand model. Panel 1 in Table 6 contains the model’s di­ agnostics. F-statistic also provides further evidence that all explanatory variables in the model are significant. Finally, Durbin-Watson statistic suggests that residuals of short-run rail freight demand are free from autocorrelation.
+In addition, a number of diagnostic tests are performed which assist us to check the appropriateness of estimated short-run model of rail freight demand. The results are given by panel 2 in Table 6. A high p-value of Breusch-Godfrey LM test implies that null of no residual serial correlation cannot be rejected. So, the residuals are free of serial correlation. For testing heteroscedasticity in residuals, we performed Harvey test and observed that p-value is greater than 5% significance level, showing no sign of heteroscedasticity in model’s residuals at 5% level of significance.7 Similarly, we also find that there is no autoregressive conditional heteroskedastic (ARCH) effect in the residuals. Finally, reported value of Jarque-Bera test is low, which implies that residuals are normally distributed.
+5. Conclusion
+Rail is preferable mode of transport in terms of handling long haul freight and also because of less deteriorating impact on envi­ ronmental quality. In this study, we analyzed the empirical relationship between aggregate rail freight transport demand in Pakistan and its determinants such as economic activity, freight rate, international trade and fuel price. For that, time series data is used for period 1972–2017. The unit root tests like augmented Dickey-Fuller and Phillips-Perron tests have shown that all variables are in­ tegrated of order one. The Johansen co-integration and error correction model is employed to estimate the short and long-run elas­ ticities of rail freight demand.
+The estimation results show that freight rate and aggregate economic activity (gross value added) are most significant determinants of rail freight demand in Pakistan, both in the short and long-run. We have also estimated the cross price elasticity of rail freight demand with respect to trucking cost and have found that long-run cross price elasticity is positive and significant at 10% level. Moreover, ECM is estimated to capture the short-run elasticities and dynamics. The speed of adjustment coefficient has indicated that 53% of the error, committed in the previous period, is corrected in the following period to restore the long-run equilibrium. Finally, several diagnostic tests have been conducted to ascertain the validity of estimated elasticities from the ECM. These tests proposed that estimated model is valid and can further be used for forecasting and policy purposes.
+The estimated long-run aggregate economic activity and freight rate elasticities of rail freight transport are 0.84 and À 0.39 while the same elasticities, in the short-run, are 0.51 and À 0.28, respectively. Since short and long-run freight rate elasticities are both quite
+
+7 we omit White heteroskedasticity test due to the number of insufficient observations to perform the test. 11
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+inelastic, it implies that rail authorities can increase freight revenues by raising freight rate, without losing most of the freight. The additional freight revenues may either be used to reduce the huge deficit of Pakistan railway or to purchase more freight wagons and locomotives. On the other hand, economic activity elasticities of rail freight demand are relatively more elastic and offer important implications for rail freight. It indicates that the demand for rail freight will likely to increase with the economic growth of Pakistan. Similarly, the long-run cross price elasticity, with a value of 0.25, also suggest that rail freight is likely to increase with the cost of trucking, measured by fuel price. So, increasing the road fuel taxes, particularly on the high-speed diesel, can be helpful for modal split in favor of rail freight.
+The Government of Pakistan, in its official document of vision 2025, aims to increase the share of rail from 4% to 20% during 10 years from 2015 to 2025 (Planning Commission, 2014). For that, it adopts different strategies and investment plans to achieve its objective. The above analysis may also be helpful for planners in this regard. So, our analysis suggests that rail freight is likely to increase in the future as a result of economic growth in the country. Moreover, increase in trucking costs and prudent policies regarding freight rates are also important for promoting rail freight transport in Pakistan.
+
+Appendix A. Supplementary data
+
+Supplementary data to this article can be found online at https://doi.org/10.1016/j.jrtpm.2019.100176.
+
+References
+Andersson, F.N.G., Elger, T., 2012. Swedish freight demand: short, medium, and long-term elasticities. J. Transp. Econ. Policy (JTEP) 46 (1), 79–97. Babcock, M.W., Gayle, P.G., 2014. Specifying and estimating a regional agricultural railroad demand model. J. Transp. Res. Forum 53, 35–48 (Transportation
+Research Forum). Beenish, H., Mehmood, B., Yousaf, U.S., Sattar, M.Y., 2016. Nexus between economic growth and railways in Pakistan: cointegration estimation with multiple
+structural break test and causality analysis. Sci. Int. 28 (3), 2743–2746. Ben-Akiva, M., Meersman, H., Van de Voorde, E., 2013. Freight Transport Modelling. Emerald group publishing limited. Chapman, L., 2007. Transport and climate change: a review. J. Transp. Geogr. 15 (5), 354–367. Choudhary, M.A., Khan, N., Arshad, M., Abbas, A., 2009. Analyzing Pakistan’s freight transportation infrastructure using Porter’s framework and forecasting future
+freight demand using time series models. In: 2nd, WSEAS International Conference on Urban Planning and Transportation; Recent Advances in Urban Planning and Transportation; 2009, pp. 70–77 (Rhodes, Greece). Chow, J.Y.J., Yang, C.H., Regan, A.C., 2010. State-of-the art of freight forecast modeling: lessons learned and the road ahead. Transportation 37 (6), 1011–1030. Chung, S.H., Kang, K.W., 2015. A comparative study on the forecasting accuracy of econometric models: domestic total freight volume in South Korea. J. Kor. Soc. Transp. 33 (1), 61–69. Clark, C., Naughton, H.T., Proulx, B., Thoma, P., 2005. A Survey of the Freight Transportation Demand Literature and a Comparison of Elasticity Estimates. Institute for Water Resources US Army Corps of Engineers Alexandria, Virginia. De Jong, G., Gunn, H., Walker, W., 2004. National and international freight transport models: an overview and ideas for future development. Transp. Rev. 24 (1), 103–124. Dickey, D.A., Fuller, W.A., 1979. Distribution of the estimators for autoregressive time series with a unit root. J. Am. Stat. Assoc. 74 (366a), 427–431. Engle, R., 1974. Band spectrum regression. Int. Econ.Rev. 15 (1), 1–11. Engle, R.F., Granger, C.W.J., 1987. Co-integration and error correction: representation, estimation, and testing. Econometrica: J. Econ. Soc. 55, 251–276. FitzRoy, F., Smith, I., 1995. The demand for rail transport in European countries. Transp. Policy 2 (3), 153–158. Fitzsimmons, E.L., 1981. A statistical sketch of the demand for rail transport of grain and soybeans. Transp. J. 20, 59–65. Givoni, M., Brand, C., Watkiss, P., 2009. Are railways climate friendly? Built. Environ. 35 (1), 70–86. Government of Pakistan, 2008. Transport and Communications. Retrieved from. http://www.finance.gov.pk/survey/chapters/14-Transport final08.pdf. Government of Pakistan, 2009. Economic Survey of Pakistan. Retrieved from. http://www.finance.gov.pk/survey/chapter_10/14_Transport.pdf. Government of Pakistan, 2012. Economic Survey of Pakistan. Retrieved from. http://www.finance.gov.pk/survey/chapters_13/13-Transport final.pdf. Government of Pakistan, 2013. Transport and Communications. Retrieved from. http://www.finance.gov.pk/survey/chapters_14/13_Transport_and_coms.pdf. Japan International Cooperation Agency, 2004. Diesel Electric Locomotives Rehabilitation Project (1) and Diesel Electric Locomotives Production Project (2). Retrieved from. https://www.jica.go.jp/english/our_work/evaluation/oda_loan/post/2005/pdf/2-30_full.pdf. Johansen, S., 1988. Statistical analysis of cointegration vectors. J. Econ. Dyn. Control 12 (2–3), 231–254. Kulshreshtha, M., Nag, B., Kulshrestha, M., 2001. A multivariate cointegrating vector auto regressive model of freight transport demand: evidence from Indian railways. Transp. Res. A Policy Pract. 35 (1), 29–45. https://doi.org/10.1016/S0965-8564(99)00046-4. Lewis, Kenneth A., Widup, David Paul, 1982. Deregulation and rail-truck competition: evidence from a translog transport demand model for assembled automobiles. J. Transp. Econ. Policy 16, 139–149. Lin, Z., Brannigan, A., 2003. Advances in the analysis of non-stationary time series: an illustration of cointegration and error correction methods in research on crime and immigration. Qual. Quantity 37 (2), 151–168. Marcos, C.B., Martos, L.P., 2012. Estimating the demand for freight transport: the private versus public trade-off in andalusian food industry. Available at: Encuentros. Alde.Es/Anteriores/Vieea/Autores/B/36.Doc. (Accessed 5 March 2018). Miljkovic, D., Price, G.K., Hauser, R.J., Algozin, K.A., 2000. The barge and rail freight market for export-bound grain movement from midwest to Mexican Gulf: an econometric analysis. Transp. Res. E Logist. Transp. Rev. 36 (2), 127–137. https://doi.org/10.1016/S1366-5545(99)00025-3. Mitchell, D., 2010. Australian intercapital freight demand: an econometric analysis. In: 33rd Australasian Transport Research Forum (ATRF) 2010 Proceedings, 29 September-1 October. Citeseer, Canberra, Australia. Nelldal, B.-L., Andersson, E., 2012. Mode shift as a measure to reduce greenhouse gas emissions. Procedia-Soc. Behav. Sci. 48, 3187–3197. NTRC and JICA, 2006. Pakistan Transport Plan Study in the Islamic Republic of Pakistan. Islamabad. Retrieved from. http://open_jicareport.jica.go.jp/pdf/11821907_ 02.pdf. Nuzzolo, A., Coppola, P., Comi, A., 2013. Freight transport modeling: review and future challenges. Int. J. Transp. Econ./Rivista Int. Econ. Trasp. 151–181. Oum, T.H., 1979. Derived demand for freight transport and inter-modal competition in Canada. J. Transp. Econ. Policy 13, 149–168. Oum, T.H., 1989. Alternative demand models and their elasticity estimates. J. Transp. Econ. Policy 23 (2), 163–187. Oum, T.H., Waters, W.G., Yong, J.S., 1990. A Survey of Recent Estimates of Price Elasticities of Demand for Transport. Infrastructure and Urban Development Department No. 359, Washington, DC. Oum, T.H., Waters, W.G., Yong, J.-S., 1992. Concepts of price elasticities of transport demand and recent empirical estimates: an interpretative survey. J. Transp. Econ. Policy 26 (2), 139–154.
+12
+
+M.Z. Khan and F.N. Khan
+
+Journal of Rail Transport Planning & Management 14 (2020) 100176
+
+Pakistan Railway, 2018. The Success Story 2013-18. Retrieved from. https://www.pakrail.gov.pk/images/downloads/TheSuccessStory2013_2018.pdf. Phillips, P.C.B., Perron, P., 1988. Testing for a unit root in time series regression. Biometrika 75 (2), 335–346. Planning Commission, 2014. Pakistan Vision 2025. Ministry of Planning. Porter, M.E., 1980. Competitive Strategy: Techniques for Analyzing Industries and Competitors. Free Press, New York. Productivity Commission, 2006. Road and Rail Freight Infrastructure Pricing. Inquiry Reports. Productivity Commission, Government of Australia. https://doi.org/
+10.2139/ssrn.1018886. Ramanathan, R., 2001. The long-run behaviour of transport performance in India: a cointegration approach. Transp. Res. A Policy Pract. 35 (4), 309–320. https://doi.
+org/10.1016/S0965-8564(99)00060-9. Rao, P.S., 1978. Forecasting the demand for railway freight services. J. Transp. Econ. Policy 7–26. Retrieved from. http://www.jstor.org/stable/10.2307/20052487. Regan, A.C., Garrido, R.A., 2001. Modelling freight demand and shipper behaviour: state of the art, future directions. In: Hensher, D. (Ed.), Travel Behaviour
+Research. Pergamon-Elsevier Science. Shen, S., Fowkes, T., Whiteing, T., Johnson, D., 2009. Econometric modelling and forecasting of freight transport demand in Great Britain. In: Proceedings of
+European Transport Conference, 5-7 October. Noordwijkerhout. Citeseer, The Netherlands. Shrestha, M.B., Bhatta, G.R., 2018. Selecting appropriate methodological framework for time series data analysis. J. Financ. Data Sci. 4 (2), 71–89. South Asia Terrorism Portal, 2018. Terrorist Attacks on Railways in Pakistan. Retrieved September 24, 2019, from. https://www.satp.org/satporgtp/countries/
+pakistan/database/railwayattack.htm. Tavasszy, L., De Jong, G., 2013. Modelling Freight Transport. Elsevier. Wijeweera, A., To, H., Charles, M., 2014. An empirical analysis of Australian freight rail demand. Econ. Anal. Policy 44 (1), 21–29. https://doi.org/10.1016/j.
+eap.2014.01.001. Wilson, William W., W W W, W W K, 1988. Modal competition in grain transport. J. Transp. Econ. Policy 22, 319–337. Winston, C., 1983. The demand for freight transportation: models and applications. Transp. Res. A Gen. 17 (6), 419–427. Yu, T.-H., Fuller, S.W., 2005. The measurement of grain barge demand on inland waterways: a study of the Mississippi River. J. Transp. Res. Forum 44, 27–39. Zlatoper, T.J., Austrian, Z., 1989. Freight transportation demand: a survey of recent econometric studies. Transportation 16 (1), 27–46.
+
+13
+
+Update Journal of Rail Transport Planning & Management
+Volume 17, Issue , March 2021, Page
+DOI: https://doi.org/10.1016/j.jrtpm.2021.100237
+
+Journal of Rail Transport Planning & Management 17 (2021) 100237
+Contents lists available at ScienceDirect
+Journal of Rail Transport Planning & Management
+journal homepage: http://www.elsevier.com/locate/jrtpm
+Erratum regarding previously published articles
+The Declaration of Competing Interest statements were not included in the published version of articles that appeared in Volume 2 of Journal of Rail Transport Planning & Management. For the below articles, the authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Towards a conflict prevention strategy applicable for real-time railway traffic management [J. Rail Transport. Plann. Manag., 2019; 11(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Open access passenger rail competition in Slovakia – Experience from the Bratislava–Koˇsice line [J. Rail Transport. Plann. Manag., 2019; 12(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+A concurrent approach to the periodic event scheduling problem [J. Rail Transport. Plann. Manag., 2019; 15(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Long-distance rail prices in a competitive market. Evidence from head-on competition in Italy [J. Rail Transport. Plann. Manag., 2019; 12(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+A dynamic model for real-time track assignment at railway yards [J. Rail Transport. Plann. Manag., 2020; 14(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Competition for and in the passenger rail market: Comparing open access versus franchised train operators’ costs and reliability in Britain [J. Rail Transport. Plann. Manag., 2020; 12(C)] The authors were contacted after publication to request a Declaration of In­ terest statement.
+Extending UIC 406-based capacity analysis–New approaches for railway nodes and network effects [J. Rail Transport. Plann. Manag., 2020; 15(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Dynamic assignment model of trains and users on a congested urban-rail line [J. Rail Transport. Plann. Manag., 2020; 14(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Quantifying the effects of running time variability on the capacity of rail corridors [J. Rail Transport. Plann. Manag., 2020; 15(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Optimal running time supplement distribution in train schedules for energy-efficient train control [J. Rail Transport. Plann. Manag., 2020; 14(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+A multi-state train-following model for the analysis of virtual coupling railway operations [J. Rail Transport. Plann. Manag., 2020; 15(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Enhanced data reconciliation of freight rail dispatch data [J. Rail Transport. Plann. Manag., 2020; 14(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Maintenance scheduling within rolling stock planning in railway operations under uncertain maintenance durations [J. Rail Transport. Plann. Manag., 2020; 14(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Simulated and real train driving in a lineside automatic train protection (ATP) system environment [J. Rail Transport. Plann. Manag., 2020; 16(C)] The authors were contacted after publication to request a Declaration of Interest statement.
+Explaining dwell time delays with passenger counts for some commuter trains in Stockholm and Tokyo [J. Rail Transport. Plann.
+DOIs of original article: https://doi.org/10.1016/j.jrtpm.2019.100143, https://doi.org/10.1016/j.jrtpm.2020.100189, https://doi.org/10. 1016/j.jrtpm.2019.100176, https://doi.org/10.1016/j.jrtpm.2020.100199, https://doi.org/10.1016/j.jrtpm.2020.100177, https://doi.org/10. 1016/j.jrtpm.2019.100144, https://doi.org/10.1016/j.jrtpm.2020.100203, https://doi.org/10.1016/j.jrtpm.2020.100195, https://doi.org/10. 1016/j.jrtpm.2020.100196, https://doi.org/10.1016/j.jrtpm.2020.100201, https://doi.org/10.1016/j.jrtpm.2019.100175, https://doi.org/10. 1016/j.jrtpm.2019.100142, https://doi.org/10.1016/j.jrtpm.2020.100193, https://doi.org/10.1016/j.jrtpm.2020.100205, https://doi.org/10. 1016/j.jrtpm.2020.100198, https://doi.org/10.1016/j.jrtpm.2020.100178, https://doi.org/10.1016/j.jrtpm.2019.07.001, https://doi.org/10. 1016/j.jrtpm.2020.100180, https://doi.org/10.1016/j.jrtpm.2020.100206.
+https://doi.org/10.1016/j.jrtpm.2021.100237
+Available online 12 February 2021 2210-9706/© 2021 Published by Elsevier Ltd.
+
+Journal of Rail Transport Planning & Management 17 (2021) 100237
+Manag., 2020; 14(C)] The authors were contacted after publication to request a Declaration of Interest statement. Estimating the demand for rail freight transport in Pakistan: A time series analysis [J. Rail Transport. Plann. Manag., 2020; 14(C)]
+The authors were contacted after publication to request a Declaration of Interest statement. Dynamic and robust timetable rescheduling for uncertain railway disruptions [J. Rail Transport. Plann. Manag., 2020; 15(C)] The
+authors were contacted after publication to request a Declaration of Interest statement. Urban rail transit operation safety evaluation based on an improved CRITIC method and cloud model [J. Rail Transport. Plann.
+Manag., 2020; 16(c)] The authors were contacted after publication to request a Declaration of Interest statement. Hybrid integer-coded Wolf Pack Algorithm for multiple-type flatcars loading problem [J. Rail Transport. Plann. Manag., 2020; 16
+(c)] The authors were contacted after publication to request a Declaration of Interest statement.
+2
+

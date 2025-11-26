@@ -1,0 +1,556 @@
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC) | 978-1-6654-8018-5/22/$31.00 ©2022 IEEE | DOI: 10.1109/IPCCC55026.2022.9894336
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+FedMC: Federated Reinforcement Learning on the
+Edge with Meta-Critic Networks
+Derun Zou∗, Xusheng Liu†, Lintan Sun†, Jianhui Duan∗, Ruichen Li∗, Yeting Xu∗, Wenzhong Li∗, Sanglu Lu∗
+∗State Key Laboratory for Novel Software Technology, Nanjing University, Nanjing, China †State Grid Customer Service Center, State Grid Corporation of China, Tianjin, China
+
+Abstract—Federated learning (FL) has been proposed as a novel paradigm to enable distributed learning on the edge with privacy protection. However, existing federated learning approaches mainly focus on training deep classiﬁcation and clustering models, and no enough attention has been paid to solve the federated reinforcement learning task on the edge, a challenging task where multiple learning agents observe local state and take local actions to train a global learning model without revealing their local dataset. In this paper, we propose a generalised federated reinforcement learning framework called FedMC that integrates reinforcement learning models trained by multiple edge devices into a general model based on a metalearning approach. In the proposed framework, each participant adopts a meta-value network (MVN) and task-actor encoder network (TAEN) locally to perform meta-learning training based on local task samples, and periodically uploads the weights of local MVN and TAEN to the server, which aggregate them to a global model with rapid adaptability and cross-task applicability. Extensive experiments based on a number of reinforcement learning tasks show that FedMC outperforms various federated learning baseline algorithms, and it is competitive with the methods that centrally train reinforcement learning task with global dataset.
+Index Terms—Edge Computing, Federated Learning, Reinforcement Learning, Meta Learning
+I. INTRODUCTION
+Edge computing refers to the use of open platforms that integrate network, computing, storage, and application core capabilities on the side close to the source of objects or data for better quality of services [1–3]. Its applications are initiated on the edge side to generate faster network service responses and meet the basic needs of the industry in real-time business, application intelligence, etc. With the rapid development of artiﬁcial intelligence, there is an increasing trend to deploying machine learning models in the edge devices to improve the edge intelligence [4, 5].
+Reinforcement learning (RL) is a side branch of machine learning. It was used to describe and solve problems in which agents learn strategies to maximize rewards or achieve speciﬁc goals in the process of interacting with the environment, which is currently widely used in automatic driving, industrial
+This work was supported by the science and technology project from State Grid Corporation of China (No. 5700-202153172A-0-0-00). The corresponding authors are Wenzhong Li (Email: lwz@nju.edu.cn) and Sanglu Lu (sanglu@nju.edu.cn).
+
+automation, ﬁnancial trade and other ﬁelds [6, 7]. At present, there are many mainstream algorithms that can solve reinforcement learning tasks. The Deep Q-Networks (DQN) algorithm introduced a deep learning model ﬁnd the actions for an agent at each state. The Actor-Critic algorithm [8] jointly trains two networks, namely actor network and critic network, where the actor learns how to solve tasks and the critic learns how to effectively guide actor. Based on the Actor-Critic algorithm, researchers have proposed different improved solutions such as DDPG [9], A3C [10], SAC [11, 12] and so on.
+However, applying reinforcement learning in an edge computing environment encounters the following difﬁculties:
+• Global data is unavailable. Each edge device generates its own data, and it is reluctant to upload the data to the server due to privacy concerns and communication overhead.
+• Each edge device performs a separate reinforcement learning task and trains its own personalized model. These models have no migration ability and generalization, and their performances may suffer from degradation when being used in other environment.
+• The number of local samples generated from each edge device is limited, which maybe not enough to support the training of a good machine learning model at the edge.
+To tackle these problems, federated learning (FL) was proposed as a novel paradigm to enable distributed learning on the edge with privacy protection [13, 14]. In federated learning, mobile devices use their local data to collaboratively train the machine learning models required by the federated server. They then send the model updates (i.e. the model’s weights) to the server for aggregation. These steps are repeated for multiple rounds until the desired accuracy is achieved. Although federated learning has been widely studied to train deep classiﬁcation models [15–17], the study of using federated learning to train reinforcement learning models on the edge is limited. The work of FedRL [18] proposed a pioneer method which aims to train a global reinforcement learning by learning private Q-network for each agent with partial observations on the states. However, FedRL only focused on training a deep Q-network and it is hard to be generalised to the broader deep reinforcement learning scenarios on the edge.
+In this paper, we propose a generalised federated reinforcement learning framework called FedMC, which integrates
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+
+978-1-6654-8018-5/22/$31.00 ©2022 IEEE
+
+344
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+the reinforcement learning models trained by multiple edge devices into a general model based on a meta-learning approach. In the proposed framework, each participant adopts a meta-value network (MVN) and task-actor encoder network (TAEN) locally to perform meta-learning training based on local task samples, and periodically uploads the weights of local MVN and TAEN to the server. Then the server aggregates the received local models, and broadcasts the aggregated model to each participant to train the global model round by round. On one hand, meta-learning provides the model’s rapid adaptability and cross-task applicability. On the other hand, federated learning provides cross-device safe fusion and broadens the available training samples of the model.
+Our main contributions are summarized as follows:
+• We propose FedMC, a novel framework for solving reinforcement learning tasks through meta-learning using a federated learning paradigm on the edge devices. To the best of our knowledge, this is the ﬁrst attempt incorporating meta-learning for federated reinforcement learning for edge computing.
+• We proposed a federated meta Actor-Critic network model that consists of a meta-value network (MVN) and task-actor encoder network (TAEN) that can be trained with small number of local samples and aggregated to a global model with rapid adaptability and cross-task applicability, which is ideal for federated reinforcement learning on the edge.
+• We evaluate FedMC through experiments on a number of reinforcement learning tasks. For a ﬁxed number of interactions with the environment, FedMC outperforms various federated learning baseline algorithms, and it is on par with methods that centrally use meta-learning to train reinforcement learning tasks.
+II. RELATED WORKS
+We summarized the related works in the area of federated learning, reinforcement learning, meta learning, and federated reinforcement learning.
+Federated learning is a popular research topic in the recent years. The concept of federated learning was proposed in Google’s paper with the most famous federated learning algorithm called FedAvg [13]. In this framework, multiple users can participate in the process of training machine learning models. They use their own local training data to train their own exclusive network models, and then aggregate these participants’ models into a global model according to speciﬁc rules to ﬁt the training samples held by all participants. In recent years, more and more researchers have improved FedAvg and proposed many new federated learning algorithms. Li et al. proposed FedProx [15], which not only directly averages the parameters of each model, but also adds a penalty term to reduce the impact of the data distribution difference of local training samples. Wang et al. proposed FedMA [16], which combines the weights of neurons with similar characteristics based on the permutation invariance of neurons. Karimireddy et al. stated the problem of “client-drift” when the data is
+
+heterogeneous, and proposed the SCAFFOLD method [17] which uses variance reduction to correct for the client-drift in its local updates. Wang et al. proposed FedNova [19], a normalized averaging method that eliminates objective inconsistency while preserving fast error convergence.
+Our work is also related to reinforcement learning and its applications on the edge. In a reinforcement learning task, after an agent takes a speciﬁc action in a speciﬁc state, it can obtain a reward according to the transformation rules and transfer to a speciﬁc next state until the end of the task. The goal of reinforcement learning is to train an agent to make the action decision with the highest cumulative reward under a given state. When the single agent of reinforcement learning task is extended to multi-agent, edge computing can be applied to reinforcement learning training, that is, each agent is assigned to each edge device. Independent Q-learning (IQL) [20, 21] is such an application. In this method, each agent observes the global state, makes a decision on a single action, and obtains team rewards.
+There are extensive works on meta-learning and few-shot learning. Vinyals et al. considered to let deep learning model learn a new concept through a single sample, and proposed to use the metric approach of K-nearest neighbors to combine the parameterized model with the parameter-free model for training [22]. Ravi et al. proposed a meta-learner model for the few-shot ﬁeld, which can be directly learned to train another learner [23]. Koch et al. proposed a method of ﬁrst learning one-short classiﬁcation of convolutional Siamese network models, and can be extended to one-short learning in other ﬁelds [24]. With more and more attention to meta learning, many researchers applied few-shot learning in meta learning to reinforcement learning to try to train reinforcement learning agents that can quickly adapt to new tasks, such as the Meta-Critic Network proposed by ﬂood sung et al [25]. Other researchers use Recurrent Neural Networks (RNNs) as agents in reinforcement learning, taking the agent’s learning process as a goal and optimizing it with standard reinforcement learning algorithms, then used RNN to process multiple RL problems to achieve the purpose of learning reinforcement learning tasks using meta-learning [26, 27].
+Our work is most relevant to the work of Federated deep Reinforcement Learning (FedRL) proposed in [18]. FedRL proposed a novel deep reinforcement learning framework to federatively build models of high-quality for agents with consideration of their privacies. It tried to train a private Qnetwork to help each agent make decisions while only sharing limited information among them, and created a shared value network to get a global model’s output. Different from FedRL, our work adopts a meta reinforcement learning approach that incorporates meta learning and federated learning to distributively train reinforcement learning tasks with a Meta-Critic network framework [25], which has rapid adaptability and cross-task applicability for federated reinforcement learning on the edge.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+345
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+III. PROBLEM FORMULATION
+
+A. Prelimilary
+
+Federated learning uses edge devices such as smartphones,
+
+tablets, and computers held by users as working nodes, and
+
+uses local data saved by users in smart devices as data samples
+
+(instead of dividing large-scale training data and assigning
+
+them to each working node) to train the sub-models, and
+
+aggregates the sub-models of each working node according
+
+to a certain rule to obtain the global model. This method
+
+can make full use of the heterogeneity of local data between
+
+different users, and is suitable for many scenarios. For exam-
+
+ple, many different types of hospitals (eye hospitals, surgical
+
+hospitals, pediatric hospitals, etc) can work as participants to
+
+join federated learning to obtain a comprehensive machine
+
+learning model without sharing their local data to a central
+
+server.
+
+The FedAvg [13] algorithm was proposed by Mcmahan et
+
+al. in 2016, and it is the most basic algorithm in federated
+
+learning. The FedAvg algorithm can be used for non-convex
+
+loss functions encountered in deep neural network training,
+
+and is applicable to any of the following ﬁnite addition loss
+
+functions:
+
+1N
+
+min
+w∈Rd
+
+f (w)
+
+=
+
+n
+
+i=1
+
+fi(w).
+
+(1)
+
+In the above formula, n represents the number of training data, and w ∈ Rd represents the d-dimensional model parameters.
+Assuming that there are K participants in a federated learning system, let Dk represent the dataset owned by the k-th participant, and Pk represent the index set of data points located at customer k, and let nk = |Pk| represent the cardinality of Pk, the above formula can be rewritten as:
+
+f (w) =
+
+K
+
+nk n
+
+Fk
+
+(w),
+
+(2)
+
+k=1
+
+1
+
+Fk (w)
+
+=
+
+nk
+
+fi(w).
+i∈Pk
+
+(3)
+
+In the FedAvg algorithm, the central server performs a weighted average of the sub-model outputs of all participants based on their local data to achieve the effect of aggregating the sub-models of all participants. The sub-models with a larger number of local data samples will have a greater impact on the global model when they are aggregated. The training data of each participant is always kept locally and will not be accessed by other nodes in order to achieve the purpose of privacy protection.
+The actor-critic architecture [8] is a classic framework for learning RL tasks. It consists of two networks, which are known as actor and critic. The actor network is used to make action decisions. Given a state st, it can return an action at. Let its parameters be represented by θ, then the action can be represented by at = Pθ(st). The critic network whose parameters are represented by φ is used to evaluate the value brought by performing a speciﬁc action in a speciﬁc state.
+
+Given a state st and an action at that re from Pθ(st), it can return a value Qφ(st, at) to approximate an expected discounted reward rt + γQφ(st+1, at+1) that is considered to be the true label for learning.
+The actor network regards the output of the critic network as the ultimate reward, and it will try to maximize the output of the critic network. The critic network will try to predict more accurately to make its output approximating the expected discounted reward.
+B. Federated RL problem
+In this paper, we propose to solve the reinforcement learning problem on the edge by solving a number of meta-reinforcement learning tasks. Let Dtrain = {task1train, ..., taskmtrain} denote the set of training tasks, where taskitrain ∈ Dtrain denotes a speciﬁc reinforcement learning task. Ledt Dtest = {task1test, ..., taskmtest} denote the testing set, where taskitest ∈ Dtest denotes a speciﬁc reinforcement learning task sample that won’t appear in Dtrain.
+Since the local reinforcement learning task samples held by a single participant are limited, the objective is to incorporate federated learning and mete learning to obtain a metareinforcement task learner that can quickly learn a speciﬁc reinforcement learning task in a few steps. The solution of the problem will be discussed in the next section.
+IV. THE FEDMC FRAMEWORK
+We proposed a federated mete learning approach called FedMC to solve the problem. The overall framework is illustrated in FIg. 1, and the details are explained in the following.
+A. Meta-Critic Network
+In a speciﬁc reinforcement learning task, an agent can acquire a current state st at a speciﬁc time step t. If the agent performs an action at based on st, it can acquire a new state st+1 and a reward rt.
+In this part, we adopt the Meta-Critic in [25] as the framework for meta-learning locally on the clients. Meta-Critic uses the meta-learning methods for actor-critic training. Its goal is to train a set of networks (known as Meta-Critic), which can help a blank actor network learn to solve a kind of reinforcement learning tasks (not a speciﬁc task) in fewer steps. Note that the training data for meta-critic network is not a set of data samples, but a set of RL tasks.
+As illustrated in Fig. 1, in each client, all local tasks and local actor networks interact with a meta-critic, which consists of a meta-value network (MVN) and a task-actor encoder network (TAEN). The role of MVN is the same as the critic network in actor-critic. But in Meta-Critic, in addition to the state st and action at that is from Pθ(st), the input of MVN adds an embedded vector zt, that is an embedding vector to encode the historical experience of a speciﬁc actor network interacting with a speciﬁc task. This allows the Meta-Critic to capture the relationship between a speciﬁc task and a speciﬁc actor for the purpose of meta-learning. To get this embedding vector zt, the
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+346
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+Fig. 1: The framework of FedMC.
+
+Meta-Critic sets a TAEN, whose main body is an RNN and
+its parameters are represented by ω. We take the interaction history of a speciﬁc actor network with a speciﬁc task, Ltt−k = [(st−k, at−k, rt−k), (st−k+1, at−k+1, rt−k+1), ..., (st−1, at−1, rt−1)], as the input of the TAEN, so that the embedding vector zt = Cω(Ltt−k) can be obtained from its output.
+Assume the number of training RL tasks is M , each actor
+network and Meta-Critic will update its parameters according
+to the following formula [25]:
+
+θ(i)
+
+←
+
+arg
+
+max
+θ(i)
+
+Qφ
+
+(s(ti)
+
+,
+
+a(ti),
+
+zt(i)),
+
+∀i ∈ [1, 2, ..., M ] (4)
+
+M
+
+φ, ω ← arg min
+φ,ω
+
+(rt(i) + γQφ(s(t+i)1, a(t+i)1, zt(+i)1)
+
+i=1
+
+(5)
+
+−Qφ(s(ti), a(ti), zt(i)))2.
+
+network parameters according to the size of the local dataset to aggregate them as Eq. 7, and broadcasts the result to all participants as the starting network for the next round.
+
+N
+
+W t+1 = piWit,
+
+(7)
+
+i=1
+
+pi =
+
+|Di|
+
+N j=1
+
+|Dj
+
+|
+
+,
+
+(8)
+
+where Wt denotes the global model weight at the t-th communication round, and Wit denotes the local model weight located at the i-th participant at the t-th communication round.
+For each participant, the local MVN and TAEN’s parameters
+are updated through local training samples by the Meta-Critic
+algorithm with Eq. 9.
+
+Since the training task is a discrete-action RL task, the actor network outputs the probability distribution of all optional actions. Finally, we choose which type of action to execute according to the probability distribution, and use its one-hot vector to represent at, and the actor network is updated as follows [25]:
+
+wmc vn,t+1, wtcaen,t+1 ← M eta − Critic(c, wmvn,t, wtaen,t), (9)
+where wmc vn,t denotes the local MVN model located at the c-th participant after t communication rounds; wtcaen,t denotes the local TAEN model located at the c-th participant after
+t communication rounds; wmvn,t denotes the global MVN
+
+θ(i)
+
+←
+
+arg
+
+min
+θ
+
+l(o(ti),
+
+a(ti))Qφ(s(ti),
+
+a(ti),
+
+zt(i)),
+
+∀i
+
+∈
+
+[1,
+
+2,
+
+...,
+
+M]
+
+(6)
+
+model after t communication rounds; and wtaen,t denotes the global TAEN model after t communication rounds.
+
+where ot stands for probability distribution of action decisions, So the optimal MVN and TAEN models are as follows:
+
+and l(·, ·) stands for the cross entropy loss function.
+B. Federated Meta-Critic In the proposed federated Meta-Critic (FedMC) training
+method, each participant has a meta-value network (MVN)
+
+N
+
+φ, ω ← arg min
+φ,ω
+
+(Qφ(s(ti), a(ti), zt(i))−
+
+c=1 i∈Dc
+
+rt(i) − γQφ(s(t+i)1, a(t+i)1, zt(+i)1))2,
+
+(10)
+
+and a task-action encoder network (TAEN) locally. Each participant trains locally based on local training data samples,
+
+Wm∗ vn, Wt∗aen ← φ, ω.
+
+(11)
+
+and then updates the local MVN and TAEN’s parameters. The The framework of FedMC is illustrated in Figure 1, and
+
+central server periodically collects the local MVN and TAEN the pseudo-code of the FedMC algorithm is described in
+
+parameters of each participant, weights and averages these Algorithm 1.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+347
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+Algorithm 1 FedMC Algorithm
+
+Input: Clients set C, Number of iterations T
+
+Output: Federated MVN model wmvn,T , federated TAEN
+
+model wtaen,T
+
+1: Server executes:
+
+2:
+
+Initialize wmvn,0, wtaen,0
+
+3: For each round t = 0, 2, ..., T − 1 do
+
+4:
+
+For client id c = 1, 2, ...|C| in parallel do
+
+5:
+
+wmc vn,t+1, wtcaen,t+1 ←
+
+ClientUpdate(c, wmvn,t, wtaen,t)
+
+6:
+
+wmvn,t+1 ←
+
+|C| c=1
+
+pc
+
+wmc vn,t
+
+7:
+
+wtaen,t+1 ←
+
+|C| c=1
+
+pcwtcaen,t
+
+8:
+
+Return wmvn,T , wtaen,T
+
+9:
+
+10: ClientUpdate(c, wmvn, wtaen)
+
+11:
+
+Dc ← the local dataset at client c
+
+12: For each local epoch from 1 to E do
+
+13:
+
+wmvn,t, wtaen,t ←
+
+Meta-Critic Algorithm(Dc, wmvn,t, wtaen,t)
+
+14:
+
+wmc vn,t+1, wtcaen,t+1 ← wmvn,t, wtaen,t
+
+15:
+
+Return wmc vn,t+1, wtcaen,t+1
+
+• Local-Actor-Critic: It uses the standard actor-critic algorithm [28] to train directly on each meta test RL task locally. The actor model is used to solve the RL task, and the critic model is used to evaluate the current actor model. This is a local reinforcement learning approach without coordination among users.
+• Central-Meta-Critic: It is a centralized method to use a large number of RL tasks to train a TAEN for task coding and a MVN [25] for current value evaluation, so as to teach an agent to quickly learn to solve a speciﬁc RL task. It assumes global data is available in the server, which does not concerns the privacy as federated learning.
+• FedRL-Actor-Critic: It adapts the actor-critic framework into the FedRL framework [18] by assigning an independent actor-critic to each training task for local learning, and periodically sending the critic network to the server for federated aggregation.
+• FedRL-DDPG: The training mode is the same as the previous one, except that the local model is speciﬁcally set to DDPG [9], another popular reinforcement learning framework. Both actor and critic are divided into a current network and a target network. In the training process, the target network is frozen ﬁrst. After several update steps, the parameters of the current network are assigned to the target network.
+
+V. EXPERIMENTS
+In this section, we conduct extensive experiments to evaluate the performance of the proposed FedMC method.
+A. Experimental Environment
+We implemented the proposed federated Meta-Critic with the Python deep learning framework Pytorch1. The experiments in this paper are run on a personal computer equipped with Intel(R) Core i7-9700 CPU @ 3.00GHz 8 cores and Geforce RTX 2070 SUPER with 8GB memory.
+By default we setup a FL system for FedMC with 4 mobile devices and a central server. The local training data distribution of different mobile devices in the follow experiments is independent and identically distributed, and each mobile device owns the same amout of local training data. In this FL system, within a communication round, each mobile device ﬁrst downloads the parameters of the global model from the central server as the initial parameters of the local meta reinforcement learning critical model, and then evaluates the local critical model according to the performance of the local actor model on the local training data (i.e. reinforcement learning task) and adjusts the parameters. Then the mobile device uploads the current critical model to the central server for global aggregation to obtain a new global model.
+B. Baseline Algorihms
+We compare FedMC with the following baseline algorithms:
+
+C. Cart-Pole Cart-pole is a classic reinforcement learning task offered by
+OpenAI Gym2, consisting of a small car and a thin rod tied to the small car, as shown in Figure 2. The agent needs to apply a left or right force to the car according to the current position, speed and state of the stick to maintain the balance of the thin stick. When the stick fails to maintain balance and falls to one side, the game fails. Obviously, the length of the pole will be an important parameter of the task. When the length of the pole changes, the decision function of the task also needs to change accordingly. In the experiments, the pole length of the training task when training the meta-learner is uniformly randomly sampled from a predeﬁned range.
+Fig. 2: The Cart-Pole game.
+1) Parameter settings: The default parameter settings are as follows. The network structure of the actor model of all algorithms is the same, which is a linear full connected neural network (FCN) with two hidden layers, each of which contains 40 neurons. The pole lengths of different Cart-Pole training tasks are different. There are a total of 100 training tasks, and their pole lengths are arithmetic progressions between 1 and
+
+1https://pytorch.org/
+
+2https://github.com/openai/gym
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+348
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+TABLE I: Comparison of average reward for different Cart-Pole test tasks.
+
+Metric AvgReward
+
+Algorithm
+Local-Actor-Critic Central-Meta-Critic FedRL-Actor-Critic
+FedRL-DDPG FedMC
+
+2 19.44 68.24 78.50 17.72 65.70
+
+Range of the Pole’s length
+
+3
+
+4
+
+7
+
+8
+
+28.42 24.82 32.47 33.72
+
+61.13 88.04 92.60 103.57
+
+61.11 44.85 51.56 55.69
+
+21.45 24.46 66.17 60.20
+
+79.86 85.02 104.41 122.42
+
+9 34.53 119.10 50.11 54.54 125.80
+
+5. To test the adaptivity of the learning models, we adopt 6 test tasks with pole lengths 2, 3, 4, 7, 8 and 9 respectively. The ﬁrst three items are within the pole length range of the training sample, and the last three items are outside the pole length range of the training sample (representing unseen environment).
+In the training stage, the model would train locally for 500 steps. During the training period, we regularly take out the current meta model for testing, and summarize all test results except the maximum value of 20% and the minimum value of 20% to calculate the average value.
+In the testing stage, every blank agent’s learning step is set to 150 to test their convergence with fewer training steps, and the agent can interact with the test task 30 times within each learning step. For every 10 learning steps, the actor model will execute the current task 10 times, record the total number of rewards obtained when the pole falls and take the average value. If the cart is pushed 200 times and the pole has not fallen, it is considered that the current game is successful.
+2) Performance comparsion: By default we set the number of participants to 4 in FedMC, and we set the local training data distribution of different participants in FedMC to be independent and identically distributed.
+We respectively compared the reward performance and success rate of FedMC and the other algorithms for reinforcement learning tasks. The total reward after all learning step in test tasks are shown in Table I. According to the table, when the pole length of testing samples is within the pole length range of the training samples, the agents trained by FedMC and centralized training Central-Meta-Critic can obtain similar rewards, and in most cases, they are ahead of other baseline trained agents. When the pole length is 2, FedRL-Actor-Critic achieves the best performance, which means it works well for training and testing tasks within the same range, but it lacks of the transferability to unseen scenarios. The proposed distributed FedMC performances close to or better than the centrally trained Central-Meta-Critic method.
+We further compare the dynamic change curves of rewards obtained by the participant model in different learning steps, and the results are shown in Figure 3. In Figure 3(a), FedRLActor-Critic has the highest starting point, but with the increase of learning steps, FedMC and Central-Meta-Critic soon surpass FedRL-Actor-Critic and are far better than the other baselines. In Figure 3(b), we can see that in a few learning steps, the Local-Actor-Critic has not learned useful information, the FedeRL-Actor-Critic and FedRL-DDPG converge to
+
+(a) Average reward curve (pole length within {2,3,4}).
+
+(b) Average reward curve (pole length within {7,8,9}).
+
+Fig. 3: Average reward of different algorithms under varying learning steps (Cart-Pole).
+
+a very low level, while the Central-Meta-Critic and FedMC quickly converge to a high level of reward value.
+D. Pendulum
+Pendulum is a classic reinforcement task offered by OpenAI Gym. In the Pendulum game, one end of the straight rod is ﬁxed on the wall, and it is necessary to continuously exert different torques on the other end of the straight rod to make it swing to the top and keep it. The reward value of each step of the Pendulum task depends on the angle and angular velocity of the current straight rod, and is always non-positive. For the convenience of processing, we make the following settings: when the current reward is greater than -1, it is regarded as shaking to the top and stationary, and the task is over. Or when the number of times the agent performs actions on the straight rod reaches an upper limit, but the rod still does not reach a stable state, the current task also ends.
+
+Fig. 4: The Pendulum game.
+Similarly, in this task, the length of the straight rod is an important parameter. When the same torque is applied in the same state, the response of straight rods with different lengths is different, so we modify the length of the straight rod in the task to obtain different task samples.
+1) Parameter settings: The default parameter settings are as follows. The network structure of the actor model of all algorithms is the same as that in Cart-Pole. The straight rods’
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+349
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+TABLE II: Comparison of average reward for different Pendulum test tasks.
+
+Metric AvgReward
+
+Algorithm
+Local-Actor-Critic Central-Meta-Critic FedRL-Actor-Critic
+FedRL-DDPG FedMC
+
+2 -837.604 -508.735 -812.259 -1098.719 -452.692
+
+Range of the rod’s length
+
+3
+
+4
+
+7
+
+8
+
+-758.123 -841.089 -877.939 -832.581
+
+-684.839 -736.296 -814.270 -803.528
+
+-829.528 -833.995 -829.674 -820.140
+
+-998.652 -931.190 -831.738 -834.359
+
+-585.131 -699.667 -774.366 -757.646
+
+9 -837.706 -783.041 -799.858 -773.012 -791.952
+
+(a) Average reward curve (rod length within 2,3,4).
+
+(b) Average reward curve (rod length within 7,8,9).
+
+Fig. 5: Average reward of different algorithms under varying learning steps (Pendulum).
+
+lengths of different Pendulum training tasks are different. There are a total of 800 training tasks, and their pole lengths are arithmetic progressions between 1 and 5. While thereare 6 test tasks in total, and their pole lengths are 2, 3, 4, 7, 8 and 9 respectively. The ﬁrst three items are within the rod length range of the training sample, and the last three items are outside the rod length range of the training sample.
+In the training stage, the model would train locally for 500 steps. We periodically take out the current global model for testing during the whole training process, and aggregate all test results together for an average.
+In the testing stage, every blank agent’s learning step will be 2000 with the help of the meta-model, and the agent can interact with the test task 30 times within each learning step. For every 50 learning steps, the actor model will execute the current task 10 times to record the rewards and take the average value.
+2) Performance Comparison: Similar to the Cart-Pole part, we set the number of participants to 4 in FedMC, and the local training data distribution of different participants in FedMC to be independent and identically distributed.
+We respectively compared the reward performance of FedMC and the other baselines for reinforcement learning tasks. The total reward after all learning step and the result of success rate in test tasks are shown in Table II. Except that when the rod length is 9, the performance of FedMC is better than FedRL-DDPG and Central-Meta-Critic, signiﬁcantly outperforms FedRL-Actor-Critic and Local-Actor-Critic. Whether the rod length of the testing task is within the training range or not, the meta model trained by FedMC can teach the agent to get higher rewards than other baselines, and the performance of the meta model trained by FedMC does not lag signiﬁcantly compared with the Central-Meta-Critic trained by global dataset.
+
+Similarly, we also compare the change curve of the reward obtained by the actor model on the test task at different learning steps during the meta-test phase when the pole length of the test task is within and outside the training range, which is shown in Figure 5. In Figure 5(a), the agents taught by the meta model trained by FedMC and Central-Meta-Critic ﬁnally get higher rewards than other baselines, and the performance of FedMC is even better than Central-Meta-Critic. In Figure 5(b), when the pole length increases, the learning of the test task begins to become difﬁcult to converge. We can ﬁnd that as the learning steps go on, the ﬂuctuation of reward value obtained by the actor model taught by FedMC and CentralMeta-Critic begins to decrease and is more generally higher than that of FedRL-Actor-Critic and Local-Actor-Critic, while FedRL-DDPG obviously performs the highest ﬂuctuation on these test tasks.
+E. Discussions
+Our solution combines the ideas of federated learning and meta-learning to solve the reinforcement learning tasks. The experimental results show that in the face of more training samples, spreading the training samples across different participants does not lead to a signiﬁcant performance degradation of the global model (which itself is more in line with the real world situation). So the idea of using federated learning is feasible for training reinforcement learning tasks on the edge with privacy protection.
+Next, we analyze whether it is beneﬁcial to adopt the metalearning component. Since the Meta-Critic network is designed based on the Actor-Critic algorithm, if the meta-learning idea is not adopted, it should be performs close to the FedRL-ActorCritic algorithm and the FedRL-DDPG algorithm. According to the experimental results and curves above, it can be found that using meta-learning to train reinforcement learning tasks can indeed help the actor model adapt to new learning tasks in fewer learning steps. So, it veriﬁes the effectiveness of adopting the idea of meta-learning for federated training.
+VI. CONCLUSION
+We focused on the challenging task to reinforcement learning models on the edge in a decentralized manner without revealing local dataset of multiple edge devices. We proposed a novel framework called FedMC to tackle the challenges through meta-learning with a federated learning paradigm. In the proposed framework, each participant adopted a meta Actor-Critic network model to perform meta-learning based on local task samples, and periodically uploads the weights
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+350
+
+2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)
+
+of local models to the server to form a global model with rapid adaptability and cross-task applicability. Extensive experiments based on a number of reinforcement learning tasks show that the proposed FedMC signiﬁcantly outperforms the state-of-the-art.
+REFERENCES
+[1] Z. Xu, L. Zhao, W. Liang, O. F. Rana, P. Zhou, Q. Xia, W. Xu, and G. Wu, “Energy-aware inference ofﬂoading for dnn-driven applications in mobile edge clouds,” IEEE Trans. Parallel Distributed Syst., vol. 32, pp. 799–814, 2021.
+[2] X. Wang, Z. Ning, and S. Guo, “Multi-agent imitation learning for pervasive edge computing: A decentralized computation ofﬂoading algorithm,” IEEE Trans. Parallel Distributed Syst., vol. 32, no. 2, pp. 411–425, 2021.
+[3] X. Xia, F. Chen, Q. He, J. C. Grundy, M. Abdelrazek, and H. Jin, “Cost-effective app data distribution in edge computing,” IEEE Trans. Parallel Distributed Syst., vol. 32, no. 1, pp. 31–44, 2021.
+[4] E. Li, Z. Zhou, and X. Chen, “Edge intelligence: Ondemand deep learning model co-inference with deviceedge synergy,” in MECOMM@SIGCOMM, 2018, pp. 31– 36.
+[5] M. Kachuee, O. Goldstein, K. Ka¨rkka¨inen, S. Darabi, and M. Sarrafzadeh, “Opportunistic learning: Budgeted costsensitive learning from data streams,” in ICLR, 2019.
+[6] M. Andrychowicz, B. Baker, M. Chociej, R. Jo´zefowicz, B. McGrew, J. Pachocki, A. Petron, M. Plappert, G. Powell, A. Ray, J. Schneider, S. Sidor, J. Tobin, P. Welinder, L. Weng, and W. Zaremba, “Learning dexterous in-hand manipulation,” Int. J. Robotics Res., vol. 39, no. 1, 2020.
+[7] S. Aradi, “Survey of deep reinforcement learning for motion planning of autonomous vehicles,” IEEE Trans. Intell. Transp. Syst., vol. 23, no. 2, pp. 740–759, 2022.
+[8] I. Grondman, L. Busoniu, G. A. D. Lopes, and R. Babuska, “A survey of actor-critic reinforcement learning: Standard and natural policy gradients,” IEEE Trans. Syst. Man Cybern. Part C, vol. 42, no. 6, pp. 1291–1307, 2012.
+[9] T. P. Lillicrap, J. J. Hunt, A. Pritzel, N. M. O. Heess, T. Erez, Y. Tassa, D. Silver, and D. Wierstra, “Continuous control with deep reinforcement learning,” CoRR, vol. abs/1509.02971, 2016.
+[10] V. Mnih, A. P. Badia, M. Mirza, A. Graves, T. P. Lillicrap, T. Harley, D. Silver, and K. Kavukcuoglu, “Asynchronous methods for deep reinforcement learning,” in ICML, 2016, pp. 1928–1937.
+[11] T. Haarnoja, A. Zhou, P. Abbeel, and S. Levine, “Soft actor-critic: Off-policy maximum entropy deep reinforcement learning with a stochastic actor,” in ICML, 2018, pp. 1856–1865.
+[12] T. Haarnoja, A. Zhou, K. Hartikainen, G. Tucker, S. Ha, J. Tan, V. Kumar, H. Zhu, A. Gupta, P. Abbeel, and S. Levine, “Soft actor-critic algorithms and applications,” CoRR, vol. abs/1812.05905, 2018.
+
+[13] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efﬁcient learning of deep networks from decentralized data,” in AISTATS, 2017, pp. 1273–1282.
+[14] W. Y. B. Lim, N. C. Luong, D. T. Hoang, Y. Jiao, Y. Liang, Q. Yang, D. Niyato, and C. Miao, “Federated learning in mobile edge networks: A comprehensive survey,” IEEE Commun. Surv. Tutorials, vol. 22, no. 3, pp. 2031–2063, 2020.
+[15] T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, and V. Smith, “Federated optimization in heterogeneous networks,” in MLSys, 2020.
+[16] H. Wang, M. Yurochkin, Y. Sun, D. S. Papailiopoulos, and Y. Khazaeni, “Federated learning with matched averaging,” in ICLR, 2020.
+[17] S. P. Karimireddy, S. Kale, M. Mohri, S. J. Reddi, S. U. Stich, and A. T. Suresh, “Scaffold: Stochastic controlled averaging for federated learning,” in ICML, 2020.
+[18] H. H. Zhuo, W. Feng, Y. Lin, Q. Xu, and Q. Yang, “Federated deep reinforcement learning,” arXiv, 2019.
+[19] J. Wang, Q. Liu, H. Liang, G. Joshi, and H. V. Poor, “Tackling the objective inconsistency problem in heterogeneous federated optimization,” in NeurIPS, 2020.
+[20] J. Z. Leibo, V. F. Zambaldi, M. Lanctot, J. Marecki, and T. Graepel, “Multi-agent reinforcement learning in sequential social dilemmas,” ArXiv, vol. abs/1702.03037, 2017.
+[21] A. Tampuu, T. Matiisen, D. Kodelja, I. Kuzovkin, K. Korjus, J. Aru, J. Aru, and R. Vicente, “Multiagent cooperation and competition with deep reinforcement learning,” PLoS ONE, vol. 12, 2017.
+[22] O. Vinyals, C. Blundell, T. Lillicrap, K. Kavukcuoglu, and D. Wierstra, “Matching networks for one shot learning,” in NeurIPS, 2016, pp. 3630–3638.
+[23] S. Ravi and H. Larochelle, “Optimization as a model for few-shot learning,” in ICLR, 2017.
+[24] G. R. Koch, “Siamese neural networks for oneshot image recognition,” 2015. [Online]. Available: http://www.cs.cmu.edu/∼rsalakhu/papers/oneshot1.pdf
+[25] F. Sung, L. Zhang, T. Xiang, T. M. Hospedales, and Y. Yang, “Learning to learn: Meta-critic networks for sample efﬁcient learning,” CoRR, vol. abs/1706.09529, 2017.
+[26] Y. Duan, J. Schulman, X. Chen, P. L. Bartlett, I. Sutskever, and P. Abbeel, “Rl2: Fast reinforcement learning via slow reinforcement learning,” CoRR, vol. abs/1611.02779, 2016.
+[27] J. Wang, Z. Kurth-Nelson, H. Soyer, J. Z. Leibo, D. Tirumala, R. Munos, C. Blundell, D. Kumaran, and M. M. Botvinick, “Learning to reinforcement learn,” in CogSci, 2017.
+[28] R. S. Sutton, D. A. McAllester, S. Singh, and Y. Mansour, “Policy gradient methods for reinforcement learning with function approximation,” in NIPS, 1999.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 04:19:02 UTC from IEEE Xplore. Restrictions apply.
+351
+

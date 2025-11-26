@@ -1,0 +1,198 @@
+IJPDLM 26,6
+4
+Received August 1995 Revised May 1996
+
+An event-based approach to modelling intermodal freight
+systems
+Glen D’Este
+Transport Systems Centre, University of South Australia, The Levels, Australia
+
+International Journal of Physical Distribution & Logistics Management, Vol. 26 No. 6, 1996, pp. 4-15. © MCB University Press, 0960-0035
+
+Logistics and intermodalism In response to business trends including global sourcing, quality management, just-in-time inventory control and the growth of the global marketplace, logistics and intermodalism have become catchphrases for freight transport in the 1990s. To achieve the efficiencies demanded by logistics managers requires effective transport links and the ability to chain several transport modes in a single co-ordinated freight movement. The practice of using more than one mode of transport in a co-ordinated and seamless way is usually called intermodal transport, but is also known as multi-modal transport, combined transport and through-transport.
+Definitions of intermodalism usually concentrate on operational aspects and transport infrastructure. However, successful intermodal transport also requires a conducive administrative and legal environment, and efficient interchange of information. Lloyd’s of London[1] has proposed a framework that describes the intermodal system in terms of five layers representing five different functions vital to the efficient operation of the system. The top layers are first: the physical base of transport operators and transport movements; and second, the associated commercial services and their direct costs. The remaining layers comprise the “hidden” and intangible aspects of the business of intermodalism. The third layer refers to management control of the system and is measured in terms of management time and effort. An intermodal transport system is a relatively complex operation that places much greater demand on system management than does uni-modal transport. The fourth layer is an adjunct to the management system and concerns the flow of information required to co-ordinate the intermodal trip and process the required documentation. Finally, the fifth layer refers to the liability for damage and delay and is measured in terms of relative risk. Due to the involvement of several modes and operators, door-to-door transport potentially poses complex liability problems. However, one of the practical benefits of intermodalism is
+This article is based on a paper presented at the World Conference on Transport Research, Sydney, July 1995.
+
+insulation from the vagaries of international carriage under uni-modal liability regimes.
+It is apparent from the Lloyd’s framework that an intermodal system is much more than the physical movement of goods and the associated direct costs, and that defining intermodalism as the practice of using more than mode is a misleading oversimplification. It is more useful to define intermodalism as
+A technical, legal, commercial and management framework for moving goods from door-todoor using more than one mode of transport.This definition emphasises that intermodalism is a service rather than a technology. In so doing, it draws attention to the “soft” aspects of service delivery that facilitate the technology of multi-modal transport.
+The aim of this paper is to discuss intermodal system modelling from the perspective of intermodalism as an integrated transport service. The paper reviews current intermodal modelling paradigms and implementations and proposes an innovative approach that encompasses the key technological and service-related aspects of an intermodal system. The paper also addresses some of the technical issues involved in embedding the proposed framework in a traditional network model. The discussion will be centred largely on intermodal movements associated with long distance and/or international trade, but the concepts are transferable to local transport and more general logistical systems.
+
+Modelling intermodal freight systems
+5
+
+Frameworks for modelling intermodal systems The standard approach to developing models of intermodal systems has been to generalize a unimodal model of a freight network or market. This is not surprising given that uni-modal freight network modelling has an established track record and the conventional view of an intermodal freight movement is as a sequence of transport movements linked together by transhipments. The network metaphor has been successfully implemented at a strategic level in several intermodal freight models, notably by Crainac et al.[2] and D’Este and Meyrick[3]. This approach concentrates on building a mathematical representation of the network of transport links and investigating freight flows on the network. It builds on mathematical graph theory and practical experience gained from representing urban road traffic and transit systems. The study of spatially separated markets and the concepts of spatial and economic equilibrium provides an alternative starting point for the development of models of intermodal systems. This approach aims to represent the economics of the freight transport market including consideration of price and demand equilibrium, as well as the pattern of freight movements. For a review and typology of freight network equilibrium models from an economic perspective, see Friesz and Harker[4]. For the purposes of the following discussion, the two standard frameworks will be referred to as the network and equilibrium approaches.
+These approaches have led to the development of useful representations of an intermodal system but have concentrated on either the spatial dimension of the intermodal system and costs associated with physical transfers of goods, or on
+
+IJPDLM 26,6
+6
+
+the overall economics of the freight market. As a result, current approaches have failed to keep pace with changing priorities in management and operation of intermodal systems. In particular, they have failed to reflect the growing importance of service and information factors.
+Over the past decade, considerable management effort has been devoted to the optimization of the physical base and the reduction of direct costs associated with transport and storage of goods. As a result, the operational and commercial aspects of linehaul and storage are currently the best understood and most efficient of the components of the intermodal system. It has been noted by Peters[5] and others that problems at the intermodal interfaces, outsourcing and the shipper-carrier relationship, documentation and transfer of information are now the most important issues in intermodal transport markets. The linehaul function per se is not a major concern or focus of competition. Carriers in intermodal markets are now competing on overall doorto-door performance and are judged on the basis of service quality, information systems and efficiencies at the intermodal interfaces.
+Some progress has been made towards incorporating additional factors into intermodal models. Borg[6] (or see [7]) has proposed a theoretical framework that includes the contribution of informatics to a transport and logistics system. Borg has taken Manheim’s[8] general two-level framework for modelling transport systems and has modified and extended it to better reflect logistics and transport issues in the 1990s. The resulting five-level framework is shown in Figure 1.
+Borg’s major contribution is the inclusion of the information layer but the framework is still based on technology. As argued above, recent trends in logistics have taken the emphasis away from the technology with which the service is delivered, and towards an emphasis on competitive advantage through service delivery within agreed performance criteria. In many cases, the
+
+Figure 1. Five layers model of road freight transport
+
+Material flow
+Transport market
+Transport operations
+Traffic market
+Transport infrastructure
+
+Informatics market
+Informatics operation
+Telecommunications market
+Telecommunicatons infrastructure
+
+way that the service is delivered is not of prime importance to the shipper, and in some cases is not known to the shipper; it is the outcome that is important.
+The inadequate treatment of service, management and information aspects of intermodal systems is not the only area in which the network and equilibrium approaches fail to replicate the behaviour of intermodal systems. In most cases, they also fail to capture some or all of the following characteristics:
+• the mismatch between finely-divisible demand and lumpy supply;
+• the lumpiness of supply, in terms of service frequency;
+• the importance of transhipment competition between several different carriers over the same physical link;
+• the significance of the intermodal interface;
+• the significance of cargo-handling and unitization technologies;
+• the perspective of the individual shipper purchasing intermodal services;
+• the richness of the shipper decision-making process.
+The first four aspects are products of the ancestry of most current freight models in urban traffic and spatial equilibrium models; both of which are essentially continuous models. Most goods are produced in small units at a steady rate so it is reasonable to assume that supply is infinitely-divisible and can be represented by continuous functions. However, many components of the intermodal transport system supply capacity in large and indivisible units. Consider the case of international container shipping, where containers are generated into the system in individual units but the supply of transport capacity is in quantums of thousands of containers. As a result there is a mismatch between finely-divisible demand and lumpy supply that is not accommodated in most modelling frameworks. This mismatch is also manifested in the time domain. Goods are produced continuously but major transport services (ships, trains, planes) operate at prescribed frequencies. In both respects, intermodal freight has more in common with public transport than with private motor vehicle traffic.
+Transhipment can be handled in both network and equilibrium frameworks but it is normal in both formulations for the intermodal transfers to be defined as a special link type or node attribute (for example, the transfer structure in Crainac et al.[2] rather than arising naturally and spontaneously from the intermodal system. Similarly, explicit competition between modes and different carriers within the same mode is not an integral part of most network models despite being an integral component of an intermodal system. Carrier competition entails multiple links between the same physical nodes of the network but most network solution algorithms assume that there is one and only one link between each pair of nodes. The problem can be overcome, as in D’Este and Meyrick[3], by defining notional nodes representing calls by each of the carriers at physical nodes but in general, competition between carriers is not an inherent characteristic of the network formulation.
+
+Modelling intermodal freight systems
+7
+
+IJPDLM 26,6
+8
+
+As noted by Peters[5], many of the costs, delays and problems occur at the interfaces between the modes of an intermodal system. In general, the linehaul component works reasonably efficiently. It follows that it is important for an intermodal system model to include explicitly representation of the intermodal exchanges. This can be accomplished by defining special links, as in D’Este and Meyrick[3], but in general, intermodal system models have concentrated on linehaul rather than issues associated with loading, unloading and transfers in general. Costs and delays at the modal interface tend to be internalized into linehaul links and the impact of modal transfers is hidden. In so doing, some areas in which intermodal operators are seeking to differentiate their services (e.g. accelerated customs clearance) are not explicitly represented in the model. An allied problem involves the effect of cargo handling technology and the impact of competing technologies. Containerization has been a key element in the development of intermodal systems and the choice between competing cargo handling technologies can be as significant a factor as the choice between modes and carriers.
+The last two problem areas relate to the treatment of decision making and the perspective ef the individual shipper. Recent studies of shipper decision making[9,10], have verified that time and cost are significant decision factors but have also noted the complexity of the decision-making process and have confirmed the growing importance of service quality factors. Most network and spatial equilibrium models are predicated on the assumption that the goal is to minimize a linear utility measure (which may include cost, time, energy, etc.) or a global measure of system performance (such as total system cost). From a strategic perspective, this may be a valid approach but it fails to capture the behavioural dynamics of individual decision making and hence is less appropriate for modelling the response of shippers to significant changes in the intermodal system.
+The challenge for modelling of an intermodal system lies not just in further improvement of techniques for representing the physical transport base but in addressing issues associated with the other layers of the framework described in Lloyd’s of London[1]. This involves incorporating the inherent informatic, transactional and modal interface aspects of intermodalism into an integrated modelling framework. The challenge is to extend the intermodal modelling paradigm to encompass the abstract environment in which the overall business of intermodalism is conducted.
+Intermodal events: an abstract network model At its most basic level, the passage of a consignment through an intermodal freight system is equivalent to a sequence of logistical events. Each event takes the goods from one logistical state to another by performing a logistical activity. This simple statement provides a terminology and alternative conceptual framework for describing and modelling intermodal freight systems. The concept of a logistical event more closely mirrors the operation of an intermodal network and provides sufficient generality to be able to capture the diversity of
+
+components of an intermodal freight system. It also directs attention away from linehaul, technology and spatial concerns and towards services, transitions and outcomes, in the broadest sense. In this respect it is similar to the abstract mode concept described by Quandt and Baumol[11] and Baumol and Vinod[12]. The abstract mode concept was devised to examine mode choice problems for passenger transport. Each mode (actual or hypothetical) is represented in terms of the service characteristics it delivers and the price, without reference to the technology.
+The key to developing an event-based approach to intermodal system modelling is the definitions of the key concepts. A logistical state can be defined as the minimal set of key characteristics that identify the condition of a freight consignment in its passage through the logistical system. An important research issue is the definition of this minimal set. In other words, what are the components of the minimal set of characteristics that is needed to adequately describe a logistical state? A starting point for the definition of events in a multi-modal, multi-commodity multi-unit intermodal framework is to address the questions:
+
+• What is it ?
+
+Product
+
+• Where is it ?
+
+Location
+
+• What form is it in ?
+
+Unit (bulk, pallet, container, etc.)
+
+• How is it being conveyed ? Mode (road, rail, warehouse, processing, etc.)
+
+To these physical dimensions we need to add one or more characteristics that reflect business practice and the growing importance of information events, for instance:
+
+What is the commercial status ? = Status
+
+This characteristic reflects contractual and other commercial arrangements that define the commercial status of a consignment, or simply the status of its documentation. Changes in commercial status usually imply management intervention and/or an exchange of information, so the addition of this dimension is instrumental in capturing many of the aspects of logistical systems associated with information and commercial transactions.
+It follows that a useful working definition of state is an instance of the set:
+
+{Product, Location, Unit, Mode, Status }.
+
+The basic dimensions of logistics are time, cost and risk, so an activity is anything that takes time, costs money or involves risk. This definition includes standard transport activities such as loading, unloading, and linehaul, but is also general enough to encompass warehousing, and information and transaction activities such electronic data interchange (EDI), customs clearance and quarantine. It is also general enough so that activities can be defined at whatever level of detail is appropriate and there is no conceptual difficulty in mixing events at different levels of detail. Each activity will have a set of
+
+Modelling intermodal freight systems
+9
+
+IJPDLM 26,6 10
+Table I. Archetypal events
+
+performance measures which might include monetary cost, duration, delay, availability and qualitive service factors. These measures may be deterministic or by allowing stochastic performance measures, the influence of variations in performance level and hence reliability can be incorporated.
+The outcome of an activity will in most cases be a transition from one logistical state to another, so an event can be defined as a triplet of the input and output states and the activity. The only significant exception is warehousing, which although it consumes time and money does not alter the fundamental status of the consignment. Warehousing can be considered to be a null event and hence to comply with the definition.
+By carefully selecting the set of state attributes, it appears that the major intermodal processes can be represented as events in which one and only one state attribute changes. Table I illustrates this property. Using the attribute set introduced above, it shows a cross tabulation of selected logistic processes and the single state attribute that is affected by the process. For example, linehaul involves changing the state attribute “Location” while holding other attributes constant.
+It follows that with an appropriate definition of the state set, it may be possible to define a small but comprehensive set of archetypal simple events that cover all of the important logistical processes in an intermodal system.
+The process of moving consignments through an intermodal freight system is one of finding a sequence of logistical services that provide an intermodal path from origin to destination. This is equivalent to finding a sequence of events that act in a particular order to transform a consignment from its initial to final state. This is equivalent to building a logistic chain. To be able to link and hence to transfer the consignment, two events must be conformable, i.e. the output state of one event must be identical to the input state of a successive event. The condition of conformability guarantees that the framework has behavioural veracity by ensuring that events can only be combined in physically meaningful ways. Through a sequence of conformable events the state of the consignment is successively transformed from its origin state to its destination state. Therefore an event can be likened to a mathematical transformation. It is possible to define the concepts of states, activities, events,
+
+Event
+Warehousing Processing Linehaul Packing Intermodal transfer Document transfer
+
+Product Location Unit Mode Status
+X X X X X
+
+and conformability in formal mathematical terms which opens the way for the development of a formal algebra of logistical states and transformations.
+The generality of the event concept means that many more aspects of an intermodal system can be represented as inherent components of the model. As mentioned above, transhipment, carrier competition, operation of the intermodal interface and cargo-handling technology are not natural elements of the network and spatial equilibrium frameworks. By judicious definition of the state attributes these activities can become inherent features of an event-based model. For example, the <Unit> attribute provides a natural lead into the comparison of cargo handling technologies and the <Mode> attribute can facilitate the inclusion of a detailed evaluation of the modal interface. For eventbased networks, nodes have an abstract definition in terms of a logistical state and there is not a strong connection between locations and network nodes. It follows that carrier competition can be an integral part of the network through the use of an appropriate definition of the logistical state. Further, in an eventbased network, conformability is the only constraint on network building so transhipment can arise naturally from the set of events.
+
+Modelling intermodal freight systems
+11
+
+Implementation: technical issues The algebra of logistical states and events would provide a convenient conceptual framework for developing intermodal freight models, but for computational purposes it is convenient to embed the framework in a more traditional network formulation. Events can be associated with links, and by defining a suitable one-to-one transformation:
+(Producti, Locationi, Uniti, Modei, Statusi) ¡ Ni
+logistical states can be projected on to nodes. The triplet that defines a logistical event can then be translated to the familiar {A node, B node, impedance} paradigm of traffic network modelling. Note, however, that the result is an abstract intermodal network in which nodes and links are only loosely associated with physical locations and transport movements in the traditional sense.
+Having translated the logistical event framework into a network format, the intermodal system model then becomes amenable to analysis using standard transport network techniques. The event structure overcomes most of the problems associated with spatially-based networks but several problems remain unresolved. These relate to the mismatch between finely-divisible demand and lumpy supply and to techniques for representing shipper decisionmaking behaviour.
+As noted above, the characteristics of freight networks are more like those of transit than of traffic. It follows that techniques developed for handling the effects of service frequency in transit modelling can be adopted for modelling intermodal systems. The optimal strategies approach proposed by Spiess and Florian[13] and implemented in the transit module of EMME/2 has been successfully applied to intermodal systems modelling by D’Este and
+
+IJPDLM 26,6
+12
+
+Meyrick[3]. The issue of lumpy supply of transport capacity is more problematic but less significant. For strategic planning purposes, it can be treated as a capacity constraint problem and resolved using standard penalty function and capacitated network techniques. When investigating the decisions of individual shippers, short-shipment is the only significant consequence of lumpy supply and this possibility should be ignored when creating a preference ranking of carrier options.
+An event-based approach provides a framework for incorporating a wider range of factors into a freight network model, but for the formulation to realize its full potential, its richness must be matched by assignment techniques that model the observed behaviour of purchasers of intermodal services. Observations of shipper behaviour[9] have led to the development of conceptual models[10,14] that describe the carrier choice process in considerable detail. It has been found that the basic structure of the carrier choice process has the components shown in Figure 2. It follows that the choice process is sequential and a hybrid of both satisficing and optimizing behaviour. The aim is to find the path (or paths) through the intermodal system that provide maximum utility under some set decision criteria and constraints.
+The network analysis counterpart of the decision-making process is to find the shortest path under multiple constraints. Techniques for finding shortest paths subject to side constraints exist (for example, see [15]) but their usefulness is limited by efficiency and flexibility. Alternatives include calculating the k-shortest paths[16,17], then enumerating and screening the paths, or to assemble a choice set for each decision by applying the constraints sequentially as shown in Figure 2.
+Consider the problem of assigning a flow between two given network nodes (recall that the nodes are abstract intermodal states). The first step, checking links for technological feasibility, is omitted in most network modelling but is essential in intermodal modelling because there is no single uniform unit of flow. Some links may have zero capacity for certain types of cargo, e.g. refrigerated cargo has special needs that might not be met by some services. Simply scanning the network for technologically feasible links may eliminate many links (and any unconnected nodes) and significantly reduce the size of the feasible network.
+
+Figure 2. Carrier selection process
+
+Step 1
+Elimination of technically
+infeasible options
+
+Step 2
+Elimination of options that
+fail to meet service criteria
+
+Step 3
+Trade-off between service characteristics
+
+Choice
+
+The second step involves removing from the feasible network, those intermodal paths with performance that does not meet prescribed criteria. Typical criteria may include:
+• Maximum acceptable cost; every commodity will have a maximum logistical cost that the product can bear.
+• Maximum acceptable transit time; in most cases, delivery must be made within a prescribed period due to perishability or quality of service considerations, such as to service just-in-time requirements.
+• Minimum levels of reliability or quality of service.
+The model should also cope with individual requirements such as aversion to transhipment or preference for consolidation at a particular port. The screening process has much in common with the elimination by aspects (EBA) model developed by Tversky[18]) and explored in a transport context by Young and Richardson[19]. With fixed tolerances, EBA can be efficiently implemented across a network by the use of a node-labelling shortest path algorithm. By labelling nodes from both origin and destination using Dijkstra’s[20] doubletree method and adding the two labels, it is possible to find the “length” of the shortest path through each node. Nodes (and attached links) that fail the decision criteria can then be eliminated. Further, using the shortest-path algorithm in additive, multiplicative or “bottleneck” mode (see [21]), it is possible to screen for a range of different constraint types. Considering the criteria sequentially (or all at once with a more complex labelling structure), nodes and links can be progressively eliminated from the network. The result is a reduced network with a guaranteed feasible and acceptable path through every node. Note that the screening process does not guarantee that all possible paths in the reduced network will satisfy the criteria – it only guarantees that there will exist an acceptable path through every node in the reduced network. Therefore some final screening of the choice set will be required in Step 3.
+Studies of shippers in intermodal markets[9,22] have found that the number of intermodal options that are considered in the final trade-off (Step 3) is very small – almost always less than ten and typically less than five. It follows that, if realistic acceptability thresholds are used in Step 2 then the reduced network of feasible and acceptable options will be very small. With a small network, complete enumeration of paths becomes feasible and with full enumeration, it is viable to use assignment procedures that make full use of available information. A variant of the Gallagher and Meyrick[23] approach would be an appropriate assignment procedure since it incorporates service frequency effects and being probabilistic, it reflects the observed behaviour that shippers tend to split their cargo between several carriers, with the preferred carrier receiving the bulk of the trade. Shippers are averse to “keeping all their eggs in one basket”.
+Having combined the network screening processes with a trade-off mechanism involving a small choice set and rich use of information, the result is a realistic representation of the way that shippers go about the task of
+
+Modelling intermodal freight systems
+13
+
+IJPDLM 26,6
+14
+
+selecting a carrier in a complex intermodal system. Taken together with the abstract intermodal network framework, the resulting model captures the full range of operational, commercial and behavioural characteristics of intermodal systems.
+Conclusions Intermodalism is a service; not a technology. Further, it is a service that attempts to internalize the geographic aspects of transport and to overcome the operational and organizational issues associated with using multiple modes and several links in the transport chain. As a result, intermodalism is an integrated transport task in which a wide range of quality of service and commercial factors are at least as important as the physical movement of goods. Further, intermodalism has special characteristics including the mismatch of finely-divisible demand with lumpy supply, the prevalence of transhipment, activities at the intermodal interface, importance of information and the complexity of the decision-making process – that sets it apart from other transport tasks. This has important implications for the development of realistic models of intermodal systems since it highlights the weaknesses inherent in applying standard network and equilibrium models.
+This paper has proposed an event-based framework for addressing the special needs of intermodal system modelling. By abstracting from network links to logistic events, it integrates the full range of relevant intermodal activities into a single coherent framework. In certain respects, the proposed framework shares more in common with project management concepts than with traditional transport network models. This is not surprising given the complexity and diversity of the management task involved in moving goods through an intermodal system.
+It has also been demonstrated that the event-based framework can be embedded into a traditional network model. When combined with an assignment procedure that takes into account service frequency and mirrors the way shippers apply a sequential screening process, the event-based network model can provide a valuable tool for modelling and evaluating the performance of intermodal systems.
+References
+1. Lloyd’s of London, Effective Intermodalism, Lloyd’s, London, 1992.
+2. Crainac, T.D, Florian, M., Guelat, J. and Spiess, H., “Strategic planning of freight transportation: STAN, an interactive graphics system”, Transportation Research Record, Vol. 1283, 1990, pp. 97-124.
+3. D’Este, G.M and Meyrick, S., “What if the future is not like the past?: modelling the impact of change in the Bass Strait shipping market”, Proceedings of the 1991 International Transport Conference, IEAust Publication No. 91/4, Canberra, 1991.
+4. Friesz,T.T. and Harker, P.T., “Freight network equilibrium: a review of the state of the art”, in Daughety, A.F. (Ed.), Analytic Studies in Transport Economics, Cambridge University Press, Cambridge, 1985.
+
+5. Peters, H., Trade, Manufacturing, and the Service Industries: A Survey of Changing International Practice, World Bank, Washington, DC, 1991.
+6. Borg, J., Makrologistiska Studier, Department of Management and Economics, Linkoping Institute of Technology, Sweden, 1991.
+7. Wandel, S., “Towards a theoretical framework for analyzing interrelations between shifts in logistics, transport, informatics and infrastructure”, 6th World Conference of Transport Research, Lyon, 1992.
+8. Manheim, M.L., Fundamentals of Transport Systems Analysis, MIT Press, Cambridge, MA, 1979.
+9. D’Este, G.M. and Meyrick, S., “Carrier selection in a RO/RO ferry trade. Part 1: decision factors and attitudes”, Maritime Policy and Management, Vol. 19, 1992, pp. 115-26.
+10. Brooks, M.R., “Ocean carrier selection criteria in a new environment”, Logistics and Transportation Review, Vol. 26, 1990, pp. 339-55.
+11. Quandt, R.E. and Baumol, W.J., “The demand for abstract transport modes: theory and measurement”, Journal of Regional Science, Vol. 6 No. 2, 1966, pp. 13-26.
+12. Baumol, W.J. and Vinod, H.D.., “An inventory theoretic model of freight transport demand”, Management Science, Vol. 16, 1970, pp. 413-21.
+13. Spiess, H. and Florian, M., “Optimal strategies: a new assignment model for transit networks”, Transportation Research, Vol. 23B, 1989, pp. 83-102.
+14. D’Este, G.M., “Carrier selection in a RO/RO ferry trade. Part 2: conceptual framework for the decision process”, Maritime Policy and Management, Vol. 19, 1992, pp. 127-38.
+15. Aneja, Y.P., Aggarwal, V. and Nair, K.P.K., “Shortest chain subject to side constraints”, Networks, Vol. 13, 1983, pp. 295-302.
+16. Yen, J.Y., “Finding the k-shortest, loopless paths in a network”, Management Science, Vol. 17, 1971, p. 712.
+17. Katoh, N., Ibaraki, T. and Mine, H., “An efficient algorithm for K shortest simple paths”, Networks, Vol. 12, 1982, pp. 411-27.
+18. Tversky, A., “Elimination by aspects: a theory of choice”, Psychological Review, Vol. 79, 1972, pp. 281-99.
+19. Young, W. and Richardson, A.J., “Freight mode choice: an application of the elimination by aspects model”, Report 81/30, Australian Railways Research and Development Organisation, Melbourne, 1981.
+20. Dijkstra, E.W., “A note on two problems in connection with graphs”, Numerische Mathematik, Vol. 1, 1959, p. 269.
+21. Christofides, N., Graph Theory: An Algorithmic Approach, Academic Press, New York, NY, 1975.
+22. Saleh, F. and LaLonde, B.J., “Industrial buying behaviour and the motor carrier selection decision”, Journal of Purchasing, Vol. 8, 1972, pp. 18-33.
+23. Gallagher, F.D. and Meyrick, S.J., “ASEAN-Australia liner shipping: a cost-based simulation analysis”, ASEAN-Australia Economic Papers, Vol. 12, ASEAN-Australia Joint Research Project, Canberra, 1984.
+
+Modelling intermodal freight systems
+15
+

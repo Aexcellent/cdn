@@ -1,651 +1,21 @@
 {
 	"translatorID": "411f9a8b-64f3-4465-b7df-a3c988b602f3",
+	"translatorType": 4,
 	"label": "RePEc - Econpapers",
 	"creator": "Sebastian Karcher",
 	"target": "^https?://econpapers\\.repec\\.org/",
-	"minVersion": "1.0.0b4.r1",
-	"maxVersion": "",
+	"minVersion": "5.0",
+	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
-	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2016-12-27 20:18:46"
+	"lastUpdated": "2025-04-29 03:15:00"
 }
-
-/*********************** BEGIN FRAMEWORK ***********************/
-/**
-    Copyright (c) 2010-2013, Erik Hetzner
-
-    This program is free software: you can redistribute it and/or
-    modify it under the terms of the GNU Affero General Public License
-    as published by the Free Software Foundation, either version 3 of
-    the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public
-    License along with this program.  If not, see
-    <http://www.gnu.org/licenses/>.
-*/
-
-/**
- * Flatten a nested array; e.g., [[1], [2,3]] -> [1,2,3]
- */
-function flatten(a) {
-    var retval = new Array();
-    for (var i in a) {
-        var entry = a[i];
-        if (entry instanceof Array) {
-            retval = retval.concat(flatten(entry));
-        } else {
-            retval.push(entry);
-        }
-    }
-    return retval;
-}
-
-var FW = {
-    _scrapers : new Array()
-};
-
-FW._Base = function () {
-    this.callHook = function (hookName, item, doc, url) {
-        if (typeof this['hooks'] === 'object') {
-            var hook = this['hooks'][hookName];
-            if (typeof hook === 'function') {
-                hook(item, doc, url);
-            }
-        }
-    };
-
-    this.evaluateThing = function(val, doc, url) {
-        var valtype = typeof val;
-        if (valtype === 'object') {
-            if (val instanceof Array) {
-                /* map over each array val */
-                /* this.evaluate gets out of scope */
-                var parentEval = this.evaluateThing;
-                var retval = val.map ( function(i) { return parentEval (i, doc, url); } );
-                return flatten(retval);
-            } else {
-                return val.evaluate(doc, url);
-            }
-        } else if (valtype === 'function') {
-            return val(doc, url);
-        } else {
-            return val;
-        }
-    };
-
-    /*
-     * makeItems is the function that does the work of making an item.
-     * doc: the doc tree for the item
-     * url: the url for the item
-     * attachments ...
-     * eachItem: a function to be called for each item made, with the arguments (doc, url, ...)
-     * ret: the function to call when you are done, with no args
-     */
-    this.makeItems = function (doc, url, attachments, eachItem, ret) {
-        ret();
-    }
-
-};
-
-FW.Scraper = function (init) { 
-    FW._scrapers.push(new FW._Scraper(init));
-};
-
-FW._Scraper = function (init) {
-    for (x in init) {
-        this[x] = init[x];
-    }
-
-    this._singleFieldNames = [
-        "abstractNote",
-        "applicationNumber",
-        "archive",
-        "archiveLocation",
-        "artworkMedium",
-        "artworkSize",
-        "assignee",
-        "audioFileType",
-        "audioRecordingType",
-        "billNumber",
-        "blogTitle",
-        "bookTitle",
-        "callNumber",
-        "caseName",
-        "code",
-        "codeNumber",
-        "codePages",
-        "codeVolume",
-        "committee",
-        "company",
-        "conferenceName",
-        "country",
-        "court",
-        "date",
-        "dateDecided",
-        "dateEnacted",
-        "dictionaryTitle",
-        "distributor",
-        "docketNumber",
-        "documentNumber",
-        "DOI",
-        "edition",
-        "encyclopediaTitle",
-        "episodeNumber",
-        "extra",
-        "filingDate",
-        "firstPage",
-        "forumTitle",
-        "genre",
-        "history",
-        "institution",
-        "interviewMedium",
-        "ISBN",
-        "ISSN",
-        "issue",
-        "issueDate",
-        "issuingAuthority",
-        "journalAbbreviation",
-        "label",
-        "language",
-        "legalStatus",
-        "legislativeBody",
-        "letterType",
-        "libraryCatalog",
-        "manuscriptType",
-        "mapType",
-        "medium",
-        "meetingName",
-        "nameOfAct",
-        "network",
-        "number",
-        "numberOfVolumes",
-        "numPages",
-        "pages",
-        "patentNumber",
-        "place",
-        "postType",
-        "presentationType",
-        "priorityNumbers",
-        "proceedingsTitle",
-        "programTitle",
-        "programmingLanguage",
-        "publicLawNumber",
-        "publicationTitle",
-        "publisher",
-        "references",
-        "reportNumber",
-        "reportType",
-        "reporter",
-        "reporterVolume",
-        "rights",
-        "runningTime",
-        "scale",
-        "section",
-        "series",
-        "seriesNumber",
-        "seriesText",
-        "seriesTitle",
-        "session",
-        "shortTitle",
-        "studio",
-        "subject",
-        "system",
-        "thesisType",
-        "title",
-        "type",
-        "university",
-        "url",
-        "version",
-        "videoRecordingType",
-        "volume",
-        "websiteTitle",
-        "websiteType" ];
-    
-    this._makeAttachments = function(doc, url, config, item) {
-        if (config instanceof Array) {
-            config.forEach(function (child) { this._makeAttachments(doc, url, child, item); }, this);
-        } else if (typeof config === 'object') {
-            /* plural or singual */
-            var urlsFilter = config["urls"] || config["url"];
-            var typesFilter = config["types"] || config["type"];
-            var titlesFilter = config["titles"] || config["title"];
-            var snapshotsFilter = config["snapshots"] || config["snapshot"];
-
-            var attachUrls = this.evaluateThing(urlsFilter, doc, url);
-            var attachTitles = this.evaluateThing(titlesFilter, doc, url);
-            var attachTypes = this.evaluateThing(typesFilter, doc, url);
-            var attachSnapshots = this.evaluateThing(snapshotsFilter, doc, url);
-
-            if (!(attachUrls instanceof Array)) {
-                attachUrls = [attachUrls];
-            }
-            for (var k in attachUrls) {
-                var attachUrl = attachUrls[k];
-                var attachType;
-                var attachTitle;
-                var attachSnapshot;
-                if (attachTypes instanceof Array) { attachType = attachTypes[k]; }
-                else { attachType = attachTypes; }
-
-                if (attachTitles instanceof Array) { attachTitle = attachTitles[k]; }
-                else { attachTitle = attachTitles; }
-
-                if (attachSnapshots instanceof Array) { attachSnapshot = attachSnapshots[k]; }
-                else { attachSnapshot = attachSnapshots; }
-
-                item["attachments"].push({ url      : attachUrl,
-                                           title    : attachTitle,
-                                           mimeType : attachType,
-                                           snapshot : attachSnapshot });
-            }
-        }
-    };
-
-    this.makeItems = function (doc, url, ignore, eachItem, ret) {
-        var item = new Zotero.Item(this.itemType);
-        item.url = url;
-        for (var i in this._singleFieldNames) {
-            var field = this._singleFieldNames[i];
-            if (this[field]) {
-                var fieldVal = this.evaluateThing(this[field], doc, url);
-                if (fieldVal instanceof Array) {
-                    item[field] = fieldVal[0];
-                } else {
-                    item[field] = fieldVal;
-                }
-            }
-        }
-        var multiFields = ["creators", "tags"];
-        for (var j in multiFields) {
-            var key = multiFields[j];
-            var val = this.evaluateThing(this[key], doc, url);
-            if (val) {
-                for (var k in val) {
-                    item[key].push(val[k]);
-                }
-            }
-        }
-        this._makeAttachments(doc, url, this["attachments"], item);
-        eachItem(item, this, doc, url);
-        ret();
-    };
-};
-
-FW._Scraper.prototype = new FW._Base;
-
-FW.MultiScraper = function (init) { 
-    FW._scrapers.push(new FW._MultiScraper(init));
-};
-
-FW._MultiScraper = function (init) {
-    for (x in init) {
-        this[x] = init[x];
-    }
-
-    this._mkSelectItems = function(titles, urls) {
-        var items = new Object;
-        for (var i in titles) {
-            items[urls[i]] = titles[i];
-        }
-        return items;
-    };
-
-    this._selectItems = function(titles, urls, callback) {
-        var items = new Array();
-	Zotero.selectItems(this._mkSelectItems(titles, urls), function (chosen) {
-	    for (var j in chosen) {
-		items.push(j);
-	    }
-	    callback(items);
-	});
-    };
-
-    this._mkAttachments = function(doc, url, urls) {
-        var attachmentsArray = this.evaluateThing(this['attachments'], doc, url);
-        var attachmentsDict = new Object();
-        if (attachmentsArray) {
-            for (var i in urls) {
-                attachmentsDict[urls[i]] = attachmentsArray[i];
-            }
-        }
-        return attachmentsDict;
-    };
-
-    /* This logic is very similar to that used by _makeAttachments in
-     * a normal scraper, but abstracting it out would not achieve much
-     * and would complicate it. */
-    this._makeChoices = function(config, doc, url, choiceTitles, choiceUrls) {
-        if (config instanceof Array) {
-            config.forEach(function (child) { this._makeTitlesUrls(child, doc, url, choiceTitles, choiceUrls); }, this);
-        } else if (typeof config === 'object') {
-            /* plural or singual */
-            var urlsFilter = config["urls"] || config["url"];
-            var titlesFilter = config["titles"] || config["title"];
-
-            var urls = this.evaluateThing(urlsFilter, doc, url);
-            var titles = this.evaluateThing(titlesFilter, doc, url);
-
-            var titlesIsArray = (titles instanceof Array);
-            if (!(urls instanceof Array)) {
-                urls = [urls];
-            }
-            for (var k in urls) {
-                var myUrl = urls[k];
-                var myTitle;
-                if (titlesIsArray) { myTitle = titles[k]; }
-                else { myTitle = titles; }
-                choiceUrls.push(myUrl);
-                choiceTitles.push(myTitle);
-            }
-        }
-    };
-
-    this.makeItems = function(doc, url, ignore, eachItem, ret) {
-        if (this.beforeFilter) {
-            var newurl = this.beforeFilter(doc, url);
-            if (newurl != url) {
-                this.makeItems(doc, newurl, ignore, eachItem, ret);
-                return;
-            }
-        }
-        var titles = [];
-        var urls = [];
-        this._makeChoices(this["choices"], doc, url, titles, urls);
-        var attachments = this._mkAttachments(doc, url, urls);
-        
-	var parentItemTrans = this.itemTrans;
-	this._selectItems(titles, urls, function (itemsToUse) {
-	    if(!itemsToUse) {
-		ret();
-	    } else {
-	        var cb = function (doc1) {
-		    var url1 = doc1.documentURI;
-		    var itemTrans = parentItemTrans;
-		    if (itemTrans === undefined) {
-			itemTrans = FW.getScraper(doc1, url1);
-		    }
-		    if (itemTrans === undefined) {
-			/* nothing to do */
-		    } else {
-			itemTrans.makeItems(doc1, url1, attachments[url1],
-                                            eachItem, function() {});
-		    }
-		};
-	        Zotero.Utilities.processDocuments(itemsToUse, cb, ret);
-	    }
-	});
-    };
-};
-
-FW._MultiScraper.prototype = new FW._Base;
-
-FW.WebDelegateTranslator = function (init) { 
-    return new FW._WebDelegateTranslator(init);
-};
-
-FW._WebDelegateTranslator = function (init) {
-    for (x in init) {
-        this[x] = init[x];
-    }
-    this.makeItems = function(doc, url, attachments, eachItem, ret) {
-        // need for scoping
-        var parentThis = this;
-
-        var translator = Zotero.loadTranslator("web");
-        translator.setHandler("itemDone", function(obj, item) { 
-            eachItem(item, parentThis, doc, url);
-        });
-        translator.setDocument(doc);
-
-        if (this.translatorId) {
-            translator.setTranslator(this.translatorId);
-            translator.translate();
-        } else {
-            translator.setHandler("translators", function(obj, translators) {
-                if (translators.length) {
-                    translator.setTranslator(translators[0]);
-                    translator.translate();
-                }
-            });
-            translator.getTranslators();
-        }
-        ret();
-    };
-};
-
-FW._WebDelegateTranslator.prototype = new FW._Base;
-
-FW._StringMagic = function () {
-    this._filters = new Array();
-
-    this.addFilter = function(filter) {
-        this._filters.push(filter);
-        return this;
-    };
-
-    this.split = function(re) {
-        return this.addFilter(function(s) {
-            return s.split(re).filter(function(e) { return (e != ""); });
-        });
-    };
-
-    this.replace = function(s1, s2, flags) {
-        return this.addFilter(function(s) {
-            if (s.match(s1)) {
-                return s.replace(s1, s2, flags);
-            } else {
-                return s;
-            }
-        });
-    };
-
-    this.prepend = function(prefix) {
-        return this.replace(/^/, prefix);
-    };
-
-    this.append = function(postfix) {
-        return this.replace(/$/, postfix);
-    };
-
-    this.remove = function(toStrip, flags) {
-        return this.replace(toStrip, '', flags);
-    };
-
-    this.trim = function() {
-        return this.addFilter(function(s) { return Zotero.Utilities.trim(s); });
-    };
-
-    this.trimInternal = function() {
-        return this.addFilter(function(s) { return Zotero.Utilities.trimInternal(s); });
-    };
-
-    this.match = function(re, group) {
-        if (!group) group = 0;
-        return this.addFilter(function(s) { 
-                                  var m = s.match(re);
-                                  if (m === undefined || m === null) { return undefined; }
-                                  else { return m[group]; } 
-                              });
-    };
-
-    this.cleanAuthor = function(type, useComma) {
-        return this.addFilter(function(s) { return Zotero.Utilities.cleanAuthor(s, type, useComma); });
-    };
-
-    this.key = function(field) {
-        return this.addFilter(function(n) { return n[field]; });
-    };
-
-    this.capitalizeTitle = function() {
-        return this.addFilter(function(s) { return Zotero.Utilities.capitalizeTitle(s); });
-    };
-
-    this.unescapeHTML = function() {
-        return this.addFilter(function(s) { return Zotero.Utilities.unescapeHTML(s); });
-    };
-
-    this.unescape = function() {
-        return this.addFilter(function(s) { return unescape(s); });
-    };
-
-    this._applyFilters = function(a, doc1) {
-        for (i in this._filters) {
-            a = flatten(a);
-            /* remove undefined or null array entries */
-            a = a.filter(function(x) { return ((x !== undefined) && (x !== null)); });
-            for (var j = 0 ; j < a.length ; j++) {
-                try {
-                    if ((a[j] === undefined) || (a[j] === null)) { continue; }
-                    else { a[j] = this._filters[i](a[j], doc1); }
-                } catch (x) {
-                    a[j] = undefined;
-                    Zotero.debug("Caught exception " + x + "on filter: " + this._filters[i]);
-                }
-            }
-            /* remove undefined or null array entries */
-            /* need this twice because they could have become undefined or null along the way */
-            a = a.filter(function(x) { return ((x !== undefined) && (x !== null)); });
-        }
-        return flatten(a);
-    };
-};
-
-FW.PageText = function () {
-    return new FW._PageText();
-};
-
-FW._PageText = function() {
-    this._filters = new Array();
-
-    this.evaluate = function (doc) {        
-        var a = [doc.documentElement.innerHTML];
-        a = this._applyFilters(a, doc);
-        if (a.length == 0) { return false; }
-        else { return a; }
-    };
-};
-
-FW._PageText.prototype = new FW._StringMagic();
-
-FW.Url = function () { return new FW._Url(); };
-
-FW._Url = function () {
-    this._filters = new Array();
-
-    this.evaluate = function (doc, url) {        
-        var a = [url];
-        a = this._applyFilters(a, doc);
-        if (a.length == 0) { return false; }
-        else { return a; }
-    };
-};
-
-FW._Url.prototype = new FW._StringMagic();
-
-FW.Xpath = function (xpathExpr) { return new FW._Xpath(xpathExpr); };
-
-FW._Xpath = function (_xpath) {
-    this._xpath = _xpath;
-    this._filters = new Array();
-
-    this.text = function() {
-        var filter = function(n) {
-            if (typeof n === 'object' && n.textContent) { return n.textContent; }
-            else { return n; }
-        };
-        this.addFilter(filter);
-        return this;
-    };
-
-    this.sub = function(xpath) {
-        var filter = function(n, doc) {
-            var result = doc.evaluate(xpath, n, null, XPathResult.ANY_TYPE, null);
-            if (result) {
-                return result.iterateNext();
-            } else {
-                return undefined;               
-            }
-        };
-        this.addFilter(filter);
-        return this;
-    };
-
-    this.evaluate = function (doc) {
-        var res = doc.evaluate(this._xpath, doc, null, XPathResult.ANY_TYPE, null);
-        var resultType = res.resultType;
-        var a = new Array();
-        if (resultType == XPathResult.STRING_TYPE) {
-            a.push(res.stringValue);
-        } else if (resultType == XPathResult.BOOLEAN_TYPE) {
-            a.push(res.booleanValue);
-        } else if (resultType == XPathResult.NUMBER_TYPE) {
-            a.push(res.numberValue);
-        } else if (resultType == XPathResult.ORDERED_NODE_ITERATOR_TYPE ||
-                   resultType == XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
-            var x;
-            while ((x = res.iterateNext())) { a.push(x); }
-        } 
-        a = this._applyFilters(a, doc);
-        if (a.length == 0) { return false; }
-        else { return a; }
-    };
-};
-
-FW._Xpath.prototype = new FW._StringMagic();
-
-FW.detectWeb = function (doc, url) {
-    for (var i in FW._scrapers) {
-	var scraper = FW._scrapers[i];
-	var itemType = scraper.evaluateThing(scraper['itemType'], doc, url);
-	var v = scraper.evaluateThing(scraper['detect'], doc, url);
-        if (v.length > 0 && v[0]) {
-	    return itemType;
-	}
-    }
-    return undefined;
-};
-
-FW.getScraper = function (doc, url) {
-    var itemType = FW.detectWeb(doc, url);
-    return FW._scrapers.filter(function(s) {
-        return (s.evaluateThing(s['itemType'], doc, url) == itemType)
-		&& (s.evaluateThing(s['detect'], doc, url));
-    })[0];
-};
-
-FW.doWeb = function (doc, url) {
-    var scraper = FW.getScraper(doc, url);
-    scraper.makeItems(doc, url, [], 
-                      function(item, scraper, doc, url) {
-                          scraper.callHook('scraperDone', item, doc, url);
-                          if (!item['title']) {
-                              item['title'] = "";
-                          }
-                          item.complete();
-                      },
-                      function() {
-                          Zotero.done();
-                      });
-    Zotero.wait();
-};
-
-/*********************** END FRAMEWORK ***********************/
-
-
-
 
 /*
 	***** BEGIN LICENSE BLOCK *****
 
-	RePEc Translator
-	Copyright © 2011 Sebastian Karcher
+	Copyright © 2011 Sebastian Karcher and contributors.
 
 	This file is part of Zotero.
 
@@ -665,133 +35,338 @@ FW.doWeb = function (doc, url) {
 	***** END LICENSE BLOCK *****
 */
 
+// NOTE: EconPapers now implements mostly acceptable metadata, and their own
+// citation export is implemented as entirely client-side JS code that scrapes
+// the metadata.
 
-function detectWeb(doc, url) { return FW.detectWeb(doc, url); }
-function doWeb(doc, url) { return FW.doWeb(doc, url); }
+function detectWeb(doc, url) {
+	let path = new URL(url).pathname;
 
-/**Article */
+	if (isSearch(path) && getSearchResults(doc, true)) {
+		return 'multiple';
+	}
 
-FW.Scraper({
-itemType : 'journalArticle',
-detect : FW.Xpath('//meta[@name="citation_journal_title"]'),
-title : FW.Xpath('//meta[@name="citation_title"]/@content').text().trim(),
-attachments : [{ url: FW.Xpath('//p/a[contains(@href, "scripts/redi") and contains(@href, ".pdf")]').text().trim(),
-  title: "RePEc PDF",
-  type: "application/pdf" },
-  {url: FW.Url(),
-  title: "RePEc Snapshot",
-  type: "text/html"},
-  ],
-creators : FW.Xpath('//meta[@name="citation_authors"]/@content').text().replace(/(;[^A-Za-z0-9]*)$/, "").split(/;/).cleanAuthor("author", true),
-date : FW.Xpath('//meta[@name="citation_date"]/@content|//meta[@name="citation_year"]/@content').text(),
-issue : FW.Xpath('//meta[@name="citation_issue"]/@content').text(),
-volume : FW.Xpath('//meta[@name="citation_volume"]/@content').text(),
-pages : FW.Xpath('concat(//meta[@name="citation_firstpage"]/@content, "-", //meta[@name="citation_lastpage"]/@content)').remove(/^-|-$/),
-ISSN : FW.Xpath('//meta[@name="citation_issn"]/@content').text(),
-abstractNote: FW.Xpath('//meta[@name="citation_abstract"]/@content').text(),
-journalAbbreviation : FW.Xpath('//meta[@name="citation_journal_abbrev"]/@content').text(),
-DOI : FW.Xpath('//meta[@name="citation_doi"]/@content').text(),
-language : FW.Xpath('//meta[@name="DC.Language"]/@content').text(),
-tags :  FW.Xpath('//meta[@name="citation_keywords"]/@content').text().split(/;/),
-publisher: FW.Xpath('//meta[@name="citation_publisher"]/@content').text(),
-publicationTitle : FW.Xpath('//meta[@name="citation_journal_title"]/@content').text(),
-place : FW.Xpath('//meta[@name="citation_publication_place"]/@content').text(),
-hooks : { "scraperDone": function  (item,doc, url) {
-	for (i in item.creators) {
-		if (item.creators[i]  && !item.creators[i].firstName) {
-	   	item.creators[i]= ZU.cleanAuthor(item.creators[i].lastName, "author")
+	if (isListing(path) && getListing(doc, true)) {
+		return 'multiple';
+	}
+
+	let pathMatch = path.match(/\/(\w+)\/.+\/.+/);
+	if (pathMatch) {
+		switch (pathMatch[1]) {
+			case "article":
+				return "journalArticle";
+			case "software":
+				return "computerProgram";
+			case "paper":
+				return "report"; // working papers
+			case "bookchap":
+				return getBookChapType(doc);
 		}
-	}}
+	}
+
+	return false;
 }
-});
 
-
-/** Working Papers*/
-FW.Scraper({
-itemType : 'report',
-detect : FW.Xpath('//meta[@name="dc.Type" and contains(@content, "techreport")]|//meta[contains(@name, "technical_report")]'),
-title : FW.Xpath('//meta[@name="citation_title"]/@content').text().trim(),
-attachments : [{ url: FW.Xpath('//p/a[contains(@href, "scripts/redi") and contains(@href, ".pdf")]').text().trim(),
-  title: "RePEc PDF",
-  type: "application/pdf" },
-  {url: FW.Url(),
-  title: "RePEc Snapshot",
-  type: "text/html"},
-  ],
-//make sure there are no empty authors:
-creators : FW.Xpath('//meta[@name="citation_authors"]/@content').text().replace(/(;[^A-Za-z0-9]*)$/, "").split(/;/).cleanAuthor("author", true),
-date : FW.Xpath('//meta[@name="citation_date"]/@content|//meta[@name="citation_year"]/@content').text(),
-pages : FW.Xpath('concat(//meta[@name="citation_firstpage"]/@content, "-", //meta[@name="citation_lastpage"]/@content)').remove(/^-|-$/),
-ISBN : FW.Xpath('//meta[@name="citation_isbn"]/@content').text(),
-abstractNote: FW.Xpath('//meta[@name="citation_abstract"]/@content').text(),
-DOI : FW.Xpath('//meta[@name="citation_doi"]/@content').text(),
-language : FW.Xpath('//meta[@name="DC.Language"]/@content').text(),
-tags :  FW.Xpath('//meta[@name="citation_keywords"]/@content').text().split(/;/),
-publisher: FW.Xpath('//meta[@name="citation_publisher"]/@content|//meta[@name="citation_technical_report_institution"]/@content').text(),
-reportNumber: FW.Xpath('//meta[@name="citation_technical_report_number"]/@content').text(),
-reportType : FW.Xpath('//meta[@name="series"]/@content').text().replace(/apers$/, "aper"),
-place : FW.Xpath('//meta[@name="citation_publication_place"]/@content').text(),
-numPages : FW.Xpath('//meta[@name="citation_number_of_pages"]/@content').text().remove(/\s\D*/),
-hooks : { "scraperDone": function  (item,doc, url) {
-	for (i in item.creators) {
-		if (item.creators[i]  && !item.creators[i].firstName) {
-	   	item.creators[i]= ZU.cleanAuthor(item.creators[i].lastName, "author")
+// determine whether the type of the item under the path "/bookchap" is a book
+// or bookSection (chapter)
+function getBookChapType(doc) {
+	let type = attr(doc, "meta[name='redif-type']", "content");
+	// fallback when metadata is missing
+	if (!type) {
+		let accessStatisticsLine = ZU.xpathText(doc,
+			'//div[@class = "bodytext"]/p[.//a[contains(@href, "/paperstat.pf")]][1]');
+		if (accessStatisticsLine) {
+			accessStatisticsLine = ZU.trimInternal(accessStatisticsLine);
+			// take last word
+			let components = accessStatisticsLine.split(" ");
+			type = components[components.length - 1];
 		}
-	}}
-}
-});
+	}
 
-FW.Scraper({
-itemType : 'computerProgram',
-detect : FW.Xpath('//meta[@name="dc.Type" and contains(@content, "software")]'),
-title : FW.Xpath('//meta[@name="citation_title"]/@content').text().trim(),
-attachments : [{ url: FW.Xpath('//p/a[contains(@href, "scripts/redi") and contains(@href, ".pdf")]').text().trim(),
-  title: "RePEc PDF",
-  type: "application/pdf" },
-  {url: FW.Url(),
-  title: "RePEc Snapshot",
-  type: "text/html"},
-  ],
-//make sure there are no empty authors:
-creators : FW.Xpath('//meta[@name="citation_authors"]/@content').text().replace(/(;[^A-Za-z0-9]*)$/, "").split(/;/).cleanAuthor("author", "true"),
-date : FW.Xpath('//meta[@name="citation_date"]/@content|//meta[@name="citation_year"]/@content').text(),
-pages : FW.Xpath('concat(//meta[@name="citation_firstpage"]/@content, "-", //meta[@name="citation_lastpage"]/@content)').remove(/^-|-$/),
-ISBN : FW.Xpath('//meta[@name="citation_isbn"]/@content').text(),
-abstractNote: FW.Xpath('//meta[@name="citation_abstract"]/@content').text(),
-DOI : FW.Xpath('//meta[@name="citation_doi"]/@content').text(),
-programmingLanguage: FW.Xpath('//meta[@name="plang"]/@content').text().trim(),
-seriesTitle: FW.Xpath('//meta[@name="series"]/@content').text().trim(),
-language : FW.Xpath('//meta[@name="DC.Language"]/@content').text(),
-tags :  FW.Xpath('//meta[@name="citation_keywords"]/@content').text().split(/;/),
-publisher: FW.Xpath('//meta[@name="citation_publisher"]/@content|//meta[@name="citation_technical_report_institution"]/@content').text(),
-place : FW.Xpath('//meta[@name="citation_publication_place"]/@content').text(),
-version : FW.Xpath('//meta[@name="citation_software_version"]/@content').text(),
-hooks : { "scraperDone": function  (item,doc, url) {
-	for (i in item.creators) {
-		if (item.creators[i]  && !item.creators[i].firstName) {
-	   	item.creators[i]= ZU.cleanAuthor(item.creators[i].lastName, "author")
+	switch (type) {
+		case "book":
+			return "book";
+		case "chapter":
+			return "bookSection";
+		default:
+			Z.debug(`Unknown book or book-section type ${type}`);
+	}
+
+	return false;
+}
+
+function isSearch(path) {
+	return path.startsWith("/scripts/search.pf");
+}
+
+function getSearchResults(doc, checkOnly) {
+	var items = {};
+	var found = false;
+	var rows = doc.querySelectorAll('.reflist > a');
+	if (!rows.length) rows = doc.querySelectorAll('ol b > a');
+	for (let row of rows) {
+		let href = row.href;
+		let title = ZU.trimInternal(row.textContent);
+		if (!href || !title) continue;
+		if (checkOnly) return true;
+		found = true;
+		items[href] = title;
+	}
+	return found ? items : false;
+}
+
+function isListing(path) {
+	return /\/(article|paper|software|bookchap)\/.+\/(default\d+\.htm)?$/.test(path);
+}
+
+function getListing(doc, checkOnly) {
+	var items = {};
+	var found = false;
+	var rows = doc.querySelectorAll('.bodytext dt a');
+	for (let row of rows) {
+		let href = row.href;
+		let title = ZU.trimInternal(row.textContent);
+		if (!href || !title) continue;
+		if (checkOnly) return true;
+		found = true;
+		items[href] = title;
+	}
+	return found ? items : false;
+}
+
+async function doWeb(doc, url) {
+	if (detectWeb(doc, url) == 'multiple') {
+		let path = new URL(url).pathname;
+		let listFunction = isSearch(path) ? getSearchResults : getListing;
+		let items = await Zotero.selectItems(listFunction(doc, false));
+		if (!items) return;
+		for (let url of Object.keys(items)) {
+			await scrape(await requestDocument(url));
 		}
-	}}
+	}
+	else {
+		await scrape(doc, url);
+	}
 }
-});
 
+async function scrape(doc, url = doc.location.href) {
+	let type = detectWeb(doc, url);
+	let translator = Zotero.loadTranslator('web');
+	// Embedded Metadata
+	translator.setTranslator('951c027d-74ac-47d4-a107-9c3069ab7b48');
+	translator.setDocument(doc);
 
+	translator.setHandler('itemDone', (_obj, item) => {
+		cleanItem(item);
 
-//Multi Econpapers - this happens in frames - scaffold fails, regular testing works
-FW.MultiScraper({
-itemType : 'multiple',
-detect : FW.Url().match(/scripts\/a\/abstract\.pf/),
-choices : {
-  titles : FW.Xpath('//div[@class="abstractframe"]//li/a').text().trim(),
-  urls : FW.Xpath('//div[@class="abstractframe"]//li/a').key("href")
+		switch (type) {
+			case "report":
+				item.reportType = "Working paper";
+				break;
+			case "journalArticle":
+				handleJournalArticle(item);
+				break;
+			case "book":
+				handleBook(item, doc);
+				break;
+			case "computerProgram":
+				handleComputerProgram(item, doc);
+				break;
+		}
+
+		finalize(item, doc);
+	});
+
+	let em = await translator.getTranslatorObject();
+	em.itemType = type;
+	em.addCustomFields({
+		book_title: 'bookTitle', // eslint-disable-line camelcase
+		series: 'seriesTitle'
+	});
+	await em.doWeb(doc, url);
 }
-});
+
+function handleJournalArticle(item) {
+	// clean up the seriesTitle that we've EM translator to produce, because
+	// it's redundant with the publicationTitle
+	if (item.publicationTitle && item.publicationTitle === item.seriesTitle) {
+		delete item.seriesTitle;
+	}
+}
+
+function handleBook(item, doc) {
+	let pages = getBoldHeadLineContent(doc, "Pages:");
+	if (pages && !isNaN(parseInt(pages))) {
+		item.numPages = pages;
+	}
+}
+
+function handleComputerProgram(item, doc) {
+	let lang = getBoldHeadLineContent(doc, "Language:");
+	if (lang) {
+		item.programmingLanguage = lang;
+	}
+
+	let date = getBoldHeadLineContent(doc, "Date:");
+	if (date.includes(",")) {
+		let origDate = date.split(",")[0];
+		if (origDate) {
+			addExtraLine(item, `Original Date: ${origDate}`);
+		}
+	}
+	// TODO: "See Also" article for code from article?
+}
+
+function finalize(item, doc) {
+	let jelCodes = ZU.trimInternal(attr(doc, "meta[name='JEL-Codes']", "content"));
+	if (jelCodes) {
+		for (let code of jelCodes.split("; ")) {
+			item.tags.push(code);
+		}
+	}
+
+	let doiElem = paragraphHeadedBy(doc, "DOI:");
+	if (doiElem) {
+		let doi = text(doiElem, "a[href^='/scripts/redir.pf']").trim();
+		Z.debug(`Possible DOI string: ${doi}`, 4);
+		if (/10\.\d{4,}\/.+/.test(doi)) {
+			item.DOI = doi;
+		}
+	}
+
+	let downloadParagraph = paragraphHeadedBy(doc, "Downloads:");
+	if (downloadParagraph) {
+		creatAttachments(
+			downloadParagraph.querySelectorAll("a[href^='/scripts/redir.pf']"),
+			item,
+			item.itemType !== "computerProgram" // don't save links to source code; there can be too many
+		);
+	}
+
+	item.libraryCatalog = "EconPapers"; // their own self-appellation and styling
+
+	item.complete();
+}
+
+// Find paragraph (<p> element) by the text content of the bold heading in it
+// (<b> element)
+function paragraphHeadedBy(doc, heading) {
+	let container = doc.querySelector(".bodytext");
+	if (!container) return null;
+
+	let quotedStr = JSON.stringify(heading);
+	let elem = ZU.xpath(container,
+		`//p[.//b[starts-with(text(), ${quotedStr})][1]]`)[0];
+	return elem || null;
+}
+
+// For a single line (part of the inner html of a <p> element) that starts with
+// a <b> heading, retrieve the text that appears after the heading before the
+// next element
+function getBoldHeadLineContent(doc, heading) {
+	let container = doc.querySelector(".bodytext");
+	if (!container) return null;
+
+	let quotedStr = JSON.stringify(heading);
+	let node = ZU.xpath(container,
+		`//p//b[starts-with(text(), ${quotedStr})]`)[0];
+	if (!node) return null;
+
+	let acc = [];
+	while ((node = node.nextSibling) && node.nodeType === 3/* text node */) {
+		acc.push(node.textContent);
+	}
+	return ZU.trimInternal(acc.join(""));
+}
+
+// Create attachments from the <a> elements
+function creatAttachments(elements, item, keepNonPDF) {
+	for (let elem of elements) {
+		// the site's own redirect facility; we will work around it to save a
+		// redirect
+		if (!elem.href) continue;
+		let redirectURLObj = new URL(elem.href);
+		let targetURL = redirectURLObj.searchParams.get("u") || "";
+		// Remove the redirect script's handle parameter
+		targetURL = targetURL.replace(/;h=repec:.+$/i, "");
+		if (!targetURL) continue;
+		let targetURLObj;
+		try {
+			targetURLObj = new URL(targetURL);
+		}
+		catch (err) {
+			continue;
+		}
+
+		Z.debug(`External link: ${targetURL}`, 4);
+		let doi;
+		if (!item.DOI && (doi = doiFromExtLink(targetURLObj))) {
+			Z.debug(`DOI (from external link): ${doi}`, 4);
+			item.DOI = doi;
+		}
+		// Best-effort try for PDF link; NOTE that even if the page may say
+		// "application/pdf" beside a link, that link could point to a landing
+		// page rather than the PDF file.
+		if (maybePDF(targetURLObj)) {
+			item.attachments.push({
+				title: "RePEc PDF",
+				url: targetURL,
+				mimeType: "application/pdf"
+			});
+		}
+		else if (keepNonPDF) {
+			item.attachments.push({
+				title: "RePEc External Link",
+				url: targetURL,
+				snapshot: false // don't download
+			});
+		}
+	}
+}
+
+// A conservative DOI-extractor that works on the "Downloads" section. Only try
+// to extract if the link's domain is a well-known resolver.
+function doiFromExtLink(urlObj) {
+	if (/^((dx\.)?doi\.org|hdl\.handle\.net)$/.test(urlObj.hostname)) {
+		let m = decodeURIComponent(urlObj.pathname).match(/^\/(10\.\d{4,}\/.+)/);
+		if (m) {
+			return m[1];
+		}
+	}
+	return false;
+}
+
+function maybePDF(urlObj) {
+	return /(\.|\/)pdf$/.test(urlObj.pathname);
+}
+
+// add a string line to the item's extra field
+function addExtraLine(item, line) {
+	if (!item.extra) {
+		item.extra = line;
+	}
+	else {
+		item.extra += item.extra.endsWith("\n") ? line : `\n${line}`;
+	}
+}
+
+// Remove unnecessary and non-informative fields from embedded metadata,
+// especially the DC fields
+var FIELDS_TO_CLEAN = ["label", "distributor", "letterType", "manuscriptType", "mapType", "thesisType", "websiteType", "presentationType", "postType", "audioFileType", "reportType"];
+
+function cleanItem(item) {
+	for (let field of FIELDS_TO_CLEAN) {
+		if (Object.hasOwn(item, field)) {
+			delete item[field];
+		}
+	}
+}
 
 /** BEGIN TEST CASES **/
 var testCases = [
 	{
 		"type": "web",
-		"url": "http://econpapers.repec.org/paper/nbrnberwo/11309.htm",
+		"url": "https://econpapers.repec.org/paper/nbrnberwo/11309.htm",
 		"items": [
 			{
 				"itemType": "report",
@@ -811,22 +386,30 @@ var testCases = [
 				"date": "2005/05",
 				"abstractNote": "Supporters of touch-screen voting claim it is a highly reliable voting technology, while a growing number of critics argue that paperless electronic voting systems are vulnerable to fraud. In this paper we use county-level data on voting technologies in the 2000 and 2004 presidential elections to test whether voting technology affects electoral outcomes. We first show that there is a positive correlation between use of touch-screen voting and the level of electoral support for George Bush. This is true in models that compare the 2000-2004 changes in vote shares between adopting and non-adopting counties within a state, after controlling for income, demographic composition, and other factors. Although small, the effect could have been large enough to influence the final results in some closely contested states. While on the surface this pattern would appear to be consistent with allegations of voting irregularities, a closer examination suggests this interpretation is incorrect. If irregularities did take place, they would be most likely in counties that could potentially affect statewide election totals, or in counties where election officials had incentives to affect the results. Contrary to this prediction, we find no evidence that touch-screen voting had a larger effect in swing states, or in states with a Republican Secretary of State. Touch-screen voting could also indirectly affect vote shares by influencing the relative turnout of different groups. We find that the adoption of touch-screen voting has a negative effect on estimated turnout rates, controlling for state effects and a variety of county-level controls. This effect is larger in counties with a higher fraction of Hispanic residents (who tend to favor Democrats) but not in counties with more African Americans (who are overwhelmingly Democrat voters). Models for the adoption of touch-screen voting suggest it was more likely to be used in counties with a higher fraction of Hispanic and Black residents, especially in swing states. Nevertheless, the impact of non-random adoption patterns on vote shares is small.",
 				"institution": "National Bureau of Economic Research, Inc",
-				"libraryCatalog": "RePEc - Econpapers",
+				"libraryCatalog": "EconPapers",
 				"reportNumber": "11309",
-				"reportType": "NBER Working Paper",
+				"reportType": "Working paper",
+				"seriesTitle": "NBER Working Papers",
 				"shortTitle": "Does Voting Technology Affect Election Outcomes?",
-				"url": "http://econpapers.repec.org/paper/nbrnberwo/11309.htm",
+				"url": "https://EconPapers.repec.org/RePEc:nbr:nberwo:11309",
 				"attachments": [
+					{
+						"title": "Snapshot",
+						"mimeType": "text/html"
+					},
 					{
 						"title": "RePEc PDF",
 						"mimeType": "application/pdf"
-					},
-					{
-						"title": "RePEc Snapshot",
-						"mimeType": "text/html"
 					}
 				],
-				"tags": [],
+				"tags": [
+					{
+						"tag": "H0"
+					},
+					{
+						"tag": "J0"
+					}
+				],
 				"notes": [],
 				"seeAlso": []
 			}
@@ -834,7 +417,7 @@ var testCases = [
 	},
 	{
 		"type": "web",
-		"url": "http://econpapers.repec.org/software/bocbocode/s439301.htm",
+		"url": "https://econpapers.repec.org/software/bocbocode/s439301.htm",
 		"items": [
 			{
 				"itemType": "computerProgram",
@@ -846,29 +429,37 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2017/02/02",
+				"date": "2023/02/12",
 				"abstractNote": "estout produces a table of regression results from one or several models for use with spreadsheets, LaTeX, HTML, or a word-processor table. eststo stores a quick copy of the active estimation results for later tabulation. esttab is a wrapper for estout. It displays a pretty looking publication-style regression table without much typing. estadd adds additional results to the e()-returns for one or several models previously fitted and stored. This package subsumes the previously circulated esto, esta, estadd, and estadd_plus. An earlier version of estout is available as estout1.",
-				"libraryCatalog": "RePEc - Econpapers",
+				"company": "Boston College Department of Economics",
+				"extra": "Original Date: 2004-07-22",
+				"libraryCatalog": "EconPapers",
+				"programmingLanguage": "Stata",
 				"seriesTitle": "Statistical Software Components",
 				"shortTitle": "ESTOUT",
-				"url": "http://econpapers.repec.org/software/bocbocode/s439301.htm",
+				"url": "https://EconPapers.repec.org/RePEc:boc:bocode:s439301",
 				"attachments": [
 					{
-						"url": false,
-						"title": "RePEc PDF",
-						"mimeType": "application/pdf"
-					},
-					{
-						"title": "RePEc Snapshot",
+						"title": "Snapshot",
 						"mimeType": "text/html"
 					}
 				],
 				"tags": [
-					" HTML",
-					" LaTeX",
-					" output",
-					" word processor",
-					"estimates"
+					{
+						"tag": "HTML"
+					},
+					{
+						"tag": "LaTeX"
+					},
+					{
+						"tag": "estimates"
+					},
+					{
+						"tag": "output"
+					},
+					{
+						"tag": "word processor"
+					}
 				],
 				"notes": [],
 				"seeAlso": []
@@ -877,7 +468,7 @@ var testCases = [
 	},
 	{
 		"type": "web",
-		"url": "http://econpapers.repec.org/article/emerafpps/v_3a9_3ay_3a2010_3ai_3a3_3ap_3a244-263.htm",
+		"url": "https://econpapers.repec.org/article/emerafpps/v_3a9_3ay_3a2010_3ai_3a3_3ap_3a244-263.htm",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -887,37 +478,248 @@ var testCases = [
 						"firstName": "Sharad",
 						"lastName": "Asthana",
 						"creatorType": "author"
+					},
+					{
+						"firstName": "Steven",
+						"lastName": "Balsam",
+						"creatorType": "author"
 					}
 				],
 				"date": "2010",
-				"abstractNote": "Purpose - The purpose of this paper is to show that director turnover varies in predictable and intuitive ways with director incentives. Design/methodology/approach - The paper uses a sample of 51,388 observations pertaining to 13,084 directors who served 1,065 firms during the period 1997-2004. The data are obtained from RiskMetrics, Compustat, Execu-Comp, CRSP, IBES, and the Corporate Library databases. Portfolio analysis, logit, and GLIMMIX regression analysis are used for the tests. Findings - The paper provides evidence that directors are more likely to leave when firm performance deteriorates and the firm becomes riskier. While turnover increasing as firm performance deteriorates is consistent with involuntary turnover, directors are also more likely to leave in advance of deteriorating performance. The latter is consistent with directors having inside information and acting on that information to protect their wealth and reputation. When inside and outside director turnover is contrasted, the association between turnover and performance is stronger for inside directors. Research limitations - Since data are obtained from multiple databases, the sample may be biased in favor of larger firms. The results may, therefore, not be applicable to smaller firms. To the extent that the story is unable to differentiate between voluntary and involuntary director turnover, the results should be interpreted with caution. Originality/value - Even though extant research has looked extensively at the determinants of CEO turnover, little has been written on director turnover. Director turnover is an important topic to study, since directors, especially outside directors, possess a significant oversight role in the corporation.",
+				"DOI": "10.1108/14757701011068057",
+				"ISSN": "1475-7702",
+				"abstractNote": "Purpose - The purpose of this paper is to show that director turnover varies in predictable and intuitive ways with director incentives. Design/methodology/approach - The paper uses a sample of 51,388 observations pertaining to 13,084 directors who served 1,065 firms during the period 1997‐2004. The data are obtained from RiskMetrics, Compustat, Execu‐Comp, CRSP, IBES, and the Corporate Library databases. Portfolio analysis, logit, and GLIMMIX regression analysis are used for the tests. Findings - The paper provides evidence that directors are more likely to leave when firm performance deteriorates and the firm becomes riskier. While turnover increasing as firm performance deteriorates is consistent with involuntary turnover, directors are also more likely to leave in advance of deteriorating performance. The latter is consistent with directors having inside information and acting on that information to protect their wealth and reputation. When inside and outside director turnover is contrasted, the association between turnover and performance is stronger for inside directors. Research limitations - Since data are obtained from multiple databases, the sample may be biased in favor of larger firms. The results may, therefore, not be applicable to smaller firms. To the extent that the story is unable to differentiate between voluntary and involuntary director turnover, the results should be interpreted with caution. Originality/value - Even though extant research has looked extensively at the determinants of CEO turnover, little has been written on director turnover. Director turnover is an important topic to study, since directors, especially outside directors, possess a significant oversight role in the corporation.",
 				"issue": "3",
-				"libraryCatalog": "RePEc - Econpapers",
+				"libraryCatalog": "EconPapers",
 				"pages": "244-263",
 				"publicationTitle": "Review of Accounting and Finance",
-				"url": "http://econpapers.repec.org/article/emerafpps/v_3a9_3ay_3a2010_3ai_3a3_3ap_3a244-263.htm",
+				"url": "https://EconPapers.repec.org/RePEc:eme:rafpps:v:9:y:2010:i:3:p:244-263",
 				"volume": "9",
 				"attachments": [
 					{
-						"url": false,
-						"title": "RePEc PDF",
-						"mimeType": "application/pdf"
+						"title": "Snapshot",
+						"mimeType": "text/html"
 					},
 					{
-						"title": "RePEc Snapshot",
-						"mimeType": "text/html"
+						"title": "RePEc External Link",
+						"snapshot": false
+					},
+					{
+						"title": "RePEc PDF",
+						"mimeType": "application/pdf"
 					}
 				],
 				"tags": [
-					" Directors",
-					" Employee turnover",
-					" Risk analysis",
-					"Company performance"
+					{
+						"tag": "Company performance"
+					},
+					{
+						"tag": "Directors"
+					},
+					{
+						"tag": "Employee turnover"
+					},
+					{
+						"tag": "Risk analysis"
+					}
 				],
 				"notes": [],
 				"seeAlso": []
 			}
 		]
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/bookchap/agshnhavl/207771.htm",
+		"items": [
+			{
+				"itemType": "book",
+				"title": "Lecture notes in econometric methods and analysis",
+				"creators": [
+					{
+						"firstName": "Joseph",
+						"lastName": "Havlicek",
+						"creatorType": "author"
+					}
+				],
+				"date": "1980",
+				"abstractNote": "The late Professor Havlicek's Econometrics notes are often cited. But until now they have been very difficult to obtain. Here, you have the complete notes as published in Fall 1976 and in Fall 1980. They are identical in content. However, neither PDF reproduction is perfect. If there is a passage that seems difficult to read in one version, then please try the other!",
+				"libraryCatalog": "EconPapers",
+				"publisher": "AgEcon Search",
+				"url": "https://EconPapers.repec.org/RePEc:ags:hnhavl:207771",
+				"attachments": [
+					{
+						"title": "Snapshot",
+						"mimeType": "text/html"
+					},
+					{
+						"title": "RePEc PDF",
+						"mimeType": "application/pdf"
+					}
+				],
+				"tags": [
+					{
+						"tag": "Teaching/Communication/Extension/Profession"
+					}
+				],
+				"notes": [],
+				"seeAlso": []
+			}
+		]
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/bookchap/bisbisifc/58-24.htm",
+		"items": [
+			{
+				"itemType": "bookSection",
+				"title": "A characterisation of financial assets based on their cash-flow structure",
+				"creators": [
+					{
+						"firstName": "Celestino",
+						"lastName": "Girón",
+						"creatorType": "author"
+					}
+				],
+				"date": "2023",
+				"abstractNote": "By Celestino Girón; A characterisation of financial assets based on their cash-flow structure",
+				"bookTitle": "Post-pandemic landscape for central bank statistics",
+				"libraryCatalog": "EconPapers",
+				"publisher": "Bank for International Settlements",
+				"url": "https://EconPapers.repec.org/RePEc:bis:bisifc:58-24",
+				"volume": "58",
+				"attachments": [
+					{
+						"title": "Snapshot",
+						"mimeType": "text/html"
+					},
+					{
+						"title": "RePEc PDF",
+						"mimeType": "application/pdf"
+					}
+				],
+				"tags": [],
+				"notes": [],
+				"seeAlso": []
+			}
+		]
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/scripts/search.pf?ft=&adv=true&wp=on&art=on&bkchp=on&pl=&auth=on&online=on&sort=rank&lgc=AND&aus=&ar=on&kw=second+hand+car&jel=&nep=&ni=&nit=epdate",
+		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/scripts/search.pf?jel=C81",
+		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/software/bocbocode/",
+		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/bookchap/fipfednmo/",
+		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/article/eeemoneco/",
+		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/paper/ehllserod/",
+		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/article/oupcopoec/v_3a39_3ay_3a2020_3ai_3a1_3ap_3a91-94..htm",
+		"items": [
+			{
+				"itemType": "journalArticle",
+				"title": "Gresham’s Law: The Life and World of Queen Elizabeth I’s Banker",
+				"creators": [
+					{
+						"firstName": "Mohamed A.",
+						"lastName": "El-Erian",
+						"creatorType": "author"
+					}
+				],
+				"date": "2020",
+				"DOI": "10.1093/cpe/bzaa009",
+				"ISSN": "0277-5921",
+				"abstractNote": "By Mohamed A El-Erian; Gresham’s Law: The Life and World of Queen Elizabeth I’s Banker",
+				"issue": "1",
+				"libraryCatalog": "EconPapers",
+				"pages": "91-94",
+				"publicationTitle": "Contributions to Political Economy",
+				"shortTitle": "Gresham’s Law",
+				"url": "https://EconPapers.repec.org/RePEc:oup:copoec:v:39:y:2020:i:1:p:91-94.",
+				"volume": "39",
+				"attachments": [
+					{
+						"title": "Snapshot",
+						"mimeType": "text/html"
+					},
+					{
+						"title": "RePEc External Link",
+						"snapshot": false
+					}
+				],
+				"tags": [],
+				"notes": [],
+				"seeAlso": []
+			}
+		]
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/article/oupcopoec/v_3a39_3ay_3a2020_3ai_3a1_3ap_3a91-94..htm",
+		"items": [
+			{
+				"itemType": "journalArticle",
+				"title": "Gresham’s Law: The Life and World of Queen Elizabeth I’s Banker",
+				"creators": [
+					{
+						"firstName": "Mohamed A.",
+						"lastName": "El-Erian",
+						"creatorType": "author"
+					}
+				],
+				"date": "2020",
+				"DOI": "10.1093/cpe/bzaa009",
+				"ISSN": "0277-5921",
+				"abstractNote": "By Mohamed A El-Erian; Gresham’s Law: The Life and World of Queen Elizabeth I’s Banker",
+				"issue": "1",
+				"libraryCatalog": "EconPapers",
+				"pages": "91-94",
+				"publicationTitle": "Contributions to Political Economy",
+				"shortTitle": "Gresham’s Law",
+				"url": "https://EconPapers.repec.org/RePEc:oup:copoec:v:39:y:2020:i:1:p:91-94.",
+				"volume": "39",
+				"attachments": [
+					{
+						"title": "Snapshot",
+						"mimeType": "text/html"
+					},
+					{
+						"title": "RePEc External Link",
+						"snapshot": false
+					}
+				],
+				"tags": [],
+				"notes": [],
+				"seeAlso": []
+			}
+		]
+	},
+	{
+		"type": "web",
+		"url": "https://econpapers.repec.org/paper/bisbiswps/default8.htm",
+		"items": "multiple"
 	}
 ]
 /** END TEST CASES **/

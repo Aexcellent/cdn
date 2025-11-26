@@ -1,0 +1,854 @@
+Hindawi Wireless Communications and Mobile Computing Volume 2022, Article ID 6596925, 16 pages https://doi.org/10.1155/2022/6596925
+
+Research Article A Data Augmentation Method for Vertical Federated Learning
+
+JianFei Zhang and YuChen Jiang
+Changchun University of Science and Technology, Changchun 130000, China
+Correspondence should be addressed to JianFei Zhang; jfzhang@cust.edu.cn
+Received 29 September 2021; Accepted 7 December 2021; Published 24 January 2022
+Academic Editor: Amr Tolba
+Copyright © 2022 JianFei Zhang and YuChen Jiang. This is an open access article distributed under the Creative Commons Attribution License, which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.
+Federated learning (FL) enables various organizations to jointly train one single model without revealing their private data to each other. The FL can be classiﬁed as horizontal federated learning (HFL) and vertical federated learning (VFL) according to the distribution of overlap samples and overlap features in the dataset. VFL allows various organizations to share machine learning based on the overlap samples, each one of which has the same identity. However, VFL suﬀers from insuﬃcient number of overlap samples among all participants. Hence, the shortage of overlap data results in a worse performance of the global model. In this article, we propose a data augmentation method, FedDA, which is based on the generative adversarial network (GAN) to increase the number of training data. We generate more overlap data by learning the features of ﬁnite overlap data and many locally existing nonoverlap data, which expand the availability for training the overlap dataset. A series of experiments were executed on both MNIST and CIFAR-10. The results show that FedDA can eﬃciently utilize nonoverlap samples to enhance the eﬀect of the data augmentation. It can generate high-quality overlap samples and expand the set of overlap samples. Thus, when the VFL is short of overlap samples, FedDA can provide abundant training data to improve the performance of the VFL model.
+
+1. Introduction
+Machine learning is used to explore the hidden information from a large volume of existing data, and obviously, it is tedious that those data are from a single participant. Diversiﬁed data from diﬀerent institutions are need to be used for model training. In the early years, the parties were involved in the joint machine learning carried out by gathering data on a trusted server. The data privacy protection, however, has been gradually realized, and the corresponding legal provisions have been formulated. Since privacy data are hardly obtained, various institutions and organizations have become isolated data islands.
+In order to resolve the above problems, Google proposed an innovative machine learning framework called federated learning in 2016 [1]. It eﬀectively helps multiple organizations to train a global model with privacy data without violating users’ privacy protection, data security, and government regulations. Since then, as an eﬃcient approach, federated learning has become a hot research topic, and it is applied in many
+
+ﬁelds, such as ﬁnance [2], healthcare [3], urban computing [4], Internet of Things [5], and blockchain [6].
+Generally, federated learning is classiﬁed into horizontal federated learning and vertical federated learning. Horizontal federated learning is usually applied to the scenarios where the datasets of participants have nearly the same feature space but diﬀerent sample identity spaces. Vertical federated learning, on the other hand, is used in the scenarios where the datasets of participants have nearly the same sample identity space but diﬀerent feature spaces. Overlap data refers to the data of common users in diﬀerent institutions. Normally, the amount of overlap data is not very large. Lots of research focus on how to establish a vertical federated learning model. However, they usually can only use the overlap data between participants. When the amount of overlap data between multiple organizations is scarce, performing vertical federated learning will undoubtedly produce a terrible model eﬀect. In order to improve the eﬀect of VFL, we hope to enhance the overlap data by increasing the number of available samples.
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+2
+
+Wireless Communications and Mobile Computing
+
+In summary, our contributions are as follows:
+(1) We design a novel federated data augmentation method for vertical federated learning, namely, FedDA, to expand the number of available samples
+(2) We proposed to use adversarial generative networks for data augmentation in vertical federated learning
+(3) We conducted a range of experiments on FedDA to prove its eﬀectiveness and studied the quality of generated data by FedDA under diﬀerent data distributions on two diﬀerent typical datasets of MNIST and CIFAR-10
+2. Related Work
+Currently, the major research of VFL is mainly focused on modifying the traditional machine learning method to the federated learning mode and optimizing the existing federated learning algorithm. Hardy et al. use entity analysis [7] and homomorphic encryption [8] to learn vertically partitioned data and provide encryption [9]. Yang et al. proposed a vertical federated logistic regression implementation method based on the centralized federated learning framework. This method collects and calculates the encryption gradient of the participants through the server and assists the participants to update the parameters [10]. Yang et al. believe that it is diﬃcult to ﬁnd a third-party assistance model that can be trusted by both parties in real life. Besides, the third party will increase the risk of data leakage and the overall complexity of the system. Therefore, they believe that a third party is unnecessary for federated learning framework, and they implement vertical federated logistic regression under the framework of distributed federated learning [11]. For the traditional boosting tree model, Liu et al. proposed a random forest implementation method based on the vertical federated learning framework. In the process of joint modeling, each participant is regarded as a tree, and the structure of each tree will be stored in the central server and individual data holders. The privacy of data is guaranteed by each data holder on holding decentralized node information that matches its own features. This random forest-based federated learning method eﬀectively reduces the communication frequency of each tree during prediction and improves the communication eﬃciency to a certain extent [12]. Cheng et al. proposed a decentralized vertical federated learning framework based on gradient boosting decision trees. Compared to other federated boosting tree algorithms, it has no loss on accuracy [13]. Li et al. study a practical federated environment with relaxed privacy constraints. In this environment, a dishonest party might obtain some information about the other parties’ data, but it is still impossible for the dishonest party to derive the actual raw data of other parties. It is worth noting that their approach can signiﬁcantly improve the predictive accuracy and achieve comparable accuracy to the original GBDT with the data from all parties [14].
+As a popular generative model, the generative adversarial network (GAN) is widely used in many ﬁelds [15]. There-
+
+fore, more and more researchers have begun to study the application of GAN to federated learning. The team of Rajagopal and Nirmala proposed a novel collaborative imaginary deep learning architecture called Federated AI Imagination, which lets a team of two or more come together to imagine and envision ideas and synergies well with each other’s likes [16]. In order to improve the performance of GAN in the target task, it is essential to collect as many images as possible from diﬀerent sources. Rasouli et al. proposes a method for training a GAN across distributed sources of nonindependent-and-identically distributed data sources subject to communication and privacy [17]. It also provides a further theoretical basis and improved experiments based on Federated AI Imagination. Due to various factors, the images collected by diﬀerent types of devices may have distinctive deviations. Fan et al. proposed a GAN learning scheme based on a federated learning framework and studied training in a federal environment [18]. This method attempts to distribute generative models to diﬀerent customers and then merges the models trained in each customer into a uniﬁed and general model in the center. It helps solve the problem of data limitation in actual situations. Although the GAN is directly applied in many federated learning solutions to boost the performance of GANs in target tasks, we utilize the GAN to design a data augmentation model to enhance the training eﬀects of federated learning.
+3. The Proposed Approach
+3.1. Problem Deﬁnition. Although in VFL we can align samples according to the identity and privacy protection policies, it is hard to match every sample between participants. Figure 1 shows the relation of samples among diﬀerent participants. Without loss of generality, we assume that there are two participants, party A and party B.
+Datasets of party A and party B can be denoted as DA ≔ fðxAi , yAi ÞgNi=A1, and DB ≔ fðxBi ÞgNi=B1, respectively, where xAi , xBi ∈ Ra. xAi is the ith sample of A, xBi is the ith sample of B, and yAi is the label of xAi . NA and NB are the sum number of samples in datasets A and B, respectively.
+After aligning the samples, each dataset can be divided into overlap parts and nonoverlap parts. The overlap part is a subset of samples with the same identity as other participates. The nonoverlap part is the remaining samples. Herein, the overlap part of dataset is denoted by Do, and the nonoverlap part of set is denoted by Dn. The corresponding part of the nonoverlap part is called the missing part which is denoted by Dm. Let DA = fðDAo , DAn Þg represent the dataset A, where DAo and DAn are the overlap part and nonoverlap part of A, respectively. Similarly, the dataset of B can be represented as DB = fDBo , DBng, where DBo and DBn are the overlap part and nonoverlap part of B, respectively.
+In this paper, we assume that there exists a ﬁnite overlap set Do ≔ fxBo , xAo , yAo gNi=o1 between the two parties, where party A has the partition DAo ≔ fxAo , yAo gNi=o1 and party B has the partition DBo ≔ fxBo gNi=o1. xAo is the overlap sample of part A, yAo is the label of xAo , and xBo is the overlap sample of part
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+3
+
+Party A
+
+Party B
+
+DnA
+
+DmB
+
+Non-overlap part
+
+(missing)
+
+DoA
+
+DoB
+
+Overlap part
+
+Samples
+
+DmA
+
+DnB
+
+(missing)
+
+Features
+
+Non-overlap part
+
+Figure 1: Virtual view of the dataset in vertical federated learning.
+
+B. Besides, we denote the nonoverlap dataset of A as DAn ≔ fxAn , yAn gNj=An1, whereas xAn is the nonoverlap sample of part A.
+Likewise, we denote the nonoverlap dataset of B as DBn ≔ fxBngNz=Bn1, whereas xBn is the nonoverlap sample of part B.
+Generally, a vertical federal machine learning model would be trained on overlap samples, Do, which is only a small subset of the entire dataset of participants. Each participant still has a large amount of unused nonoverlap data. In order to better improve the overall performance of the training model, we use data augmentation in the nonoverlap sample part.
+
+3.2. Federated Data Augmentation Model. GAN is a type of neural network used for unsupervised and semisupervised learning tasks, such as generating images, improving picture resolution, and retrieving pictures of speciﬁc patterns. Compared to other generative models, GAN has a lower computational cost and fewer restrictions. Therefore, based on GAN, we proposed a vertical federated data augmentation method (FedDA); it uses the nonoverlap data to enlarge the set of overlap data. FedDA helps vertical federated learning to achieve better results even if the number of overlap samples is insuﬃcient. The traditional GAN model has many shortcomings, such as the gradient of the generator is unstable or even disappears, the diversity of generated samples is insuﬃcient, and the model convergence speed is slow. However, WGAN-GP can handle the above problems well [19]. So we use WGAN-GP as the basic model.
+
+LðGÞ = −Ex~pg ½DðxÞ,
+
+ð1Þ
+
+h
+
+i2 
+
+LðGÞ = −Ex~pdata ½DðxÞ + E~x~pg ½DðxÞ + λEx̂~px̂ k∇xDðxÞkp − 1 :
+
+ð2Þ
+
+In WGAN-GP, the loss of generator is formula (1) and the loss of discriminator is formula (2). The third item of formula (2) is to impose a gradient penalty on each sample independently. The gradient penalty solves the gradient explosion problem by connecting parameters with constraints to achieve real Lipschitz constraints. In formula (1) and formula (2), x ~ Pdata is real data and x ~ Pg is generated data. For the x̂, we perform random interpolation sampling on x and ~x, x̂ = εx + ð1 − εÞ~x, ε ∈ ½0, 1.
+
+The generator is updated through stochastic gradient descent:
+
+∇θ
+
+1
+
+m
+〠
+
+m i=1
+
+−
+
+DwðGθð~xÞÞ:
+
+ð3Þ
+
+The discriminator is updated through stochastic gradient ascent:
+
+∇θ
+
+1 m
+
+m  〠 −Dw
+i=1
+
+ðxÞ
+
++
+
+Dwð~xÞ
+
++
+
+À λ k∇x∧Dw
+
+ðx∧Þk2
+
+−
+
+1Á2 :
+
+ð4Þ
+
+Formula (3) indicates that the generator intends to
+increase the score of the false sample as much as possible.
+Formula (4) indicates that the discriminator intends to
+increase the score of the true sample as much as possible
+and lower the score of the false sample.
+The deep neural network is widely used in feature repre-
+sentation to learn hidden feature representation. We use
+neural networks to learn feature representations from raw
+input data of parts A and B. Feature representation can pro-
+tect the raw data in a certain extent. And based on feature
+representation, we can further use privacy protection tech-
+nology to protect data. upr = hpc ðxpc Þ is deﬁned as learning the feature represen-
+tation of xpc through neural network hpc , whereas p ∈ fA, Bg, c ∈ fo, ng, r ∈ fo, n, mg, upr ∈ ℝNp∗dp , dp is the dimension of the hidden representation layer at the top of the neural network. Let upo be the feature representations learned from the overlap sample xpo. uAn and uBn are the feature representations learned from the nonoverlap sample xAn and xBn, respectively. Besides, u~Am and u~Bm are the generated missing part. For the feature expression, uAo ,uAn ,uBo ,uBn were produced by the samplesxAo , xAn , xBo , xBn through the neural networkhAo , hAn , hBo , hBn , respectively.
+The data augmentation process in VFL based on nono-
+verlap data of two participants is shown in Figure 2. The
+dataset of every participant consists of two parts (overlap
+data and nonoverlap data). And each participant has its
+own generator and discriminator. We use G and D to repre-
+sent generator and discriminator, respectively.
+First, the encryption-based masking technology is used
+to match the same identity samples between A and B. Fur-
+thermore, the deep neural network is used to obtain the feature representation of the overlap samples (uAo and uBo ) and transmit them to the other party, so each participant obtains
+the feature representations of the shared samples. Furthermore, we train the generator (GA, GB) and discriminator (DA, DB) in each participant. For the generator, the local nonoverlap samples (xAn , xBn) are input to the deep neural network to obtain nonoverlap feature representation (uAn , uBn), and then, the nonoverlap feature representation is input to the generator. The generator through the nonoverlap feature representation to obtain missing parts (u~Bm, u~Am). For the discriminator, the input data consists of two parts. One part (u~A, u~B) is composed of the feature representation
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+4
+
+Wireless Communications and Mobile Computing
+
+Party A
+
+unA
+
+GA
+
+hnA
+
+u~
+
+DA
+
+uo hoA
+
+Party B
+
+GB
+
+unB
+
+u~
+
+hnB
+
+DB
+
+uo hoB
+
+Non-overlap part Overlap part Missing part Deep neural network
+
+Feature representations Generator Discriminator
+
+Figure 2: View of the virtual dataset in vertical federated generative adversarial networks.
+
+of the input generator data (uAn , uBn) and its corresponding generated data (u~Bm, u~Am). Another part (uo) is the feature representation of the overlap samples by both parties. After
+that, the model only needs to train the discriminator and
+generator until the model converges continuously. Finally,
+we use the trained generator based on the nonoverlap sam-
+ples to generate the missing part and merge the missing part
+and nonoverlap part to get a new overlap set.
+We take party A as an example and use Figure 3 to
+describe the process of data augmentation process in detail. Step 1: xAo , xAn , xBo get their feature representations uAo , uAn ,
+uBo through the deep neural network hAo , hAn , hBo , respectively. Step 2: the overlap part data is concatenated to get uo, as
+per the following formula.
+
+uo = concatÂuAo ; uBo Ã:
+
+ð5Þ
+
+Step 3: for the nonoverlap part u~, missing data u~Bm need to be generated before concatenation. Input uAn into the generator and generate u~Bm corresponding to uAn , as per formula (6). Then, concatenate uAn and u~Bm to get the nonoverlap part u~, as per formula (7).
+
+u~Bm
+
+=
+
+GθÀuAn
+
+Á ,
+
+ð6Þ
+
+u~ = concatÂuAn ; u~BmÃ:
+
+ð7Þ
+
+Step 4: input the uo as the real part and u~ as the false part into the discriminator. Use the real part features to guide the false part features, so that the u~Bm generated by the generator can be more realistic and closer to the actual uBm. Repeat the train of the generator and discriminator until convergence.
+Formulas (8) and (9) are updated by formulas (3) and (4).
+
+∇θ
+
+1 m
+
+m
+〠
+i=1
+
+−
+
+Dwðu~Þ,
+
+ð8Þ
+
+∇θ
+
+1 m
+
+m  〠 −DwðuoÞ
+i=1
+
++
+
+Dwðu~Þ
+
++
+
+À λ k∇x∧Dwðx∧Þk2
+
+−
+
+1Á2 :
+
+ð9Þ
+
+Step 5: when the generator converges, the feature representations of all nonoverlap samples are input into their respective generators to generate their corresponding missing parts. Then, the nonoverlap feature representation uAn and generated feature representations u~Bm are concatenated to get an enlarged dataset χAB~ = fuAn ; u~Bmg.
+Similarly, according to the above steps, we can generate the missing data u~Am corresponding to the nonoverlap part uBn of B. By concatenating missing data part and the nonoverlap part, we get the χA~B=fu~Am ; uBng. So, we get a large training set χ = fχAB, χAB~, χA~Bg. Hence, A and B participating in the VFL have completed data enhancement based on overlap data and their respective nonoverlap data.
+3.3. Algorithm. The entire process of A-party data generation can be summarized as Algorithm 1. A and B have the same training process; the whole algorithm is a loop program. In the ﬁrst subloop (lines 2-16), we train the discriminator. In WGAN-GP, in order to balance the training of the generator and the discriminator, we need to strengthen the training of the discriminator. In each iteration, we train the discriminator ncritic times, and each time, we train m batchs of samples. First, FedDA learn the feature representation of the sample data through the neural network, as executed in lines 4-6. After that, FedDA concatenate the feature representation of the overlap part as the line 7. In addition, the generator generates the missing part of B as line 8. Then, FedDA concatenate the feature representation of the nonoverlap part of A with the feature representation of the missing part of B as the line 9. FedDA calculate the discriminator loss through line 13 according to the data prepared in lines 10-12. Finally, in line 15, FedDA update the discriminator DA by increasing the stochastic gradient. Next, FedDA train the generator. In the second subloop (lines 17-22), FedDA prepare the training data for the generator. And in the line 23, FedDA update the discriminator by decreasing the stochastic gradient.
+The process of generating B-party data is similar to Algorithm 1. When Party A and Party B have completed training, we use the trained generator GA and GB to generate the missing part χAB~, χA~B. Finally, FedDA concatenate the overlap part and the supplementary parts into a larger overlap part χ.
+In the training process of FedDA, there is no need to share raw data and no restrictions on local models. Each party does not need to know the other party’s model structure in each iteration and only exchanges encrypted data hidden feature representations (feature representations can be further encrypted using encryption technology). The deep neural network transforms the feature representation through multiple layers of transformation (our method allows both parties to use diﬀerent models. And better models can improve the training eﬀect).
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+5
+
+G
+
+xnA
+
+unA
+
+hnA
+
+u~nB u~
+
+unA
+
+D
+
+hoA
+
+xoA
+
+uoA
+
+uo
+
+xoB
+
+uoB
+
+hoB
+
+Figure 3: Vertical federated generative adversarial networks of structure diagram.
+
+Input datasets DA and DB, neural networks hAo , hBo , hAn , a random number ε ~ [0,1], epoch number K, the batch size m, Adam hyperparameters α, intitial cirtic parameters w0, initial generator parameters θ0. 1 for e = 1, 2, ⋯K do.
+
+2 for t = 1, 2, ⋯ncritic do.
+
+3
+
+for i = 1, 2, ⋯m do.
+
+4 5
+
+Sample Sample
+
+ffxxAiAj ,gxmj=Bi0g, mia=0b,aatbcahtcfhrofmromthethDeAnD; o;
+
+6
+
+Learn uAi , uBi , uAj through hAo , hBo , hAn ;
+
+7
+
+ui = concatðuAi ; uBi Þ;
+
+8
+
+u~Bj =GθðuAj Þ;
+
+9
+
+u~j = concatðuAj ; u~Bj Þ;
+
+10
+
+Sample real data x ⟵ ui;
+
+11
+
+Latent variable ~x ⟵ uj;
+
+12
+
+x̂ = εx + ð1 − εÞ~x;
+
+13
+
+LðiÞ ⟵ Dwð~xÞ − DwðxÞ + λðk∇x∧Dwðx∧Þk2 − 1Þ2
+
+14
+
+end for
+
+15
+
+w ⟵ Adamð∇wð1/mÞ∑mi=1LðiÞ, w, αÞ
+
+16 end for
+
+17 for i = 1, 2, ⋯m do
+
+18
+
+Sample fxAj gmj=0, a batch from the DAn ;
+
+19
+
+Learn uAj through hAn ;
+
+20
+
+u~Bj = GθðuAj Þ;
+
+21
+
+u~j = concatðuAj ; u~Bj Þ;
+
+22 end for
+
+23 θ ⟵ Adamð∇θð1/mÞ∑mi=1 − Dwðu~jÞ, θ, αÞ
+
+24 end for
+
+Algorithm 1: FedDA algorithm of part A. We use default values of λ=10, ncritic=5, and α=0.0001.
+
+4. Experiment Evaluation
+In this section, to verify the performance of the method we proposed, we designed a series of experiments based on the dataset of MNIST and CIFAR-10. And we use the Fréchet Inception Distance (FID) as the metrics to quantitatively evaluate the FedDA data augmentation method [20].
+In our simulations, we still suppose that there are two participants, A and B. The two parties are entirely independent. Moreover, each of them has its own features. As we
+
+described above, the datasets of A and B have overlap parts and nonoverlap parts. To imitate the dataset composition, we divide the examples in MNIST or CIFAR-10 into two parts. One part is the overlap part which is shared by both A and B. The other part is the nonoverlap part which belongs to participant A. To establish the relationships in these two parts of samples, we have to split each sample (a picture in MNIST or CIFAR-10) into two pieces. For the overlap part, we distribute the two pieces of one picture to A and B, respectively. For the nonoverlap part, we distribute
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+6
+
+Wireless Communications and Mobile Computing
+
+one piece to A and drop the remaining piece. Therefore, we can use the settings to simulate the circumstance of vertical federated learning with two participants.
+Our FedDA model tries to generate a dropping piece of picture in B basing on a piece of picture which belongs to the nonoverlap parts of A. Hence, the combinations of generation piece and nonoverlap piece can be used as a new overlap sample. It denotes that the data of overlap parts can be augmented by our method. Theoretically, the generated piece should be the same as the piece we dropped when we form the nonoverlap part. In practice, if the generation piece is more similar to the dropped piece, the eﬀect of the augmentation is better. To verify the eﬀect of augmentation, we calculate the FID scores of each pair of generation piece and dropped piece.
+The FID can capture the similarity of generated images to real ones. It is a method of discrimination based on spatial distribution. FID ﬁrst calculates the mean value and covariance of the image. It calculates the statistical information through the multivariate GAUSSIAN function to obtain the real image’s spatial distribution and the generated image’s spatial distribution. The Fréchet distance (also known as the Wasserstein-2 distance) is then used to calculate the distance between these two distributions. The lower the FID score, the better the quality of the image; on the contrary, the higher the score, the worse the quality of the image. When the score is 0, the two pictures can be considered the same. When a generated image is output, we will use FID to calculate the similarity between the generated image and the target image to measure our generated image’s quality.
+Figure 4 shows calculation process of the FID score. First, the nonoverlap data of A has to be prepared according to the previous settings. Then, after each round of training, we input a batch of data into the trained generator. Further, we get the missing data in part B corresponding to A by generator. Finally, we combine the output data and nonoverlap data into complete data. And we use the complete data and the original data to calculate the FID score.
+4.1. Simulations on Dataset of MNIST. MNIST is the classic dataset that is heavily used in the ﬁeld of machine learning. It contains 70000 handwritten digital images. And the entire dataset was separated into 60000 training images and 10000 test images. As our design, the images will be used as samples of participants. To construct the overlap and nonoverlap data, we horizontally divide every picture (28 ∗ 28 pixels) in MNIST into two pieces which are rectangle pictures (28 ∗ 14 pixels), as shown in Figure 5. Considering the diversity of the samples, to ensure the reliability of the FID score, for each iteration of the experiments, we randomly select a batch (the batch size is 64) to calculate its FID score according to the process shown in Figure 4; we repeat it 200 times and ﬁnally get the average FID score of this iteration.
+The ﬁrst experimental group is aimed at studying the eﬀect of using FedDA for data augments under diﬀerent numbers of overlap samples and with a certain number of nonoverlap samples. Figure 6 shows that the FID score con-
+
+4 1
+4 FID
+
+2
+
+3
+
+Generator
+
+1 Split 2 Input 3 Output 4 Calculation
+Figure 4: The FID calculates process.
+
+Figure 5: Samples on the MNIST dataset.
+tinues to decline, while the number of overlap samples rises. The result means that the increase in the number of overlap samples can help us generate higher quality images. As we all know, increasing the number of samples can help us train a better model. When the number of samples is insuﬃcient, the model’s performance is often terrible. However, when the number of samples is lacking, FedDA also have a good eﬀect. For instance, the blue line has only 250 overlap samples, but its average FID score has reached a lower level, which means that our method can enhance data and solve the problem of insuﬃcient training data.
+Moreover, we study the eﬀect with or without nonoverlap data. For training without nonoverlap samples, we set the source of the generator to only come from the overlap sample dataset as a baseline. Hence, we set the baseline of diﬀerent sizes (represented by the blue lines) and use 10000 nonoverlap data (represented by the orange lines) as a comparison. The result is shown in Figure 7. We noticed that in Figures 7(a)–7(c), the blue and orange lines converge in similar iteration times, but the average FID score of the
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+7
+
+400
+
+300
+
+FID score
+
+200
+
+100
+
+0 0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap:Non -overlap=250:10000 Overlap:Non -overlap=500:10000 Overlap:Non -overlap=1000:10000 Overlap:Non -overlap=2000:10000 Overlap:Non -overlap=5000:10000 Overlap:Non -overlap=10000:10000
+Figure 6: FID score on MNIST: nonoverlap = 10000 and overlap = 250, 500, 1000, 2000, 5000, and 10000.
+
+orange lines is signiﬁcantly lower than that of the blue lines. These ﬁndings prove that when the number of overlap samples is small, although the convergence speed of the blue line is almost the same as that of the orange line, the eﬀect of the orange lines is signiﬁcantly better than that of the blue lines. It means that our data augmentation can provide better samples. Furthermore, in Figures 7(d)–7(f), as the number of overlap samples increases, the iteration times required for the blue lines have signiﬁcantly increased over the orange lines. In Figure 7(f), the iteration time diﬀerence has reached about 5000 times. We can ﬁnd that when the number of overlap samples is huge, the quality of pictures without nonoverlap data is only slightly lower than that using nonoverlap data. However, the convergence speed of orange lines is signiﬁcantly faster than that of blue lines.
+More intuitively, we listed the average FID score of each curve after convergence in Figure 7 in Table 1. Table 1 highlights the diﬀerence between using the nonoverlap samples and without the nonoverlap samples. Obviously, comparing the results with nonoverlap and without nonoverlap, we found that no matter how many samples in the overlap datasets, the results with nonoverlap is always smaller than the results without nonoverlap. Besides, as the number of overlap samples increases, the average FID score diﬀerence between with nonoverlap and without nonoverlap gradually becomes smaller. For example, when used with 250 overlap samples, the average FID score without nonoverlap is 119.45. In contrast to the results with nonoverlap, the average FID score is 68.67, a drop of 50.78. This score diﬀerence is still very obvious, but when the number of overlap samples reaches 10000, the average FID score with nonoverlap drops by 9.97 compared with the result without nonoverlap. After using nonoverlap samples, the available samples for learning are augmented, the model can learn more data, and the quality of the generated pictures is signiﬁcantly improved. What
+
+is more, notice that when the number of overlap samples is 2000, and with nonoverlap samples, the result is lower than when the number of overlap samples is 10000 and without nonoverlap samples. The result of using the nonoverlap parts when the overlap is small can be similar to when the overlap parts are large. It conﬁrms our conclusion that we can use a large amount of local nonoverlap data to augment data in the case of insuﬃcient overlap data.
+Based on the above phenomenon, we have summarized the conclusion that when the number of overlap samples is small, the iteration times with nonoverlap are slightly faster than those without overlap, but the result with nonoverlap is signiﬁcantly better than that without nonoverlap. Further, when the number of overlap samples is huge, the result with nonoverlap is slightly better than that without overlap, but the iteration times with nonoverlap is signiﬁcantly faster than those without nonoverlap.
+Further, we ﬁxed the number of overlap samples and changed the number of nonoverlap samples to analyze the impact of changes in the number of nonoverlap samples on the model. Figure 8 shows the diﬀerence in the average FID scores when the number of overlap samples is 500 (Figure 8(a)) and 1000 (Figure 8(b)) under a diﬀerent number of nonoverlap samples. Obviously, as the number of nonoverlap samples increases, the average FID score will decrease. This means that the larger the number of nonoverlap data, the better the eﬀect of our data enhancement method. In addition, we found that when the number of nonoverlap samples is less than 2000, the average FID score has increased rapidly. But, when the number of nonoverlap samples is more than 2000, the improvement is gradually slow. Finally, the result with 10000 nonoverlap samples is only slightly higher than that with 2000 nonoverlap samples. It is apparent from this picture that the results will be significantly improved after using a small number of nonoverlap
+
+FID score
+
+FID score
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+8
+
+Wireless Communications and Mobile Computing
+
+500
+400
+300 200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 250 Overlap:non-overlap = 250:10000
+(a)
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 500 Overlap:non-overlap = 500:10000
+(b) 500
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 1000 Overlap:non-overlap = 1000:10000
+(c)
+Figure 7: Continued.
+
+FID score
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+9
+
+FID score
+
+500 400 300 200 100
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 2000 Overlap:non-overlap = 2000:10000
+(d)
+
+FID score
+
+400
+
+300
+
+200
+
+100
+
+0 0
+
+2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+
+Overlap = 5000 Overlap:non-overlap = 5000:10000
+
+(e)
+
+400
+
+300
+
+FID score
+
+200
+
+100
+
+0 0
+
+2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+
+Overlap=10000 Overlap:non-overlap=10000:10000
+(f )
+
+Figure 7: FID score on MNIST: overlap = 250 ðaÞ, 500 ðbÞ, 1000 ðcÞ, 2000 ðdÞ, 5000 ðeÞ, and 10000 ðf Þ; nonoverlap = 10000 or without nonoverlap.
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+10
+Overlap With nonoverlap Without nonoverlap
+
+Wireless Communications and Mobile Computing
+
+Table 1: The average FID score corresponding to Figure 7.
+
+250 68.67 119.45
+
+500 57.02 112.44
+
+1000 48.54 92.49
+
+2000 34.93 61.55
+
+5000 30.33 44.73
+
+10000 25.47 35.44
+
+FID score
+
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap:non-overlap = 500:250 Overlap:non-overlap = 500:500 Overlap:non-overlap = 500:1000 Overlap:non-overlap = 500:2000 Overlap:non-overlap = 500:5000 Overlap:non-overlap = 500:10000
+(a) 500
+400
+300
+200
+100
+
+FID score
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap:non-overlap = 1000:250 Overlap:non-overlap = 1000:500 Overlap:non-overlap = 1000:1000 Overlap:non-overlap = 1000:2000 Overlap:non-overlap = 1000:5000 Overlap:non-overlap = 1000:10000
+(b)
+Figure 8: (a) FID score on MNIST: overlap = 500 and nonoverlap = 250, 500, 1000, 2000, 5000, and 10000. (b) FID score on MNIST: overlap = 1000 and nonoverlap = 250, 500, 1000, 2000, 5000, and 10000.
+
+samples. But this improvement will gradually decrease as the number of nonoverlap samples increases. Besides, the improvement of training results can increase the number of overlap samples and also can improve the results of train-
+
+ing by increasing the number of nonoverlap samples. Comparing the lines in Figures 8(a) and 8(b), we can see that even only using 500 overlap samples, the training results have been signiﬁcantly improved. However, it is usually
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+Nonoverlap Overlap (500) Overlap (1000)
+
+Table 2: The average FID score corresponding to Figure 8.
+
+250 191.35 160.68
+
+500 156.70 112.00
+
+1000 96.24 78.68
+
+2000 67.84 61.55
+
+5000 59.86 54.67
+
+11
+10000 57.02 48.54
+
+Figure 9: Samples on the CIFAR-10 dataset.
+
+160
+
+140 120
+
+FID score
+
+100
+
+80
+
+60
+
+40
+
+20 0
+
+2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+
+Overlap:non-overlap = 250:10000 Overlap:non-overlap = 500:10000 Overlap:non-overlap = 1000:10000 Overlap:non-overlap = 2000:10000 Overlap:non-overlap = 5000:10000 Overlap:non-overlap = 10000:10000
+
+Figure 10: FID score on CIFAR-10: nonoverlap = 10000 and overlap = 250, 500, 1000, 2000, 5000, and 10000.
+
+diﬃcult to increase the number of overlap samples, but we can signiﬁcantly improve the performance of the model by using a large number of local nonoverlap samples.
+Table 2 shows the average of the FID scores in Figure 8. As shown in the table, regardless of the number of the overlap samples, when we use more nonoverlap samples, the average FID score decreases. When using 500 overlap samples and 250 nonoverlap samples, the average FID score is 191.35. Then, as the number of overlap samples increases, the average FID score gradually decreases. When the num-
+
+ber of nonoverlap samples added reaches 10000, the average FID score will fall to 57.02. Similarly, when the overlap samples are 1000, we also can see that with the increase of nonoverlap samples, the average FID score is gradually decreasing. It denotes that using more nonoverlap data can help further improve the quality of generated data. Besides, we noticed that when the number of overlap samples is small, the result of adding the same number of nonoverlap samples is better than overlap samples. For example, when the number of nonoverlap samples is 500, adding 500
+
+FID score
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+12
+
+Wireless Communications and Mobile Computing
+
+FID score
+
+450
+
+400
+
+350
+
+300
+
+250
+
+200
+
+150
+
+100
+
+50 0
+
+2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+
+Overlap = 250 Overlap:non-overlap = 250:10000
+
+(a)
+
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 500 Overlap:non-overlap = 500:10000
+(b) 450 400 350 300 250 200 150 100 50
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 1000 Overlap:non-overlap = 1000:10000
+(c)
+Figure 11: Continued.
+
+FID score
+
+FID score
+
+FID score
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+13
+
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 2000 Overlap:non-overlap = 2000:10000
+(d)
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 5000 Overlap:non-overlap = 5000:10000
+(e)
+400
+300
+200
+100
+0 2500 5000 7500 10000 12500 15000 17500 20000 Iterations times
+Overlap = 10000 Overlap:non-overlap = 10000:10000
+(f )
+Figure 11: FID score on MNIST: overlap = 250 ðaÞ, 500 ðbÞ, 1000 ðcÞ, 2000 ðdÞ, 5000 ðeÞ, and 10000 ðfÞ; nonoverlap = 10000 or without nonoverlap.
+
+FID score
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+14
+Overlap With nonoverlap Without nonoverlap
+
+Wireless Communications and Mobile Computing
+
+Table 3: The average FID score corresponding to Figure 11.
+
+250 66.66 172.41
+
+500 54.07 155.22
+
+1000 51.78 124.44
+
+2000 40.62 97.27
+
+5000 33.58 78.16
+
+10000 28.28 71.53
+
+120 140
+110
+
+100
+
+120
+
+FID score FID score
+
+90
+
+100
+
+80
+
+70
+
+80
+
+60
+
+60
+
+50
+
+0 2500 5000 7500 10000 12500 15000 17000 20000 Iterations times
+Overlap:non-overlap = 500:500 Overlap:non-overlap = 500:1000 Overlap:non-overlap = 500:2000 Overlap:non-overlap = 500:5000 Overlap:non-overlap = 500:10000
+(a)
+
+0 2500 5000 7500 10000 12500 15000 17000 20000 Iterations times
+Overlap:non-overlap = 1000:500 Overlap:non-overlap = 1000:1000 Overlap:non-overlap = 1000:2000 Overlap:non-overlap = 1000:5000 Overlap:non-overlap = 1000:10000
+(b)
+
+Figure 12: (a) FID score on CIFAR-10: overlap = 500 and nonoverlap = 250, 500, 1000, 2000, 5000, and 10000. (b) FID score on CIFAR-10: overlap = 1000 and nonoverlap = 250, 500, 1000, 2000, 5000, and 10000.
+
+overlap samples will reduce the average FID score by 44.70. However, adding 500 nonoverlap samples will reduce the average FID score by 60.4. Hence, when overlap samples are scarce, it is necessary to utilize the local many nonoverlap samples.
+
+Table 4: The average FID score corresponding to Figure 12.
+
+Nonoverlap Overlap (500) Overlap (1000)
+
+500 76.74 78.97
+
+1000 72.14 68.86
+
+2000 66.10 61.90
+
+5000 63.31 57.93
+
+10000 54.07 51.78
+
+4.2. Simulations on Dataset of CIFAR-10. In this section, we execute a series of similar experiments on CIFAR-10, shown in Figure 9. CIFAR-10 is a dataset of color images which are closer to universal matters. It contains ten categories of RGB color pictures with 32 ∗ 32 pixels. And each category has 6000 images. Diﬀerent from MNIST, the pictures in CIFAR-10 have a 3-channel color. And the size of pictures in CIFAR-10 is slightly larger. Besides, the proportions and characteristics of the objects in the sample are diﬀerent, which bring great diﬃculties to recognition. Therefore, it can better compare and represent the eﬀects of our method. Hence, in this part of the experiment, the experimental setting is the same as the setting on the MNIST.
+In the same way, we execute the experiments on CIFAR10. First, using the same number of nonoverlap samples, we studied the eﬀect of data augments when the number of overlap samples increases. Figure 10 shows that the FID score continues to decline, while the number of overlap samples rises. In addition, when the number of samples in the overlap part is insuﬃcient, the FID score will converge to a bigger value which is actually a lower level. And the ten-
+
+dency of curves in Figure 10 is consistent with the result on MNIST.
+Apparently, compared with the same experiments on MNINT (shown in Figure 6), it has better performance on the CIFAR-10 (shown in Figure 10). The curves ﬂuctuated more stably, the model converged faster, and the FID score is smaller. The reason is that a larger size of the image can provide more information.
+Moreover, we study the eﬀect with or without nonoverlap data. The result is shown in Figure 11. Similar to Figure 7, when the number of overlap samples is insuﬃcient, the result of the orange line is signiﬁcantly better than that of the blue. When the number of overlap samples is suﬃcient, the orange line iteration times are signiﬁcantly faster than those of the blue line. Furthermore, comparing Figure 11 to Figure 7, the ﬂuctuation of the FID score curves becomes smaller, and the number of iteration times required for convergence is relatively reduced.
+In addition, in Figures 11(a)–11(e), the number of iteration times for the blue line to converge is approximately four times faster than that for the orange line. Even in Figure 11(f),
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Wireless Communications and Mobile Computing
+
+15
+
+the blue line has not converged in 20000 iteration times, while the orange line stabilized in 6000 iteration times. Unlike the previous experiment on MNIST, after adding nonoverlap samples, even if the number of overlap samples is small, the number of iteration times required for convergence is also signiﬁcantly reduced. On the other hand, it can be clearly found that as the overlapped samples increase, the distance between the blue line and the orange line gradually decreases. When the number of overlap samples is 10000, the distance between the blue line and the orange line is very close on MNIST, but on CIFAR-10, the distance between them is still very obvious.
+In Table 3, we list the average FID score of each curve after convergence in Figure 11. It highlights the diﬀerence between data augmentation with the nonoverlap samples and without the nonoverlap samples. Comparing Table 3 with Table 1, our method has more excellent performance on more complex images. In Table 3, as the number of overlap samples increases, the score of using nonoverlap samples is always lower than the score without nonoverlap samples. However, the diﬀerence of a pair of scores in each column is gradually decreasing. When the number of overlap samples reaches 10000, the score of using nonoverlap samples is still 43.25 ahead of that without nonoverlap samples. This means that the result of using nonoverlap is still signiﬁcantly better than that without nonoverlap, even if the number of overlap samples is large.
+Further, we verify the inﬂuence of changing the number of nonoverlap samples. We ﬁxed the number of overlap samples and changed the number of nonoverlap samples to analyze the eﬀects of augmentation with the diﬀerent number of nonoverlap samples. Figure 12 shows the trend of FID scores with the diﬀerent number of nonoverlap samples when the number of overlap samples is ﬁxed at 500 and 1000. Obviously, as the number of nonoverlap samples increases, the FID score continuously decreased. The result is diﬀerent from experiments on MNIST. In Figure 8, when the number of nonoverlap samples exceeds 2000, the FID score will decrease slowly. However, in Figure 12, the FID score can still steadily fall when it exceeds 2000. This means that nonoverlap samples with rich features can better train the generator to improve the quality of augmenting data.
+Table 4 shows the average FID scores of each line in Figure 12. The results are similar to Table 2. For the same number of overlap samples, as nonoverlap samples increase, the FID score steadily decreases. Besides, as nonoverlap samples increase, the diﬀerence of FID score between 500 overlap samples and 1000 overlap samples gradually becomes smaller. In addition, the FID score in Table 4 is signiﬁcantly better than that in Table 2 when the number of nonoverlap samples is less than 2000. This means that when the number of nonoverlap samples is small, the quality of the generated picture based on the complex image was improved. Further, the score diﬀerence between the average FID score of 500 overlaps and 1000 overlaps in Table 4 is smaller than that in Table 2. The average FID score with 500 overlap samples is slightly lower than the average FID score with 1000 overlap samples. This result proved that our method could alleviate the lack of overlap samples in large-sized images. In one special case on column 1, when the nonoverlap sample
+
+is 500, the FID score with 1000 overlap samples is greater than with 500 overlap samples. The reason is the overﬁtting of the model. As shown in Figure 12(b), the blue curve with 500 overlap samples starts rising after 15000 iteration times.
+5. Conclusion
+In vertical federated learning, the overlap data is usually only a small subset of the entire dataset of participants. Each participant has a large amount of nonoverlap data, but it is not utilized for vertical federated learning. Considering this situation, we propose a data enhancement method called FedDA. FedDA generates corresponding missing data based on local nonoverlap data. It can provide a large amount of overlap data for subsequent vertical federation training. We designed a series of experiments on MNIST and CIFAR-10. The results conﬁrm that our method can generate overlap data based on nonoverlap parts of the data. Further, whether it is to utilize the overlap data or to not utilize the nonoverlap data, the quality of the generated data will be improved. Normally, with the utilized overlap data, the number of iterations obviously decreases. Meanwhile, it is worth noting that in the absence of overlap data, using a large number of nonoverlap samples can signiﬁcantly improve the quality of the generated data. Furthermore, in the dataset with richer sample features, the quality of the missing data generated is generally better. The fusion of training federated learning model methods is an exciting problem, and we will explore it in further research.
+Data Availability
+All data included in this study are available upon request by contact with the corresponding author.
+Conflicts of Interest
+The authors declare that they have no conﬂicts of interest.
+Acknowledgments
+This paper is supported by the project “User Behavior Features Oriented Research on Analysis of Multi-Source Data in CDN” (20200401082GX), which is ﬁnancially supported by the Science & Technology Development Program of Jilin Province, China.
+References
+[1] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-eﬃcient learning of deep networks from decentralized data,” in Artiﬁcial Intelligence and Statistics, pp. 1273–1282, PMLR, 2017.
+[2] D. Byrd and A. Polychroniadou, “Diﬀerentially private secure multiparty computation for federated learning in ﬁnancial applications,” https://arxiv.org/abs/2010.05867, 2020.
+[3] J. Xu, B. S. Glicksberg, C. Su, P. Walker, J. Bian, and F. Wang, “Federated learning for healthcare informatics,” Journal of Healthcare Informatics Research, vol. 5, no. 1, pp. 1–19, 2021.
+
+16
+[4] J. C. Jiang, B. Kantarci, S. Oktug, and T. Soyata, “Federated learning in smart city sensing: challenges and opportunities,” Sensors, vol. 20, no. 21, p. 6230, 2020.
+[5] Y. Zhao, J. Zhao, L. Jiang, R. Tan, and D. Niyato, “Mobile edge computing, blockchain and reputation-based crowdsourcing IoT federated learning: a secure, decentralized and privacypreserving system,” https://arxiv.org/abs/1906.10893, 2019.
+[6] H. Kim, J. Park, M. Bennis, and S.-L. Kim, “Blockchained ondevice federated learning,” IEEE Communications Letters, vol. 24, no. 6, pp. 1279–1283, 2019.
+[7] M. Scannapieco, I. Figotin, E. Bertino, and A. K. Elmagarmid, “Privacy preserving schema and data matching,” Proceedings of the 2007 ACM SIGMOD international conference on Management of data, pp. 653–664, 2007.
+[8] M. Ogburn, C. Turner, and P. Dahal, “Homomorphic encryption,” Procedia Computer Science, vol. 20, pp. 502–509, 2013.
+[9] S. Hardy, W. Henecka, H. Ivey-Law et al., “Private federated learning on vertically partitioned data via entity resolution and additively homomorphic encryption,” https://arxiv.org/ abs/1711.10677, 2017.
+[10] K. Yang, T. Jiang, Y. Shi, and Z. Ding, “Federated learning via over-the-air computation,” IEEE Transactions on Wireless Communications, vol. 19, no. 3, pp. 2022–2035, 2020.
+[11] S. Yang, B. Ren, X. Zhou, and L. Liu, “Parallel distributed logistic regression for vertical federated learning without thirdparty coordinator,” https://arxiv.org/abs/1911.09824, 2019.
+[12] Y. Liu, Y. Liu, Z. Liu et al., “Federated forest,” IEEE Transactions on Big Data, 2020.
+[13] K. Cheng, T. Fan, Y. Jin et al., “Secureboost: a lossless federated learning framework,” IEEE Intelligent Systems, vol. 36, no. 6, pp. 87–98, 2021.
+[14] Q. Li, Z. Wen, and B. He, “Practical federated gradient boosting decision trees,” Proceedings of the AAAI Conference on Artiﬁcial Intelligence, vol. 34, no. 4, pp. 4642–4649, 2020.
+[15] I. J. Goodfellow, J. Pouget-Abadie, M. Mirza et al., “Generative adversarial networks,” https://arxiv.org/abs/1406.2661, 2014.
+[16] A. Rajagopal and V. Nirmala, “Federated AI lets a team imagine together: federated learning of GANs,” Corr, vol. 7, no. 5, pp. 704–709, 2019.
+[17] M. Rasouli, T. Sun, and R. Rajagopal, “FedGAN: federated generative adversarial networks for distributed data,” https:// arxiv.org/abs/2006.07228, 2020.
+[18] C. Fan and P. Liu, “Federated generative adversarial learning,” in Chinese Conference on Pattern Recognition and Computer Vision (PRCV), pp. 3–15, Springer, 2020.
+[19] I. Gulrajani, F. Ahmed, M. Arjovsky, V. Dumoulin, and A. Courville, “Improved training of Wasserstein GANs,” https://arxiv.org/abs/1704.00028, 2017.
+[20] M. Heusel, H. Ramsauer, T. Unterthiner, B. Nessler, and S. Hochreiter, “GANs trained by a two time-scale update rule converge to a local Nash equilibrium,” https://arxiv.org/abs/ 1706.08500, 2017.
+
+Wireless Communications and Mobile Computing
+
+6302, 2022, 1, Downloaded from https://onlinelibrary.wiley.com/doi/10.1155/2022/6596925, Wiley Online Library on [06/09/2024]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+

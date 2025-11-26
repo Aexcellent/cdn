@@ -1,0 +1,1321 @@
+International Journal of Civil Engineering (2019) 17:1537–1546 https://doi.org/10.1007/s40999-019-00420-7
+RESEARCH PAPER
+
+An Integrated Planning/Pricing Decision Model for Rail Container Transportation
+Xiaoqiang Zhang1,2  · Lin Li1,2
+Received: 1 November 2018 / Revised: 7 March 2019 / Accepted: 19 March 2019 / Published online: 22 April 2019 © Iran University of Science and Technology 2019
+Abstract Pricing and operation planning are two key issues for railway trainer transportation. Most of the researches tried to optimize the pricing or operation planning strategies separately. As in fact, these two factors are related to each other. The isolated research on either of them cannot get the optimal solution. In this paper, a bi-level model is proposed, which integrate the pricing, the operation planning, and competition from road transportation, to maximize the profit of rail operators. The lower level is designed to minimize the customer’s general cost, and the upper level is to maximize the revenue of rail operators. A descent algorithm based on the sensitivity analysis method is designed to solve the bi-level model. A real transportation network with 5 freight stations of China Railway Corporation is applied to evaluate the proposed model. The results show that our method can improve the rail operator’s profit about 14% compared with the fixed pricing policy under the competition freight transportation market.
+Keywords  Rail container transportation · Operation planning · Pricing · Bi-level model
+
+1 Introduction
+The railway container transportation, an efficient mode of transport, with advantages of all-weather running, large capacity, long distance, economical and environmentfriendly, can effectively reduce the transportation cost and the circulation and operating expenses. But compared with the more flexible road container transportation and the more economical ship container transportation, the railway container operators are facing a serious challenge. According to National Bureau of Statistic of China, the railway container traffic accounts for only 12–13% of the total Chinese rail freight transport, far below than the US, 30–40% [1].
+The successful application of revenue management in the airline industry has encouraged the rail industry to follow the same footsteps. Rail operators are trying to apply revenue
+* Xiaoqiang Zhang xqzhang@swjtu.edu.cn
+* Lin Li LeanneLi@my.swjtu.edu.cn
+1 School of Transportation and Logistics, Southwest Jiaotong University, Chengdu 610031, People’s Republic of China
+2 National United Engineering Laboratory of Integrated and Intelligent Transportation, Chengdu 610031, People’s Republic of China
+
+management in the decision support system, which includes pricing, capacity allocation, and operation planning. Meanwhile, rail operators are trying to optimize their operation planning, which decides the frequency of service that can be available to customers. These are two key factors for customers when they make decisions among multi-transportation models.
+In the rail industry, flexible freight fares can attract more demand for freight transportation, and the demand is the basis for rail operation planning. Lots of researches focused on the operation planning or pricing policies for maximizing railway operators’ profit. All of those researches investigated these two problems separately, which is not optimal for rail operators making decisions. The proposed approach combining operation planning and pricing policies is meaningful to build the gap between the pricing and rail operation planning. In this paper, a bi-level mathematical model, which integrates the planning and pricing for rail container transportation, is developed to maximize railway operators’ profit. The proposed model considers the competition from road container transportation as well.
+2  Literature Review
+Recent achievements on rail industries showed that potential profit could be gained by using mathematical optimization.
+
+1 3 Vol.:(0123456789)
+
+1538
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+2.1  Rail Operation Planning
+Most researches of rail operation planning focus on yard management, train routing, scheduling, makeup, empty car management, etc. Shi and Zhou presented a set of theoretically rigorous mixed integer programming models for formulating and solving the yard operation planning problem, which is a critical decision-making problem in railroad industries [2]. The train routing problem aims to determine the departure station, terminal station and the intermediate stations of each train [3]. Cordeau, Toth et al. and Caprara, Fischetti et al. and provided the detailed review of early researches in this field [4, 5]. Murali, Ordonez et al. presented a decision tool to aid train planners obtain quickly good quality routes and schedules for short time horizons, and this decision tool was made up of an integer programming based capacity management model and a genetic algorithm based solution procedure [6]. Fang, Ke et al. focused on minimizing the total cost, i.e., the earliness, tardiness and holding costs incurred to fulfill all the demands. They proposed a mixed integer programming model and a heuristic algorithm was designed to solve this strongly NP-hard problem [7]. Sama, Pellegrini et al. solved the train routing selection problem at tactical level and operational level [8]. Tamannaei, Saffarzadeh et al. focused on the double-track railway rescheduling problem, and the objective function minimizes the cost of deviation from the primary timetable and the cost of train cancellation [9]. In the research of [10], an integer programming optimization model was defined to solve the block-to-train assignment problem. Railroads are showing great interest to improve the efficiency and timeliness of their operations, as part of their efforts to increase the quality and profits of their services. Bektas, Crainic et al. considered the problem of reducing the time that empty cars spent in classification yards of rail systems [11].
+Some scholars conducted comprehensive research on several aspects. Crainic, Ferland, Rousseau et al. studied train blocking and train makeup comprehensively [12, 13]. Haghani integrated train routing, train blocking, empty car allocation and locomotive assignment [14]. Zhu, Crainic et al. addressed the scheduled service network design problem for freight rail transportation. The proposed model integrates service selection and scheduling, car classification and blocking, train makeup, and routing of time-dependent customer shipments based on a cyclic three-layer space–time network representation of the associated operations and decisions and their relations and time dimensions [15].
+The operation planning of rail container trains is closely related to the rail container services. Good planning would ensure that rail freight services are competitive, efficient,
+
+and meet all delivery requirements. Anghinolfi, Paolucci et al. investigated the most convenient way to meet a set of transportation orders, in particularly determining the number of boxes employed to satisfy the orders [16]. Xie and Song considered the optimal planning problem for container prestaging and dynamic discharging/loading at seaport rail terminals subject to uncertainties [17]. Gradually, researches of transportation operations planning have extended to the intermodal network, and the object is to minimize the total transportation cost and meet a set of operational constraints. In the research of [18], an integer linear programming model was used to formulate the container transport across operations at container terminals, the network interconnecting them, railway yards and the railway networks towards the hinterland. With the continuous advancement of technology, researchers found that the introduction of optimization tools in the railway operation planning can gain more potential benefits [19]. For instance, the challenges and possible gains of implementing optimization tools in the day-to-day activities of a rail carrier were analyzed [20]. Zhang, Yan et al. established a new optimization model which based on customers’ demand, and this model was solved by particle swarm algorithm which was suitable for the multi-objective problem and large-scale network. The objects of this model are to maximize the customers’ demand as well as minimize the operation cost under unique scheduled train [21].
+2.2  Pricing Policies of Railway Transportation
+Service
+As a rail freight operator, you must balance conflicting demands. Your clients expect your services to be reliable, affordable and traceable. Your shareholders expect you to maximize shareholder return. Pricing policies would be a useful tool for those problems. Furthermore, with fierce competition from other transportation modes, pricing is recognized by rail operators as one of the most important issues. Armstrong and Meissner provided an overview of railway revenue management for both the freight and the passenger transportation. As mentioned in this research, carriers may smoothen demand, reduce global network congestion and make better use of assets by the theory of revenue management [22]. Friesz, Mookherjee et al. described that pricing is one of the most important instruments which can be used to generate higher revenues [23]. Marcucci, Gatta et al. also investigated transport providers’ preferences for parking and pricing policies [24]. And a series of factors which influence the price policy has been analyzed by [25], such as the average railway freight charge and the GDP per capita in the point of origin. Liu and Yang formulated a two-stage model based on revenue management. The first stage was to settle long-term slot allocation in the contract market and empty container allocation, while the second
+
+1 3
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+1539
+
+stage was to solve the dynamic pricing and inventory control problem [26].
+Most of researches researched on train operation planning and transportation pricing strategy separately. But these two issues are related to each other. Crevier, Cordeau et al. innovatively proposed a model for integrating rail freight revenue management with train operation schemes, and considered the constraints of road capacity, train capacity and marshalling station processing capacity. However, the customers’ choice behavior between multiple transportation modes is not considered [27]. Zhang, Liu et al. established a 0–1 mixed integer bi-level model which integrated the rail operation and pricing decisions. The capacity constraints and customers’ choice mechanism were not investigated [28].
+In transport economics, the general cost is the sum of the monetary and non-monetary costs of a journey. For a competitive freight market, the market demand is the fact that as the general cost of service increases, the quantity demanded of that service decreases. Individual operators are forced to charge the equilibrium general cost of the market or consumers will purchase the service from the other firms in the market having a lower general cost.
+The contribution of this paper is to integrate the pricing dimension into rail service planning. The optimal decision for rail operators is the trade-off between operators’ profit and the general costs of customers. When the general cost of rail freight is higher than other transportation modes’, freight demands will shift to those modes with lower general cost. So, it is a dilemma for rail operators. In order to get the optimal solution for planning and pricing, a bi-level mathematical model is proposed in this study.
+
+Flowchart of the research methodology
+proposed to optimize the benefit of rail operators and customers for a competitive freight market. 3.2  Notations
+Table 1 summarizes notations employed in this study.
+
+3  Bi‑level Model
+The research methodology is presented by a flowchart as follows:
+3.1  Model Assumptions
+Let s be the set of rail container stations and e be the set of edges which link the stations in the railway transportation network. Container trains can be divided into k types according to the distinct transportation frequencies or stopping patterns. The trains can meet the freight demands in different ODs. The model proposed in this paper focuses on optimizing the operation planning and pricing strategies for operators.
+Except for transportation service price, customers concern about factors such as timeliness, convenience, and security. Different customers have specific preferences of the service offered. For example, some of them would pay more attention on transport expenses, but some may be willing to pay a premium for the faster transportation. So the bi-level model is
+
+3.3  Modeling
+
+The upper level is to maximize the profit of railway operators
+
+and satisfy the transportation demands at a given price policy.
+
+In other words, the upper level is to optimize the best operation
+
+planning for operators among the decision pool. Price of rail-
+
+way container transportation is the output of the lower level.
+
+∑∑
+
+∑
+
+max
+
+P1j qkj − fkzk,
+
+kj
+
+k
+
+(1)
+
+s.t.
+
+∑
+
+qkj ⩽ Qj, ∀j,
+
+(2)
+
+k
+
+∑
+
+bkjqkj ⩽ Φkzk , ∀k,
+j∈ k
+
+(3)
+
+∑
+
+gekzk ⩽ e , ∀e,
+
+(4)
+
+k
+
+1 3
+
+1540
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+Table 1  Summary of notations Sets
+
+s
+
+The set of container handling stations
+
+j
+
+The origin–destination pair (o(j), d(j)) for freight transportation request j = 1, 2, 3 …
+
+k
+
+Set of container train types due to distinct transportation itineraries or stopping schedules k = 1, 2, 3 …
+
+N
+
+Set of transport modes, N = {1, 2 } ; n = 1 if customers choose the railway container transportation mode, n = 2 if customers
+
+choose the road container transportation mode
+
+e
+
+The physical edge of the rail, the track between two stations e = 1, 2, 3, … , m
+
+Parameters
+
+fk
+
+The fixed operating cost for equipment k
+
+Qj
+
+The total freight transportation demands on ODj
+
+bkj
+
+The incidence matrix, which denotes the occupation relationship between ODj and the transport edges of the train k , bkj = 1
+
+if ODj occupies one transport edge of the train k , otherwise bkj = 0
+
+k
+
+Set of ODj which train k can satisfy the transportation demands
+
+Φk
+
+The capacity of the train k
+
+gek
+
+The incidence matrix denotes the occupation relationship between train k and edge e , gek = 1 if there is occupation relation-
+
+ship, otherwise, gek = 0
+
+e
+
+The line capacity limit on edge e , = ( 1, 2, … , m)
+
+Cj1
+
+The railway container freight transportation cost per unit for each origin–destination pair (o(j), d(j))
+
+P2j
+
+The road container freight transportation price for ODj
+
+qkj
+
+The freight volume carried by the rail train k from o(j) to d(j)
+
+qnj
+
+The freight volume carried by transportation mode n on ODj
+
+Decision variables
+
+P1j
+
+The rail freight transportation price for ODj
+
+zk
+
+The service frequency of train k during the decision period
+
+qkj ⩾ 0, zk ∈ Z ∗, ∀k, j.
+
+(5)
+
+The objective function (1) denotes that the operation planning decision zk is made by the railway operator for P1j.
+Inequality (2) constrains that the goods transformed by
+
+the rail container train are less than the total demand. Inequality (3) defines the maximal capacity for a rail con-
+tainer train.
+
+Inequality (4) ensures that the number of trains on the rail line should not exceed the capacity limit of each edge.
+Inequality (5) constrains that the decision variables are
+
+positive. For the ODs with short distance, rail has difficulty in
+meeting the competition of road transport. Rail also has suf-
+
+fered from competition from road and air modes for high-
+
+value shipments. The probability of choosing a transportation mode is
+described by the logit model at the lower level. The lower
+
+level is to minimize customers’ general costs. The lower level reflects the generalized costs, which include the service price, the transportation time, the service convenience
+
+and goods security.
+
+∑ qnj
+
+min n ∫0 f (x) d(x),
+
+(6)
+
+s.t.
+
+∑
+
+qnj = Qj, n ∈ N,
+
+(7)
+
+n
+
+qnj ⩾ 0, n ∈ N,
+
+(8)
+
+Cj1 ⩽ P1j ⩽ P2j .
+
+(9)
+
+Formulation (6) minimizes the general costs of custom-
+
+ers. If and only if the general cost is minimized, the freight
+
+flow among different transportation modes will reach a
+
+stable state.
+
+The function f is the general cost function for different transportation modes. f (qnj ) = 1 ln qnj − Vjn is used to cal-
+
+culate the general cost.
+
+And Vjn = ( 1nPnj +
+
+2ntjn +
+
+n 3
+
+cnj
+
++
+
+n 4
+
+snj )
+
+denotes
+
+the
+
+cus-
+
+tomer utility function on ODj . 1, 2, 3 and 4 are weights of Pnj , tjn, cnj andsnj  . t represents the timeliness; c denotes the
+
+financial cost; s denotes the security.
+
+Equation (7) guarantees that all demands are satisfied on
+
+ODj.
+
+Inequality (8) indicates that the freight volume for each
+
+mode of transportation is non-negative.
+
+1 3
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+1541
+
+Inequality (9) defines the price range of railway freight transportation. Cj1 is the cost of the railway container transportation, and P2j  is the maximal price given by the
+government.
+
+3.4  Solution Algorithm
+
+The research of Jeroslow and Boyce found out that even a
+
+very simple bi-level problem is NP-hard, and there is no pol-
+
+ynomial algorithm [29, 30]. To solve the nonlinear bi-level
+
+model, the Kuhn–Tucker method and the descent method are
+
+usually used [31]. The Kuhn–Tucker method generally uses
+
+the branch and bound technique to solve the complementa-
+
+rity problem. However, since the calculation of branch and
+
+bound method increases exponentially with the increase of
+
+variables, it obviously cannot be applied to large-scale opti-
+
+mization problems. Therefore, a descent algorithm based on
+
+sensitivity analysis is adapted in this paper.
+
+To get the best pricing and operation plan, we alternately solve the upper level and lower level. P1j (0) is the initial price
+
+of the jth OD for railway container transportation, and the
+
+price of road transportation remains stable. In this case, the
+
+equilibrium solution of railway container freight volume
+
+q1 j
+
+(P1j (0)
+
+)
+
+can
+
+be
+
+optimized
+
+by
+
+solving
+
+the
+
+lower
+
+level,
+
+and
+
+the
+
+derivative relationship q1j ∕ P1j between the freight volume
+
+and the price of railway container transportation can be
+
+achieved by the proposed sensitivity analysis method. Then
+
+the reactive function can be reformed by Taylor expansion:
+
+q1
+
+q1j (P1j ) = q1j (P1j (0)) +
+
+j
+P1j
+
+(P1j
+
+−
+
+P1j (0)).
+
+(10)
+
+As a result, the relationship between the freight volume and the price of railway container transportation can be described by formulation (11):
+
+P1j = P1j (0) +
+
+P1j q1
+
+(q1j (P1j )
+
+−
+
+q1j (P1j (0))).
+
+(11)
+
+j
+
+So, the algorithm of the bi-level model is:
+
+Step 1: Initialization. Set the price for the railway container transportation as P1j (0) = 0.
+
+Step 2: Get the initial equilibrium solution for the freight
+
+volume
+
+of
+
+railway
+
+container
+
+transportation
+
+q1 j
+
+(P1j (0)
+
+)
+
+by
+
+solv-
+
+ing the lower level using the initial price P1j (0) = 0.
+
+Step 3: Get the derivative relationship q1j ∕ P1j between
+
+the freight volume and price of railway container transporta-
+
+tion by sensitivity analysis method. And get the approximate
+
+solution of reactive function by formulation (11).
+
+Step 4: Assuming that the price of railway container transportation is P1j (i) , and the length of the iterative step is i = 1 . (At first, an initial price is given. And in the iteration process of step 6, the price is gotten from the solution of the lower level.) Both the operation plan zk and freight volume qj(P1j (i)) of railway container transportation can be achieved by solving the upper level model (YALMIP toolbox of MATLAB is used to solve the model).
+Step 5: To get the new price for railway container transportation P1j (i+1) by applying the freight volume of railway container transportation qj(P1j (i)) to formulation (11).
+Step 6: Iteration. Repeat step-4 and step-5 until |P1j (i+1) − P1j (i)| ⩽ W(W = 0.01).
+3.5  Empirical Study
+This section presents an empirical study to evaluate the proposed model. The case is to optimize the rail operation planning for a rail network (Fig. 1). The rail network includes five main container stations, Dahongmen, Taiyuan East, Dalang, Jinan and Zhengzhou East. The OD pairs are enumerated in Table 2. The demand for each OD pair is randomly generated according to the data from the China Railway Corporation. There are eight operation plans, according to different train itineraries or different stopping schemes.
+Dahongmen
+
+Taiyuan east
+
+Zhengzhou east
+
+Jinan
+
+Dalang
+Fig. 1  Network of railway container transportation
+
+Table 2  Origin–destination pair of transportation demands
+
+ODj
+
+Origin–destination pair
+
+OD1
+
+Dahongmen–Taiyuan East
+
+OD2
+
+Taiyuan East–Dalang
+
+OD3
+
+Taiyuan East–Jinan
+
+OD4
+
+Jinan–Dalang
+
+OD5
+
+Dahongmen–Zhengzhou East
+
+OD6
+
+Zhengzhou East–Dalang
+
+OD7
+
+Dahongmen–Dalang
+
+1 3
+
+1542
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+The fixed operation cost for each type of container train is listed in Table 3.
+It is assumed that the price of road container freight transportation at each O–D pair is known in advance. In one decision period, the utility of the timeliness, the convenience and the security of the road and the rail transportation are stable. The freight transportation rate and the operation planning of the railway container are optimized and adjusted by the proposed model. In this case, the decision period is a week. Tables 4 and 5 show the numerical values specified for various parameters.
+The method of calculating time cost, convenience cost, and security cost in this paper is consistent with the literature [28]. We assume that the average value of the goods being transported is 30,000 yuan per ton. The potential
+Table 3  Trains information
+
+cargo damage rates of railways and roads are 0.05% and 0.06%, respectively. The weights of the service indicators are calculated by using the analytic hierarchy process of the survey data and are listed in Table 5.
+To demonstrate the gains from the proposed integrated optimization model, four scenarios are designed. And the profit of rail operators are compared and analyzed for each scenario.
+3.5.1  Scenario #1
+Profit of the railway operator is calculated, under the fixed pricing policy and fixed operation planning (see Tables 6, 7). For this scenario, the profit is listed in Table 8.
+
+Train types
+
+Itineraries
+
+Fixed operation cost (Yuan)
+
+K1
+
+Dahongmen–Taiyuan East–Dalang
+
+3500
+
+K2
+
+Dahongmen–Taiyuan East–Dalang (nonstop)
+
+3000
+
+K3
+
+Dahongmen–Jinan–Dalang
+
+3500
+
+K4
+
+Dahongmen–Jinan–Dalang (nonstop)
+
+3000
+
+K5
+
+Dahongmen–Zhengzhou East–Dalang
+
+3600
+
+K6
+
+Dahongmen–Zhengzhou East–Dalang (nonstop)
+
+3300
+
+K7
+
+Dahongmen–Taiyuan East–Zhengzhou East–Dalang
+
+3000
+
+K8
+
+Dahongmen–Zhengzhou East–Taiyuan East–Dalang
+
+3000
+
+Table 4  The value of parameters
+
+Parameters
+
+Numerical value
+
+OD1
+
+OD2
+
+OD3
+
+OD4
+
+OD5
+
+OD6
+
+OD7
+
+P2j
+
+350
+
+600
+
+300
+
+500
+
+300
+
+550
+
+800
+
+tj1
+
+9.5
+
+35.9
+
+8.3
+
+33
+
+11.5
+
+26.5
+
+41.6
+
+c1j
+
+25
+
+25
+
+25
+
+25
+
+25
+
+25
+
+25
+
+s1j
+
+20
+
+20
+
+20
+
+20
+
+20
+
+20
+
+20
+
+tj2
+
+7
+
+30
+
+6.2
+
+25
+
+8.6
+
+20
+
+38.3
+
+c2j
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+s2j
+
+10
+
+10
+
+10
+
+10
+
+10
+
+10
+
+10
+
+Table 5  Value of parameters Parameters Freight capacity per train Transit limitation on blocks One parameter of the demand cost function The weight of railway container transport service indicators The weight of road container transport service indicators
+1 3
+
+Numerical value
+
+Φk = 800 ton e = 5 train = 0.3
+
+1 i
+
+=
+
+(0.36,
+
+0.24,
+
+0.22,
+
+0.18)
+
+2 i
+
+=
+
+(0.28,
+
+0.32,
+
+0.22,
+
+0.18)
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+Table 6  The fixed price currently adopted by the China Rail Corporation
+
+OD
+
+OD1
+
+OD2
+
+OD3
+
+Price
+
+162.48
+
+469.22
+
+147.88
+
+OD4 482.59
+
+OD5 197.39
+
+OD6 361.85
+
+1543
+OD7 546.41
+
+Table 7  The train frequencies of China Rail Corporation
+
+Train types
+
+Monday
+
+Tuesday
+
+Wednesday
+
+K1
+
+1
+
+1
+
+1
+
+K2
+
+0
+
+0
+
+0
+
+K3
+
+2
+
+2
+
+2
+
+K4
+
+0
+
+0
+
+0
+
+K5
+
+0
+
+0
+
+0
+
+K6
+
+0
+
+0
+
+0
+
+K7
+
+1
+
+1
+
+1
+
+K8
+
+1
+
+1
+
+1
+
+Thursday
+1 0 2 0 0 0 1 1
+
+Friday
+1 0 2 0 0 0 1 1
+
+Saturday
+1 0 2 0 0 0 1 1
+
+Sunday
+1 0 2 0 0 0 1 1
+
+Total
+7 0 14 0 0 0 7 7
+
+Table 8  The profit in a decision period under Scenario #1 (Yuan)
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+1,231,900
+
+1,261,900
+
+1,240,200
+
+1,270,000
+
+Friday 1,246,500
+
+Saturday 1,244,500
+
+Sunday 1,238,300
+
+Total 8,733,400
+
+Table 9  The optimal frequencies in a decision period under Scenario# 2
+
+Train types
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+K1
+
+0
+
+0
+
+0
+
+0
+
+K2
+
+0
+
+0
+
+0
+
+0
+
+K3
+
+1
+
+2
+
+1
+
+2
+
+K4
+
+0
+
+0
+
+0
+
+0
+
+K5
+
+0
+
+0
+
+0
+
+0
+
+K6
+
+0
+
+0
+
+0
+
+0
+
+K7
+
+2
+
+3
+
+2
+
+2
+
+K8
+
+3
+
+2
+
+3
+
+2
+
+Friday
+0 0 1 1 0 0 2 2
+
+Saturday
+0 0 1 0 0 0 3 2
+
+Sunday
+0 0 1 0 1 0 2 2
+
+Total
+0 0 9 1 1 0 16 16
+
+Table 10  The profit in a decision period under Scenario #2 (Yuan)
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+1,347,900
+
+1,439,100
+
+1,578,400
+
+1,312,500
+
+Friday 1,352,200
+
+Saturday 1,328,300
+
+Sunday 1,398,100
+
+Total 9,756,300
+
+Table 6 illustrates the fixed fare currently used by the China Rail Corporation, which is employed as input of Scenario #1 and Scenario #2.
+
+(Table 9). The maximal profits of rail operators under this scenario are listed as Table 10.
+3.5.3  Scenario #3
+
+3.5.2  Scenario #2
+Under this scenario, the fixed pricing policy is adopted. The frequencies of the rail container train are optimized
+
+Under this scenario, the dynamic pricing policy is adopted and the frequencies of the rail container train are optimized jointly for each day. The optimal pricing policy and frequencies are listed as Tables 11 and 12.
+
+1 3
+
+1544
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+Table 11  The dynamic pricing policies in a decision period under Scenario #3 (Yuan/Ton)
+
+ODj
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+OD1
+
+256.32
+
+OD2
+
+432.54
+
+OD3
+
+213.90
+
+OD4
+
+0
+
+OD5
+
+203.36
+
+OD6
+
+284.92
+
+OD7
+
+700.79
+
+255.62 417.81 210.86 0 202.02 338.42 699.75
+
+261.30 431.51 211.79 0 202.52 344.12 698.29
+
+260.13 423.31 209.12 0 204.61 343.15 702.19
+
+Friday
+258.94 431.36 214.80 0 205.94 298.67 698.95
+
+Saturday
+259.45 416.20 214.73 0 204.43 344.44 699.70
+
+Sunday
+258.56 431.77 211.32 0 203.15 341.08 702.46
+
+Table 12  The optimal train frequencies in a decision period under Scenario #3
+
+Train types
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+K1
+
+0
+
+0
+
+0
+
+0
+
+K2
+
+0
+
+0
+
+1
+
+0
+
+K3
+
+1
+
+2
+
+1
+
+2
+
+K4
+
+0
+
+0
+
+0
+
+0
+
+K5
+
+0
+
+0
+
+0
+
+0
+
+K6
+
+0
+
+0
+
+0
+
+0
+
+K7
+
+2
+
+3
+
+2
+
+2
+
+K8
+
+3
+
+2
+
+3
+
+2
+
+Friday
+0 1 1 0 0 0 2 2
+
+Saturday
+0 0 1 0 0 0 3 2
+
+Sunday
+1 0 1 0 0 0 2 2
+
+Total
+1 2 9 0 0 0 16 16
+
+Table 13  The profit in a decision period under Scenario #3 (Yuan)
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+1,532,600
+
+1,673,500
+
+1,796,000
+
+1,491,200
+
+Friday 1,537,000
+
+Saturday 1,515,400
+
+Sunday 1,580,300
+
+Total 11,126,000
+
+Table 14  The optimal frequencies in a decision period for Scenario #4
+
+Trains
+
+K1
+
+K2
+
+K3
+
+K4
+
+K5
+
+K6
+
+K7
+
+K8
+
+Operation frequency
+
+0
+
+6
+
+13
+
+0
+
+0
+
+0
+
+14
+
+14
+
+Table 15  The pricing policy in a decision period under Scenario #4 (Yuan/Ton)
+
+ODj
+
+OD1
+
+OD2
+
+OD3
+
+OD4
+
+Price
+
+235.37
+
+438.99
+
+189.31
+
+278.40
+
+OD5 180.13
+
+OD6 375.83
+
+OD7 678.37
+
+Table 11 shows the results of optimal rail container transportation service price for each origin–destination pair during one decision period from Monday to Sunday. Zero means that there is no container train on this OD. In Scenario #3, the price of railway container transportation on each OD pair is updated. And the operation planning of container train is optimized again based on the new price (see Table 12), to satisfy the cargo demands on each OD and reduce operating cost. For example, in the optimization process, when the freight fare on OD1 increase, the train K1 and K2 will leave
+
+Table 16  Profits under 4 scenarios (Yuan) Scenario Scenario #1 Scenario #2 Scenario #3 Scenario #4 Profits 8,733,400 9,756,300 11,126,000 12,425,000
+on time. In contrast, when the fare is less than the operating cost on OD4, the train K4 and K5 could be canceled. Moreover, the profit of railway operators is calculated under the dynamic pricing policy (see Table 13).
+
+1 3
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+1545
+
+3.5.4  Scenario #4
+Railway container train operation planning and pricing are jointly optimized on an entire decision period (1 week) (Tables 14, 15, 16).
+Analyses of the profits of the fixed pricing policy and dynamic pricing policy show that the profits of railway enterprises can be improved by about 14% under dynamic pricing policy. In the decision-making period, compared with optimizing the train schedule and freight rates independently, optimizing the jointed optimization for the entire decision-making period can make the railway companies realize higher profits, because the enterprises can allocate their resources much efficient. However, for those time-sensitive goods, the demand will shift to those transportation modes with less waiting time, such as road transportation and air cargo transportation.
+4  Conclusions
+A new approach integrating operation planning and pricing for rail freight carrier is investigated. Four scenarios are designed to evaluate the proposed methodology. The first scenario is a real case with fixed pricing and fixed operation planning, which is adopted by China Rail Corporation. The second scenario is a methodology with fixed pricing and dynamic operation planning. The third scenario is a joint optimization of pricing and operation planning for one day. The last scenario is a joint optimization of pricing and operation planning for one week. The results show that the proposed joint optimization methodology can increase the profit of rail operators by 14% compared with the fixed pricing policy.
+Rail container trains with same speed are considered in the proposed methodology, which cannot satisfy the demand of different customers. Some goods with higher values prefer transportation with high speed, and some goods with lower values prefer transportation with lower fares. How to plan multiple container trains with different speeds is an interesting issue that needs to be investigated in the future.
+Acknowledgements  This work was supported by the National Social Science Foundation of China under grant 14BGL060.
+References
+1. Notice on the issuance of the “13th five-year” railway container multimodal transport development plan: development and reform basis [2017] no. 738 (2017) National Development and Reform Commission of the People’s Republic of China, Ministry of Transport of the People’s Republic of China, China Railway Corporation
+
+2. Shi T, Zhou X (2015) A mixed integer programming model for optimizing multi-level operations process in railroad yards. Transp Res Part B: Methodol 80:19–39
+3. Patty BW (2015) Handbook of operations research applications at railroads. Springer, US
+4. Cordeau JF, Toth P, Vigo D (1998) A survey of optimization models for train routing and scheduling. Transp Sci 32(4):380–404
+5. Caprara A, Fischetti M, Toth P (2002) Modeling and solving the train timetabling problem. Oper Res 50(5):851–861
+6. Murali P, Ordonez F, Dessouky MM (2016) Modeling strategies for effectively routing freight trains through complex networks. Transp Res Part C-Emerg Technol 70:197–213
+7. Fang K, Ke GY, Verma M (2017) A routing and scheduling approach to rail transportation of hazardous materials with demand due dates. Eur J Oper Res 261(1):154–168
+8. Sama M et al (2017) On the tactical and operational train routing selection problem. Transp Res Part C-Emerg Technol 76:1–15
+9. Tamannaei M et al (2016) A novel train rescheduling approach in double-track railways: optimization model and solution method based on simulated annealing algorithm. Int J Civil Eng 14(3A):139–150
+10. Xiao J et al (2018) Solving the block-to-train assignment problem using the heuristic approach based on the genetic algorithm and tabu search. Transp Res Part B-Methodol 108:148–171
+11. Bektas T, Crainic TG, Morency V (2009) Improving the performance of rail yards through dynamic reassignments of empty cars. Transp Res Part C-Emerg Technol 17(3):259–273
+12. Crainic TG, Rousseau JM (1986) Multicommodity, multimode freight transportation: a general modeling and algorithmic framework for the service network design problem. Transp Res, Part B (Methodological) 20B(3):225–242
+13. Crainic T, Ferland JA, Rousseau JM (1984) A tactical planning model for rail freight transportation. Transp Sci 1(2):165–184
+14. Haghani AE (1989) Formulation and solution of a combined train routing and makeup, and empty car distribution model. Transp Res, Part B (Methodological) 23B(6):433–452
+15. Zhu E, Crainic TG, Gendreau M (2014) Scheduled service network design for freight rail transportation. Oper Res 62(2):383–400
+16. Anghinolfi D et al. (2011) Integer programming and ant colony optimization for planning intermodal freight transportation operations. In: IEEE International Conference on Automation Science and Engineering
+17. Xie Y, Song DP (2018) Optimal planning for container prestaging, discharging, and loading processes at seaport rail terminals with uncertainty. Transp Res Part E-Logist Transp Rev 119:88–109
+18. Hu Q et al. (2018) A tabu search algorithm to solve the integrated planning of container on an inter-terminal network connected with a hinterland rail network. Transp Res Part C-Emerg Technol 91:15–36
+19. Borndoerfer R et al (2017) Recent success stories on integrated optimization of railway systems. Transp Res Part C-Emerg Technol 74:196–211
+20. Ireland P et al (2004) The Canadian Pacific railway transforms operations by using models to develop its operating plans. Interfaces 34(1):5–14
+21. Zhang Y, Yan Y, Hu Z (2013) Optimization model and particle swarm optimization algorithm of operation plan for scheduled freight train. Inf Technol J 12(8):1539–1546
+22. Armstrong A, Meissner J (2010) Railway revenue management: overview and models (operations research). Working papers
+23. Friesz TL et al (2008) Dynamic pricing in an urban freight environment. Transp Res Part B 42(4):305–324
+24. Marcucci E, Gatta V, Scaccia L (2015) Urban freight, parking and pricing policies: an evaluation from a transport providers’ perspective. Transp Res Part A Policy Pract 74:239–249
+
+1 3
+
+1546
+
+International Journal of Civil Engineering (2019) 17:1537–1546
+
+25. Ying S, Fang X, Chen Z (2012) Price analysis of railway freight transport under marketing mechanism. Phys Procedia 25:2038–2044
+26. Liu D, Yang HL (2015) Joint slot allocation and dynamic pricing of container sea-rail multimodal transportation. J Traffic Transp EngEng Edn 2(3):198–208
+27. Crevier B, Cordeau JF, Savard G (2012) Integrated operations planning and revenue management for rail freight transportation. Transp Res Part B Methodol 46(1):100–119
+
+28. Zhang X, Liu D, Chen B et al (2017) Dynamic pricing and operation planning of container train in competitive environment. J China Railw Soc 39(2):17–23
+29. Jeroslow RG (1985) The polynomial hierarchy and a simple model for competitive analysis. Math Program 32(2):146–164
+30. Boyce DE (1988) A general bilevel linear programming formulation of the network design problem. Transp Res Part B 22(4):311–318
+31. Gümüş ZH, Floudas CA (2001) Global optimization of nonlinear bilevel programming problems. J Glob Optim 20:1–31
+
+1 3
+

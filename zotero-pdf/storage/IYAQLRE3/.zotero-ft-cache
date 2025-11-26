@@ -1,0 +1,178 @@
+ 
+Your Privacy 
+ 
+We use cookies to make sure that our website works properly, as well as some ‘optional’ cookies to personalise content and advertising, provide social media features and analyse how people use our site. By accepting some or all optional cookies you give consent to the processing of your personal data, including transfer to third parties, some in countries outside of the European Economic Area that do not offer the same data protection standards as the country where you live. You can decide which optional cookies to accept by clicking on ‘Manage Settings’, where you can also find more information about how your personal data is processed. Further information can be found in our privacy policy . 
+Accept All Cookies Manage Preferences 
+Skip to main content 
+ 
+Advertisement 
+SpringerLink 
+Search 
+Go to cart 
+ 
+    Log in 
+ 
+    Published: December 1994 
+ 
+Definitions and properties of zero-knowledge proof systems 
+ 
+    Oded Goldreich & 
+    Yair Oren   
+ 
+Journal of Cryptology volume  7 ,  pages 1–32 ( 1994 ) Cite this article 
+ 
+    4867 Accesses 
+ 
+    288 Citations 
+ 
+    14 Altmetric 
+ 
+    Metrics details 
+ 
+Abstract 
+ 
+In this paper we investigate some properties of zero-knowledge proofs, a notion introduced by Goldwasser, Micali, and Rackoff. We introduce and classify two definitions of zero-knowledge: auxiliary-input zero-knowledge and blackbox-simulation zero-knowledge. We explain why auxiliary-input zero-knowledge is a definition more suitable for cryptographic applications than the original [GMR1] definition. In particular, we show that any protocol solely composed of subprotocols which are auxiliary-input zero-knowledge is itself auxiliary-input zero-knowledge. We show that blackbox-simulation zero-knowledge implies auxiliary-input zero-knowledge (which in turn implies the [GMR1] definition). We argue that all known zero-knowledge proofs are in fact blackbox-simulation zero-knowledge (i.e., we proved zero-knowledge using blackbox-simulation of the verifier). As a result, all known zero-knowledge proof systems are shown to be auxiliary-input zero-knowledge and can be used for cryptographic applications such as those in [GMW2]. 
+ 
+We demonstrate the triviality of certain classes of zero-knowledge proof systems, in the sense that only languages in BPP have zero-knowledge proofs of these classes. In particular, we show that any language having a Las Vegas zero-knowledge proof system necessarily belongs to RP . We show that randomness of both the verifier and the prover, and nontriviality of the interaction are essential properties of (nontrivial) auxiliary-input zero-knowledge proofs. 
+ 
+Download to read the full article text 
+References 
+ 
+    Aiello, W., and J. Hastad, Perfect Zero-Knowledge Languages Can Be Recognized in Two Rounds, Proc. 28th FOCS , 1987, pp. 439–448. 
+ 
+    Aiello, W., and J. Hastad, Relativized Perfect Zero-Knowledge Is Not BPP, Inform. and Comput. , Vol. 93, 1992, pp. 223–240. 
+ 
+    Google Scholar   
+ 
+    Babai, L., Trading Group Theory for Randomness, Proc. 17th STOC , 1985, pp. 421–429. 
+ 
+    Brassard, G., D. Chaum, and C. Crepeau, Minimum Disclosure Proofs of Knowledge, J. Comput. System Sci. , Vol. 37, No. 2, Oct. 1988, pp. 156–189. 
+ 
+    Google Scholar   
+ 
+    Feige, U., and A. Shamir, Personal communication. 
+ 
+    Fortnow, L., The Complexity of Perfect Zero-Knowledge, Proc. 19th STOC , 1987, pp. 204–209. 
+ 
+    Goldreich, O., S. Goldwasser, and S. Micali, How To Construct Random Functions, J. Assoc. Comput. Mach. , Vol. 33, No. 4, 1986, pp. 792–807. 
+ 
+    Google Scholar   
+ 
+    Goldreich, O., and H. Krawczyk, On the Composition of Zero-Knowledge Proof Systems, Proc. 17th ICALP , Lecture Notes in Computer Science, Vol. 443, Springer-Verlag, Berlin, 1990, pp. 268–282. 
+ 
+    Google Scholar   
+ 
+    Goldreich, O., Y. Mansour, and M. Sipser, Interactive Proof Systems: Provers that Never Fail and Random Selection, Proc 28th FOCS , 1987, pp. 449–461. 
+ 
+    Goldreich, O., S. Micali, and A. Wigderson, Proofs that Yield Nothing but their Validity and a Methodology of Cryptographic Protocol Design, Proc. 27th FOCS , 1986, pp. 174–187. 
+ 
+    Goldreich, O., S. Micali, and A. Wigderson, How to Play any Mental Game or a Completeness Theorem for Protocols with Honest Majority, Proc. 19th STOC , 1987, pp. 218–229. 
+ 
+    Goldwasser, S., and S. Micali, Probabilistic Encryption, J. Comput. System Sci. , Vol. 28, No. 2, 1984, pp. 270–299. 
+ 
+    Google Scholar   
+ 
+    Goldwasser, S., S. Micali, and C. Rackoff, Knowledge Complexity of Interactive Proofs, Proc. 17th STOC , 1985, pp. 291–304. 
+ 
+    Goldwasser, S., S. Micali, and C. Rackoff, The Knowledge Complexity of Interactive Proof Systems, SIAM J. Comput. , Vol. 18, No. 1, 1989, pp. 186–208. 
+ 
+    Google Scholar   
+ 
+    Goldwasser, S., and M. Sipser, Arthur Merlin Games Versus Interactive Proof Systems, Proc. 18th STOC , 1986, pp. 59–68. 
+ 
+    Impagliazzo, R., and Yung, M., Direct Minimum-Knowledge Computations, Advances in Cryptology—Crypto 87 (proceedings), Lecture Notes in Computer Science, Vol. 293, Springer-Verlag, Berlin, 1987, pp. 40–51. 
+ 
+    Google Scholar   
+ 
+    Oren, Y., Properties of Zero-Knowledge Proofs, M.Sc. Thesis, Computer Science Department, Technion, Haifa, Nov. 1987 (in Hebrew). 
+ 
+    Oren, Y., On the Cunning Power of Cheating Verifiers: Some Observations about Zero-Knowledge Proofs, Proc. 28th FOCS , 1987, pp. 462–471. 
+ 
+    A. Shamir, IP = PSPACE, Proc. 31st FOCS , 1990, pp. 11–15. 
+ 
+    Tompa, M., and H. Woll, Random Self-Reducibility and Zero-Knowledge Interactive Proofs of Possession of Information, Proc. 28th FOCS , 1987, pp. 472–482. 
+ 
+    Yao, A. C., Theory and Applications of Trapdoor Functions, Proc. 23rd FOCS , 1982, pp. 80–91. 
+ 
+Download references 
+Author information 
+Affiliations 
+ 
+    Department of Computer Science, Technion, Haifa, Israel 
+ 
+    Oded Goldreich & Yair Oren 
+ 
+Additional information 
+ 
+This research was partially supported by the Fund for Basic Research Administered by the Israeli Academy of Sciences and Humanities. Preliminary versions of this work have appeared in [O1] and [O2]. 
+ 
+Communicated by Shafi Goldwasser 
+Rights and permissions 
+ 
+Reprints and Permissions 
+About this article 
+Cite this article 
+ 
+Goldreich, O., Oren, Y. Definitions and properties of zero-knowledge proof systems. J. Cryptology 7, 1–32 (1994). https://doi.org/10.1007/BF00195207 
+ 
+Download citation 
+ 
+    Received : 26 February 1990 
+ 
+    Revised : 22 September 1992 
+ 
+    Issue Date : December 1994 
+ 
+    DOI : https://doi.org/10.1007/BF00195207 
+ 
+Share this article 
+ 
+Anyone you share the following link with will be able to read this content: 
+Get shareable link 
+ 
+Provided by the Springer Nature SharedIt content-sharing initiative 
+Key words 
+ 
+    Zero-knowledge 
+    Computational complexity 
+    Computational indistinguishability 
+    Cryptographic composition of protocols  
+ 
+Download PDF 
+ 
+    Sections 
+    References  
+ 
+    Abstract 
+    References 
+    Author information 
+    Additional information 
+    Rights and permissions 
+    About this article  
+ 
+Advertisement 
+ 
+Over 10 million scientific documents at your fingertips 
+Switch Edition 
+ 
+    Academic Edition 
+    Corporate Edition 
+ 
+    Home 
+    Impressum 
+    Legal information 
+    Privacy statement 
+    California Privacy Statement 
+    How we use cookies 
+    Manage cookies/Do not sell my data 
+    Accessibility 
+    FAQ 
+    Contact us 
+    Affiliate program 
+ 
+Not logged in - 154.17.2.206 
+ 
+Not affiliated 
+Springer Nature 
+ 
+© 2022 Springer Nature Switzerland AG. Part of Springer Nature . 

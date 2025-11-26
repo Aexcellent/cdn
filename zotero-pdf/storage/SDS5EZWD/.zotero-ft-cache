@@ -1,0 +1,2443 @@
+7238
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+Efﬁcient and Privacy-Preserving Feature Importance-Based Vertical Federated Learning
+Anran Li , Jiahui Huang , Ju Jia , Hongyi Peng , Lan Zhang , Luu Anh Tuan , Han Yu , Senior Member, IEEE, and Xiang-Yang Li , Fellow, IEEE
+
+Abstract—Vertical Federated Learning (VFL) enables multiple data owners, each holding a different subset of features about a largely overlapping set of data samples, to collaboratively train a global model. The quality of data owners’ local features affects the performance of the VFL model, which makes feature selection vitally important. However, existing feature selection methods for VFL either assume the availability of prior knowledge on the number of noisy features or prior knowledge on the post-training threshold of useful features to be selected, making them unsuitable for practical applications. To bridge this gap, we propose the Federated Stochastic Dual-Gate based Feature Selection (FedSDG-FS) approach. It consists of a Gaussian stochastic dual-gate to efﬁciently approximate the probability of a feature being selected. FedSDG-FS further designs a local embedding perturbation approach to achieve differential privacy for local training data. To reduce overhead, we propose a feature importance initialization method based on Gini impurity, which can accomplish its goals with only two parameter transmissions between the server and the clients. The enhanced version, FedSDG-FS++, protects the privacy for both the clients’ training data and the server’s labels through Partially Homomorphic Encryption (PHE) without relying on a trusted third-party. Theoretically, we analyze the convergence rate, privacy guarantees and security analysis of our methods.
+Manuscript received 8 March 2023; revised 8 October 2023; accepted 7 November 2023. Date of publication 17 November 2023; date of current version 7 May 2024. This work was supported in part by Nanyang Technological University (NTU), under Grant 020724-00001, in part by the National Research Foundation, Prime Ministers Ofﬁce, National Cybersecurity R&D Program under Grant NRF2018NCR-NCR005-0001, in part by NRF Investigatorship under Grant NRF-NRFI06-2020-0001, in part by the National Research Foundation, Singapore and DSO National Laboratories under the AI Singapore Programme AISG under Grant AISG2-RP-2020-019, in part by Alibaba Group through Alibaba Innovative Research (AIR) Program and Alibaba-NTU Singapore Joint Research Institute (JRI) under Grant Alibaba-NTU-AIR2019B1, NTU, Singapore, in part by the RIE 2020 Advanced Manufacturing and Engineering Programmatic Fund under Grant A20G8b0102, Singapore, in part by the National Key R&D Program of China under Grant 2021YFB2900103, in part by China National Natural Science Foundation under Grant 61932016, and in part by “the Fundamental Research Funds for the Central Universities” under Grant WK2150110024. Recommended for acceptance by J. S. Sun. (Corresponding author: Han Yu.)
+Anran Li, Hongyi Peng, Luu Anh Tuan, and Han Yu are with the School of Computer Science and Engineering, Nanyang Technological University, Singapore 639798 (e-mail: anranLi@mail.ustc.edu.cn; hongyi001@e.ntu.edu.sg; anhtuan.luu@ntu.edu.sg; han.yu@ntu.edu.sg).
+Jiahui Huang and Xiang-Yang Li are with the School of Computer Science and Technology, University of Science and Technology of China, Hefei 230052, China (e-mail: hjh233@mail.ustc.edu.cn).
+Lan Zhang is with the School of Computer Science and Technology, University of Science and Technology of China, Hefei 230052, China, and also with the Institute of Artiﬁcial Intelligence, Hefei Comprehensive National Science Center, Hefei, China (e-mail: zhanglan03@gmail.com).
+Ju Jia is with the School of Cyber Science and Engineering, Southeast University, Nanjing 210096, China (e-mail: jiaju@seu.edu.cn).
+Digital Object Identiﬁer 10.1109/TMC.2023.3333879
+
+Extensive experiments on both synthetic and real-world datasets show that FedSDG-FS and FedSDG-FS++ signiﬁcantly outperform existing approaches in terms of achieving more accurate selection of high-quality features as well as improving VFL performance in a privacy-preserving manner.
+Index Terms—Vertical federated learning, feature selection, differential privacy, partially homomorphic encryption.
+I. INTRODUCTION
+O BTAINING a large amount of high-quality training data is crucial for building machine learning (ML) models in artiﬁcial intelligence (AI) applications. It is not only expensive (especially for data with high dimensions)e, but is also challenging due to privacy concerns precluding direct data sharing in many ﬁelds (e.g., healthcare, ﬁnance). Federated learning (FL) [1], [2], [3], [4], [5], [6] is an emerging collaborative machine learning paradigm which enables multiple data owners (a.k.a., FL clients) to jointly train a model by iteratively exchanging model parameters with an FL server without exposing local data. It has been widely adopted in application such as safety monitoring [7], smart healthcare [8] and industrial fault detection [9]. FL can be broadly divided into two categories based on the distribution of local data [3]: 1) horizontal federated learning (HFL), and 2) vertical federated learning (VFL).
+Under HFL [10], [11], [12], data owners’ local datasets have little overlap in the sample space but large overlaps in the feature space. In contrast, under VFL [2], [13], [14], data owners’ local datasets have large overlaps in the sample space but little overlap in the feature space. VFL scenarios often arise in applications in which companies from different business sectors collaborate to train a model [15], [16] (e.g., an e-commerce company, a bank and a ride-sharing company could jointly build a model to identify potential ﬁnancial fraudsters based on their unique perspectives on customer behaviour patterns through VFL). The quality of data owners’ local features determines the effectiveness of their local models, which in turn, signiﬁcantly affects the performance of the global VFL model. In practical applications, data owners often possess noisy features that are irrelevant to the learning task, or a large number of redundant features which negatively impact global model performance [17].
+To improve the performance of VFL systems and reduce the cost of data acquisition, in this work, we focus on ﬁltering noisy features and selecting important features. There are a number of feature selection methods for achieving high-performance models under centralized ML settings [18], [19], [20], while
+
+1536-1233 © 2023 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+
+7239
+
+few work focused on VFL [21]. Feature selection methods for centralized ML can be divided into three categories. 1) Filter methods attempt to remove irrelevant features prior to learning a model. They calculate per-feature relevance scores based on statistical measures, e.g., Gini impurity and mutual information [20], [22], [23]. 2) Wrapper methods search for the optimal feature subset in large search spaces, and thus, become computationally expensive, especially in the context of deep neural networks [24], [25]. 3) Embedded methods try to remove this burden by selecting the subset of important features while simultaneously learn the model [19], [26], [27].
+In VFL, there are only three works on feature selection (FS) [21], [28]. In [21], FS is performed with the ﬁlter method based on secure multi-party computation, while in [28], [29] the embedded method combined the auto-encoder with l2 constraints on feature weights is used for FS. However, these works either assume prior knowledge on the number of noisy features [21] and the post-training threshold of useful features to be selected [28], or requires ﬁne parameter tuning (e.g., regularization parameters, number of pre-training epochs). These assumptions make them unsuitable for practical VFL applications. The problem of feature selection in VFL settings remains open. To enable feature selection to be performed in VFL settings, the following key research questions need to be addressed.
+1) How to accurately identify noisy features, and select a small number of important features to train an optimal global VFL model? Existing feature selection methods for centralized ML require direct access to training samples, the training process and the labels simultaneously, which is not permitted in VFL. Besides, in those VFL works that try to protect the privacy of local data, intermediate parameters are transmitted in ciphertexts during VFL training [30], [31], which further increases the difﬁculty of feature selection.
+2) How to conduct feature selection efﬁciently in VFL settings? Existing embedded feature selection methods require a large number of training iterations to select features, especially for high-dimensional data [19], [26]. Directly applying them in VFL will incur signiﬁcant computation and communication overhead since each training round involves multiple privacy preservation operations, e.g., encryption/decryption, and intermediate parameter transfers.
+3) How to provide well trade-offs between privacy protection and system efﬁciency? In this work, we try to protect both the clients’ training data and the server’s labels. Protecting the private labels is necessary since the labels often contain highly sensitive information, e.g., what a user has purchased in online advertising or whether a user has a disease or not in disease prediction. However, it is difﬁcult to directly apply the partially homomorphic encryption (PHE) algorithm, e.g., Paillier, to feature selection for vertical neural networks (NNs) since the nonlinear polynomials are not supported. Besides, different VFL systems have different privacy preservation requirements, and directly applying PHE techniques in all scenarios would incur substantial costs. Therefore, an adaptive privacy preservation method according to different privacy types to achieve a good trade-off between privacy protection and system efﬁciency is urgently needed.
+
+To address the aforementioned questions and the limitations
+
+of existing works [17], [21], we propose Federated Stochastic
+
+Dual-Gate based Feature Selection (FedSDG-FS) and FedSDG-
+
+FS++ approaches. Aiming for adaptivity to systems with differ-
+
+ent privacy preferences, FedSDG-FS and FedSDG-FS++ pro-
+
+tect the privacy of training data and the privacy of both the
+
+training data and labels, respectively. They are all embedded
+
+feature selection approaches consisting of a feature importance
+
+initialization module and a private important feature selection
+
+morduWlee.
+
+Our main contributions are propose FedSDG-FS and
+
+summarized as FedSDG-FS++
+
+follows. to accom-
+
+plish both accurate feature selection and high-performance
+
+VFL model construction while adaptively satisfying vari-
+
+r
+
+ous privacy preservation requirements. We propose the stochastic dual-gate and
+
+Gini
+
+impurity-
+
+based feature importance initialization method for
+
+FedSDG-FS and FedSDG-FS++ to ensure that the se-
+
+lected features are relevant to the context of the model.
+
+The stochastic dual-gate can efﬁciently approximate the
+
+probability of a feature and a embedding vector being
+
+selected, and can reduce the sizes of transmitted embedding
+
+vectors, thereby saving communication costs. The Gini
+
+impurity-based feature importance initialization method
+
+enables the global model to quickly ﬁlter out noisy features
+
+r
+
+and select important ones, thus speeding up model training. We further design a local embedding perturbation approach
+
+for FedSDG-FS to achieve differential privacy for local
+
+training data. To protect the privacy of both the client’s
+
+training data and the server’s labels, FedSDG-FS++ lever-
+
+ages a secure feature selection approach based on PHE and
+
+the randomized noise mechanism. In these ways, FedSDG-
+
+FS and FedSDG-FS++ privately determine the selected
+
+features and produces an optimal global model with higher
+
+accuracy and fast convergence.
+
+We evaluate FedSDG-FS and FedSDG-FS++ via extensive
+
+experiments using nine datasets including tabular data, images,
+
+texts and audios on a VFL system. The results show that they sig-
+
+niﬁcantly outperform existing approaches in terms of achieving
+
+accurate and private selection of high-quality features to build
+
+high-performance VFL models. Taking MADELON dataset as
+
+an instance, the average test accuracy of FedSDG-FS is 27.0%
+
+higher than that of the best performing baseline with 47% fewer
+
+features required, and only half the communication cost.
+
+II. RELATED WORKS & PRELIMINARIES
+Feature selection plays an important role in machine learning tasks. There are a number of feature selection methods proposed for centralized machine learning settings [18], [19], [20], while few works deal with feature selection in VFL [21]. In this section, we ﬁrst present the existing work of feature selection both in centralized learning and FL. Then, we introduce the preliminaries of Gini impurity for ﬁlter-based feature selection.
+
+A. Feature Selection in Centralized Learning
+Feature selection methods in centralized learning settings can be divided into three categories: 1) ﬁlter methods, 2) wrapper methods, and 3) embedded methods.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7240
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+1) Filter Methods: These methods attempt to remove irrelevant features prior to learning a model. A typical ﬁlter method consists of two steps, where the ﬁrst step ranks features based on certain criteria, and in the second step, the features with highest rankings are chosen to induce classiﬁcation models. Various performance criteria have been proposed for ﬁlter-based feature selection, e.g., Gini impurity [18], Fisher score [20] and mutual information [22].
+2) Wrapper Methods: Since ﬁlter methods select features independent of any particular models, they totally ignore the impacts of the selected subset of features on the performance of the induction algorithm [32], [33], which results in inaccurate feature selection for speciﬁc models. The optimal feature subset should depend on the speciﬁc biases and heuristics of the induction algorithm. Based on this assumption, wrapper methods leverage the outcomes of a model to determine the importance of each feature. They attempt to select a subset of features which can achieve the best prediction performance. As the number of subsets can be very large in the context of deep neural networks, and a model need to be recomputed for each subset, wrapper methods are generally computationally expensive [24], [25].
+3) Embedded Methods: These methods aim to select a subset of relevant features, while simultaneously learning the model [19], [26], [27]. Embedded methods have the advantages of 1) wrapper methods - they consider the contextual information of the classiﬁcation model and 2) ﬁlter methods - they are far less computationally intensive than wrapper methods. The least absolute shrinkage and selection operator [27] is a wellknown embedded feature selection method, whose objective is to minimize the loss while enforcing an l1 constraint on the weights of the features. However, embedded methods with regularized objective suffers from shrinkage of the model parameters, and cannot sparse the input layer [26], [34]. Another recently proposed method [19] uses a continuously relaxed Bernoulli variable to conduct feature selection based on stochastic gates. However, it requires a large number of parameters to be trained in the ﬁrst layer of the model, resulting in overﬁtting to the training data, especially for deep neural networks with high-dimensional data or when there are only a limited number of training samples available.
+Since these methods are designed for centralized learning scenarios in which all training data are accessible, such approaches are not applicable to VFL which demands data privacy protection for both local clients and the server. In addition, they are also not optimized to reduce communication or computation costs when the volume of training data is large, which make them not applicable in FL scenarios where clients are resource-constrained.
+B. Feature Selection in VFL
+In VFL, there are only a few existing works on feature selection and feature importance evaluatio. SFFS [21] conducts feature selection with the ﬁlter method based on secure multi-party computation. However, since it performs VFL feature selection out of the context of the learning task, it can lead to inaccurate feature selection. Besides, it assumes that the number of noisy features is known in advance, and that there is a trusted third
+
+party for performing feature selection. These assumptions are unrealistic in practice. Further, it incur large communication overhead since a massive amount of parameters are transmitted between participants and the trusted third party. Other methods [28], [29] leverage the embedded method through combining the auto-encoder with l2 constraints on feature weights. However, [28] suffers from the model parameter shrinkage [26] and requires post-training threshold setting to determine the selected features [17], while [29] requires ﬁne parameter tuning (e.g., number of pre-training epochs) and is vulnerable to reconstruction attacks and label leakage. The work [35] proposes two key factors affecting VFL performance - feature importance and feature correlation, and propose evaluation metrics and dataset splitting methods to improve model performance. However, it requires direct access to data features which breaches the privacy requirements of VFL. To this end, the proposed FedSDG-FS approach addresses these limitations of the state of the art.
+
+C. Differential Privacy
+Deﬁnition 1 (( , δ)-DP [36]): A randomized mechanism M : D → R with domain D and range R satisﬁes ( , δ)-DP if for any subset of outputs S ⊆ R and for any two adjacent inputs d, d ∈ D,
+
+Pr[M(d) ∈ S] ≤ e Pr[M(d ) ∈ S] + δ.
+
+(1)
+
+Instead of the original deﬁnition of -DP, we adopt the variant [37] which allows for the possibility that plain -differential privacy is broken with probability δ. A common paradigm for approximating a real-valued function f : d → R with a differentially private mechanism is via additive noise calibrated to f ’s sensitivity Sf , which is deﬁned as Sf = maxd,d |f (d) − f (d )|. For instance, the Gaussian noise mechanism is deﬁned as
+
+M(d) = f (d) + N 0, Sf2 · σ2 ,
+
+(2)
+
+where N (0, Sf2 · σ2) is the Gaussian distribution with mean 0 and standard deviation Sf σ. In [38], a DP stochastic gradient decent algorithm (DP-SGD) has been proposed. It is similar to mini-batch gradient decent with the gradient averaging process being approximated by a Gaussian mechanism (GM). The basic idea for designing a differentially private additive-noise mechanism that implements a given functionality consists of the following steps: 1) approximating the functionality by a sequential composition of bounded-sensitivity functions; 2) choosing parameters of additive noise; and 3) performing privacy analysis of the resulting mechanism. Following this approach, we propose a differentially private feature selection method to prevent the transmission parameters (e.g., local embedding vectors) from leaking clients’ data information during the training and selection procedure.
+
+III. PROBLEM DESCRIPTION
+A. Basic Setup of VFL
+There are two types of entities involved in VFL: a server S and M clients M := {1, 2, . . . , M }. A dataset U = {U1, . . . , UM } of N samples, {X, Y } := {xn, yn}Nn=1, is maintained by the M
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+TABLE I IMPORTANT NOTATIONS
+
+7241
+
+Fig. 1. Test accuracy and model size of vertical neural networks training using (a) the dataset ARECENE with redundant features; (b) the dataset MADELON with noisy features.
+
+clients. Let [N ] = {1, 2, . . . , N }. Each client m is associated with a unique set of features {fm,1, . . . , fm,dm }, and owns sample xn,m ∈ Rdm , n ∈ [N ], where xn,m is the mth block of the nth sample vector xn := [xn,1, xn,2, . . . , xn,M ] . Suppose there are C possible class labels, the nth label yn ∈ [C] is stored by server S. Typically, a data owner, which holds both the feature
+and the class labels, can act as the “FL server”. It is referred to
+as the active party. Others which hold only features are referred
+to as the passive parties.
+Each client m learns a local embedding hm parameterized by θm ∈ Θ that maps a high-dimensional vector xn,m ∈ Rdm into a low-dimensional one hn,m := hm(θm; xn,m) ∈ Rdm with dm dm. The server S learns the prediction yˆn through the the top model θ0 which is parameterized by θ0 := {w1, . . . , wM , α0} ∈ Θ, wm ∈ Rdm , m ∈ [M ], where {w1, . . . , wM } are parameters of the interactive layer which concatenates embedding vectors hn,1, . . . , hn,M in a weighted manner and α0 denotes the parameters of the succeeding layers of the top model connected to the interactive layer. Generally,
+the objective of VFL is to minimize,
+
+R(θ) := EX,Y L(h(θ0, hn,1, . . . , hn,M ); yn)
+
+with hn,m : = hm(θm; xn,m), m ∈ [M ],
+
+(3)
+
+where θ := {θi}M i=0 denotes the global model, which consists of M local models θ1, . . . , θM and the top model θ0, and L(·; ·) is the loss function. This problem can be solved via iterative stochastic optimization. In the tth iteration, the server receives embedding vectors {htn,m}M m=1 from M clients. It then calculates and sends the gradients of the loss w.r.t. htn,m to all clients. Upon receiving the gradients, client m updates the local model to obtain θmt+1. Then, client m randomly selects a datum xn,m, calculates htn+,m1 using θmt+1, and sends it to the server. This process is repeated until the global model converges (i.e.,
+a convergence criterion is met). To ensure that neither data nor
+labels can be obtained or inferred by any other party, the above
+iterative training must be conducted in a privacy-preserving
+manner. For better illustration, some notations are summarized
+in Table I.
+
+B. Motivating Analyses
+First, we conduct data driven analysis to demonstrate the necessity of feature selection in VFL. We illustrate this from two aspects: 1) many clients possess a large number of redundant features, which results in a low quality and very complex global model; and 2) some clients possess noisy or task irrelevant features which reduces global model performance. Speciﬁcally, we use datasets ARCENE [39] and MADELON [40] as training data. ARCENE contains 2,400 instances with 7,000 informative but redundant features. MADELON contains 4,400 instances with 5 informative features and 480 noisy features. We employ two clients, A and B, and a server to jointly train neural networks [30], i.e., VFLNN-ARCENE and VFLNN-MADELON, based on these two datasets via VFL, and evaluate the test accuracy of the global model updated by by aggregating local bottom models of clients and the top model of the server.
+To illustrate aspect 1), we assign different numbers of features of ARCENE to client B, while assigning 100 ﬁxed features to client A to train VFLNN-ARCENE. The results in Fig. 1(a) show that, as the number of redundant features increases, the test accuracy of the global model decreases slightly, while the model size grows rapidly. To illustrate aspect 2), we assign different numbers of noisy features from the MADELON dataset to client B, while assigning 10 ﬁxed features to client A to train VFLNN-MADELON. The results are shown in Fig. 1(b), where 10 : k indicates that, A owns 10 features (i.e., 3 informative features and 7 noisy features), and B owns k features (i.e., 2 informative features and (k − 2) noisy features). It shows that as the number of noisy features increases, the test accuracy of the global VFL model decreases signiﬁcantly. These results show that an efﬁcient and privacy-preserving feature selection method is urgently needed for VFL.
+C. Problem Formulation
+In a typical VFL system, under the coordination of the server S, all participants jointly train a global model by transferring their local embedding vectors trained using their local datasets. We consider a practical situation that some clients possess a large number of noisy features or redundant features. This may result in a low-performance and extremely complex global model. Speciﬁcally, we can divide all features into qualiﬁed important features and negatively inﬂuential features, e.g., noisy features or
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7242
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+redundant features, by their effects to the objective of the global model. A desired VFL framework should enable all participants to jointly train a simple global model with a small number of important features, while eliminating negatively inﬂuential ones. The goal of feature selection in VFL is to simultaneously select a subset of features, and construct a global model θˆ with the objective by minimizing,
+
+R(θ, s) := EX,Y L(h(θ0, hn,1, . . . , hn,M ); yn)
+
+(with) hn,m := hm(θm; xn,m sm), m ∈ [M ],
+
+(4)
+
+where sm = {0, 1}dm is the vector of indicator variables, and sm,i, i ∈ [dm] are Bernoulli variables which indicate whether or not the ith feature of client m is selected.
+Security Assumptions: We assume that all participants are semi-honest. They follow the protocol of VFL and feature selection without tampering with it and they do not collude with one another. Nevertheless, they are curious about other’s private information and will try to infer as much as possible from the information received from the other participants. The semi-honest assumption is reasonable in our context since all participants have an incentive to learn a high-performance VFL model.
+
+D. Privacy Threats
+
+In this work, we consider two types of privacy threats, which
+
+expose the information about the training data of clients and the
+
+labrelsTorawinniendgbDyathtae:sTehrveetrr.aining data shall not be accessed by
+
+or exposed to any party other than the original owners. Be-
+
+sides, the transmitted intermediate parameters (e.g., local
+
+embedding vectors) generated during forward propagation
+
+might leak private information (e.g., data distributions)
+
+about the training data. Privacy-preserving techniques shall
+
+r
+
+protect these aspects of training data. Labels: During backward propagation, the label informa-
+
+tion might be leaked from the server through transmitted
+
+intermediate parameters (e.g., gradients of the training loss
+
+w.r.t. the interactive layer weights) [41], [42]. Thus, these
+
+parameters shall be protected.
+
+E. Design Goals
+We aim to design a VFL model training framework to support collaborative feature selection and model construction to achieve the following goals.
+1) Effective Selection: The framework shall accurately select important features which have large positive effects on the global model performance, and exclude negatively inﬂuential features from training with the aim of improving model performance in terms of convergence speed and inference accuracy.
+2) Privacy Preservation: For the above privacy threats, we aim to achieve two levels of privacy preservation. (1) Level-1 privacy protects transmission parameters (e.g., local embedding vectors) from leaking clients’ training data information during model training and feature selection. (2) Level-2 privacy protects both the clients’ training data and the server’s private labels
+
+from being exposed to or inferred by any party through the transmission parameters other than original owners.
+3) Reducing Overhead: Considering the resource constraints of edge and mobile devices, the selection and updating process shall not incur high computation and communication cost.
+
+IV. THE PROPOSED APPROACH
+In this section, we ﬁrst illustrate our proposed key techniques to enable feature selection to be performed jointly with model training under VFL settings. Then, we present the system design motivation and the system architecture. Finally, we present the details of the proposed approaches, which include feature importance initialization, DP-based important feature selection for FedSDG-FS and secure important feature selection for FedSDGFS++.
+
+A. Stochastic Dual-Gates for VFL
+
+To achieve accurate feature selection during model training, we need to dynamically calculate the inﬂuence of features on the global model, and increase the selection probabilities of features with high inﬂuence. In VFL, local embedding vectors are transferred to the server, where the size of them affects the communication cost. To reduce communication overhead in feature selection, we ﬁrst introduce stochastic dual-gates for VFL to efﬁciently approximate the probabilities of features and dimensions of embedding vectors being selected. We re-express (4) into minimizing the l0 constrained risk
+R(θ, s, q) := EX,Y L(h(θ0, gn,1, . . . , gn,M ); yn)
+
++ λ (|sm|0 + |qm|0) ,
+
+(5)
+
+m
+
+where hn,m := hm(θm; xn,m sm), gn,m = hn,m qm, qm = {0, 1}dm is the vector of indicator variables, where qm,i, i ∈ [dm] are Bernoulli variables and indicate whether or
+not the ith dimension of embedding hn,m is selected for global model training, and λ is a weighting factor for the regularization.
+
+We use l0 norm to penalize the number of non-zero entries
+
+in the vectors sm, qm, and encourage the sparsity in the ﬁnal estimates. Notice that l0 norm induces no shrinkage on the
+
+actual values of the parameters, which is in contrast to l1
+
+regularization [27].
+
+To solve this problem is not straightforward, since the op-
+
+timization of hard feature selection with binary masks suf-
+
+fers from high variance. To this end, we propose a se-
+
+cure Gaussian-based continuous relaxation for the Bernoulli
+
+variables for VFL. We approximate each element of
+
+sm, qm to clipped Gaussian random variables parameterized
+by μm, ωm as sm,i = max(0, min(1, μm,i + ρm,i)), qm,j =
+max(0, min(1, ωm,j + γm,j)), where ρm,i, γm,j are drawn from N (0, σ2), and μm,i, ωm,j can be learned during VFL
+
+training. Under the continuous relaxation, the regularization
+
+term in (5) is simply the sum of the probabilities that
+
+i∈[dm] P (sm,i > 0) + j∈[dm] P (qm,j > 0), and can be cal-
+
+culated by
+
+i∈[dm] Φ
+
+μm,i σ
+
++
+
+j∈[dm] Φ
+
+ωm,j σ
+
+, where Φ(·)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+
+7243
+
+is the cumulative distribution function of the standard Gaussian distribution. By leveraging the continuous distribution, we can thus transform (5) into the following:
+
+R(θ, μ, ω) := EX,Y L(h(θ0, gn,1, . . . , gn,M ); yn)
+
++λ
+
+Φ μm,i +
+
+Φ ωm,j
+
+σ
+
+σ
+
+m,i
+
+m,j
+
+. (6)
+
+To optimize the objective of (6), we ﬁrst differentiate it with respect to μm, ωm. However, since the loss L of the global model is calculated and stored at the server S, client m cannot directly access it. Thus, client m performs the differentiation using chain rules [43] based on the Monte Carlo sampling gradient estimator, e.g., for μm
+
+1
+
+∂Ln · ∂gn,m · ∂sm,i + λ ∂ Φ μm , (7)
+
+Q
+i∈[Q]
+
+∂gn,m
+
+∂sm
+
+∂μm,i
+
+∂μm σ
+
+where Q is the number of Monte Carlo samples. The calculation of gradient of estimator for ωm is similar to (7). Thus, we can update μm, ωm via stochastic gradient descent.
+
+Fig. 2. Example motivation of FedSDG-FS design. The vertical neural network is trained on the dataset MADELON.
+
+B. System Design Motivations
+There are many challenges in solving this optimization problem. First, updating the parameters and conducting the above operations require access to all local training samples or training processes, which are hidden from any third party including the server in FL. Thus, how to accurately calculate them in a privacypreserving manner is challenging. Second, it would require a large number of parameters to be trained (e.g., μm, m ∈ [M ]) by directly applying the stochastic dual-gates to the clients’ inputs and local embedding vectors, which slows down the convergence of the global model and incurs signiﬁcant computation and communication overhead, especially for high-dimension features.
+To address these challenges, we propose efﬁcient and privacy-preserving feature selection frameworks, FedSDG-FS and FedSDG-FS++, which commonly adopts the Gini impuritybased important feature initialization to facilitate feature selection and reduce computation and communication cost. Then, important features and signiﬁcant local embeddings can be selected by the proposed stochastic dual gates, enhanced with DP and local perturbations in FedSDG-FS, and enhanced with PHE and the randomized noisy mechanism in FedSDG-FS++ to achieve privacy preservation. We make the following three empirical observations to illustrate the motivation of the importance initialization. i) As illustrated in Fig. 2(a), there can be a large ratio of the same features being selected by the Gini impurity [18] and by the stochastic gates in some training rounds. ii) Gini impurity initialization can speed up feature selection (Fig. 2(b)). iii) The reason that Gini impurity cannot be directly used for feature selection is that it cannot take into account the speciﬁc VFL models and has no prior knowledge of the number of important features to select. The feature importance initialization step can be accomplished through two parameter transmissions with two encryption/decryption operations on the server based on Gini impurity and PHE, which signiﬁcantly
+
+Fig. 3. System overview of FedSDG-FS. 1 Send encrypted embeddings, 2 send encrypted gradients.
+improves efﬁciency and privacy preservation. In this way, we can achieve efﬁcient and private feature selection while constructing the global VFL model.
+C. System Overview
+FedSDG-FS and FedSDG-FS++ consist of two modules (as shown in Fig. 3):
+1) Feature Importance Initialization before Training: To save feature selection costs, local clients ﬁrst securely initialize feature importance based on Gini impurity and PHE, in cooperation with the server prior to the commencement of model training.
+2) Important Feature Selection during Training: After feature importance initialization, the server coordinates clients to select important features, while training the VFL model for improved performance. Speciﬁcally, in FedSDG-FS, to achieve Level-1 privacy, we propose a DP-based feature selection approach based on local perturbation on embedding functions. While in FedSDG-FS++, to achieve Level-2 privacy, we propose a secure feature selection approach which includes forward propagation for secure feature selection, and backward propagation for secure feature selection, based on the proposed stochastic dual-gate, PHE and the randomized noise mechanism. In this way, FedSDG-FS and FedSDG-FS++ determine the selected features and produces optimal global models θˆ with higher accuracy and fast convergence.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7244
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+Algorithm 1: Feature Importance Initialization.
+
+Input: Server S, clients m
+
+Output: Initialized feature importance
+
+1 Server S 2 Generate an indicator matrix A, [[A]] ← Enc(A) 3 Send [[A]] to all clients
+
+4 Client m
+
+5 Induce a partition Um,1 ∪ Um,2 ∪ · · · ∪ Um,b of Um
+
+6 Calculate [[pm,k]] ← a∈I(Um,i)[[A]]a,k/|Um,i|
+
+7 Calculate [[pm,k]]2 with the protocol in [44]
+
+8 [[G(Um,i)]] ← 1 − k∈[c][[pm,k]]2
+
+9 [[G(fm,j)]] ←
+
+c i=1
+
+|Um,i | |Um |
+
+·
+
+[[G(Um,i)]]
+
+10 Send [[G(fm,j)]], j ∈ [dm] to the server
+
+11 Server S
+
+12 G(fm,j) ← Dec([[G(fm,j )]])
+
+13 Send G(fm,j), j ∈ [dm] to client m
+
+14 Client m
+
+15
+
+Initialize
+
+μm,j
+
+∝
+
+1 G(fm,j )
+
+16 Return feature importance initialization μm,j, j ∈ [dm]
+
+D. FedSDG-FS
+
+1) Feature Importance Initialization: As illustrated in Sec-
+
+tion III-A that M clients have a set U = {U1, . . . , UM } of N samples, for client m, if the jth feature fm,j is a discrete feature that can assume b values, then it induces a partition
+
+Um,1 ∪ · · · ∪ Um,c of the set Um in which Um,i is the set of
+
+instances with the ith value for fm,j. The Gini impurity of Um,i is deﬁned as G(Um,i) = 1 − k∈[C] p2m,k, where pm,k is
+
+the probability of a randomly selected instance from Um,i that
+
+belongs to the kth class. The Gini score of feature fm,j is cal-
+
+culated as G(fm,j) =
+
+i∈[c]
+
+|Um,i | |Um |
+
+·
+
+G(Um,i),
+
+where
+
+G(fm,j )
+
+measures the likelihood of a randomly selected instance being
+
+misclassiﬁed. If fm,j is a feature with continuous values, then G(fm,j) is deﬁned as the weighted average of the Gini impurities
+
+of a set of discrete feature values. We use the Paillier as the
+
+PHE method which supports homomorphic addition of two
+
+ciphertexts and homomorphic multiplication between a plaintext
+
+and a ciphertext. The calculation of pm,k requires collaboration between client m and the server. Thus, we design an efﬁcient
+
+and secure collaborative calculation protocol, which is shown in
+
+Algorithm 1.
+
+Speciﬁcally, the server ﬁrst generates an indicator matrix
+
+A with a size of N × C, where An,k = 1 denotes the category of the nth sample is k; otherwise, An,k = 0. Then, the probability pm,k of client m can be calculated as pm,k =
+a∈I(Um,i) Aa,k/|Um,i|, where I(Um,i) indicates the index set of instances from Um,i. To prevent the label information
+from being leaked, the server encrypts the matrix A, and sends
+
+[[A]] to all clients (Line 2-3). Then, client m calculates the
+
+probability [[pm,k]] = a∈I(Um,i)[[A]]a,k/|Um,i| and uses the protocol in [44] to compute the square of [[pm,k]] as follows. First,
+client m generates a random value r and computes [[um,k]] = [[pm,k + r]], such that p2m,k equals u2m,k − 2um,k · r + r2 and
+
+[[−2um,k · r + r2]] can be locally computed by the client (Line
+5-10). Then, client m sends [[um,k]] to the server. The server decrypts it, computes and sends [[u2m,k]] to client m (Line 12-13). Finally, client m computes [[p2]] = [[u2m,k − 2um,k · r + r2]]. After calculating [[p2]], client m calculates the Gini impurity
+
+[[G(fm,j)]] of feature fm,j, and sends them to the server (Line
+
+15-16). The server then decrypts them, and assigns larger initial
+
+importance values, i.e., larger initial value of μm, to features
+
+with smaller Gini values. During this process, only the server
+
+learns the Gini scores of client m’s features, while other parties
+
+learn nothing. It shows that the calculation of Gini impurity only
+
+involves two parameter transmissions between the server and the
+
+clients. The computation cost of each client is O(1) operations
+
+due to multiple addition and multiplication operations, while the
+
+communication cost of each client is O(size([[A]]) +
+
+· M
+m=1
+
+dm
+
+M
+
+size([[G(fm,j)]])) where size([[A]]), size([[G(fm,j)]]) denote
+
+sizes of [[A]] and [G(fm,j)]], respectively.
+
+2) Differentially Private Important Feature Selection: Dur-
+
+ing the feature selection and updating process, clients keep
+
+sending the embedding vectors to the server, which might leak
+
+training data information [38], [45]. To this end, we propose
+
+a privacy-preserving feature selection framework based on the
+
+Gaussian DP mechanism [46] to enhance data conﬁdentiality of
+
+VFL participants (with negligible training time), test accuracy
+
+in the feature selection and updating process.
+
+Local Perturbation: As illustrated in Section III-A, hm denotes the local embedding function of client m with the parame-
+
+ter θm which embeds the input data xn,m into its output hn,m := hm(θm; xn,m sm). When hm is linear embedding, it is as simple as hm(θm; xn,m) = (xn,m sm) θm. For non-linear embeddings such as neural networks, hn,m can be represented
+
+as
+
+u0m = xn,m sm
+
+uim = σi(wmi ui−1 + bim), i ∈ [I]
+
+hn,m = uIm,
+
+(8)
+
+where σi(·) is a linear or non-linear function, wmi , bim corresponds to the parameter θmi of hm (e.g., θmi = {wmi , bim} ) and θmi is the ith layer parameter of θm. Here, we use Kσi to denote the lipschitz constant of a function σi(·), and we
+assume that σi is Kσi -Lipschitz continuous. Specially, when hm is linear, the composite form embedding corresponds to I = 1, σ1(wm1 xn,m sm + b1m) = wm1 xn,m sm + b1m. We per-
+turb the local embedding function hm by adding a random neuron with output zmi at each layer i
+
+uim = σi(wmi ui−1 + bim + zmi ), i ∈ [I].
+
+(9)
+
+hn,m = uIm, where zm1 , . . . , zmI are independent random vari-
+
+ables. We show hm is smooth and enables DP with properly
+
+zchmIos∼enNd(i0st,rζibm2u)t,ioznmi o∼f zUmi [,−i√∈3[ζImi].,
+
+W√e set 3ζmi ],
+
+the i∈
+
+distribution as [I − 1], where
+
+Nand(0v, aζrm2ia)ncdeenζom2te,sant√hdeUG[−au√√ss3iζamni
+
+d√istribution with zero mean , 3ζmi ] denotes the uniform
+
+distribution over [− 3ζmi , 3ζmi ].
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+
+7245
+
+Algorithm 2: GDP-Based Private Feature Selection.
+
+Input: M clients with N samples {xn, yn}Nn=1, xn,m ∈ Rdm , ζ, ζi, i ∈ [I − 1]
+
+Output: Global model θˆ, indicator vector {sm}M m=1 1 Initialize model θ0 := {α0, w1, w2, . . . , wM }, {θi}M i=1,
+ωm ∈ Rdm , initialize μm with Algorithm 1
+
+2 Client m, m ∈ [M ]
+
+3 Select datum xn,m, u0m = xn,m sm 4 Sample ρm,i, γm,j ∼ N (0, σ2), i ∈ [dm], j ∈ [dm]
+
+5 Compute sm,i = max(0, min(1, μm,i + ρm,i))
+
+6 qm,j = max(0, min(1, ωm,j + γm,j))
+
+7 Rm =
+
+i∈[dm ]
+
+Φ(
+
+μm,i σ
+
+)
+
++
+
+j ∈[dm ]
+
+Φ(
+
+ωm,j σ
+
+)
+
+8 for i = 1, .√. . , I −√1 do 9 zmi ∼ U [− 3ζmi , 3ζmi ] 10 uim = σi(wmi uim−1 + bim + zmi )
+
+11 zmI ∼ N (0, ζm), hn,m = uIm, gn,m = hn,m qm
+
+12 Send gn,m to the server
+
+13 Server S
+
+14
+
+Compute
+
+the
+
+gradients
+
+∂Ln ∂wm
+
+,
+
+m
+
+∈
+
+[M ],
+
+∂Ln ∂α0
+
+15 Update top model θ0 = {w1, . . . , wM , α0} as
+
+wm
+
+←
+
+wm
+
+−
+
+η0
+
+∂Ln ∂wm
+
+,
+
+m
+
+∈
+
+[M ],
+
+α0 ← α0 − η0∇α0 Ln
+
+16
+
+Compute
+
+the
+
+gradient
+
+, ∂Ln
+∂ gn,m
+
+send
+
+it
+
+to
+
+client
+
+m
+
+17 Client m ∈ [M ]
+
+18
+
+Calculate
+
+∂Ln ∂μm
+
+,
+
+∂Ln ∂ωm
+
+,
+
+∂Ln ∂θm
+
+19
+
+Update
+
+μm
+
+←
+
+μm
+
+−
+
+ηm(
+
+∂Ln ∂μm
+
++
+
+λ
+
+∂Rm ∂μm
+
+)
+
+20
+
+ωm
+
+←
+
+ωm
+
+−
+
+ηm(
+
+∂Ln ∂μm
+
++
+
+λ
+
+∂Rm ∂ωm
+
+),
+
+θm
+
+←
+
+θm
+
+−
+
+ηm
+
+∂Ln ∂θm
+
+21 Return the global model θ = {θm}M m=0.
+
+Enforcing Smoothness: After the embedding function hm is perturbed, to guarantee the convergence of model training con-
+sidering the feature selection, the objective function ( (6)) should
+be smooth. Inspired by the randomized smoothing technique, we
+are able to smooth the objective function by taking expectation
+with respect to random neurons, which follows the fact that the
+smoothness of a function can be increased by convolving with
+proper distributions. Speciﬁcally, by adding a random neuron zmi , σi will be smoothed in expectation with respect to zmi , and the local embedding vector hn,m is smooth by induction. Then the global objective R is smooth by taking expectation with respect to all the random neurons when the loss function L(·) is smooth w.r.t. the local embedding vector hn,m. Further, the perturbed loss is smooth w.r.t. the local model θm, and a large perturbation (large ζmi or ζm) will lead to a smaller smoothness constant.
+GDP-Based Feature Selection: We now leverage the local
+embedding perturbation technique in the private information
+transmission and achieve privacy-preserving feature selection and model updating (see Algorithm 2). Client m ∈ [M ] randomly selects a private datum (or mini-batch) xn,m, and calculates the indicator sm,i for each feature fm,i, i ∈ [dm]. Then, it perturbs the local embedding function hm using (8) with the random neuron zmi , i ∈ [I], and calculates the perturbed
+
+embedding vector hn,m and the masked embedding gn,m which
+
+is sent to the server. Then, the server calculates the gradients
+
+of
+
+the
+
+loss
+
+w.r.t.
+
+the
+
+interactive
+
+layer
+
+weight
+
+∂Ln ∂wm
+
+,
+
+and
+
+w.r.t.
+
+the
+
+succeeding
+
+layer
+
+weights
+
+∂Ln ∂α0
+
+,
+
+and
+
+updates
+
+its
+
+top
+
+model
+
+θ0
+
+(Line
+
+13-14).
+
+It
+
+then
+
+calculates
+
+the
+
+gradient
+
+∂Ln ∂ gn,m
+
+of
+
+the
+
+loss
+
+w.r.t.
+
+the
+
+masked
+
+embedding
+
+gn,m,
+
+and
+
+sends
+
+∂Ln ∂ gn,m
+
+to
+
+client
+
+m.
+
+Upon
+
+receiving
+
+the
+
+gradient
+
+, ∂Ln
+∂ gn,m
+
+client
+
+m
+
+updates
+
+the
+
+local
+
+model θm and the selection variables μm, ωm (Line 17-19). This
+
+process is repeated until the global model converges. In this
+
+way, model update and feature selection can be accomplished
+
+simultaneously.
+
+We further provide privacy guarantees and utility analyses
+
+for Algorithm 2. We ﬁrst deﬁne notations and make some
+
+assumptions.
+
+Deﬁnition 2: A mechanism M is said to satisfy β-GDP if for
+
+all neighboring datasets D and D , we have
+
+H(M(D), M(D )) ≤ H(N (0, 1), N (β, 1)), (10)
+
+where the trade-off function H(·; ·)(d) = inf {aφ : dφ ≤ d} are type I and type II errors given a threshold φ.
+
+Intuitively, β-GDP guarantees that distinguishing two adja-
+
+cent datasets via information revealed by M is at least as difﬁcult
+
+as distinguishing the two distributions N (0, 1) and N (β, 1).
+
+Smaller β means less privacy loss. We leverage the moments
+
+accountant technique [38] to characterize the level of privacy of
+
+the GDP-based feature selection method.
+
+Assumption 1: The optimal loss is lower bounded L∗ > −∞.
+
+The
+
+gradient
+
+∂R(θ) ∂θ0
+
+is
+
+K -Lipschitz
+
+continuous,
+
+and
+
+∂R(θ) ∂θm
+
+,
+
+m
+
+∈
+
+[M ] is Km-Lipschitz continuous.
+
+Theorem 1: Under Assumption 1 and the assumptions that,
+
+for each embedding function hm, if the activation functions
+
+σi = σ, ∀i, and ||wmi || is bounded, for client m, if we set the
+
+variance o√f the Gaussian random neuron at the Ith layer as ζ = O(bm e/(βb)), where bm is the size of batch of client
+
+m, b =
+
+M m=1
+
+bm
+
+is
+
+the
+
+size
+
+of
+
+the
+
+whole
+
+batch,
+
+and
+
+e
+
+is
+
+the
+
+number of queries (i.e., the number of data samples processed
+
+by hm at client m), then the Algorithm 2 of FedSDG-FS satisﬁes β-GDP for the dataset Um of client m.
+
+Theorem 1 illustrates the trade-off between model perfor-
+
+mance and local data privacy. Speciﬁcally, to increase data
+
+privacy, i.e., decrease β in (10), we can increase the variance
+
+of random neurons. While as the variance of random neurons
+
+increases, the variance of the stochastic gradients of the loss
+
+w.r.t. top model θ0, and w.r.t. local model θm, m ∈ [M ] also
+
+increase, which will in turn lead to lower test accuracy or slower
+
+convergence. Thus, through Theory 1, we can set the proper
+
+value of β according to the requirements of model performance
+
+and local data privacy so as to achieve a good trade-off between
+
+them.
+
+E. FedSDG-FS++
+The feature importance initialization phase of FedSDG-FS++ is the same as FedSDG-FS (illustrated in Section IV-D1), thus we directly present the secure important feature selection. We use the Paillier as the PHE method. The detailed processes of
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7246
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+Algorithm 3: Forward Propagation for Secure Feature Se-
+
+Algorithm 4: Backward Propagation for Secure Feature
+
+lection.
+
+Input: M clients with N samples {xn, yn}Nn=1, xn,m ∈ Rdm Output: Global model θˆ, indicator vector {sm}M m=1 1 Initialize model θ0 := {α0, w1, w2, . . . , wM }, {θi}M i=1,
+noise acc, ωm ∈ Rdm , initialize μm with Algorithm 1
+2 Client m, m ∈ [M ]
+
+3 Select datum (or data mini-batch) xn,m
+
+4 Sample ρm,i, γm,j ∼ N (0, σ2), i ∈ [dm], j ∈ [dm]
+
+5 Compute sm,i = max(0, min(1, μm,i + ρm,i))
+
+6 qm,j = max(0, min(1, ωm,j + γm,j))
+
+7 Rm =
+
+i∈[dm ]
+
+Φ(
+
+μm,i σ
+
+)
+
++
+
+j ∈[dm ]
+
+Φ(
+
+ωm,j σ
+
+)
+
+8 hn,m ← hm(θm; xn,m sm), gn,m = hn,m qm
+
+9 [[gn,m]] ← Enc(gn,m), sends [[gn,m]] to the server
+
+10 Server S
+
+11 Calculate the noisy weight wm ← wm + acc 12 Compute [[zn,m]] ← [[gn,m]] · wm 13 Add random noise [[zn,m + s]] ← [[zn,m]] + s 14 Send [[zn,m + s]] to client m 15 Client m, m ∈ [M ]
+
+16 zn,m + s ← Dec([[zn,m + s]]) 17 Remove noise zn,m + s ← zn,m + s − accgn,m 18 Send zn,m + s to the server
+
+19 Server S
+
+20 Remove noise zn,m ← zn,m + s − s 21 Compute Ln ← L(h(α0, zn,1, . . . , zn,M ); yn)
+
+22 Return the loss Ln
+
+forward propagation and backward propagation are shown in
+Algorithms 3 and 4. 1) Forward Propagation on Clients: Client m randomly se-
+lects a private datum (or mini-batch) xn,m, and calculates the indicator sm,i for each feature fm,i, i ∈ [dm]. Then, it calculates the embedding vector hn,m using the local model θm and the masked embedding gh,m = hn,m qm, and encrypts it with PHE to obtain [[gn,m]] = Enc(gn,m), which is sent to the server (Line 2-9 of Algorithm 3).
+2) Forward Propagation on the Server: After receiving the encrypted embedding [[gn,m]], the server calculates the weighted vector [[zn,m]] = [[gn,m]] wm, and performs the forward propagation of the top model. Since the non-linear activation function
+on the top model cannot be calculated on the encrypted data, the weighted vector [[zn,m]] should be sent back to client m for decryption. However, sending the weighted vector directly
+without any protection would leak the prediction to the client (e.g., client m can use the activation prediction pair (zn,m, gn,m) to infer activation values and weights of the top model). To prevent this, the server adds random noises s on [[zn,m]], and sends [[zn,m + s]] to client m. Then, client m decrypts the noisy weighted sum [[zn,m + s]], and sends zn,m + s to the server (Line 11-14 of Algorithm 3). Finally, the server removes the
+noise and computes the activation for the next layer. The process
+repeats until the ﬁnal layer is reached. Another problem is that the server holds both wm and zn,m,
+and can easily infer hn,m via linear regression. To avoid this, the server should use the noisy weight wm to calculate the weighted
+
+Selection.
+
+Input: Loss Ln on the server, target {yn}Nn=1, learning rates η0, ηm Output: Global model θˆ, indicator vector
+
+sm, qm, m ∈ [M ]
+
+1 Server S
+
+2
+
+Compute
+
+the
+
+gradients
+
+[[
+
+∂Ln ∂wm
+
+]]
+
+←
+
+∂Ln ∂ zn,m
+
+· [[gn,m]],
+
+∂Ln ∂ gn,m
+
+←
+
+∂Ln ∂ zn,m
+
+· wm,
+
+∂Ln ∂α0
+
+3
+
+Add
+
+noise
+
+[[
+
+∂Ln ∂wm
+
++
+
+s]]
+
+←
+
+[[
+
+∂Ln ∂wm
+
+]]
+
++
+
+s
+
+4
+
+Send
+
+∂Ln ∂wm
+
++
+
+s
+
+to client m
+
+5 Client m ∈ [M ]
+
+6
+
+∂Ln ∂wm
+
++
+
+s
+
+←
+
+D
+
+ec([[
+
+∂Ln ∂wm
+
++
+
+s]])
+
+7
+
+Add
+
+noise
+
+∂Ln ∂wm
+
++
+
+s
+
+←
+
+∂Ln ∂wm
+
++
+
+s−
+
+m
+η0
+
+8 Encrypt noise [[ acc]] ← Enc( acc)
+
+9 Accumulate noise acc ← acc + m
+
+10
+
+Send
+
+∂Ln ∂wm
+
++
+
+s, and [[ acc]] to the server
+
+11 Server S
+
+12
+
+Remove noise
+
+∂Ln ∂wm
+
+←
+
+∂Ln ∂wm
+
++
+
+s−
+
+s
+
+13 Update θ0 = {w1, . . . , wm, α0}:
+
+wm
+
+←
+
+wm
+
+−
+
+η0
+
+∂Ln ∂wm
+
+,
+
+α0
+
+←
+
+α0
+
+−
+
+η0∇α0 Ln
+
+14
+
+Remove
+
+noise
+
+[[
+
+∂Ln ∂ gn,m
+
+]]
+
+←
+
+∂Ln ∂ gn,m
+
+− [[
+
+acc]] ·
+
+∂Ln ∂ zn,m
+
+15
+
+Send
+
+[[
+
+∂Ln ∂ gn,m
+
+]]
+
+to
+
+client
+
+m
+
+16 Client m ∈ [M ]
+
+17
+
+∂Ln ∂ gn,m
+
+←
+
+[Dec([[
+
+∂Ln ∂ gn,m
+
+]])
+
+18
+
+Calculate
+
+∂Ln ∂μm
+
+,
+
+∂Ln ∂ωm
+
+,
+
+∂Ln ∂θm
+
+19
+
+Update μm ← μm − ηm
+
+∂Ln ∂μm
+
++
+
+λ
+
+∂Rm ∂μm
+
+20
+
+ωm ← ωm − ηm
+
+∂Ln ∂μm
+
++
+
+λ
+
+∂Rm ∂ωm
+
+,
+
+θm
+
+←
+
+θm
+
+−
+
+ηm
+
+∂Ln ∂θm
+
+21 Return the global model θ = {θm}M m=0.
+
+vector [[zn,m]] ← [[gn,m]] wm, where wm = wm + acc, acc is generated by the client.
+
+3) Backward Propagation on the Server: To update the global
+
+model, two gradients need to be computed ﬁrst, the loss gradients
+
+w.r.t.
+
+the
+
+weight
+
+of
+
+the
+
+interactive
+
+layer
+
+∂Ln ∂wm
+
+,
+
+and
+
+w.r.t.
+
+the
+
+embedding
+
+vector
+
+. ∂Ln
+∂ gn,m
+
+Since
+
+these
+
+two
+
+gradients
+
+are
+
+linear
+
+transformations of either gn,m or wm, both the server and client
+
+m can derive what they want to acquire via regression. To
+
+this end, we design the following secure backward propagation
+
+method.
+
+Speciﬁcally, the server ﬁrst calculates the following gradients:
+
+∂Ln ∂wm
+
+,
+
+∂Ln ∂ gn,m
+
+,
+
+∂Ln ∂α0
+
+.
+
+If
+
+the
+
+server
+
+updates
+
+[[wm]]
+
+by
+
+[[wm]]
+
+=
+
+wm − ηm
+
+∂Ln ∂wm
+
+, this would result in two encrypted quantities
+
+in calculating the weighted vector zn,m = [[wm]] [[gn,m]], which
+
+is incompatible with PHE. To avoid this, the server needs to send
+
+∂Ln ∂wm
+
+to
+
+client
+
+m,
+
+and
+
+receive
+
+the
+
+decrypted
+
+gradient
+
+∂Ln ∂wm
+
+back. However, sending
+
+∂Ln ∂wm
+
+directly to client m would leak
+
+information
+
+about
+
+both
+
+parties,
+
+because
+
+the
+
+server
+
+holds
+
+∂Ln ∂ zn,m
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+
+7247
+
+and client m holds hn,m. Thus, both the server and client m
+
+need to add random noises to the encrypted gradient of weights
+
+∂Ln ∂ zn,m
+
+before
+
+sending
+
+them
+
+to
+
+the
+
+other
+
+party,
+
+and
+
+update
+
+the
+
+parameters (Line 3-10 of Algorithm 4). Note that the noise s
+
+generated
+
+by
+
+the
+
+server
+
+can
+
+be
+
+removed
+
+when
+
+the
+
+gradient
+
+∂Ln ∂wm
+
+still
+
+contains
+
+noise,
+
+where
+
+∂Ln ∂wm
+
+=
+
+∂Ln ∂wm
+
+−
+
+m
+η0
+
+.
+
+With
+
+∂Ln ∂wm
+
+,
+
+the
+
+server updates the weights as wmt+1 = wmt − η
+
+− ∂Ln
+
+m
+
+∂wm
+
+η0
+
+=
+
+wmt+1 + m. It can be observed that the noise m will accumulate
+
+in weights wm in each iteration. If we take the accumulated noise
+
+as acc =
+
+M m=1
+
+t i=1
+
+i m
+
+,
+
+the
+
+true
+
+weights
+
+used
+
+in
+
+forward
+
+and backward propagation should be wmt+1 = wmt+1 − acc. To
+
+perform the correct forward operation, client m needs to remove
+
+the noise by subtracting gn,m acc from the noisy weighted vector zn,m. Similarly, the extra noise should be added to
+
+, ∂Ln
+∂ gn,m
+
+and
+
+removed
+
+before
+
+backpropagation
+
+by
+
+client
+
+m.
+
+To
+
+achieve this, client m needs to send the encrypted noise [[ acc]]
+
+to the server, and the server calculates the true gradient via
+
+∂Ln ∂ gn,m
+
+=
+
+∂Ln ∂ gn,m
+
+− [[
+
+acc]] ·
+
+, ∂Ln
+∂ zn,m
+
+and
+
+sends
+
+the
+
+encrypted
+
+gradient
+
+∂Ln ∂ gn,m
+
+to the client m.
+
+4) Backward Propagation on Clients: The client m ﬁrst de-
+
+crypts the gradient
+
+∂Ln ∂ gn,m
+
+received from the server. Then, it
+
+updates the local model θm and the variables μm, ωm simulta-
+
+neously (Line 16-20 of Algorithm 4).
+
+We further present discussions about the setting where clients
+
+have diverse computing and communication resources and re-
+
+sults the problem of asynchrony and delays. For this scenario,
+
+we can add existing asynchronous and parallel optimization
+
+methods [13] on top of FedSDG-FS. Speciﬁcally, we describe
+
+the asynchronous FedSDG-FS in a high level as follows. During
+
+the learning and feature selection process, from the server side,
+
+it waits until receiving a message from a local client m, which
+
+is either i) a query of the loss function’s gradient w.r.t. to
+
+the embedding vector hn,m, or ii) a new embedding vector calculated using the updated local model parameter. To respond
+
+to query i), the server calculates the gradient for client m using
+
+its current hn,m, and sends it to client m; and, upon receiving ii), the server computes the new gradient w.r.t. the top model θ0
+
+using the embedding vectors it currently has from other clients
+
+and updates its model. For each interaction with the server, each
+
+client m randomly selects a datum xn,m, calculates parameters sm,i and qm,j, queries the corresponding gradient w.r.t. hn,m from the server, uploads the updated embedding vector hn,m, and updates the local bottom model θm and variables μm and ωm.
+
+V. THEORETICAL ANALYSIS
+A. Convergence Analyses
+As illustrated in Section IV-D2 that FedSDG-FS satisﬁes the smoothness property and the Assumption 1, and ciphertext operations do not affect the numerical calculations, thus we present the convergence analysis for both FedSDG-FS and
+
+FedSDG-FS++ in a uniﬁed way. We present the convergence results through two steps. First, we show that there is an equivalence between our proposed l0 constrained optimization for feature selection and optimization over Bernoulli distribution through Mutual Information (MI). Then, we present the convergence results of the gradient decent methods for optimizing the l0 constrained optimization. Without loss of generality, we only consider the bottom level stochastic gates. The goal of feature selection is to ﬁnd the subset of features Q that has the highest MI with the target variable Y . We can formulate the task as selecting Q such that the MI I(·) between XQ and Y is maximized
+
+max I(XQ, Y ) s.t. |Q| = k.
+
+(11)
+
+Q
+
+Then, under the mild assumption that there exists an optimal subset of indices Q∗, the (11) is equivalent to
+
+max I(X Q˜; Y ) s.t.
+0≤π≤1
+
+E Q˜i ≤ k, (12)
+
+i
+
+where Q˜ are independently sampled from the Bernoulli distribution with parameter π. Then, we can rewrite this constrained optimization problem as a penalty optimization problem, which is the same as (5)
+
+R = min L(X Q˜; Y ) + λ|Q˜|.
+
+(13)
+
+So far, we have proved the equivalence between the proposed l0 constrained optimization and the selection of the optimal feature subset. Then, we proceed to give the convergence results of the l0 constrained optimization for feature selection. For notational brevity, at iteration t, we deﬁne,
+
+μt0
+
+:=
+
+∂ L
+∂θ0
+
+h
+
+θ0t , gnt ,1, . . . , gnt ,M
+
+; yn
+
+(14)
+
+μtm
+
+:=
+
+∂ L
+∂θm
+
+h
+
+θ0t , gnt ,1, . . . , gnt ,M
+
+; yn
+
+,
+
+(15)
+
+Theorem 2: Under Assumption 1, and the additional assump-
+
+tion
+
+that
+
+R(θ)
+
+is
+
+ρ-strongly
+
+convex,
+
+if
+
+ηt
+
+=
+
+1 ρ minm(t+T0)
+
+with
+
+the constant T0 > 0. Then the convergence rate is O(1/T ).
+
+The objective value satisﬁes the following inequality,
+
+R θt+1
+
+≤ R θt − η0t
+
+1
+
+−
+
+K 2
+
+η0t
+
+||μt0||2
+
+M
+
+−
+
+ηmt
+
+1
+
+−
+
+Km 2
+
+ηmt
+
+||μtm||2,
+
+(16)
+
+m=1
+
+where
+
+0
+
+<
+
+η0t
+
+≤
+
+1 K
+
+,
+
+0
+
+<
+
+ηmt
+
+<
+
+1 Km
+
+,
+
+then
+
+1
+
+−
+
+K 2
+
+ηt
+
+≤
+
+1 2
+
+,
+
+1
+
+−
+
+K 2
+
+ηmt
+
+≤
+
+1 2
+
+.
+
+Then,
+
+we
+
+have
+
+R
+
+θt+1
+
+≤R
+
+θt
+
+−
+
+1 2
+
+M
+
+η0t ||μt0||2 +
+
+ηmt ||μtm||2 .
+
+m=1
+(17)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7248
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+We denote θˆ as the optimal global model. Then, according to the ﬁrst-order Taylor expansion, we have
+
+M
+
+R θt ≤ R θˆ + μt0 +
+
+μtm θt − θˆ .
+
+(18)
+
+m=1
+
+Substitute the above formula into (17), we have
+
+R(θt)
+
+≤
+
+R(θˆ)
+
++
+
+2(η0t
+
+1 + ηmt )T
+
+||θ0 − θˆ||2 .
+
+(19)
+
+As T increases,
+
+=
+
+1
+2(η0t +ηm t )T
+
+||θ0 − θˆ||2
+
+decreases, θt gets
+
+increasingly close to the optimal solution θˆ, and the convergence
+
+rate is O(1/T ).
+
+Thus, we have proved the convergence of the proposed algo-
+
+rithm under the aforementioned assumptions.
+
+Time and storage complexity analysis: The time complexity of
+
+the algorithm is O
+
+K ||θ0 −θˆ||2 2
+
+,
+
+=
+
+1 2(ηt+ηm t )T
+
+||θ0 − θˆ||2 .
+
+The storage complexity is O (|θ| + |s| + |q|), where | · | de-
+
+notes the parameter size, and the communication cost is O |q| K||θ0−θˆ||2 .
+
+B. Privacy Analysis for FedSDG-FS
+1) Privacy Guarantees: We illustrate that FedSDG-FS satisﬁes β-GDP for the dataset Um of client m by proving Theory 1. Let uim, uˆim denote the outputs of ith layer with inputs u0m = xn,m, xˆn,m. Under the assumptions that zmi ∼ U [−ζmi /2, ζmi /2], σi is Lσi -Lipschitz continuous for i ∈ [I − 1], we can derive that,
+
+||wmI uIm−1 −wmI uˆIm−1|| ≤ ||wI ||LσI−1 (||wmI−1|| ||uIm−2 −uˆIm−2||)
+I −1
+≤ ||wmI || Lσi ||wmi || ||xn,m −xˆn,m||.
+i=1
+(20)
+
+Consider the linear operation of I th layer M(uIm−1) = wmI uIm−1 + bIm + zmI which is a random mechanism deﬁned by zmI ∼ N (0, ζm2 ). Since differential privacy is not affected
+
+to post-processing [36], σI ◦ M does not increase the privacy
+
+loss with M. According to Theorem√1 in [38], Algorithm 2 is
+
+(ε, δ)-differentially private if ζm =
+
+H
+
+log(1/δ) ε
+
+.
+
+2) Utility Analyses: We build utility analyses for Algorithm
+
+2 upon the difference bounds of the objective after local per-
+
+turbation. We evaluate the difference between Rζ(θ, s, q) = Ez[R(θ, s, q)] and R(θ, s, q) ( (5)). Note that,
+
+|Rζ
+
+(θ,
+
+s,
+
+q)
+
+−
+
+R(θ,
+
+s,
+
+q)|2
+
+≤
+
+M N
+
+N
+
+L2Ez
+
+2
+||hn,m −hn,m|| ,
+
+n=1
+
+(21)
+
+where hn,m, hn,m corresponds to the outputs of (8), (9). Since
+
+we have that
+
+||hn,m − hn,m|| = ||uI − uI || ≤ LσI (||wI || ||uI − uI || + ||zI ||)
+
+⎛
+
+⎞
+
+I
+
+I
+
+≤ ⎝ Lσj ||wmj ||⎠ ||zj||. (22)
+
+i=1 j=i
+
+Taking expectation on square of both sides, we have
+
+⎛
+
+⎞
+
+I
+
+I −1
+
+E||hn,m − hn,m||2 ≤ ⎝ L2σj ||wmj ||2⎠
+
+ζm2i + ζ2 .
+
+j=i
+
+i=1
+
+(23)
+
+Substituting it into (21), we arrive that
+
+|Rζ(θ, s, q) − R(θ, s, q)|2
+
+⎛
+
+⎞1
+
+I
+
+2
+
+≤ M ⎝ L2σj ||wmj ||2⎠
+
+j=i
+
+1
+
+I −1
+
+2
+
+ζm2i + ζ2 .
+
+i=1
+
+(24)
+
+C. Security Analysis of FedSDG-FS++
+
+In this section, we perform security analysis of FedSDG-FS++
+
+against the well-known equation solving attack in the semi-
+
+honest model [47].
+
+Proposition 1 (Gradient protection in backward propaga-
+
+tion):
+
+The server
+
+cannot
+
+learn
+
+the
+
+true
+
+values of
+
+∂Ln ∂ gn,m
+
+in order
+
+to reconstruct activations and training data.
+
+Proof: The prove follows the simulation approach [48],
+
+where the basic idea is to build a simulator given the client
+
+an input and a global output, and show that it learns nothing
+
+but the ﬁnal result. During model training, the server attempts
+
+to remove the randomness from the received gradients. In the
+
+space Z, given a noise value m selected by client m and a
+
+value s for the server, the probability that m equals s is p{ m = s} ≤ 1 − e−2/|Z|, where |Z| is the size of a ﬁnite ﬁeld
+
+identical to the cipher space of Paillier. Since the elements of
+
+the noise is independent, the server can correctly yield vectors of gn,m with the probability p{gn,s = gn,m} ≤ (1 − e−2/|Z|)nl ,
+where nl is the number of neuron in the last embedding layer. Since |Z| is a large number, the probability that the server can
+
+successfully derive the gradients is close to zero.
+
+Proposition 2 (Model protection in forward propagation):
+
+The accumulated weighted vectors {zn,m = gn,m · wm}, n ∈ [N ], m ∈ [M ] reveals nothing but the sub-spaces of weights
+
+from which the weights wm cannot be reconstructed by clients. Proof: Let zn,m = gn,m · wm denote the weighted vector
+obtained by client m after one forward propagation. It does
+
+not reveal any information regarding the actual values of the
+
+matrices wm but the sub-spaces linearly combined by inﬁnitely many possible matrices solutions. Hence, top model weights wm
+
+cannot be reconstructed by local clients.
+
+Thus, we can conclude that the server cannot reconstruct
+
+training data and clients cannot infer the labels during feature
+
+selection and training process.
+
+VI. EXPERIMENTAL EVALUATION
+A. Experiment Conﬁguration 1) Datasets: We use 10 datasets with 4 types of data: tab-
+ular data, images, texts and audios. These include 2 synthetic
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+TABLE II DESCRIPTION OF DATASETS FOR EMPIRICAL EVALUATIONS
+
+7249
+
+Fig. 4. Test accuracy and R2 scores versus number of selected features on synthetic datasets.
+
+TABLE III SETTINGS FOR TRAINING DIFFERENT VFL MODELS
+datasets, MADELON [40] and FRIEDMAN [49]; and 8 realworld datasets, ARCENE [39], KDD99 [50], BASEHOCK [51], RELATHE [51], PCMAC [51], GISETTE [52], COIL20 [53] and ISOLET [54]. The synthetic datasets are derived from the feature selection challenge [40], where MADELON consists of 5 informative features, 15 redundant features constructed by linear combinations of those 5 informative features, and 480 noisy features, while FRIEDMAN consists of 5 informative and 995 noisy features. For the real-world datasets, most of them are collected from the ASU feature selection database online [51], and KDD99 is used for the third international knowledge discovery and data mining tools competition. The descriptions of all datasets are listed in Table II. We employ two clients in our settings, where we divide features into two parts randomly for every dataset, and assign each part to each client. The labels are located in the server. To further investigate the performance of FedSDG-FS and FedSDG-FS++, we also employ ﬁve and ten clients for implementations (see Section VI-C).
+2) VFL Models: We have implemented the typical logistic regression model for VFL [55] on FRIEDMAN, and neural networks for VFL [30] on the other 9 datasets (see Table III). We run VFL models until a pre-speciﬁed test accuracy is reached, or a maximum number of iterations has elapsed. In addition, training the dual-gates until convergence may sometimes cause overﬁtting of the model, where we set the cutoff value of the variables and perform early stopping. We test the accuracy of the global model on the test datasets. We build our VFL models with Flower 0.19.0 [56] and Pytorch 1.8.1 [57]. All the experiments are performed on Ubuntu 16 operating system equipped with a 12-core i7 Intel CPU, 64 G of RAM and 4 Titan X GPUs.
+
+3) Comparison Baselines: We compare FedSDG-FS and FedSDG-FS++ methods against state-of-art baselines, 1) allFeatures: It performs feature selection with all features participating. 2) SFFS [21]: It performs feature selection with the ﬁlter method based on secure multi-party computation. 3) MS-GINI [18]: It leverages a ﬁlter feature selection method based on Gini impurity. 4) VFLFS [28]: It leverages the embedded method through combining the auto-encoder with l2 constraints on feature weights. 5) LESS-VFL [29]: It utilizes a pre-training step and determines the relevant features by embedding component selection. 6) VertiBench [35]: It proposes dataset splitting methods based on feature importance and feature correlation to improve model performance. 7) original-Gate [19]: It has neither gates of the embedding vectors nor importance initialization. For fair comparison, we implement VFLFS [17] without the part that makes use of the non-overlapping samples. We use the Paillier as the PHE method in our implementation.
+4) Hyperparameter Setting: We use the Adam optimizer, and set learning rate η = 0.03, batch size b = 128, weight factor λ = 0.1. We add random noises on the output of each local embe√dding √layer, and the noises follow the uniform distributions U [− 3/5, 3/5] with ζ = 0.2, = 4, δ = 0.01. For baseline methods that have their own parameters, we follow the parameter settings in their implementations.
+
+B. Evaluating Gini Impurity for VFL
+
+First, we evaluate the effectiveness of our Gini impurity metric
+
+(FedSDG-FS-gini) designed for feature importance initializa-
+
+tion in both the FedSDG-FS and FedSDG-FS++ by comparing
+
+the test accuracy of the global models to the other three ﬁltering
+
+based feature selection strategies, SFFS [21], random FS, and all
+
+features participating (allFeatures). We select different numbers
+
+of features (i.e., k features with the smallest Gini scores), and
+
+assign them to the two clients. Since those datasets differ in both
+
+the number of features and the number of noisy features. Thus,
+
+we select features from each dataset in similar proportions and
+
+round the numbers of selected features. We perform 5-fold cross
+
+validation and report the average R2 scores, test accuracy and
+
+standard deviations in Fig. 4. Here, the R2 score is deﬁned as
+
+R2 = 1 −
+
+, n∈[N ] (yn −yˆn )2
+n∈[N ] (yn −y¯)
+
+where
+
+y¯ =
+
+1 N
+
+n∈[N] yn, and yn,
+
+yˆn are the true target and predicted target of the nth sample,
+
+respectively. The results show that FedSDG-FS-gini achieves
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7250
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+TABLE IV TEST ACCURACY OF MODELS TRAINED WITH FEATURES SELECTED WITH DIFFERENT METHODS
+
+TABLE V TEST ACCURACY OF MODELS TRAINED WITH FEDSDG-FS WITH DIFFERENT
+RATIOS (%) OF CLIENTS PARTICIPATING IN FEATURE IMPORTANCE INITIALIZATION
+
+Fig. 6. ROC curve of the model VFLNN-ARCENE.
+
+Fig. 5. Test accuracy of VFLNN-ARCENE with different ratio of clients.
+higher test accuracy and R2 scores than other strategies. Specifically, the average test accuracy and R2 scores of FedSDG-FSgini are 28.71%/ 123.8%, 29.69%/ 70.3%, 12.85%/ 3.4% higher than that of random, allFeatures and SFFS for MADELON and FRIEDMAN, respectively. Meanwhile, the standard deviations are relative small, e.g., with 1.22% and 4.3% smaller than that of SFFS for MADELON and FRIEDMAN. In addition, we analyze why some of the test accuracy in Fig. 4 is less than 50%. First, since there are noisy features irrelevant to the learning task and a large number of redundant features possessed by local clients, samples with very similar or the same features may have completely opposite labels. Such low quality training data makes the models perform almost like random guesses or slightly worse when they overﬁt the noise.
+We further evaluate the performance of FedSDG-FS when only a subset of clients participates in the feature importance initialization. Speciﬁcally, we train different VFL models (illustrated in Table III) on corresponding datasets of clients with different selection ratios, i.e., r = 0.1, 0.3, 0.5, 0.7, 1.0. For the remaining clients who did not participate in the feature importance initialization, we assign their feature importance scores to be zeros. The test accuracy results are shown in Table V and Fig. 5. It can be observed that as the selection ratio decreases, the test accuracy decreases slightly, and the
+
+model converges slower. For example, for the BASEHOCK and RELATHE dataset, when the participating ratio is 0.5, the drop of test accuracy is much small, only 0.06%, 0.57%. To solve this problem, we need to allow all clients to participate in the initialization stage, which is much efﬁcient and incremental, i.e., clients can individually interact with the server to perform the feature importance initialization without recomputing feature importance from scratch. Take the dataset ARECENE as an example, the total communication overhead is 7.82 MB and the computation cost is 173.36 s, which is much efﬁcient to calculate.
+C. Evaluating Important Feature Selection
+After feature importance initialization, the server proceeds to select important features using the stochastic dual-gates.
+1) Learning Accuracy: We compare FedSDG-FS and FedSDG-FS++ with other baselines by training different VFL models and evaluating the test accuracy of the global models, and the ratios of selected features. The results are shown in Table IV. It can be observed that FedSDG-FS++ achieves the highest test accuracy using the fewest features in almost all datasets, and FedSDG-FS achieves the comparable test accuracy with similar number of features. Taking MADELON as an example, the average test accuracy of FedSDG-FS++ is 47.2%, 33.6%, 27.0%, 48.2%, 13.39%, 7.7%, 0.3/%, 0.1%, higher than other seven baselines, respectively; while the ratio of selected features is 0.97, 0.47, 0.47, 0.47, 0.54, 0.78, 0.02, 0.01, less than them. Fig. 6 shows the ROC curve of FedSDG-FS++, and the ROC curve of FedSDG-FS and on other datasets is much similar to Fig. 6. It also illustrates that our methods achieve high test accuracy on various datasets. In some cases where there are small number of noisy features, and having little negative impact on the model, using all features results the
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+
+7251
+
+Fig. 7. Test accuracy of model VFLNN-COIL.
+
+Fig. 9. The number of features selected of different training rounds of VFLNNCOIL and VFLNN-ISOLET.
+
+Fig. 8. Precision of different methods on MADELON.
+
+higher accuracy. Nevertheless, FedSDG-FS and FedSDG-FS++ can still achieve comparable test accuracy with fewer features. In addition, FedSDG-FS++ is a lossless solution since it adopts the strategy that sending activation back and forth between the client and the server for handling non-linear operation instead of using the polynomial function approximation method [58]. Besides, we show the results of test accuracy different communication rounds for training VFLNN-COIL model using the FedSDG-FS and FedSDG-FS++ in Fig. 7. It can be observed that FedSDG-FS and FedSDG-FS++ achieve much similar test accuracy during training process with small DP noises, i.e., (10−4, 0.01).
+2) Precision: We use precision to measure the accuracy of FedSDG-FS and FedSDG-FS++, which calculates the proportion of correctly selected informative features over all selected features. For FedSDG-FS and the original gate method, we train VFLNN-MADELONE until the model converges, and determine the important features. For SFFS and MS-GINI, we calculate the F-statistics and Gini impurity of each individual feature, respectively, and select different numbers of informative features. The results are shown in Fig. 8. It can be observed that FedSDG-FS, FedSDG-FS++ and the original gate method achieve much higher precision than allFeatures, SFFS, MS-GINI, and FedSDG-FS++ achieves the highest precision. This illustrates that reducing the sizes of embedding vectors does not degrade the model accuracy. For example, the average precision scores of different number settings of FedSDG-FS++ are 13% and 76% higher than the original gate method and SFFS, respectively. As the number of selected features increases, the precision of SFFS and MS-GINI decreases dramatically, while the presicion of FedSDG-FS, FedSDG-FS++ and original gate methods decreases slightly, which demonstrates their effectiveness without knowing the number of features to be selected.
+3) Efﬁciency: We evaluate the efﬁciency of FedSDG-FS and FedSDG-FS++ from two aspects: 1) the speed of the feature importance initialization, and 2) computation and communication saving during model prediction. First, we calculate the
+
+Fig. 10. Computation cost and communication cost of model inference for the samples of test datasets ARCENE and GISETTE.
+number of selected features in different training rounds. Take training models VFLNN-COIL and VFLNN-ISOLET (Fig. 9(a) and (b)) for example. Here, we set the weight factor λ = 1.0. The results show that with importance initialization, FedSDG-FS, FedSDG-FS++ can ﬁlter out noisy features before training, and can quickly ﬁlter out noisy features and select important ones, thus speeding up model training. Second, we compare the prediction computation overhead and communication overhead of those models of FedSDG-FS, FedSDG-FS++ and other baseline methods. For example, Fig. 10 shows the total computation and communication cost of each method to perform model inference on test datasets of ARCENE and GISETTE. The computation cost of FedSDG-FS is much lower than other methods, e.g., 99.46%, 99.45%, 99.44%, 99.42% lower of dataset ARCENE, and the computation cost of FedSDG-FS++ is 6.69%, 4.18%, 2.61% lower than allFeatures, SFFS and original-Gate methods. Besides, FedSDG-FS saves 87.11%, 86.12%, 87.11%, 82.06% communication cost, while FedSDGFS++ saves 28.13%, 28.21%, 28.56% communication cost. The efﬁciency analysis clearly demonstrated the advantages of the feature importance initialization module and the DP-based feature selection module.
+D. Differential Privacy Analysis
+To illustrate that our differentially private FedSDG-FS is the small difference in model testing accuracy as well as small differences in selected features compared to the non-private system, we ﬁrst train various models under different noise levels, i.e., with different ζ values and report the test accuracy in
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7252
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+Fig. 11. Test accuracy under different noise levels, i.e., different ζ values of
+
+FedSDG-FS.
+
+Fig. 13. Test accuracy and ratios of same selected features of FedSDG-FS
+
+with various ( , δ) privacy values on the dataset COIL-20.
+
+Fig. 12. Test accuracy and ratios of same selected features under different noise levels, i.e., different ζ values of FedSDG-FS.
+different training rounds. We refer to FedSDG-FS++ as the setting with ζ = 0. The example results of models VFLNN-COIL and VFLNN-ISOLET are shown in Figs. 11 and 12. It can be observed that with some moderate noises, the difference in test accuracy is much small, e.g., 0.45%, 0.2% with ζ = 0.1, and 0.7%, 0.76% with ζ = 0.5 for datasets COIL-20 and ISOLET. Besides, the results show that the ratio of the same selected features are much high, e.g., 0.865, 0.852 with ζ = 0.1, and 0.857, 0.878 with ζ = 0.5 for datasets COIL-20 and ISOLET. In addition, the noise levels affect the performance of feature selection and model training. Speciﬁcally, as noise increases, the ratio of the same selected features and model test accuracy decrease dramatically, and the model converges much slower. Take dataset COIL-20 for example, when the noise value increases from 1.0 to 15.0, the test accuracy drops from 98.76% to 10.1%, and the ratio of the same features drops from 0.82 to 0.18 accordingly. For dataset ISOLTE, when the noise equals 10 or 15, the model learns almost nothing, thus the ratio of the same selected features is 0. By using the moments accountant, we can obtain a δ value for any given . We record the test accuracy for different ( , δ) pairs in Fig. 13. In the ﬁgure, each curve corresponds to the average test accuracy of models achieved for a ﬁxed δ, as it varies between 10−5 and 10−2. For example, we can achieve 91.52% accuracy for VFLNN-COIL with = 0.7 and δ = 0.01. In addition, with strong privacy guarantees, i.e., with being 0.4, the test accuracy decreases dramatically. Thus, by adjusting the added noise, we can balance the feature selection performance and privacy protection level.
+E. Ablation Study
+1) Impacts of number of selected features: We evaluate the stability of FedSDG-FS by calculating the test accuracy of
+
+Fig. 14. Test accuracy versus number of selected features by training models for 20 rounds.
+the global model with different numbers of selected features. We illustrate the test accuracy of models VFLNN-ARCENE and VFLNN-GISETTE by training them for 20 rounds with different numbers of features in Fig. 14. The results show that compared to SFFS, the original based method, FedSDG-FS and FedSDG-FS++ all achieve much higher test accuracy. Meanwhile, the performance of FedSDG-FS and FedSDG-FS++ has less variation in all cases than other two methods.
+2) Impacts of number of participants: To further validate the proposed methods, we employ larger number of participants, i.e., 5 clients, 10 clients and 100 clients for model training. Two example results on datasets ARCENE and RELATHE are presented in Table VI. It shows that as the number of clients increases, the test accuracy of the global model decreases slightly, which demonstrates the scalability of our methods. Besides, FedSDG-FS and FedSDG-FS++ achieve comparable high test accuracy, and FedSDG-FS++ achieves the highest test accuracy using the fewest features in most cases. For the only case where FedSDG-FS++ performs second best in terms of accuracy, our accuracy 99.5% is very close to the best accuracy 99.8%, while FedSDG-FS++ use about 20% fewer features.
+3) Impacts of initialization metrics: One of our contributions is designing a feature importance initialization method based on Gini impurity and making it work in a privacy-preserving manner under VFL settings. It is not easy to design a feature selection approach which is also privacy preserving. We compare our feature importance initialization metric Gini with other metrics, including F-statistics and Mutual Information (MI) without considering the privacy issue. Table VII shows that these methods achieve comparable feature selection performance. We
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+TABLE VI TEST ACCURACY OF MODELS TRAINED WITH FEATURES SELECTED WITH DIFFERENT METHODS
+
+7253
+
+TABLE VII TEST ACCURACY OF MODELS TRAINED WITH FEATURES SELECTED WITH
+DIFFERENT IMPORTANCE INITIALIZATION METHODS
+will explore how to make the information gain based feature selection method work in VFL settings in our future work.
+VII. CONCLUSION AND FUTURE WORK
+In this work, we proposed an efﬁcient and privacy-preserving vertical federated learning feature selection framework to select important features in VFL settings. We ﬁrst designed a Gaussian stochastic dual-gates for clients’ inputs to efﬁciently approximate the probability of a feature being selected. To adaptively fulﬁll the two-level privacy requirements, we ﬁrst proposed a local embedding perturbation approach, FedSDG-FS, to achieve differential privacy for local training data. Then, we proposed FedSDG-FS++ which incorporates PHE and randomized noise mechanism into the stochastic dual-gates to achieve secure feature selection. To reduce overhead, we proposed a feature importance initialization method based on Gini impurity and PHE, which can be accomplished through only two parameter transmissions, and two encryption/decryption operation on the server. Experiment results show that the proposed methods signiﬁcantly outperform existing approaches in terms of achieving more accurate selection of high-quality features and building global models with better performance.
+REFERENCES
+[1] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efﬁcient learning of deep networks from decentralized data,” in Proc. 20th Int. Conf. Artif. Intell. Statist., PMLR, 2017, pp. 1273–1282.
+[2] Y. Hu, D. Niu, J. Yang, and S. Zhou, “FDML: A collaborative machine learning framework for distributed features,” in Proc. 25th ACM SIGKDD Int. Conf. Knowl. Discov. Data Mining, 2019, pp. 2232–2240.
+[3] Q. Yang, Y. Liu, Y. Cheng, Y. Kang, T. Chen, and H. Yu, Federated Learning. Cham, Switzerland: Springer, 2020.
+[4] A. Li, L. Zhang, J. Wang, F. Han, and X.-Y. Li, “Privacy-preserving efﬁcient federated-learning model debugging,” IEEE Trans. Parallel Distrib. Syst., vol. 33, no. 10, pp. 2291–2303, Oct. 2022.
+
+[5] J. Wang, L. Zhang, A. Li, X. You, and H. Cheng, “Efﬁcient participant contribution evaluation for horizontal and vertical federated learning,” in Proc. IEEE 38th Int. Conf. Data Eng., 2022, pp. 911–923.
+[6] R. Goebel, H. Yu, B. Faltings, L. Fan, and Z. Xiong, Trustworthy Federated Learning, vol. 13448. Cham, Switzerland: Springer, 2023.
+[7] Y. Liu et al., “FedVision: An online visual object detection platform powered by federated learning,” in Proc. 32nd Innov. Appl. Artif. Intell. Conf., 2020, pp. 13172–13179.
+[8] Z. Liu et al., “Contribution-aware federated learning for smart healthcare,” in Proc. Innov. Appl. Artif. Intell. Conf., 2022, pp. 12396–12404.
+[9] Y. Chen et al., “Efﬁcient training of large-scale industrial fault diagnostic models through federated opportunistic block dropout,” in Proc. 35th Innov. Appl. Artif. Intell. Conf., 2023, Art. no. 1767.
+[10] A. Li et al., “Efﬁcient federated-learning model debugging,” in Proc. IEEE 37th Int. Conf. Data Eng., 2021, pp. 372–383.
+[11] W. Zhuang, Y. Wen, and S. Zhang, “Joint optimization in edge-cloud continuum for federated unsupervised person re-identiﬁcation,” in Proc. 29th ACM Int. Conf. Multimedia, 2021, pp. 433–441.
+[12] A. Li, L. Zhang, J. Tan, Y. Qin, J. Wang, and X.-Y. Li, “Sample-level data selection for federated learning,” in Proc. IEEE Conf. Comput. Commun., 2021, pp. 1–10.
+[13] T. Chen, X. Jin, Y. Sun, and W. Yin, “VAFL: A method of vertical asynchronous federated learning,” 2020, arXiv:2007.06081.
+[14] J. Tan, L. Zhang, Y. Liu, A. Li, and Y. Wu, “Residue-based label protection mechanisms in vertical logistic regression,” 2022, arXiv:2205.04166.
+[15] PowerFL, “Angel powerﬂ,” 2013. [Online]. Available: https://data.qq. com/powerﬂ/
+[16] FATE, “Fate-federated-AI,” 2020. [Online]. Available: https://github.com/ FederatedAI/DOC-CHN
+[17] C. Louizos, M. Welling, and D. P. Kingma, “Learning sparse neural networks through l0 regularization,” 2017, arXiv:1712.01312.
+[18] X. Li, R. Dowsley, and M. De Cock, “Privacy-preserving feature selection with secure multiparty computation,” in Proc. Int. Conf. Mach. Learn., 2021, pp. 6326–6336.
+[19] Y. Yamada, O. Lindenbaum, S. Negahban, and Y. Kluger, “Feature selection using stochastic gates,” in Proc. Int. Conf. Mach. Learn., PMLR, 2020, pp. 10648–10659.
+[20] J. Chen, M. Stern, M. J. Wainwright, and M. I. Jordan, “Kernel feature selection via conditional covariance minimization,” in Proc. 31st Int. Conf. Neural Inf. Process. Syst., 2017, pp. 6949–6958.
+[21] F. Pan, D. Meng, Y. Zhang, H. Li, and X. Li, “Secure federated feature selection for cross-feature federated learning,” in Proc. Conf. Neural Inform. Process. Syst., 2020.
+[22] L. Song, A. Smola, A. Gretton, J. Bedo, and K. Borgwardt, “Feature selection via dependence maximization,” J. Mach. Learn. Res., vol. 13, no. 1, pp. 1393–1434, 2012.
+[23] P. A. Estévez, M. Tesmer, C. A. Perez, and J. M. Zurada, “Normalized mutual information feature selection,” IEEE Trans. Neural Netw., vol. 20, no. 2, pp. 189–201, Feb. 2009.
+[24] D. Roy, K. S. R. Murty, and C. K. Mohan, “Feature selection using deep neural networks,” in Proc. Int. Joint Conf. Neural Netw., 2015, pp. 1–6.
+[25] M. M. Kabir, M. M. Islam, and K. Murase, “A new wrapper feature selection approach using neural network,” Neurocomputing, vol. 73, no. 16/18, pp. 3273–3283, 2010.
+[26] Y. Li, C.-Y. Chen, and W. W. Wasserman, “Deep feature selection: Theory and application to identify enhancers and promoters,” J. Comput. Biol., vol. 23, no. 5, pp. 322–336, 2016.
+[27] C. Hans, “Bayesian lasso regression,” Biometrika, vol. 96, no. 4, pp. 835–845, 2009.
+[28] S. Feng, “Vertical federated learning-based feature selection with nonoverlapping sample utilization,” Expert Syst. Appl., vol. 208, 2022, Art. no. 118097.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+7254
+
+IEEE TRANSACTIONS ON MOBILE COMPUTING, VOL. 23, NO. 6, JUNE 2024
+
+[29] T. Castiglia, Y. Zhou, S. Wang, S. Kadhe, N. Baracaldo, and S. Patterson, “LESS-VFL: Communication-efﬁcient feature selection for vertical federated learning,” 2023, arXiv:2305.02219.
+[30] Y. Zhang and H. Zhu, “Additively homomorphical encryption based deep neural network for asymmetrically collaborative machine learning,” 2020, arXiv:2007.06849.
+[31] K. Cheng et al., “SecureBoost: A lossless federated learning framework,” IEEE Intell. Syst., vol. 36, no. 6, pp. 87–98, Nov./Dec. 2021.
+[32] R. Kohavi and G. H. John, “Wrappers for feature subset selection,” Artif. Intell., vol. 97, no. 1/2, pp. 273–324, 1997.
+[33] M. A. Hall and L. A. Smith, “Feature selection for machine learning: Comparing a correlation-based ﬁlter approach to the wrapper,” in Proc. 12th Int. Florida Artif. Intell. Res. Soc. Conf., 1999, pp. 235–239.
+[34] S. Scardapane, D. Comminiello, A. Hussain, and A. Uncini, “Group sparse regularization for deep neural networks,” Neurocomputing, vol. 241, pp. 81–89, 2017.
+[35] Z. Wu, J. Hou, and B. He, “VertiBench: Advancing feature distribution diversity in vertical federated learning benchmarks,” 2023, arXiv:2307.02040.
+[36] C. Dwork et al., “The algorithmic foundations of differential privacy,” Found. Trends Theor. Comput. Sci., vol. 9, no. 3/4, pp. 211–407, 2014.
+[37] C. Dwork and Kenthapadi, “Our data, ourselves: Privacy via distributed noise generation,” in Proc. Annu. Int. Conf. Theory Appl. Cryptographic Techn., 2006, pp. 486–503.
+[38] M. Abadi et al., “Deep learning with differential privacy,” in Proc. ACM SIGSAC Conf. Comput. Commun. Secur., 2016, pp. 308–318.
+[39] J. Thomas, “Mass spectrometric data,” 2018. [Online]. Available: https: //www.openml.org/d/41157
+[40] I. Guyon, S. Gunn, A. Ben-Hur, and G. Dror, “Result analysis of the NIPS 2003 feature selection challenge,” in Proc. Adv. Neural Inf. Process. Syst., 2004, pp. 545–552.
+[41] O. Li et al., “Label leakage and protection in two-party split learning,” 2021, arXiv:2102.08504.
+[42] C. Fu et al., “Label inference attacks against vertical federated learning,” in Proc. 31st USENIX Secur. Symp., Boston, MA, 2022, pp. 1397–1414.
+[43] A. Miller, N. Foti, A. D’Amour, and R. P. Adams, “Reducing reparameterization gradient variance,” in Proc. Adv. Neural Inf. Process. Syst., 2017, pp. 3711–3721.
+[44] Z. Erkin, M. Franz, J. Guajardo, S. Katzenbeisser, I. Lagendijk, and T. Toft, “Privacy-preserving face recognition,” in Proc. Int. Symp. Privacy Enhancing Technol. Symp., Springer, 2009, pp. 235–253.
+[45] C. Wang, J. Liang, M. Huang, B. Bai, K. Bai, and H. Li, “Hybrid differentially private federated learning on vertically partitioned data,” 2020, arXiv:2009.02763.
+[46] J. Dong, A. Roth, and W. J. Su, “Gaussian differential privacy,” 2019, arXiv:1905.02383.
+[47] F. Tramèr, F. Zhang, A. Juels, M. K. Reiter, and T. Ristenpart, “Stealing machine learning models via prediction APIs,” in Proc. USENIX Secur. Symp., 2016, pp. 601–618.
+[48] O. Goldreich, Foundations of Cryptography: Volume 2, Basic Applications. Cambridge, U.K.: Cambridge Univ. Press, 2009.
+[49] J. H. Friedman, “Multivariate adaptive regression splines,” Ann. Statist., vol. 19, no. 1, pp. 1–67, 1991.
+[50] T. U. K. Archive, “KDD cup 1999 data data set,” 1999. [Online]. Available: https://kdd.ics.uci.edu/databases/kddcup99/kddcup99.html
+[51] A. State University, “Feature selection datasets,” 2010. [Online]. Available: https://jundongl.github.io/scikit-feature/OLD/datasets_old.html
+[52] U. Machine Learning Repository, “Handwritten digit recognition problem,” 2003. [Online]. Available: https://archive.ics.uci.edu/ml/datasets/ Gisette
+[53] C. University, “Image classiﬁcation task,” 1996. [Online]. Available: https: //www.cs.columbia.edu/CAVE/software/softlib/coil-20.php
+[54] U. Machine Learning Repository, “Letter-name classiﬁcation task,” 1987. [Online]. Available: https://archive.ics.uci.edu/ml/datasets/isolet
+[55] S. Hardy et al., “Private federated learning on vertically partitioned data via entity resolution and additively homomorphic encryption,” 2017, arXiv:1711.10677.
+[56] Flower, “Flower: A friendly federated learning framework,” 2022. [Online]. Available: https://ﬂower.dev/
+[57] Pytorch, “Pytorch,” 2022. [Online]. Available: https://pytorch.org/ [58] R. Gilad-Bachrach, N. Dowlin, K. Laine, K. Lauter, M. Naehrig, and J.
+Wernsing, “CryptoNets: Applying neural networks to encrypted data with high throughput and accuracy,” in Proc. Int. Conf. Mach. Learn., PMLR, 2016, pp. 201–210.
+
+Anran Li received the PhD degree from the University of Science and Technology of China, China, in 2021. She is a research fellow with the School of Computer Science and Engineering, Nanyang Technological University, Singapore. Her research interests mainly focus on data quality assessment, federated learning and mobile computing.
+Jiahui Huang received the bachelor of engineering degree from the University of Science and Technology of China, in 2022. He is currently working toward the master’s degree of the School of Computer Science and Technology, University of Science and Technology of China, China. His research interests include federated learning and data quality assessment.
+Ju Jia received the PhD degree in cyberspace security from Wuhan University, China, in 2021, and he was a research fellow with the School of Computer Science and Engineering, Nanyang Technological University, Singapore. He is currently an associate professor with the School of Cyber Science and Engineering, Southeast University, China. His research interests include: data security, multimedia data security, and artiﬁcial intelligence security.
+Hongyi Peng received the bachelor of engineering degree from Nanyang Technological University, in 2019 and the master of science degree from the National University of Singapore, in 2020. He is currently working toward the PhD degree of Alibaba Talent Programme with the School of Computer Science and Engineering, Nayang Technological University, Singapore. His research interests include federated learning and data analysis.
+Lan Zhang received the bachelor’s and PhD degrees from Tsinghua University, China. She is currently a professor with the School of Computer Science and Technology, University of Science and Technology of China. Her research interests include mobile computing, privacy protection, and data sharing and trading.
+Luu Anh Tuan is currently an assistant professor with Nanyang Technological University, Singapore. Prior than that, he was a research fellow with MIT from 2018 to 2020. His research interests lie in the intersection of AI, Deep Learning, and NLP. He also served as the senior area chair of EMNLP 2020, area chair of ACL 2021–2023, area chair of ICLR 2022, area chair of NeurIPS 2023, senior program committee of IJCAI 2020–2021, and program committee member of ICLR, ICML, AAAI, etc.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+
+LI et al.: EFFICIENT AND PRIVACY-PRESERVING FEATURE IMPORTANCE-BASED VERTICAL FEDERATED LEARNING
+
+7255
+
+Han Yu (Senior Member, IEEE) received the PhD degree from the School of Computer Science and Engineering, Nanyang Technological University. He is a Nanyang assistant professor (NAP) with the School of Computer Science and Engineering (SCSE), Nanyang Technological University (NTU), Singapore. He held the prestigious Lee Kuan Yew PostDoctoral Fellowship (LKY PDF) from 2015 to 2018. His research focuses on federated learning and algorithmic fairness. He has published more than 200 research papers and book chapters in leading international conferences and journals. He is a co-author of the book Federated Learning - The ﬁrst monograph on the topic of federated learning. His research works have won multiple awards from conferences and journals. He is a distinguished member of CCF, and a senior member of AAAI.
+
+Xiang-Yang Li (Fellow, IEEE) received the bachelor’s degree from the Department of Computer Science, the bachelor’s degree from the Department of Business Management, Tsinghua University, in 1995, and the PhD degree from the University of Illinois at Urbana–Champaign. He is a full professor and the executive dean of the School of Computer Science and Technology, University of Science and Technology of China, Hefei, China. He is an ACM fellow. His research interests include wireless networking/mobile computing/RFID, privacy and security, cyber-physical systems and IoT, social computing, and interdisciplinary research.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:53:40 UTC from IEEE Xplore. Restrictions apply.
+

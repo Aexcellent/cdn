@@ -1,0 +1,2289 @@
+arXiv:2008.10838v3 [cs.LG] 15 Jun 2024
+
+1
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+YAN KANG, WeBank, China YANG LIU*, Institute for AI Industry Research, Tsinghua University, China XINLE LIANG, WeBank, China
+Federated learning allows multiple parties to build machine learning models collaboratively without exposing data. In particular, vertical federated learning (VFL) enables participating parties to build a joint machine learning model based upon distributed features of aligned samples. However, VFL requires all parties to share a sufficient amount of aligned samples. In reality, the set of aligned samples may be small, leaving the majority of the non-aligned data unused. In this paper, we propose Federated Cross-View Training (FedCVT), a semisupervised learning approach that improves the performance of the VFL model with limited aligned samples. More specifically, FedCVT estimates representations for missing features, predicts pseudo-labels for unlabeled samples to expand the training set, and trains three classifiers jointly based upon different views of the expanded training set to improve the VFL model’s performance. FedCVT does not require parties to share their original data and model parameters, thus preserving data privacy. We conduct experiments on NUS-WIDE, Vehicle, and CIFAR10 datasets. The experimental results demonstrate that FedCVT significantly outperforms vanilla VFL that only utilizes aligned samples. Finally, we perform ablation studies to investigate the contribution of each component of FedCVT to the performance of FedCVT.
+CCS Concepts: • Theory of computation → Semi-supervised learning; • Computing methodologies → Distributed computing methodologies.
+Additional Key Words and Phrases: vertical federated learning, semi-supervised learning, cross-view training
+ACM Reference Format: Yan Kang, Yang Liu, and Xinle Liang. 2022. FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training. J. ACM 1, 1, Article 1 (January 2022), 17 pages. https://doi.org/10.1145/3510031
+1 INTRODUCTION With the increasingly stricter privacy-protection laws implemented worldwide [6, 9], federated learning has received significant attention and become a popular research topic recently [17]. As the research goes deeper and wider, the practice of federated learning has been expanded from building powerful mobile applications based on data resided in millions of mobile devices [28] to solving the problem of data silos among or within organizations [40]. For example, many business decisions of a bank may rely on its customers’ purchasing preferences. This bank may share some customers with a local retail company that owns local people’s purchasing preference data. Thus, the bank can invite
+*corresponding author
+Authors’ addresses: Yan Kang, yangkang@webank.com, WeBank, Shenzhen, China; Yang Liu, liuy03@air.tsinghua.edu.cn, Institute for AI Industry Research, Tsinghua University, Beijing, China; Xinle Liang, shindler@mail.ustc.edu.cn, WeBank, Shenzhen, China.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org. © 2022 Copyright held by the owner/author(s). Publication rights licensed to ACM. 0004-5411/2022/1-ART1 $15.00 https://doi.org/10.1145/3510031
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:2
+
+Kang, et al.
+
+the retail company to build a joint model collaboratively by leveraging the data features of both sides to improve its business. The retail company can also benefit from this joint model.
+This and various other similar practical demands [40] motivate the development of vertical federated learning (VFL)[39] (also called feature-partitioned federated learning), which enables participating parties to train a joint machine learning model collaboratively by utilizing scattered features of their aligned samples without disclosing original data. However, a critical prerequisite of VFL is that it requires all parties to share a sufficient amount of aligned samples to achieve competitive model performance. [26] proposes a federated transfer learning framework to address weak supervision (few labels) problems in the VFL setting. Nonetheless, it does not take full advantage of unlabeled samples for improving learning quality, and it aims to build a model only for the party of the target domain. Some other similar approaches, such as domain adaptation [24, 33, 34] and knowledge distillation [11, 22], have been applied in the federated learning setting. However, they mainly focus on scenarios where all parties share the same feature space (also known as horizontal federated learning [39]). Therefore, research on applying semi-supervised techniques in the VFL setting is insufficient.
+This paper proposes a novel semi-supervised algorithm in the VFL setting, termed FedCVT, to address the limitations of existing vertical federated learning approaches. Our contributions are as follows:
+(1) FedCVT significantly boosts up the performance of the federated model when the aligned samples between participating parties are limited;
+(2) FedCVT works with data of various types. This feature is important in practice since real-world VFL applications often need to deal with heterogeneous features;
+(3) FedCVT does not require participating parties to share their original data and model parameters, but only intermediate representations and gradients, which can be further protected by the privacy-preserving VFL-DNN (Deep Neural Network) framework proposed by [18] and implemented in FATE [25]1.
+2 RELATED WORK
+In this section, we focus on reviewing closely related fields and approaches.
+Vertical Federated Learning (VFL). VFL is also known as feature-partitioned machine learning in some literature. The secure linear machine learning with data partitioned in the feature space has been well studied in [8, 14, 29]. They apply either hybrid secure multi-party computation (SMPC) protocol or homomorphic encryption (HE) [35] to protect privacy in model training and inference. [3] proposes a secure federated tree-boosting (SecureBoost) approach in the VFL setting. It enables participating parties with different features to build a set of boosting trees collaboratively and proves that the SecureBoost provides the same level of accuracy as its non-privacy-preserving centralized counterparts. FATE [25] designed and implemented a VFL-DNN (Deep Neural Network) framework that supports DNN in the VFL setting. VFL-DNN leverages a hybrid encryption scheme in the forward and backward stages of the VFL training procedure to protect data privacy and model security. [38] proposed several configurations of splitting a deep neural network to support various forms of collaborations among health facilities that each holds a partial deep network and owns a different modality of patient data.
+Semi-Supervised Learning (SSL). SSL aims to alleviate the need for numerous labeled data to train machine learning models by leveraging unlabeled data. Recent semi-supervised learning works utilize transfer learning [32], consistency regularization [21, 36] and pseudo-labeling [5, 15] to learn
+1https://github.com/FederatedAI/FATE
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:3
+
+from unlabeled data. [1] proposed MixMatch that unifies three dominant semi-supervised methods: entropy minimization [12], consistency regularization and generic regularization. It demonstrates that MixMatch can approach similar error rates as fully supervised training but depends on significantly fewer training data. [5] proposed a semi-supervised Cross-View Training (CVT) approach that simultaneously trains a full model based upon all labeled data and multiple auxiliary models that only see restricted views of the unlabeled data. During training, CVT teaches auxiliary models to match predictions made by the full model to improve representation learning, thereby improving the performance of the full model. While successful, these works are not designed for VFL scenarios where features are scattered among parties. [26] proposed a secure Federated Transfer Learning (FTL) framework, which is the first framework that enables VFL to benefit from transfer learning. FTL helps the target domain party build a competitive prediction model by utilizing rich label resources from the source domain.
+
+3 PROBLEM DEFINITION
+
+We consider a two-party vertical federated learning setting where only one party has labels. This is
+
+the typical VFL setting defined in [40] where the party having labels is short of features to build an
+
+accurate model, and thus it leverages complimentary features provided by a second party. Specifically,
+
+party A has dataset D𝐴 := {(𝑋 𝐴,𝑖, 𝑌 𝐴,𝑖 )}𝑛𝑖=𝐴1 where 𝑋 𝐴,𝑖 is the feature vector of the 𝑖th sample and 𝑌 𝐴,𝑖 ∈ {0, 1}𝐶 is the corresponding one-hot encoding ground-truth label with 𝐶 classes for the 𝑖th
+
+sample, while party B has dataset D𝐵 := {𝑋 𝐵,𝑖 }𝑛𝑖=𝐵1. D𝐴 and D𝐵 are held privately by the two parties and cannot be exposed to each other. 𝑛𝐴 and 𝑛𝐵 are numbers of samples for D𝐴 and D𝐵, respectively.
+
+If we concatenate D𝐴 and D𝐵 with samples (of different parties) having the same identity aligned,
+
+we obtain a single dataset depicted in Figure 1. This dataset is vertically partitioned, and each
+
+party owns one vertical partition (or a partial view) of this dataset. This is where the term "vertical
+
+federated learning" comes from. We assume that there exists only a limited amount of aligned samples
+
+D𝑎𝑙
+
+:=
+
+{𝑋 𝐵,𝑖
+𝑎𝑙
+
+,
+
+𝐴,𝑖
+𝑋
+𝑎𝑙
+
+,
+
+𝐴,𝑖
+𝑌
+𝑎𝑙
+
+}𝑛𝑖 =𝑎1𝑙
+
+between
+
+the
+
+two parties. Party A owns
+
+the
+
+partition
+
+D𝐴
+𝑎𝑙
+
+:=
+
+{𝑋 𝐴,𝑖
+𝑎𝑙
+
+,
+
+𝐴,𝑖
+𝑌
+𝑎𝑙
+
+}𝑛𝑖 =𝑎1𝑙
+
+and
+
+party B
+
+owns
+
+D𝐵
+𝑎𝑙
+
+:=
+
+{𝑋 𝐵,𝑖
+𝑎𝑙
+
+}𝑛𝑖 =𝑎1𝑙
+
+,
+
+where 𝑛𝑎𝑙
+
+is
+
+the
+
+number
+
+of aligned samples.
+
+One can perform
+
+the
+
+alignment through encrypted entity matching techniques in a privacy-preserving setting [30]. Here,
+
+we assume that party A and party B have already established the alignment between their samples.
+
+Fig. 1. View of the virtual dataset in vertical federated learning. Each party owns a vertical partition (or a partial view) of this dataset.
+
+Other than aligned samples, the rest samples of each party have no aligned counterparts from the
+
+other
+
+party.
+
+We
+
+call
+
+them
+
+non-aligned
+
+samples
+
+and
+
+denote
+
+them
+
+as
+
+D𝐴
+𝑛𝑙
+
+:=
+
+{𝑋 𝐴,𝑖
+𝑛𝑙
+
+,
+
+𝐴,𝑖
+𝑌
+𝑛𝑙
+
+}𝑛𝑖 =𝑛𝐴1𝑙
+
+for
+
+party
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:4
+
+Kang, et al.
+
+A
+
+and
+
+D𝐵
+𝑛𝑙
+
+:=
+
+{𝑋 𝐵,𝑖
+𝑛𝑙
+
+}𝑛𝑖 =𝑛𝐵1𝑙
+
+for
+
+party
+
+B.
+
+From
+
+the
+
+perspective
+
+of
+
+a
+
+single
+
+tabular
+
+dataset
+
+(see
+
+Figure
+
+1),
+
+each party has no features (or labels) that correspond to non-aligned samples of the other party. We
+
+treat those features (or labels) are missing.
+
+The conventional VFL is trying to build a federated machine learning model utilizing only aligned
+
+samples
+
+𝐷𝑎𝑙 ,
+
+leaving
+
+non-aligned
+
+samples
+
+𝐷𝐴
+𝑛𝑙
+
+and
+
+𝐷𝐵
+𝑛𝑙
+
+unused.
+
+We,
+
+therefore,
+
+propose
+
+a
+
+semi-
+
+supervised VFL with Cross-View Training (FedCVT) approach that not only leverages aligned
+
+samples but also takes full advantages of non-aligned samples (shown in Figure 2), aiming to boost
+
+the performance of VFL, especially when the amount of aligned samples is small.
+
+4 OVERVIEW
+Figure 2 depicts the overall workflow of our proposed FedCVT approach, which involves five stages:
+(1) Learn representations from raw input features using neural networks; (2) Estimate representations for missing features based on learned representations; (3) Apply three trained classifiers 𝑓 𝐴, 𝑓 𝐵, and 𝑓 𝐴𝐵 to predict three candidate pseudo-labels for
+each unlabeled sample; (4) When all the three candidate pseudo-labels for a sample are equal, and their probabilities are
+above a predefined threshold, retain this pseudo-labeled sample in the training set; (5) Train the three classifiers 𝑓 𝐴, 𝑓 𝐵, and 𝑓 𝐴𝐵 jointly through vertical federated learning that each
+classifier takes as input a different view of the training dataset.
+
+Fig. 2. Overview of FedCVT approach
+5 THE PROPOSED APPROACH As depicted in Figure 2, our FedCVT approach involves the following stages: learn representations from raw features (section 5.1); estimate representations for missing features (section 5.2); estimate pseudo-labels for unlabeled samples and cherry-pick pseudo-labeled samples (section 5.3); finally, jointly train three classifiers through vertical federated learning (section 5.4). In this section, we describe each of these stages in detail.
+5.1 Representation Learning Deep neural networks have been widely used to learn representations [31]. In this work, we utilize two neural networks for each party to learn representations from raw input data. One is to learn representations weakly shared between the two parties and the other is to learn representations unique to each party.
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:5
+
+Fig. 3. Learn representations from raw input features. Each party 𝑝 ∈ {𝐴, 𝐵} has two neural network models hup and hcp to learn unique and shared representations, respectively.
+
+As shown in Figure 3, for each party 𝑝
+
+∈
+
+{𝐴,
+
+𝐵},
+
+we
+
+denote
+
+𝑝
+𝑅𝑢
+
+=
+
+hup (X p)
+
+as the unique
+
+rep-
+
+resentations
+
+and
+
+𝑝
+𝑅𝑐
+
+=
+
+hcp (X p)
+
+as the shared
+
+representations that are learned from raw input 𝑋 𝑝
+
+through
+
+neural
+
+networks
+
+hup
+
+and
+
+hcp ,
+
+respectively.
+
+𝑝
+𝑅𝑢
+
+∈
+
+R𝑁 𝑝 ×𝑑𝑝
+
+and
+
+𝑝
+𝑅𝑐
+
+∈
+
+R𝑁 𝑝 ×𝑑𝑝 , where dp is
+
+the dimension of the top hidden representation layer of neural networks of party 𝑝. The complete
+
+learned
+
+representations
+
+for 𝑋 𝑝
+
+is
+
+denoted
+
+as 𝑅𝑝
+
+=
+
+[𝑅𝑐𝑝
+
+;
+
+𝑝
+𝑅𝑢
+
+]
+
+,
+
+where
+
+[; ]
+
+denotes
+
+the
+
+concatenation
+
+operator
+
+that
+
+concatenates
+
+two
+
+matrices
+
+along
+
+the
+
+feature
+
+axis.
+
+Further,
+
+we
+
+denote
+
+𝑝
+𝑅
+
+= [𝑅𝑝
+
+;
+
+𝑝
+𝑅
+
+]
+
+𝑎𝑙
+
+𝑐,𝑎𝑙 𝑢,𝑎𝑙
+
+as
+
+representations
+
+learned
+
+from
+
+aligned
+
+samples
+
+𝑋
+
+𝑝
+
+,
+
+while
+
+𝑝
+𝑅
+
+= [𝑅𝑝
+
+;
+
+𝑝
+𝑅
+
+] as representations
+
+𝑎𝑙
+
+𝑛𝑙
+
+𝑐,𝑛𝑙 𝑢,𝑛𝑙
+
+learned from non-aligned samples 𝑋 𝑝 .
+𝑛𝑙
+Intuitively, neural network hcp aims to capture domain-invariant representations between the two parties while hup helps learn domain-specific representations. We propose following three loss terms
+
+to enforce neural networks to learn the desired representations.
+
+𝐴𝐵
+𝐿diff
+
+(𝑅𝐴
+𝑐,𝑎𝑙
+
+,
+
+𝐵
+𝑅
+𝑐,𝑎𝑙
+
+)
+
+=
+
+1 𝑛𝑎𝑙
+
+∑︁
+
+𝐴,𝑖
+𝑅
+
+−
+
+𝐵,𝑖
+𝑅
+
+𝑐,𝑎𝑙 𝑐,𝑎𝑙
+
+2 𝐹
+
+(1)
+
+𝑖
+
+𝐴
+𝐿
+
+(𝑅𝐴,
+
+𝑠𝑖𝑚 𝑢
+
+𝑅𝐴)
+𝑐
+
+=
+
+1 𝑛𝐴
+
+∑︁
+
+𝐴,𝑖
+𝑅
+
+⊗
+
+𝐴,𝑖
+𝑅
+
+𝑢
+
+𝑐
+
+2 𝐹
+
+(2)
+
+𝑖
+
+𝐵
+𝐿
+
+(𝑅𝐵,
+
+𝐵
+𝑅
+
+)
+
+=
+
+1
+
+∑︁
+
+𝐵,𝑖
+𝑅
+
+⊗
+
+𝐵,𝑖
+𝑅
+
+2
+
+𝑠𝑖𝑚 𝑢 𝑐 𝑛𝐵
+
+𝑢
+
+𝑐𝐹
+
+(3)
+
+𝑖
+
+where
+
+⊗
+
+denotes
+
+matrix
+
+multiplication
+
+operator
+
+and
+
+∥·∥2
+𝐹
+
+denotes
+
+the
+
+squared
+
+Frobenius
+
+norm.
+
+By
+
+minimizing
+
+(1),
+
+neural
+
+networks
+
+ℎ𝐴
+𝑐
+
+and
+
+ℎ𝐵
+𝑐
+
+are
+
+pushed
+
+to
+
+learn
+
+shared
+
+representations
+
+from
+
+the
+
+raw
+
+features of the two parties. While (2) and (3) are orthogonality constraints [2] that encourage neural
+
+networks
+
+𝑝
+ℎ𝑐
+
+and
+
+𝑝
+ℎ𝑢
+
+belonging
+
+to
+
+party
+
+𝑝
+
+∈
+
+{𝐴, 𝐵}
+
+to
+
+learn
+
+distinct
+
+representations.
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:6
+
+Kang, et al.
+
+5.2 Representation Estimation
+
+Instead of directly imputing values of missing features, we estimate representations of missing
+
+features (see Figure 1). In other words, we want to estimate missing representations of party A that
+
+correspond to non-aligned representations 𝑅𝐵 of party B and estimate missing representations of
+𝑛𝑙
+party B that correspond to non-aligned representations 𝑅𝐴 of party A.
+𝑛𝑙
+Each missing representation is estimated through the weighted sum over representations learned
+
+from raw features. The weights reflect the similarity between the representation to be estimated and
+
+the learned representations. To compute these weights, we leverage the scaled dot-product attention
+
+(SDPA) function [37]:
+
+𝑄 ⊗ 𝐾𝑇
+
+𝑔(𝑄, 𝐾, 𝑉 ) = softmax( √ ) ⊗ 𝑉
+
+(4)
+
+𝑑𝑘 where 𝑄 is the query matrix, 𝐾 is the key matrix, 𝑉 is the value matrix, and 𝑄 and 𝐾 have the
+
+same dimension denoted as 𝑑𝑘 .
+
+In the rest of this section, we will elaborate on how the SDPA function 𝑔 is applied to performing
+
+the representation estimation by giving an example of estimating party A’s missing representations,
+
+denoted as 𝑅˜𝐴, that correspond to the representations 𝑅𝐵 learned from the non-aligned samples 𝑋 𝐵
+
+𝑛𝑙
+
+𝑛𝑙
+
+of
+
+party
+
+B.
+
+Because
+
+𝑅˜𝐴
+
+=
+
+[𝑅˜𝑐𝐴;
+
+𝑅˜𝐴
+𝑢
+
+],
+
+the
+
+estimation
+
+of
+
+𝑅˜𝐴
+
+involves
+
+two
+
+parts:
+
+one
+
+is
+
+computing
+
+𝑅˜𝐴
+𝑐
+
+cor-
+
+responding
+
+to
+
+shared
+
+representation
+
+𝑅𝐵
+𝑛𝑙,𝑐
+
+(section
+
+5.2.1)
+
+and
+
+another
+
+is
+
+computing
+
+𝑅˜𝐴
+𝑢
+
+corresponding
+
+to unique representation 𝑅𝐵 (section 5.2.2).
+𝑛𝑙,𝑢
+
+Fig. 4. Estimate missing representations 𝑅˜𝐴 corresponds to the non-aligned representations 𝑅𝐵 of
+𝑛𝑙
+
+party
+
+B.
+
+(a)
+
+estimates
+
+missing
+
+representations
+
+𝑅˜𝑐𝐴
+
+corresponding
+
+to
+
+shared
+
+representations
+
+𝑅𝐵
+𝑛𝑙,𝑐
+
+while
+
+(b)
+
+estimates
+
+missing
+
+representations
+
+𝑅˜𝑢𝐴
+
+corresponding
+
+to
+
+unique
+
+representations
+
+𝑅𝐵 .
+𝑛𝑙,𝑢
+
+Then,
+
+𝑅˜𝐴
+
+can be obtained by concatenating 𝑅˜𝑐𝐴 and 𝑅˜𝑢𝐴.
+
+5.2.1
+
+Shared
+
+Representation
+
+Estimation.
+
+Formula
+
+(5)
+
+estimates
+
+the
+
+shared
+
+representation
+
+𝑅˜𝐴
+𝑐
+
+corresponding to 𝑅𝐵 :
+𝑛𝑙,𝑐
+
+𝑅𝐵 ⊗ (𝑅𝐴)𝑇
+
+𝑅˜𝐴
+𝑐
+
+=
+
+𝑔(𝑅𝐵
+
+,
+
+𝐴
+𝑅,
+
+𝑅𝐴)
+
+𝑛𝑙,𝑐 𝑐 𝑐
+
+=
+
+softmax(
+
+𝑛𝑙,𝑐 √
+
+𝑐
+
+)
+
+⊗
+
+𝐴
+𝑅
+
+𝑐
+
+(5)
+
+𝑑
+
+where
+
+𝑅𝐴
+𝑐
+
+denotes
+
+the
+
+shared
+
+representations
+
+of
+
+𝑋𝐴
+
+and
+
+𝑑
+
+denotes
+
+the
+
+dimension
+
+of
+
+𝑅𝐴
+𝑐
+
+.
+
+The
+
+estimation procedure can be divided into the following two steps and it is pictorially described in
+
+Figure 4(a).
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:7
+
+•
+
+Step
+
+1:
+
+compute
+
+similarities
+
+between
+
+each
+
+representation
+
+vector
+
+of
+
+𝑅𝐵
+𝑛𝑙,𝑐
+
+and
+
+that
+
+of
+
+𝑅𝐴
+𝑐
+
+.
+
+The
+
+result is a similarity matrix, denoted as 𝑆𝑐 ;
+
+•
+
+Step
+
+2:
+
+compute
+
+𝑅˜𝐴
+𝑐
+
+by
+
+softmax( √𝑆𝑐
+
+)
+
+⊗
+
+𝑅𝑐𝐴 .
+
+𝑑
+
+5.2.2
+
+Unique
+
+Representation
+
+Estimation.
+
+Formula
+
+(6)
+
+estimates
+
+the
+
+unique
+
+representation
+
+𝑅˜𝐴
+𝑢
+
+corresponding to 𝑅𝐵 .
+𝑛𝑙,𝑢
+
+𝑅𝐵 ⊗ (𝑅𝐵 )𝑇
+
+𝑅˜𝐴
+𝑢
+
+=
+
+𝑔(𝑅𝐵
+
+𝐵
+,𝑅
+
+𝐴
+,𝑅
+
+)
+
+𝑛𝑙,𝑢 𝑎𝑙,𝑢 𝑎𝑙,𝑢
+
+=
+
+softmax(
+
+𝑛𝑙,𝑢
+
+√
+
+𝑎𝑙,𝑢
+
+)
+
+⊗
+
+𝐴
+𝑅
+
+𝑎𝑙,𝑢
+
+(6)
+
+𝑑
+
+where 𝑅𝐴 and 𝑅𝐵 denotes the unique representations of 𝑋 𝐴 and 𝑋 𝐵 respectively, and 𝑑 denotes
+
+𝑎𝑙,𝑢
+
+𝑎𝑙,𝑢
+
+𝑎𝑙
+
+𝑎𝑙
+
+the dimension of 𝑅𝐵 . The estimation procedure can be divided into the following two steps and it is
+𝑎𝑙,𝑢
+
+pictorially described in Figure 4(b).
+
+• Step 1: compute similarities between each representation vector of 𝑅𝐵 and that of 𝑅𝐵 . This
+
+𝑛𝑙,𝑢
+
+𝑎𝑙,𝑢
+
+result is a similarity matrix, denoted as 𝑆𝑢;
+
+•
+
+Step
+
+2:
+
+compute
+
+𝑅˜𝐴
+𝑢
+
+by
+
+softmax( √𝑆𝑢 )
+𝑑
+
+⊗
+
+𝑅𝐴 .
+𝑎𝑙,𝑢
+
+Note
+
+that
+
+the
+
+similarity
+
+matrix
+
+𝑆𝑢
+
+is
+
+calculated
+
+based
+
+on
+
+𝑅𝐵
+𝑎𝑙,𝑢
+
+in
+
+the
+
+representation
+
+space
+
+of
+
+party
+
+B
+
+and
+
+then
+
+applied
+
+to
+
+𝑅𝐴
+𝑎𝑙,𝑢
+
+in
+
+the
+
+representation
+
+space
+
+of
+
+party
+
+A.
+
+We
+
+assume
+
+𝑆𝑢
+
+calculated
+
+based
+
+on 𝑅𝐵 can be applied to 𝑅𝐴 because 𝑅𝐵 and 𝑅𝐴 are aligned indicating that they are different
+
+𝑎𝑙,𝑢
+
+𝑎𝑙,𝑢
+
+𝑎𝑙,𝑢
+
+𝑎𝑙,𝑢
+
+views of the same samples.
+
+Fig. 5. View of the training set 𝜒, each sample of which consists of the representation of a raw input feature and its corresponding label. (a) The view of 𝜒 with missing representations estimated. (b) The view of 𝜒 with cherry-picked pseudo-labeled samples.
+
+We
+
+obtain
+
+estimated
+
+representations
+
+𝑅˜𝐴
+
+=
+
+[𝑅˜𝐴
+𝑐
+
+;
+
+𝑅˜𝐴]
+𝑢
+
+corresponds
+
+to
+
+the
+
+non-aligned
+
+representation
+
+𝑅𝐵
+𝑛𝑙
+
+of
+
+party
+
+B.
+
+Following
+
+the
+
+same
+
+logic,
+
+we
+
+estimate
+
+the
+
+missing
+
+representations
+
+𝑅˜𝐵
+
+=
+
+[𝑅˜𝐵
+𝑐
+
+;
+
+𝑅˜𝐵
+𝑢
+
+]
+
+corresponds
+
+to
+
+non-aligned
+
+representation
+
+𝑅𝐴
+𝑛𝑙
+
+of
+
+party
+
+A,
+
+where
+
+𝑅˜𝐵
+𝑐
+
+=
+
+𝑔(𝑅𝐴 , 𝑅𝐵, 𝑅𝐵))
+𝑛𝑙,𝑐 𝑐 𝑐
+
+is
+
+shared
+
+representations
+
+and
+
+𝑅˜𝐵
+𝑢
+
+=
+
+𝑔(𝑅𝐴 , 𝑅𝐴 , 𝑅𝐵 )
+𝑛𝑙,𝑢 𝑎𝑙,𝑢 𝑎𝑙,𝑢
+
+is
+
+unique
+
+representations.
+
+As
+
+a
+
+result,
+
+we
+
+obtain
+
+a
+
+expanded training set 𝜒 with all missing representations estimated, as depicted in Figure 5(a).
+
+However, samples {𝑅𝐵 , 𝑅˜𝐴} in 𝜒 are unlabeled. In section 5.3, we will elaborate on the procedure of
+𝑛𝑙
+estimating pseudo-labels for these unlabeled samples.
+
+To force the estimated representations to approximate the representations learned from input raw
+
+features, we add following two loss terms:
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:8
+
+Kang, et al.
+
+𝐴
+𝐿diff
+
+(𝑅˜𝐴
+𝑎𝑙
+
+,
+
+𝐴
+𝑅
+𝑎𝑙
+
+)
+
+=
+
+1 𝑛𝑎𝑙
+
+∑︁
+
+𝑅˜𝐴,𝑖
+
+−
+
+𝐴,𝑖
+𝑅
+
+𝑎𝑙 𝑎𝑙
+
+2 𝐹
+
+(7)
+
+𝑖
+
+𝐵
+𝐿diff
+
+(𝑅˜𝐵
+𝑎𝑙
+
+,
+
+𝐵
+𝑅
+𝑎𝑙
+
+)
+
+=
+
+1 𝑛𝑎𝑙
+
+∑︁
+𝑖
+
+𝑅˜𝐵,𝑖
+
+−
+
+𝐵,𝑖
+𝑅
+
+𝑎𝑙 𝑎𝑙
+
+2
+,
+𝐹
+
+(8)
+
+where 𝑅˜𝑝 is the estimated representations of aligned samples in party 𝑝 ∈ {𝐴, 𝐵} and it should be
+
+𝑎𝑙
+
+as
+
+close
+
+to
+
+𝑝
+𝑅
+
+as possible.
+
+𝑎𝑙
+
+5.3 Pseudo-Label Prediction
+
+As discussed in section 5.2, samples {𝑅𝐵 , 𝑅˜𝐴} in training set 𝜒 are unlabeled. For each unlabeled
+𝑛𝑙
+
+sample indexed by 𝑖, we apply the three trained softmax classifiers 𝑓 𝐴, 𝑓 𝐵 and 𝑓 𝐴𝐵 that take as input
+
+𝑅˜𝐴,𝑖 ,
+
+𝐵,𝑖
+𝑅
+
+and
+
+{𝑅 𝐵,𝑖 ,
+
+𝑅˜𝐴,𝑖
+
+}
+
+respectively
+
+to
+
+produce
+
+three
+
+candidate
+
+pseudo-labels
+
+(Algorithm
+
+1,
+
+line
+
+8).
+
+𝑛𝑙
+
+𝑛𝑙
+
+Only when all the three candidate pseudo-labels are equal and their probabilities are higher than a
+
+predefined threshold 𝑡 do we retain sample 𝑖 with the estimated pseudo-label (Algorithm 1, line 9).
+
+Otherwise, we discard sample 𝑖 for the current iteration of training.
+
+As a result, all samples in the training set 𝜒 have labels, as depicted in Figure 5(b). We further
+
+define the training set 𝜒 = {𝑅𝐵, 𝑅𝐴, 𝑌 𝐴}, where 𝑅𝐴 denotes all samples of party A including estimated
+
+ones, 𝑌 𝐴 denotes labels of 𝑅𝐴, and 𝑅𝐵 denotes samples of party B that correspond to 𝑅𝐴.
+
+5.4 Cross-View Training
+Inspired by cross-view learning [5] to share representations across models and improve models’ representation learning, we train three softmax classifiers 𝑓 𝐴, 𝑓 𝐵 and 𝑓 𝐴𝐵 jointly and each classifier takes as input a different view of the training dateset 𝜒 (Figure 5(b)) and outputs estimated class distributions.
+We define the input to classifiers 𝑓 𝐴, 𝑓 𝐵 and 𝑓 𝐴𝐵 as 𝜒𝐴 = {𝑅𝐴, 𝑌 𝐴}, 𝜒𝐵 = {𝑅𝐵, 𝑌 𝐴}, and 𝜒 = {𝑅𝐵, 𝑅𝐴, 𝑌 𝐴}, respectively. Then, the loss functions for the three classifiers are defined as follows:
+
+𝐴
+𝐿
+
+(
+
+𝐴
+𝜒
+
+)
+
+𝑐𝑒
+
+=
+
+1
+
+∑︁ 𝐿𝑐𝑒 ( 𝑓 𝐴 (𝑅𝐴,𝑖 ), 𝑌 𝐴,𝑖 )
+
+(9)
+
+𝑛
+
+𝑖
+
+𝐵
+𝐿
+
+(𝜒𝐵)
+
+𝑐𝑒
+
+=
+
+1
+
+∑︁ 𝐿𝑐𝑒 ( 𝑓 𝐵 (𝑅𝐵,𝑖 ), 𝑌 𝐴,𝑖 )
+
+(10)
+
+𝑛
+
+𝑖
+
+𝑓 𝑒𝑑
+𝐿𝑐𝑒
+
+(
+
+𝜒
+
+)
+
+=
+
+1
+
+∑︁
+
+𝐿𝑐𝑒
+
+(
+
+𝑓
+
+𝐴𝐵
+
+(
+
+{𝑅𝐵,𝑖
+
+,
+
+𝐴,𝑖
+𝑅
+
+}),
+
+𝑌
+
+𝐴,𝑖
+
+)
+
+(11)
+
+𝑛
+
+𝑖
+
+where 𝑛 is the number of samples in 𝜒. Formulas (9), (10) and (11) compute the cross-entropy
+
+between estimated class distributions and ground-truth labels. Finally, we have the overall loss
+
+defined as Formula (12):
+
+𝐿𝑜𝑏 𝑗
+
+=
+
+𝑓 𝑒𝑑
+𝐿𝑐𝑒
+
++
+
+𝐴
+𝐿
+
+𝑐𝑒
+
++
+
+𝐵
+𝐿
+
+𝑐𝑒
+
++
+
+𝐴𝐵
+𝜆1𝐿diff
+
++
+
+𝐴
+𝜆2𝐿diff
+
++
+
+𝐵
+𝜆3𝐿diff
+
++
+
+𝐴
+𝜆4𝐿sim
+
++
+
+𝐵
+𝜆5𝐿sim
+
+(12)
+
+where 𝜆𝑠 are loss weights. Algorithm 1 gives a full version of the FedCVT algorithm.
+
+5.5 Security Analysis
+FedCVT does not require participating parties to share their original data and models (including architecture and parameters) but only intermediate representations and gradients. The intermediate representations are results transformed from original features through deep neural networks with multiple layers of non-linear transformations. There is little chance for a malicious party to reconstruct the victim party’s original features from exposed intermediate representations without knowing the
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:9
+
+Algorithm 1 FedCVT algorithm
+
+1: Input:
+
+Datasets 𝐷𝐴 and 𝐷𝐵;
+
+Batch
+
+index
+
+sets
+
+𝑇𝑎𝑙 ,
+
+𝑇𝐴
+𝑛𝑙
+
+and
+
+𝑇𝐵
+𝑛𝑙
+
+of
+
+𝐷𝑎𝑙 ,
+
+𝐷𝐴
+𝑛𝑙
+
+and
+
+𝐷𝐵 ,
+𝑛𝑙
+
+respectively.
+
+Neural
+
+networks
+
+ℎ𝐵, ℎ𝐵,
+𝑢𝑐
+
+ℎ𝐴
+𝑢
+
+and
+
+ℎ𝑐𝐴 ;
+
+Representation estimators 𝑔;
+
+Softmax classifiers 𝑓 𝐴, 𝑓 𝐵 and 𝑓 𝐴𝐵
+
+Class probability threshold 𝑡 and the epoch number 𝐾
+
+2: for 𝑒 = 1, 2, ..., 𝐾 do
+
+3:
+
+for 𝑏1, 𝑏2, 𝑏3
+
+in
+
+𝑇𝑎𝑙
+
+,
+
+𝑇 𝐴,
+𝑛𝑙
+
+𝑇𝐵
+𝑛𝑙
+
+do
+
+4: Select mini-batches:
+
+{𝑋 𝐵,𝑏1,
+𝑎𝑙
+
+𝑋 𝐴,𝑏1, 𝑌 𝐴,𝑏1
+𝑎𝑙 𝑎𝑙
+
+}
+
+from
+
+𝐷𝑎𝑙 ;
+
+{𝑋 𝐴,𝑏2, 𝑌 𝐴,𝑏2 } from 𝐷𝐴 ;
+
+𝑛𝑙 𝑛𝑙
+
+𝑛𝑙
+
+{𝑋 𝐵,𝑏3 } from 𝐷𝐵 ;
+
+𝑛𝑙
+
+𝑛𝑙
+
+5:
+
+Learn
+
+𝑅𝐵,𝑏1
+
+,
+
+𝐵,𝑏
+𝑅
+
+3
+
+,
+
+𝑅𝐴,𝑏1
+
+,
+
+𝑅𝐴,𝑏2
+
+𝑎𝑙 𝑛𝑙 𝑎𝑙 𝑛𝑙
+
+from
+
+𝑋 𝐵,𝑏1, 𝑋 𝐵,𝑏3, 𝑋 𝐴,𝑏1, 𝑋 𝐴,𝑏2
+𝑎𝑙 𝑛𝑙 𝑎𝑙 𝑛𝑙
+
+through
+
+ℎ𝐵
+𝑢
+
+,
+
+ℎ𝐵
+𝑐
+
+,
+
+ℎ𝐴,
+𝑢
+
+ℎ𝐴
+𝑐
+
+;
+
+6:
+
+Estimate missing representations 𝑅˜𝐵,𝑏2 and 𝑅˜𝐴,𝑏3 through 𝑔;
+
+7: Form training set 𝜒 of samples consisting of representations and corresponding labels;
+
+8:
+
+Estimate candidate pseudo-labels for unlabeled samples {𝑅𝐵,𝑏3, 𝑅˜𝐴,𝑏3 } of 𝜒:
+
+𝑛𝑙
+
+𝑌˜1𝑏3 = 𝑓 𝐴 (𝑅˜𝐴,𝑏3 );
+
+𝑌˜2𝑏3
+
+=
+
+𝑓 𝐵 (𝑅𝐵,𝑏3 );
+𝑛𝑙
+
+𝑌˜3𝑏3
+
+=
+
+𝑓 𝐴𝐵 ( [𝑅𝐵,𝑏3 ; 𝑅˜𝐴,𝑏3 ]);
+𝑛𝑙
+
+9:
+
+Retain
+
+samples
+
+of
+
+{𝑅 𝐵,𝑏3 ,
+𝑛𝑙
+
+𝑅˜ 𝐴,𝑏3 ,
+
+(𝑌˜1𝑏3 ,
+
+𝑌˜2𝑏3 ,
+
+𝑌˜3𝑏3 )}
+
+that
+
+satisfy
+
+the
+
+rule
+
+defined
+
+in
+
+section
+
+5.3;
+
+10:
+
+Feed 𝜒𝐴, 𝜒𝐵 and 𝜒 to classifiers 𝑓 𝐴, 𝑓 𝐵 and 𝑓 𝐴𝐵 respectively for cross-view training;
+
+11:
+
+Compute loss: 𝐿𝑜𝑏 𝑗 = 𝐿𝑓 𝑒𝑑 + 𝐿𝐴 + 𝐿𝐵 + 𝜆1𝐿d𝐴i𝐵ff + 𝜆2𝐿d𝐴iff + 𝜆3𝐿d𝐵iff + 𝜆4𝐿s𝐴im + 𝜆5𝐿s𝐵im;
+
+12:
+
+Compute gradients ∇𝐿𝑜𝑏 𝑗 and update models.
+
+13: end for
+
+14: end for
+
+victim’s model [13]. In recent years, there has been a series of works on investigating data leakage through gradients [10, 16, 41, 42]. However, those research works focus on horizontal federated learning where the server is malicious. They assume that the malicious server can access the victim client’s model parameters and gradients. These assumptions are not held in the FedCVT setting. Research works [23, 27] investigate privacy leakage issues in the VFL setting and demonstrate that the malicious party could recover party A’s labels through gradients. To provide a strong privacy guarantee, FATE design and implement a privacy-preserving VFL-DNN (Deep Neural Network) framework that can efficiently perform encryption in both forward and backward stages of the VFL training procedure to prevent intermediate representations and gradients from being exposed. For experimental convenience, we did not implement FedCVT with FATE. However, FedCVT is compatible with the VFL-DNN framework and can be migrated to FATE straightforwardly.
+6 EXPERIMENTAL EVALUATION We report experiments conducted on three public datasets, which are: 1) NUS-WIDE dataset [4]; 2) Vehicle dataset [7]; 3) CIFAR-10 [20] to validate our proposed FedCVT approach.
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:10
+
+Kang, et al.
+
+6.1 Hyperparameters
+FedCVT-VFL combines multiple techniques to improve the performance of VFL and thus it introduces various hyperparameters - specifically, the loss weights 𝜆𝑠 , the label probability threshold 𝑡, the sharpening temperature 𝑇 for estimating representation and learning rate. For experiments on NUS-WIDE, we set 𝜆1,2,3,4,5 = 0.1, 𝑡=0.5, 𝑇 =0.5 and learning rate = 0.005. For Vehicle, we set 𝜆1,2,3,4,5 = 0.1, 𝑡 =0.5, 𝑇 =1.0 and learning rate = 0.005. For CIFAR-10, we set 𝜆1,4,5 = 0.1, 𝜆2,3 = 0.01, 𝑡=0.6, 𝑇 =0.1 and learning rate = 0.001. For all experiments, we use Adam [19] optimizer.
+6.2 Baseline Models
+We consider three baseline models: (1) party A’s local model 𝑓 𝐴, (2) vanilla-VFL and (3) FTL [26]. Party A’s local model is trained on all local samples of party A, while vanilla-VFL is trained on aligned samples between party A and party B (without using non-aligned samples). FTL leverages all samples of party A in addition to aligned samples to help party B build a classifier model. We consider party A’s local model as a baseline model because it is worth examining whether VFL performs better than the local model when the number of aligned samples is limited. Vanilla-VFL and FTL are adopted to verify whether our FedCVT-VFL approach is effective. Note that FTL aims to build a model only for party B, and thus it does not have a federated model that takes input from both parties. To ensure a fair comparison, we add a federated model on top of local models of FTL and denote this modified FTL as mFTL.
+6.3 Experimental Results
+6.3.1 NUS-WIDE. The NUS-WIDE dataset consists of 634 low-level image features extracted from Flickr images and their associated 1000 textual tags as well as 81 ground truth labels. In this work, we consider solving a 10-label classification problem with a data federation formed between party A and party B. In our setting, each party has 56000 training samples, 8000 aligned validation samples, and 10000 aligned testing samples. Each party utilizes two local neural networks that each has one hidden layer with 96 units to learn representations from local input samples. Then, each party feeds the learned representations into its local softmax classifier 𝑓 𝑝, 𝑝 ∈ {𝐴, 𝐵} with the dimension of 192 (96x2) and the federated softmax layer 𝑓 𝐴𝐵 with the dimension of 384 (96x2x2), respectively, for federated training.
+On NUS-WIDE, we run experiments with two scenarios. In the first scenario, denoted as scenario1, we put 634 image features on party A and 1000 textual features on party B. The second scenario, denoted as scenario-2, is the other way around. In both scenarios, party A owns the labels. We consider these two scenarios because image and text are different in modality and have different discriminative power, and we want to investigate how these differences would affect the performance of FedCVT-VFL.
+Table 1 shows the accuracy comparison between FedCVT-VFL and baselines with a varying number of aligned samples from 250 to 8000. FedCVT-VFL outperforms mFTL [26] noticeably and outperforms vanilla-VFL by a large margin (see Figure 6) for both scenarios. For example, with 250 aligned samples, FedCVT-VFL improves 13.4 and 17.0 points in accuracy over vanilla-VFL in scenario-1 and scenario-2, respectively. With 8000 aligned samples, FedCVT-VFL enhances the accuracy by 1.8 and 3.8 points, respectively. In addition, FedCVT-VFL outperforms the local model with only a small amount of aligned samples. For example, FedCVT-VFL outperforms the local model with only 250 aligned samples in scenario-1 and with 500 aligned samples in scenario-2.
+As shown in Table 1, the local model of scenario-2 significantly outperforms that of scenario-1 (by 11.4 points), which demonstrates that text features have much more discriminative power than image features on the NUS-WIDE dataset. Therefore, in scenario-2, leveraging complementary
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:11
+
+Model
+
+scenario-1: Party A with image
+
+250
+
+500
+
+1000
+
+2000
+
+4000
+
+8000
+
+Local Model 58.92
+
+58.92
+
+58.92
+
+58.92
+
+58.92
+
+58.92
+
+Vanilla-VFL 51.79±0.21 56.58±0.28 64.23±0.09 68.05±0.36 71.07±0.14 73.69±0.12
+
+mFTL
+
+62.43±0.46 65.07±0.29 68.49±0.36 71.19±0.26 73.10±0.27 74.32±0.36
+
+FedCVT-VFL 65.16±0.21 68.37±0.22 68.93±0.20 71.75±0.14 74.27±0.24 75.45±0.11
+
+Δ FedCVT-VFL ↑ 13.37
+
+↑ 11.79
+
+↑ 4.7
+
+↑ 3.7
+
+↑ 3.2
+
+↑ 1.76
+
+scenario-2: Party A with text
+
+Model
+
+250
+
+500
+
+1000
+
+2000
+
+4000
+
+8000
+
+Local Model 70.31
+
+70.31
+
+70.31
+
+70.31
+
+70.31
+
+70.31
+
+Vanilla-VFL 51.79±0.21 56.58±0.28 64.23±0.09 68.05±0.36 71.07±0.14 73.69±0.12
+
+mFTL
+
+63.95±0.26 67.17±0.28 70.34±0.19 72.59±0.20 73.79±0.18 74.51±0.18
+
+FedCVT-VFL 68.76±0.08 71.51±0.27 72.77±0.21 73.95±0.06 75.92±0.24 77.45±0.06
+
+Δ FedCVT-VFL ↑ 16.97
+
+↑ 14.93
+
+↑ 8.54
+
+↑ 5.9
+
+↑ 4.85
+
+↑ 3.76
+
+Table 1. Test accuracy (%) comparison of FedCVT-VFL to party A’s local model, mFTL and vanilla-VFL
+
+on NUS-WIDE for a varying number of aligned samples. Note that the local model is trained based on 56000 local samples of party A and thus it is not affected by the number of aligned samples. Δ is the performance gain of FedCVT-VFL compared to Vanilla-VFL.
+
+(a)
+
+(b)
+
+Fig. 6. Test accuracy (%) comparison of FedCVT-VFL model to vanilla-VFL model on NUS-WIDE for a varying number of aligned samples. Exact numbers are provided in Table 1. (a) shows results when party A holds image data, while (b) shows results when party A hold text data.
+
+image features contributes little to vanilla-VFL when the number of aligned samples is small. This partially explains why vanilla-VFL models do not outperform the local model (solid-blue line v.s. red line in Figure 6(b)) in scenario-2 when the size of aligned samples is not sufficiently large enough (i.e., ≤ 2000). While in scenario-1, party A benefits significantly from leveraging complementary text features of party B through VFL (solid-blue line v.s. red line in Figure 6(a)). This suggests that, in practice, when the size of the aligned samples is limited, the party owning labels may be better off using its local model (with much more training samples) if it has much stronger discriminative features than other parties. Otherwise, it may benefit from leveraging the features of other parties.
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:12
+
+Kang, et al.
+
+6.3.2 Vehicle. The vehicle2 [7] dataset is for classifying the types of moving vehicles in a distributed sensor network. There are 3 types of vehicles. Each sample in this dataset has 100 features, the first 50 of which are acoustic features, while the rest are seismic features. Thus, it is natural to split the two modalities of features into two parties. In our setting, each party has 40000 training samples, 5000 validation samples, and 5000 testing samples. Each party utilizes two local neural networks that each has one hidden layer with 32 units to learn representations from local input samples. Then, each party feeds the learned representations into its local softmax classifier 𝑓 𝑝, 𝑝 ∈ {𝐴, 𝐵} with the dimension of 64 (32x2) and the federated softmax layer 𝑓 𝐴𝐵 with the dimension of 128 (32x2x2), respectively, for federated training.
+Similar to NUS-WIDE, we consider two scenarios on the Vehicle dataset. In scenario-1, we put acoustic features on party A. While in scenario-2, we put seismic features on party A. In both scenarios, party A owns the labels.
+
+(a)
+
+(b)
+
+Fig. 7. Test accuracy (%) comparison of FedCVT-VFL model to vanilla-VFL on Vehicle dataset for a varying number of aligned samples. Exact numbers are provided in Table 2. (a) shows results when party A holds acoustic data, while (b) shows results when party A hold seismic data.
+
+From Table 2 and Figure 7, we have the following observations. For both scenarios, FedCVT and vanilla-VFL outperform the local model by a large margin, even with only 250 aligned samples. This demonstrates that leveraging more complementary features brings great benefits for improving the accuracy of machine learning models on the Vehicle dataset. Compared to vanilla-VFL and mFTL, FedCVT achieves better performance with much less aligned samples. For example, in both scenarios, with 500 aligned samples, FedCVT reaches an accuracy comparable to the performance of vanilla-VFL and mFTL using 4000 aligned samples. It is worth noting from Figure 7 that mFTL becomes less accurate than vanilla-VFL when the number of aligned samples reaches 8000. We conjecture that this is because mFTL mainly leverages two parties’ shared representations that are learned based on aligned samples to boost performance, and thus it lost information unique to each party. With more aligned samples are added for training, more unique information would be lost.
+6.3.3 CIFAR-10. The CIFAR-10 dataset consists of color images with shape of 32 × 32 × 3 in 10 classes. To simulate the two-party vertical federated learning setting, we partition each CIFAR-10 image with shape 32 × 32 × 3 vertically into two parts (each part has shape 32 × 16 × 3). Each party has 25000 training samples, 5000 aligned validation samples, and 10000 aligned testing samples. Each
+2https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass.html
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:13
+
+Model
+
+scenario-1: Party A with acoustic features
+
+250
+
+500
+
+1000
+
+2000
+
+4000
+
+8000
+
+Local Model 69.91
+
+69.91
+
+69.91
+
+69.91
+
+69.91
+
+69.91
+
+Vanilla-VFL 76.44±0.64 77.86±0.83 78.83±0.53 79.28±0.75 80.24±0.60 80.82±0.29
+
+mFTL
+
+76.74±0.19 79.07±0.17 79.22±0.18 79.49±0.23 80.01±0.21 80.49±0.20
+
+FedCVT-VFL 79.82±0.27 80.42±0.28 80.58±0.07 80.86±0.09 81.05±0.17 81.14±0.06
+
+Δ FedCVT-VFL ↑ 3.38
+
+↑ 2.56
+
+↑ 1.75
+
+↑ 1.58
+
+↑ 0.81
+
+↑ 0.32
+
+scenario-2: Party A with seismic features
+
+Model
+
+250
+
+500
+
+1000
+
+2000
+
+4000
+
+8000
+
+Local Model 70.31
+
+70.31
+
+70.31
+
+70.31
+
+70.31
+
+70.31
+
+Vanilla-VFL 76.44±0.64 77.86±0.83 78.83±0.53 79.28±0.75 80.24±0.60 80.82±0.29
+
+mFTL
+
+77.35±0.39 78.62±0.35 79.16±0.18 80.21±0.19 80.45±0.23 80.59±0.17
+
+FedCVT-VFL 79.67±0.35 80.13±0.25 80.44±0.16 80.67±0.16 80.90±0.15 81.02±0.05
+
+Δ FedCVT-VFL ↑ 3.23
+
+↑ 2.27
+
+↑ 1.61
+
+↑ 1.39
+
+↑ 0.66
+
+↑ 0.20
+
+Table 2. Test accuracy (%) comparison of FedCVT-VFL to party A’s local model, mFTL and vanilla-VFL
+
+model on Vehicle dataset for a varying number of aligned samples. Note that the local model is trained
+
+based on 40000 local samples of party A and thus it is not affected by the number of aligned samples. Δ is the performance gain of FedCVT-VFL compared to Vanilla-VFL.
+
+party uses two local VGG-like CNN models to learn representations from input image samples. Then it feeds the learned representations into its local softmax classifier 𝑓 𝑝, 𝑝 ∈ {𝐴, 𝐵} and the federated softmax classifier 𝑓 𝐴𝐵, respectively, for jointly training. The VGG-like CNN model consists of 2x2 max-pooling layers, 3x3 convolutional layers with stride 1 and padding 1, and fully connected layers. The architecture is conv32-conv32-pool-conv64-conv64-pool-conv128-conv128-pool-fc64. Thus, the federated softmax classifier has the dimension of 256 (64x2x2). For CIFAR10, we do not swap image partitions between the two parties because they are cut from the same images, and thus we assume they have similar discriminative power.
+
+Fig. 8. Test accuracy (%) comparison of FedCVT-VFL model to vanilla-VFL model on CIFAR10 for a varying number of aligned samples. Exact numbers are provided in Table 3.
+As shown in Table 3, FedCVT-VFL significantly outperforms vanilla-VFL for CIFAR10 (dashedblue line v.s. solid-blue line in Figure 8). For example, FedCVT-VFL improves accuracy by 22.7 points with 500 aligned samples and 7.1 points with 10000 aligned samples compared with vanillaVFL. Figure 8 (solid-red line v.s. solid-blue line) depicts that the vanilla-VFL cannot beat the
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:14
+
+Kang, et al.
+
+Model
+
+500
+
+1000
+
+2000
+
+4000
+
+8000
+
+10000
+
+Local Model 67.74
+
+67.74
+
+67.74
+
+67.74
+
+67.74
+
+67.74
+
+Vanilla-VFL 40.02±0.13 44.20±0.12 50.38±0.14 56.46±0.06 62.87±0.08 65.01±0.11
+
+FedCVT-VFL 62.68±0.21 65.04±0.26 66.02±0.31 67.84±0.23 71.44±0.11 72.06±0.16
+
+Δ FedCVT-VFL ↑ 22.66
+
+↑ 20.84
+
+↑ 15.64
+
+↑ 11.38
+
+↑ 8.57
+
+↑ 7.05
+
+Table 3. Test accuracy (%) comparison of FedCVT-VFL model to vanilla-VFL model on CIFAR-10
+
+for a varying number of aligned samples. Note that the local model is trained based on 25000 local samples of party A and thus it is not affected by the number of aligned samples. Δ is the performance gain of FedCVT-VFL compared to Vanilla-VFL.
+
+local model with even 10000 aligned samples (over 1/3 of local samples). FedCVT-VFL boosts the performance of vanilla-VFL so that it outperforms the local model using 4000 aligned samples (less than 1/6 of local samples). This manifests that FedCVT equips VFL with an effective way of leveraging unlabeled data to improving model performance.
+6.4 Ablation Study
+FedCVT exploits several techniques to improve performance. It leverages unique and shared representations learned from raw features, uses both types of representations to estimate missing representations, and then performs cross-view training with additional pseudo-labeled samples. In this section, we study how each of those techniques contributes to the performance of FedCVT. Specifically, we measure effects of:
+• Use both unique and shared representations without representation estimation and cross-view training.
+• Use only unique representations, only shared representations, or both unique and shared representations for estimating missing representations but without cross-view training.
+• All techniques applied.
+
+Ablation
+
+500 4000
+
+(1) Vanilla VFL (equals to using only unique representations w/o RE and CVT) (2) FedCVT-VFL uses unique and shared representations w/o RE and CVT (3) FedCVT-VFL uses only unique representations with RE w/o CVT (4) FedCVT-VFL uses only shared representations with RE w/o CVT (5) FedCVT-VFL uses unique and shared representations with RE w/o CVT (6) FedCVT-VFL with all techniques applied
+
+56.58 63.10 66.12 65.68 67.66 68.37
+
+71.07 72.70 73.31 72.89 73.69 74.27
+
+Table 4. Ablation study results. All values are accuracy (%) on NUS-WIDE (scenario 1) with 500 or 4000 aligned samples.
+
+We conducted the ablation study on NUS-WIDE (scenario-1) with 500 and 4000 aligned samples. For conciseness, we denote representation estimation as RE and cross-view training as CVT. The results are reported in Table 4. It shows that every technique applied to FedCVT-VFL contributes to the performance boost. We obtain the most dramatic performance gain when applying representation estimation. For example, comparing (5) and (1), FedCVT-VFL outperforms vanilla-VFL by 11% and 2.6%, respectively, using 500 samples and 4000 samples. Comparing (6) and (5), cross-view training also helps boost the performance of FedCVT-VFL.
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:15
+
+7 CONCLUSION
+We propose Federated Cross-View Training (FedCVT), a semi-supervised learning approach that improves the performance of VFL using limited aligned samples. FedCVT leverages representation estimation and pseudo-labels prediction to expand the training set and trains three classifiers jointly through vertical federated learning to improve models’ representation learning. FedCVT-VFL significantly enhances the performance of vanilla VFL. The ablation study shows that each technique used in FedCVT-VFL contributes to the final performance boost.
+8 ACKNOWLEDGMENT
+This work was partially supported by the National Key Research and Development Program of China under Grant No. 2018AAA0101100.
+REFERENCES
+[1] David Berthelot, Nicholas Carlini, Ian J. Goodfellow, Nicolas Papernot, Avital Oliver, and Colin Raffel. 2019. MixMatch: A Holistic Approach to Semi-Supervised Learning. CoRR abs/1905.02249 (2019). arXiv:1905.02249 http://arxiv.org/ abs/1905.02249
+[2] Konstantinos Bousmalis, George Trigeorgis, Nathan Silberman, Dilip Krishnan, and Dumitru Erhan. 2016. Domain Separation Networks. In Advances in Neural Information Processing Systems 29, D. D. Lee, M. Sugiyama, U. V. Luxburg, I. Guyon, and R. Garnett (Eds.). Curran Associates, Inc., 343–351. http://papers.nips.cc/paper/6254-domainseparation-networks.pdf
+[3] Kewei Cheng, Tao Fan, Yilun Jin, Yang Liu, Tianjian Chen, and Qiang Yang. 2021. SecureBoost: A Lossless Federated Learning Framework. IEEE Intelligent Systems 01 (may 2021), 1–1. https://doi.org/10.1109/MIS.2021.3082561
+[4] Tat-Seng Chua, Jinhui Tang, Richang Hong, Haojie Li, Zhiping Luo, and Yantao Zheng. 2009. NUS-WIDE: A real-world web image database from National University of Singapore. In CIVR.
+[5] Kevin Clark, Minh-Thang Luong, Christopher D. Manning, and Quoc Le. 2018. Semi-Supervised Sequence Modeling with Cross-View Training. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing. Association for Computational Linguistics, Brussels, Belgium, 1914–1925. https://doi.org/10.18653/v1/D18-1217
+[6] DLA Piper. 2018. Data protection laws of the world: Full handbook. [7] Marco F Duarte and Yu Hen Hu. 2004. Vehicle classification in distributed sensor networks. J. Parallel and Distrib.
+Comput. 64, 7 (2004), 826–838. https://doi.org/10.1016/j.jpdc.2004.03.020 Computing and Communication in Distributed Sensor Networks. [8] Adrià Gascón, Phillipp Schoppmann, Borja Balle, Mariana Raykova, Jack Doerner, Samee Zahur, and David Evans. 2016. Secure Linear Regression on Vertically Partitioned Datasets. IACR Cryptology ePrint Archive (2016), 892. [9] GDPR. 2018. General Data Protection Regulation. [10] Jonas Geiping, Hartmut Bauermeister, Hannah Dröge, and Michael Moeller. 2020. Inverting Gradients - How easy is it to break privacy in federated learning?. In Advances in Neural Information Processing Systems, H. Larochelle, M. Ranzato, R. Hadsell, M. F. Balcan, and H. Lin (Eds.), Vol. 33. Curran Associates, Inc., 16937–16947. https: //proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf [11] Xuan Gong, Abhishek Sharma, Srikrishna Karanam, Ziyan Wu, Terrence Chen, David Doermann, and Arun Innanje. 2021. Ensemble Attention Distillation for Privacy-Preserving Federated Learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV). 15076–15086. [12] Yves Grandvalet and Yoshua Bengio. 2004. Semi-Supervised Learning by Entropy Minimization. In Proceedings of the 17th International Conference on Neural Information Processing Systems (Vancouver, British Columbia, Canada) (NIPS’04). MIT Press, Cambridge, MA, USA, 529–536. [13] Otkrist Gupta and Ramesh Raskar. 2018. Distributed learning of deep neural network over multiple agents. CoRR abs/1810.06060 (2018). arXiv:1810.06060 http://arxiv.org/abs/1810.06060 [14] Stephen Hardy, Wilko Henecka, Hamish Ivey-Law, Richard Nock, Giorgio Patrini, Guillaume Smith, and Brian Thorne. 2017. Private federated learning on vertically partitioned data via entity resolution and additively homomorphic encryption. CoRR abs/1711.10677 (2017). [15] Dong hyun Lee. 2013. Pseudo-Label: The Simple and Efficient Semi-Supervised Learning Method for Deep Neural Networks. In ICML Workshop on Challenges in Representation Learning. [16] Jiwnoo Jeon, jaechang Kim, Kangwook Lee, Sewoong Oh, and Jungseul Ok. 2021. Gradient Inversion with Generative Image Prior. In Advances in Neural Information Processing Systems, Vol. 34. Curran Associates, Inc. https://papers. nips.cc/paper/2021/file/fa84632d742f2729dc32ce8cb5d49733-Paper.pdf
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+1:16
+
+Kang, et al.
+
+[17] Peter Kairouz, H. Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, Rafael G. L. D’Oliveira, Hubert Eichner, Salim El Rouayheb, David Evans, Josh Gardner, Zachary Garrett, Adrià Gascón, Badih Ghazi, Phillip B. Gibbons, Marco Gruteser, Zaid Harchaoui, Chaoyang He, Lie He, Zhouyuan Huo, Ben Hutchinson, Justin Hsu, Martin Jaggi, Tara Javidi, Gauri Joshi, Mikhail Khodak, Jakub Konecný, Aleksandra Korolova, Farinaz Koushanfar, Sanmi Koyejo, Tancrède Lepoint, Yang Liu, Prateek Mittal, Mehryar Mohri, Richard Nock, Ayfer Özgür, Rasmus Pagh, Hang Qi, Daniel Ramage, Ramesh Raskar, Mariana Raykova, Dawn Song, Weikang Song, Sebastian U. Stich, Ziteng Sun, Ananda Theertha Suresh, Florian Tramèr, Praneeth Vepakomma, Jianyu Wang, Li Xiong, Zheng Xu, Qiang Yang, Felix X. Yu, Han Yu, and Sen Zhao. 2021. Advances and Open Problems in Federated Learning. Foundations and Trends® in Machine Learning 14, 1–2 (2021), 1–210. https://doi.org/10.1561/2200000083
+[18] Yan Kang, Yang Liu, Yuezhou Wu, Guoqiang Ma, and Qiang Yang. 2021. Privacy-preserving Federated Adversarial Domain Adaption over Feature Groups for Interpretability. In International Workshop on Federated and Transfer Learning for Data Sparsity and Confidentiality in Conjunction with IJCAI. arXiv:2111.10934 [cs.LG]
+[19] Diederik P. Kingma and Jimmy Ba. 2015. Adam: A Method for Stochastic Optimization. In 3rd International Conference on Learning Representations, ICLR 2015, San Diego, CA, USA, May 7-9, 2015, Conference Track Proceedings, Yoshua Bengio and Yann LeCun (Eds.). http://arxiv.org/abs/1412.6980
+[20] Alex Krizhevsky. 2009. Learning multiple layers of features from tiny images. Technical Report. University of Toronto. [21] Samuli Laine and Timo Aila. 2017. Temporal Ensembling for Semi-Supervised Learning.. In ICLR (Poster). OpenRe-
+view.net. http://dblp.uni-trier.de/db/conf/iclr/iclr2017.html#LaineA17 [22] Daliang Li and Junpu Wang. 2019. FedMD: Heterogenous Federated Learning via Model Distillation. In NeurIPS
+Workshop on Federated Learning for Data Privacy and Confidentiality. arXiv:1910.03581 [cs.LG] [23] Oscar Li, Jiankai Sun, Xin Yang, Weihao Gao, Hongyi Zhang, Junyuan Xie, Virginia Smith, and Chong Wang. 2021.
+Label Leakage and Protection in Two-party Split Learning. arXiv:2102.08504 [cs.LG] [24] Quande Liu, Cheng Chen, Jing Qin, Qi Dou, and Pheng-Ann Heng. 2021. FedDG: Federated Domain Generalization on
+Medical Image Segmentation via Episodic Learning in Continuous Frequency Space. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). 1013–1023. [25] Yang Liu, Tao Fan, Tianjian Chen, Qian Xu, and Qiang Yang. 2021. FATE: An Industrial Grade Platform for Collaborative Learning With Data Protection. Journal of Machine Learning Research 22, 226 (2021), 1–6. http://jmlr.org/papers/v22/ 20-815.html [26] Yang Liu, Yan Kang, Chaoping Xing, Tianjian Chen, and Qiang Yang. 2020. A Secure Federated Transfer Learning Framework. IEEE Intelligent Systems 35, 4 (2020), 70–82. https://doi.org/10.1109/MIS.2020.2988525 [27] Yang Liu, Zhihao Yi, and Tianjian Chen. 2020. Backdoor Attacks and Defenses in Feature-partitioned Collaborative Learning. In ICML Workshop. arXiv:2007.03608 [cs.LG] [28] H. Brendan McMahan, Eider Moore, Daniel Ramage, and Blaise Agüera y Arcas. 2016. Federated Learning of Deep Networks using Model Averaging. CoRR abs/1602.05629 (2016). arXiv:1602.05629 http://arxiv.org/abs/1602.05629 [29] Payman Mohassel and Yupeng Zhang. 2017. SecureML: A System for Scalable Privacy-Preserving Machine Learning. IACR Cryptology ePrint Archive (2017), 396. [30] Richard Nock, Stephen Hardy, Wilko Henecka, Hamish Ivey-Law, Giorgio Patrini, Guillaume Smith, and Brian Thorne. 2018. Entity Resolution and Federated Learning get a Federated Resolution. CoRR abs/1803.04035 (2018). arXiv:1803.04035 http://arxiv.org/abs/1803.04035 [31] Maxime Oquab, Ivan Laptev, Josef Sivic, Maxime Oquab, Ivan Laptev, Josef Sivic Learning, Transferring Midlevel, Maxime Oquab, Leon Bottou Ivan Laptev, and Josef Sivic. 2014. Learning and transferring mid-level image representations using convolutional neural networks. In In CVPR. [32] Sinno Jialin Pan, Xiaochuan Ni, Jian-Tao Sun, Qiang Yang, and Zheng Chen. 2010. Cross-domain Sentiment Classification via Spectral Feature Alignment. In WWW. 751–760. [33] Xingchao Peng, Zijun Huang, Yizhe Zhu, and Kate Saenko. 2019. Federated Adversarial Domain Adaptation. arXiv:1911.02054 [cs.CV] [34] Daniel Peterson, Pallika Kanani, and Virendra J. Marathe. 2019. Private Federated Learning with Domain Adaptation. In NeurIPS Workshop on Federated Learning for Data Privacy and Confidentiality. arXiv:1912.06733 [cs.LG] [35] R L Rivest, L Adleman, and M L Dertouzos. 1978. On Data Banks and Privacy Homomorphisms. Foundations of Secure Computation (1978), 169–179. [36] Antti Tarvainen and Harri Valpola. 2017. Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results. In Advances in Neural Information Processing Systems, I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett (Eds.), Vol. 30. Curran Associates, Inc. https://proceedings.neurips.cc/paper/2017/file/68053af2923e00204c3ca7c6a3150cf7-Paper.pdf [37] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Ł ukasz Kaiser, and Illia Polosukhin. 2017. Attention is All you Need. In Advances in Neural Information Processing Systems, I. Guyon, U. V.
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+
+FedCVT: Semi-Supervised Vertical Federated Learning with Cross-View Training
+
+1:17
+
+Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett (Eds.), Vol. 30. Curran Associates, Inc. https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf [38] Praneeth Vepakomma, Otkrist Gupta, Tristan Swedish, and Ramesh Raskar. 2018. Split learning for health: Distributed deep learning without sharing raw patient data. CoRR abs/1812.00564 (2018). arXiv:1812.00564 http://arxiv.org/abs/ 1812.00564 [39] Qiang Yang, Yang Liu, Tianjian Chen, and Yongxin Tong. 2019. Federated Machine Learning: Concept and Applications. ACM Transactions on Intelligent Systems and Technology 10, 2, Article 12 (2019), 12:1–12:19 pages. [40] Qiang Yang, Yang Liu, Yong Cheng, Yan Kang, Tianjian Chen, and Han Yu. 2019. Federated Learning. Morgan & Claypool. [41] Bo Zhao, Konda Reddy Mopuri, and Hakan Bilen. 2020. idlg: Improved deep leakage from gradients. arXiv preprint arXiv:2001.02610 (2020). [42] Ligeng Zhu and Song Han. 2020. Deep leakage from gradients. In Federated Learning. Springer, 17–31.
+
+J. ACM, Vol. 1, No. 1, Article 1. Publication date: January 2022.
+

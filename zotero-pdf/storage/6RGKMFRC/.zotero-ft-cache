@@ -1,0 +1,183 @@
+ 
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article 
+Elsevier logo ScienceDirect 
+ 
+    Journals & Books  
+ 
+Register Sign in 
+View PDF 
+ 
+    Seamless access 
+ 
+    Access through your institution 
+    Purchase PDF  
+ 
+Article preview 
+ 
+    Abstract 
+    Introduction 
+    Section snippets 
+    References (35) 
+    Cited by (41) 
+    Recommended articles (6)  
+ 
+Elsevier 
+Information Sciences 
+Volume 478 , April 2019, Pages 449-460 
+Information Sciences 
+Machine learning based privacy-preserving fair data trading in big data market 
+Author links open overlay panel Yanqi Zhao a b Yong Yu a b Yannan Li a Gang Han c Xiaojiang Du d 
+Show more 
+Add to Mendeley 
+Share 
+Cite 
+https://doi.org/10.1016/j.ins.2018.11.028 Get rights and content 
+Abstract 
+ 
+In the era of big data, the produced and collected data explode due to the emerging technologies and applications that pervade everywhere in our daily lives, including internet of things applications such as smart home, smart city, smart grid, e-commerce applications and social network. Big data market can carry out efficient data trading, which provides a way to share data and further enhances the utility of data. However, to realize effective data trading in big data market, several challenges need to be resolved. The first one is to verify the data availability for a data consumer. The second is privacy of a data provider who is unwilling to reveal his real identity to the data consumer. The third is the payment fairness between a data provider and a data consumer with atomic exchange. In this paper, we address these challenges by proposing a new blockchain-based fair data trading protocol in big data market. The proposed protocol integrates ring signature, double-authentication-preventing signature and similarity learning to guarantee the availability of trading data, privacy of data providers and fairness between data providers and data consumers. We show the proposed protocol achieves the desirable security properties that a secure data trading protocol should have. The implementation results with Solidity smart contract demonstrate the validity of the proposed blockchain-based fair data trading protocol. 
+Introduction 
+ 
+Currently, the emerging technologies and applications such as internet of things pervade everywhere in real life. As a result, massive data have been generated, produced and collected [8]. For instance, Facebook, Alibaba, Amazon and Tencent collect massive data from their user platforms [31]. These companies can take advantage of some advanced techniques such as machine learning and data mining to conduct big data analytics, making market decisions and improving their services. Big data have become invaluable asset and raised an emerging business pattern of data trading in data market such as DataExchange and Datacoup [15], [20]. Data owners can obtain financial reward by sharing their data. Fig. 1 illustrates the process of data trading in a big data market. A data provider encapsulates the collected data and submits the dataset to the big data market. Then, the data consumer submits his demands and the market matches the demand with the dataset. Next, the data consumer interacts with a data provider to conduct the transaction. To realize effective data trading in big data market, several challenges need to be resolved, including how to ensure the availability of trading data, how to protect the privacy of identity, how to ensure the fairness. In data trading, it is hard for data consumer to verify the availability of the encrypted data. In consideration of the privacy issue, the provider is usually reluctant to reveal his real identity to the data consumer. Furthermore, the atomic exchange and the payment fairness between the data provider and the data consumer are hard to guarantee. 
+ 
+A blockchain [21] is a hash-based data structure, which is a publicly verifiable ledger in bitcoin. Each block has a hash pointer to the previous block and a Merkle hash tree (MHT) is employed to integrate transactions into one block in an efficient way. In blockchain network, a large number of nodes known as miners mine a new block by running a consensus algorithm such as proof of work (POW), proof of stake (PoS) etc. The pros of blockchain benefit a wide domain such as supply chains [1], financial transaction [7], [16], [17] and internet of things (IoT) [19]. The decentralization of blockchain paved for data trading in big data market. 
+ 
+Related work. Zhou et al. [35] proposed distributed data vending framework based on blockchain by combining the data embedding and similarity learning. They got the trade-off between data retrieval and leakage risk by indexing the data. Delgado-Segura et al. [10] proposed a fair data trading protocol based on Bitcoin transaction. They used Bitcoin script language 1 to construct Bitcoin transaction, but the operation code OP − AND they used is disabled in real Bitcoin transaction. Chen et al. [6] presented a blockchain-based ecosystem for big data exchange. The blockchain technology was used to record transaction logs and other significant documents. Niu et al. [22] proposed TPDM, which integrates trust and privacy preserving in data markets by using homomorphic encryption and identity-based signature. Goldfeder et al. [13] raised the problem of buying physical goods which present a suit of schemes by using bitcoin to improve security and privacy properties. Campanelli et al. [5] defined the notion of zero-knowledge contingent service payment (ZKCSP) to purchase digital services. Kur et al. [18] proposed trustless machine learning contracts, which exchange machine learning models on Ethereum blockchain. However, these mechanisms are inadequate for ensuring privacy and availability for fair data trading in blockchian-based big data markets. 
+ 
+Our contributions. In this paper, we propose a new blockchain-based fair data trading protocol in big data market to conduct privacy-preserving, availability and fair data trading. The advantage of blockchain infrastructures is removing single-point-failure of big data market. The protocol makes use of ring signatures to enhance privacy of data provider identity, extends the double authentication preventing signature (DAPS) for fair data trading and utilizes similarity learning to guarantee the availability of trading data. We implement the protocol with smart contract in Solidity to demonstrate the validity of the blockchain-based fair data trading protocol. 
+ 
+The reminder of this paper is organized as follows. We describe blockchain-based data trading model in big data market in Section 2. Some building blocks of our protocol are given in Section 3. The details of blockchain-based fair data trading are described in Section 4, and the security analysis and evaluation are given in Sections 5 and 6. Finally, we conclude the paper in Section 7. 
+Section snippets 
+Blockchain-based data trading model in big data market 
+ 
+In the section, we introduce the blockchain-based data trading model and relevant security requirements. 
+Building blocks 
+ 
+In this section, we review some building blocks used in our protocol. 
+Overview 
+ 
+The protocol works as follows. First, the market manager initializes the system parameters. Then, the data provider and the data consumer register with the market manager as new users. When the data provider registers on the market manager, he has to pay deposit to the market manager. Next, the data provider publishes the topic lists on the blockchain. The data consumer searches on the blockchain and requests data about certain topics. The data provider sends the encrypted data to the data 
+Security analysis 
+ 
+In this section, we analyze the security of the blockchain-based fair data trading protocol. The security of the proposed protocol is guaranteed by following lemmas. 
+ 
+Lemma 1 
+ 
+The proposed blockchain-based fair data trading protocol achieves completeness. 
+ 
+Proof 
+ 
+If the data provider honestly follows the data trading protocol described in Section 4.2, then from the completeness of the underlying DAPS scheme, the data consumer can always recover the secret key and decrypt the ciphertext to obtain the data, and at 
+ 
+Performance evaluation 
+ 
+In this section, we report performance evaluation of our protocol with smart contract in Solidity. Since Solidity does not provide the application programme interface (API) of RS and DPAS for the time of research, we will separately quantify the time cost of cryptographic algorithms and the gas cost of smart contract. We execute cryptographic algorithms with the pairing-based library JPBC 2.0.0 3 for our simulation which the Type A 1 
+Conclusion and future work 
+ 
+In this paper, we propose a new blockchain-based fair data trading protocol in big data market, to enhance privacy, availability and fairness of data trading. The advantage of blockchain infrastructures is removing single-point-failure of big data market. We enhance anonymity of data provider and extend DAPS to data trading for fairness. At the same time, we use similarity learning to enhance the availability of trading data. Finally, We implement the protocol with smart contract in Solidity to 
+Acknowledgement 
+ 
+This work was supported by National Key R&D Program of China (2017YFB0802000), National Natural Science Foundation of China ( 61872229 ), NSFC Research Fund for International Young Scientists (61750110528), National Cryptography Development Fund during the 13th Five-year Plan Period (MMJJ20170216) and Fundamental Research Funds for the Central Universities(GK201702004, 2018CBLY006). 
+References (35) 
+ 
+    P. Yang et al. 
+    Geometry preserving multi-task metric learning 
+    Mach. Learn. 
+    (2013) 
+    J. Zhou, F. Tang, H. Zhu, N. Nan, Z. Zhu, Distributed Data Vending on Blockchain, 2018.... 
+    L. Yang et al. 
+    Distance Metric Learning: A Comprehensive Survey, Michigan State Universiy 
+    (2006) 
+    G. Wood 
+    Ethereum: a Secure Decentralised Generalised Transaction Ledger 
+    Ethereum Project Yellow Paper 
+    (2014) 
+    W.T. Wang et al. 
+    The stickiness intention of group-buying websites: the integration of the commitment-trust theory and e-commerce success model 
+    Inf. Manage. 
+    (2016) 
+    N. Szabo, Smart Contracts, 1994,... 
+    H. Shacham et al. 
+    Efficient Ring Signatures without Random Oracles 
+    International Workshop on Public Key Cryptography (PKC) 
+    (2007) 
+    C.P. Schnorr 
+    Efficient Identification and Signatures for Smart Cards 
+    Conference on the Theory and Application of Cryptology 
+    (1989) 
+    R.L. Rivest et al. 
+    How to Leak a Secret: Theory and Applications of Ring Signatures 
+    Theoretical Computer Science 
+    (2006) 
+    R.L. Rivest et al. 
+    How to Leak a Secret 
+    International Conference on the Theory and Application of Cryptology and Information Security 
+    (2001) 
+ 
+View more references 
+Cited by (41) 
+ 
+    Concept drift type identification based on multi-sliding windows 
+    2022, Information Sciences 
+    Show abstract 
+    Toward a research framework to conceptualize data as a factor of production: The data marketplace perspective 
+    2021, Fundamental Research 
+    Show abstract 
+    A novel Byzantine fault tolerance consensus for Green IoT with intelligence based on reinforcement 
+    2021, Journal of Information Security and Applications 
+    Show abstract 
+    Trading off data resource availability and privacy preservation in multi-layer network transaction 
+    2021, Physical Communication 
+    Show abstract 
+    Anti-collusion data auction mechanism based on smart contract 
+    2021, Information Sciences 
+    Show abstract 
+    When services computing meets blockchain: Challenges and opportunities 
+    2021, Journal of Parallel and Distributed Computing 
+    Show abstract 
+ 
+View all citing articles on Scopus 
+Recommended articles (6) 
+ 
+    Research article 
+    An efficient linkable group signature for payer tracing in anonymous cryptocurrencies 
+    Future Generation Computer Systems, Volume 101, 2019, pp. 29-38 
+    Show abstract 
+    Research article 
+    On pricing approximate queries 
+    Information Sciences, Volume 453, 2018, pp. 198-215 
+    Show abstract 
+    Research article 
+    Where WTS meets WTB: A Blockchain-based Marketplace for Digital Me to trade users’ private data 
+    Pervasive and Mobile Computing, Volume 59, 2019, Article 101078 
+    Show abstract 
+    Research article 
+    Efficient attribute-based encryption with attribute revocation for assured data deletion 
+    Information Sciences, Volume 479, 2019, pp. 640-650 
+    Show abstract 
+    Research article 
+    Fair auctioning and trading framework for cloud virtual machines based on blockchain 
+    Computer Communications, Volume 171, 2021, pp. 89-98 
+    Show abstract 
+    Research article 
+    Blockchain based privacy-preserving software updates with proof-of-delivery for Internet of Things 
+    Journal of Parallel and Distributed Computing, Volume 132, 2019, pp. 141-149 
+    Show abstract 
+ 
+View full text 
+© 2018 Elsevier Inc. All rights reserved. 
+Elsevier logo with wordmark 
+ 
+    About ScienceDirect 
+    Remote access 
+    Shopping cart 
+    Advertise 
+    Contact and support 
+    Terms and conditions 
+    Privacy policy  
+ 
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies . 
+ 
+Copyright © 2022 Elsevier B.V. or its licensors or contributors. ScienceDirect ® is a registered trademark of Elsevier B.V. 
+ 
+ScienceDirect ® is a registered trademark of Elsevier B.V. 
+RELX group home page 

@@ -1,0 +1,4300 @@
+5234
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+A Novel Framework for the Analysis and Design of Heterogeneous Federated Learning
+Jianyu Wang , Qinghua Liu, Hao Liang, Gauri Joshi , Member, IEEE, and H. Vincent Poor , Fellow, IEEE
+
+Abstract—In federated learning, heterogeneity in the clients’ local datasets and computation speeds results in large variations in the number of local updates performed by each client in each communication round. Naive weighted aggregation of such models causes objective inconsistency, that is, the global model converges to a stationary point of a mismatched objective function which can be arbitrarily different from the true objective. This paper provides a general framework to analyze the convergence of federated optimization algorithms with heterogeneous local training progress at clients. The analyses are conducted for both smooth non-convex and strongly convex settings, and can also be extended to partial client participation case. Additionally, it subsumes previously proposed methods such as FedAvg and FedProx, and provides the ﬁrst principled understanding of the solution bias and the convergence slowdown due to objective inconsistency. Using insights from this analysis, we propose FedNova, a normalized averaging method that eliminates objective inconsistency while preserving fast error convergence.
+Index Terms—Federated learning, distributed optimization.
+I. INTRODUCTION
+F EDERATED learning [2]–[4] is an emerging sub-area of distributed optimization where both data collection and model training is pushed to a large number of edge clients that have limited communication and computation capabilities. Unlike traditional distributed optimization [5], [6] where consensus (either through a central server or peer-to-peer communication) is performed after every local gradient computation, in federated learning, the subset of clients selected in each communication round perform multiple local updates before these models are aggregated in order to update a global model.
+Heterogeneity in the Number of Local Updates in Federated Learning: The clients participating in federated learning are typically highly heterogeneous, both in the size of their local datasets as well as their computation speeds. The original paper
+Manuscript received December 29, 2020; revised April 22, 2021 and July 8, 2021; accepted August 3, 2021. Date of publication August 24, 2021; date of current version September 24, 2021. The associate editor coordinating the review of this manuscript and approving it for publication was Dr. Ketan Rajawat. This work was supported in part by NSF under Grants CCF-1850029 and CCF2045694, in part by the 2018 IBM Faculty Research Award, and in part by the Qualcomm Innovation fellowship. (Corresponding author: Jianyu Wang.)
+Jianyu Wang and Gauri Joshi are with the Department of Electrical and Computer Engineering, Carnegie Mellon University, Pittsburgh, PA 15213 USA (e-mail: jianyuw1@andrew.cmu.edu; gaurij@andrew.cmu.edu).
+Hao Liang is with the Department of Electrical and Computer Engineering, Rice University, Houston TX 77005 USA (e-mail: hl106@rice.edu).
+Qinghua Liu and H. Vincent Poor are with the Department of Electrical Engineering, Princeton University, Princeton, NJ 08544 USA (e-mail: qinghual@princeton.edu; poor@princeton.edu).
+Digital Object Identiﬁer 10.1109/TSP.2021.3106104
+
+Fig. 1. Model updates in the parameter space. Green squares and blue triangles denote the minima of global and local objectives, respectively.
+
+on federated learning [2] proposed that each client performs
+
+E epochs (traversals of their local dataset) of local-update
+
+stochastic gradient descent (SGD) with a mini-batch size B.
+
+Thus, if a client has ni local data samples, the number of local SGD iterations is τi = Eni/B , which can vary widely across clients. The heterogeneity in the number of local SGD iterations
+
+is exacerbated by relative variations in the clients’ computing
+
+speeds. When clients are required to upload their local updates
+
+after a given wall-clock time interval to mitigate the straggler
+
+effects, faster clients will perform more local updates than slower
+
+clients. The number of local updates made by a client can also
+
+vary across communication rounds due to unpredictable strag-
+
+gling or slowdown caused by background processes, outages,
+
+memory limitations etc.
+
+Heterogeneity in Local Updates Causes Objective Incon-
+
+sistency: Most recent works that analyze the convergence of
+
+federated optimization algorithms [7]–[19] assume that number
+
+of local updates is the same across all clients (that is, τi = τ for all clients i). These works show that, when the learning
+
+rate is properly tuned, periodic consensus between the locally
+
+trained client models attains a stationary point of the global
+
+objective function F (x) =
+
+m i=1
+
+niFi(x)/n,
+
+which
+
+is
+
+a
+
+sum
+
+of local objectives weighted by the dataset size ni. However,
+
+none of these prior works provides insight into the convergence
+
+of local-update or federated optimization algorithms in the prac-
+
+tical setting when the number of local updates τi varies across clients 1, . . . , m. In fact, as we show in Section III, standard
+
+averaging of client models after heterogeneous local updates
+
+results in convergence to a stationary point – not of the original
+
+objective function F (x), but of an inconsistent objective F (x),
+
+which can be arbitrarily different from F (x) depending upon the
+
+relative values of τi and the similarity among local objectives. We refer to this problem as objective inconsistency. To gain
+
+intuition into this phenomenon, observe in Fig. 1 that if client
+
+1 performs more local updates, then the updated global model
+
+x(t+1,0) strays towards the true global minimum x∗.
+
+local
+
+minimum
+
+x∗1,
+
+away
+
+from
+
+the
+
+1053-587X © 2021 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5235
+
+The Need for a General Analysis Framework: A naive ap-
+
+proach to overcome heterogeneity is to ﬁx a target number of local updates τ that each client must ﬁnish within a com-
+
+munication round and keep fast nodes idle while the slow
+
+clients ﬁnish their updates. This method will ensure objective
+
+consistency (that is, the surrogate objective F (x) equals to the true objective F (x)). Nonetheless, waiting for the slowest one
+
+can signiﬁcantly increase the total training time [20]. More
+
+sophisticated approaches such as FEDPROX [21], VRLSGD
+
+[16] and SCAFFOLD [15], designed to handle non-IID local
+
+datasets, can be used to reduce (not eliminate) objective in-
+
+consistency to some extent, but these methods either result in
+
+slower convergence or require additional communication and
+
+memory. So far, there is no rigorous understanding of the objec-
+
+tive inconsistency and the speed of convergence for this chal-
+
+lenging setting of federated learning with heterogeneous local
+
+updates.
+
+Other Sources of Heterogeneous local Progress: We note
+
+that the root cause of the objective inconsistency is the im-
+
+balanced local training progress at clients. When clients use
+
+different local learning rates or different local solvers, there
+
+will also be a similar effects to taking different local steps.
+
+Therefore, in this paper, instead of just focusing on different local
+
+steps, we study a more general problem: how heterogeneous
+
+local progress inﬂuences the convergence of federated learning
+
+algorithms?
+
+Main Contributions: The main contributions of this paper are
+
+listredWbeelporwo.pose a general theoretical framework that subsumes
+
+a suite of federated optimization algorithms (such as FE-
+
+DAVG and FEDPROX) and helps to analyze the effects of
+
+heterogeneous local training progress on their error con-
+
+vergence. The framework allows heterogeneous number
+
+of local updates, non-IID local datasets as well as different
+
+local solvers such as GD, SGD, SGD with proximal gradi-
+
+ents, gradient tracking, adaptive learning rates, momentum,
+
+r
+
+etc. Based
+
+on
+
+the
+
+general
+
+framework,
+
+we
+
+are
+
+able
+
+to
+
+ﬁnd
+
+out the analytical expression of the surrogate objective
+
+function F (x) and show that previous federated optimization algorithms converge to the stationary points of
+
+F (x) rather than F (x). There is an objective inconsistency
+
+r
+
+problem. In order to eliminate the inconsistency problem, we pro-
+
+pose FEDNOVA, a method that correctly normalizes local
+
+model updates when averaging. The main idea of FEDNOVA is that instead of averaging the cumulative local
+
+model changes, the aggregator averages the normalized
+
+local gradients according to the local training progress.
+
+FEDNOVA ensures objective consistency while preserving fast error convergence and outperforms existing methods as
+
+shown in Section VII. By enabling aggregation of models
+
+with heterogeneous local progress, FEDNOVA gives the
+
+bonus beneﬁt of overcoming the problem of stragglers,
+
+or unpredictably slow nodes by allowing fast clients to
+
+perform more local updates than slow clients within each
+
+communication round.
+
+To the best of our knowledge, this work provides the ﬁrst
+
+fundamental understanding of the bias in the solution (caused
+
+by objective inconsistency) and how the convergence rate is
+
+inﬂuenced by heterogeneity in clients’ local progress.
+
+II. SYSTEM MODEL AND PRIOR WORK
+
+The Federated Heterogeneous Optimization Setting: In fed-
+
+erated learning, a total of m clients aim to jointly solve the
+
+following optimization problem:
+
+m
+
+min F (x) := piFi(x)
+
+(1)
+
+x∈Rd
+
+i=1
+
+where pi = ni/n denotes the relative sample size, and Fi(x) =
+
+1 ni
+
+ξ∈Di fi(x; ξ) is the local objective function at the i-th
+
+client. Here, fi is the loss function (possibly non-convex) deﬁned
+
+by the learning model and ξ represents a data sample from
+
+local dataset Di. In the t-th communication round, each client
+
+independently runs τi iterations of local solver (e.g., SGD) starting from the current global model x(t,0) to optimize its own
+
+local objective.
+
+In our theoretical framework, we treat τi as an arbitrary scalar which can also vary across rounds. In practice, if clients
+
+run for the same local epochs E, then τi = Eni/B , where B is the mini-batch size. Alternately, if each communication
+
+round has a ﬁxed length in terms of wall-clock time, then τi represents the local iterations completed by client i within the
+
+time window and may change across clients (depending on their
+
+computation speeds and availability) and across communication
+
+rounds.
+
+The FedAvg Baseline Algorithm: Federated Averaging (FE-
+
+DAVG) [2] is the ﬁrst and most common algorithm used to
+
+aggregate these locally trained models at the central server at
+
+the end of each communication round. The shared global model x(t,0) at round t is updated as follows:
+
+m
+
+x(t+1,0) − x(t,0) =
+
+piΔ(it)
+
+(2)
+
+i=1
+
+m
+
+τi −1
+
+= − pi · η
+
+gi(x(it,k)|ξi(t,k)) (3)
+
+i=1
+
+k=0
+
+where x(it,k) denotes client i’s model after the k-th local update in
+
+the t-th model
+
+communication round, at the t-th round, and
+
+xΔ(it(i,t0))
+
+= x(t,0) = x(it,τi)
+
+is client i’s initial − x(it,0) denotes
+
+the cumulative local progress made by client i. Also, η is the
+
+client learning rate and gi(x(it,k)|ξi(t,k)) represents the stochastic gradient over a mini-batch ξi(t,k) ⊂ Di of B samples. For the ease of writing, we will use gi(x(it,k)) to represent the stochastic gradients in the following texts. When the number of clients m is
+
+large, then the central server may only randomly select a subset
+
+of clients to perform computation at each round.
+
+Convergence Analysis of FedAvg: The papers [7]–[9] ﬁrst
+
+analyze FEDAVG by assuming the local objectives are identical
+
+and show that FEDAVG is guaranteed to converge to a station-
+
+ary point of F (x). This analysis was further expanded to the
+
+non-IID data partition and client sampling cases by [10]–[13].
+
+However, in all these works, they assume that the number of
+
+local steps and the client optimizer are the same across all clients.
+
+Besides, asynchronous federated optimization algorithms pro-
+
+posed in [8], [22] take a different approach of allowing clients
+
+make updates to stale versions of the global model, and their
+
+analyses are limited to IID local datasets and convex local
+
+functions.
+
+FedProx: Improving FedAvg by Adding a Proximal Term: To
+
+alleviate inconsistency due to non-IID data and heterogeneous
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5236
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+local updates, [21] proposes adding a proximal term
+
+μ 2
+
+x−
+
+x(t,0) 2 to each local objective, where μ ≥ 0 is a tunable pa-
+
+rameter. This proximal term pulls each local model backward
+
+closer to the global model x(t,0). Although [21] empirically
+
+shows that FEDPROX improves FEDAVG, its convergence anal-
+
+ysis is limited by assumptions that are stronger than previ-
+
+ous FEDAVG analysis and only works for sufﬁciently large μ.
+
+Since FEDPROX is a special case of our general framework,
+
+our convergence analysis provides sharp insights into the effect
+
+of μ. We show that a larger μ mitigates (but does not elim-
+
+inate) objective inconsistency, albeit at an expense of slower
+
+convergence. Our proposed FEDNOVA method can improve
+
+FEDPROX by guaranteeing consistency without slowing down
+
+convergence.
+
+Improving FedAvg via Momentum and Cross-Client Variance
+
+Reduction: The performance of FEDAVG has been improved in
+
+recent literature by applying momentum on the server side [17],
+
+[23], [24], or using cross-client variance reduction such as
+
+VRLSGD and SCAFFOLD [15], [16]. Again, these works do
+
+not consider heterogeneous local progress. Our proposed nor-
+
+malized averaging method FEDNOVA is orthogonal to and can be
+
+easily combined with these acceleration or variance-reduction
+
+techniques. Moreover, FEDNOVA is also compatible with and
+
+complementary to gradient compression/quantization [25]–[31]
+
+and fair aggregation techniques [32], [33].
+
+Connections With Classic Distributed Optimization Litera-
+
+ture: While this paper studies the bias induced by imbalanced
+
+local training progress at clients, there are other kinds of bias
+
+in SGD convergence discussed in distributed optimization lit-
+
+erature. For example, stochastic gradients are biased if the
+
+mini-batch is not chosen uniformly at random [34]; consensus
+
+optimization algorithms need to use the push-sum protocol to
+
+eliminate the bias associated with the underlying directed net-
+
+work [35], [36]. The bias introduced in our paper is orthogonal
+
+to these previous works, as they are caused by different mecha-
+
+nisms. All the above mentioned bias can appear simultaneously
+
+in certain algorithms. Moreover, the objective inconsistency
+
+problem is not limited to federated learning algorithms. Classic
+
+distributed or decentralized optimization algorithms can also
+
+have the inconsistency problem when they allow workers/clients
+
+to use different learning rates or perform heterogeneous local
+
+updates before synchronization.
+
+III. A CASE STUDY TO DEMONSTRATE THE OBJECTIVE INCONSISTENCY PROBLEM
+
+In this section, we use a simple quadratic model to illustrate
+
+the convergence problem. Suppose that the local objective func-
+
+tions
+
+are
+
+Fi(x)
+
+=
+
+1 2
+
+x − ei
+
+2, where ei ∈ Rd is an arbitrary
+
+vector and it is the minimum of the local objective. Consider
+
+that the global objective function is deﬁned as
+
+1m
+
+1m
+
+F (x) = m Fi(x) = 2m
+
+x − ei 2
+
+(4)
+
+i=1
+
+i=1
+
+which
+
+is
+
+minimized
+
+by
+
+x∗
+
+=
+
+1 m
+
+m i=1
+
+ei.
+
+Below,
+
+we
+
+show
+
+that the convergence point of FEDAVG can be arbitrarily away
+
+from x∗.
+
+Lemma 1 (Objective Inconsistency in FedAvg): For the objective function in (4), if client i performs τi local steps per round, then FEDAVG (with sufﬁciently small learning rate η, deterministic gradients and full client participation) will
+
+Fig. 2. Simulations comparing the FEDAVG, FEDPROX (μ = 1), VRLSGD and
+our proposed FEDNOVA algorithms for 30 clients with the quadratic objectives
+deﬁned in (4), where ei ∼ N (0, 0.01I), i ∈ [1, 30]. Clients perform GD with η = 0.05, which is decayed by a factor of 5 at rounds 600 and 900. (a): Clients perform the same number of local steps τi = 30 – FEDNOVA is equivalent to FEDAVG in this case; (b): local steps are IID, and time-varying Gaussians with
+mean 30, i.e., τi(t) ∈ [1, 96]. FEDNOVA signiﬁcantly outperforms others in the heterogeneous τi setting.
+
+converge to
+
+x˜ ∗FEDAVG
+
+=
+
+lim x(T,0)
+T →∞
+
+=
+
+m i=1
+
+τiei
+
+m i=1
+
+τi
+
+.
+
+(5)
+
+The proof (of a more general version of Lemma 1) is deferred to Section VIII-A. While FEDAVG aims at optimizing F (x), it actually converges to the optimum of a surrogate objective
+F (x). As illustrated in Fig. 2, there can be an arbitrarily large gap between x˜∗FEDAVG and x∗ depending on the relative values of τi and Fi(x). This non-vanishing gap also occurs when the local steps τi are IID random variables across clients and communication rounds (see the right panel in Fig. 2).
+Convergence Problem in Other Federated Algorithms: We can generalize Lemma 1 to the case of FEDPROX to demonstrate its convergence gap. From the simulations shown in Fig. 2, observe that FEDPROX can slightly improve on the optimality gap of FEDAVG, but it converges slower. Besides, previous cross-client variance reduction methods such as variancereduced local SGD (VRLSGD) [16] and SCAFFOLD [15] are only designed for homogeneous local steps case. In the considered heterogeneous setting, if we replace the same local steps τ in VRLSGD by different τi’s, then we observe that it has drastically different convergence under different settings and even diverge when clients perform random local steps (see the right panel in Fig. 2). These observations emphasize the critical need for a deeper understanding of objective inconsistency and new federated heterogeneous optimization algorithms.
+
+IV. NEW THEORETICAL FRAMEWORK FOR HETEROGENEOUS FEDERATED OPTIMIZATION
+We now present a general theoretical framework that subsumes a suite of federated optimization algorithms and helps analyze the effect of objective inconsistency on their error convergence. Although the results are presented for the full client participation setting, it is fairly easy to extend them to the case where a subset of clients are randomly sampled in each round. More discussions on client sampling case will be presented in Section V-B.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5237
+
+A. A Generalized Update Rule for Heterogeneous Federated Optimization
+
+Recall from (3) that the update rule of federated optimization
+
+algorithms can be written as x(t+1,0) − where Δ(it) := x(t,τi) − x(t,0) denote
+
+x(t,0) the
+
+= local
+
+m i=1
+
+piΔ(it),
+
+parameter
+
+changes of client i at round t and pi = ni/n, the fraction of
+
+data at client i. We re-write this update rule in a more general
+
+form as follows:
+
+m
+
+x(t+1,0) − x(t,0) = −τeff
+
+wi · ηd(it)
+
+(6)
+
+i=1
+
+which optimizes F (x) =
+
+m i=1
+
+wiFi(x).
+
+The
+
+three
+
+key
+
+ele-
+
+ments τeff, wi and d(it) of this update rule take different forms for
+
+different algorithms. Below, we provide detailed descriptions of
+
+these key elements.
+
+1) Locally averaged gradient: d(it): Without loss of generality, we can rewrite the accumulated
+
+local changes as Δ(it) = −ηG(it)ai, where G(it) = [gi(x(it,0)), gi(x(it,1)), . . . , gi(x(it,τi−1))] ∈ Rd×τi stacks all stochastic gradients in the t-th round, and ai ∈ Rτi
+
+is a non-negative vector and deﬁnes how stochastic
+
+gradients are locally accumulated. Then, by normalizing
+
+the is
+
+gradient weights deﬁned as d(it) =
+
+aGi,(itt)haei/loacaill1y.
+
+averaged gradient The normalizing
+
+factor ai 1 in the denominator is the 1 norm of the
+
+vector ai. By setting different ai, (6) works for most
+
+common client optimizers such as SGD with proximal
+
+updates, local momentum, and variable learning rate,
+
+and more generally, any solver whose accumulated gradient Δ(it) = −ηG(it)ai, a linear combination of local gradients.
+
+Speciﬁcally, if the client optimizer is vanilla SGD (i.e.,
+
+the case of FEDAVG), then ai = [1, 1, . . . , 1] ∈ Rτi and ai 1 = τi. As a result, the normalized gradient is just a
+
+simple average of all stochastic gradients within current
+
+round: d(it) = G(it)ai/τi =
+
+τi −1 k=0
+
+gi(x(it,k))/τi.
+
+Later
+
+in
+
+this section, we will present more speciﬁc examples on
+
+how to set ai in other algorithms. 2) Aggregation weights: wi: Each client’s locally averaged
+ptgiuroatndin,iegtnhttehsdeeiawgiesgirgmehgutasltteispdaltiigesdrfaydwieitnhm it=w1 wem ii=ig1h=tw1wi.diiO.wbBsheyernvdeecﬁothnmai--t
+
+these weights determine the surrogate objective F (x) =
+
+m i=1
+
+wiFi(x),
+
+which
+
+is
+
+optimized
+
+by
+
+the
+
+general
+
+algo-
+
+rithm in (6) instead of the true global objective F (x) =
+
+m i=1
+
+piFi(x)
+
+–
+
+we
+
+will
+
+prove
+
+this
+
+formally
+
+in
+
+Theorem
+
+1.
+
+3) Effective number of steps: τeff: Since client i makes τi
+
+local updates, the average number of local SGD steps
+
+per communication round is τ¯ =
+
+m i=1
+
+τi/m.
+
+However,
+
+the server can scale up or scale down the effect of the
+
+aggregated updates by setting the parameter τeff larger or smaller than τ¯ (analogous to choosing a global learn-
+
+ing rate [17], [24]). We refer to the ratio τ¯/τeff as the
+
+slowdown, and it features prominently in the convergence
+
+analysis presented in Section V.
+
+Remark 1 (General Local Update Rule): It is worth noting
+
+that the length and exact value of accumulation vector ai are determined by the number of local steps. We use ai(k) to denote
+
+Fig. 3. Comparison between the novel framework and FEDAVG in the model
+parameter space. Solid black arrows denote local updates at clients. Green and
+blue dots denote the global updates made by the novel generalized update rule and FEDAVG respectively. While wi controls the direction of the solid green arrow, effective steps τeff determines how far the global model moves along with this direction. FEDAVG implicitly assigns too higher weights for clients
+with more local steps, resulting in a biased global direction.
+
+the accumulation vector after performing k local steps on client i.
+
+Unless otherwise stated, we set ai = ai(τi). With these notation,
+
+we can write down the local update rule as x(it,k) = x(it,0) −
+
+η
+
+k−1 s=0
+
+ai,s(k)gi(x(it,s))
+
+for
+
+any
+
+k
+
+≥
+
+0,
+
+where
+
+ai,s(k)
+
+is
+
+the
+
+s-th element in vector ai(k) ∈ Rk.
+
+In Fig. 3, we further illustrate how the above key elements
+
+inﬂuence the algorithm and compare the novel generalized up-
+
+date rule and FEDAVG in the model parameter space. The general
+
+rule (6) enables us to freely choose τeff and wi for a given local solver ai, which helps design fast and consistent algorithms
+
+such as FEDNOVA, the normalized averaging method proposed
+
+in Section VI. To implement this generalized update rule, each cselirevnetr,cwanhicshenisdjuthset anroer-mscaalliezdedveurspidoanteof−Δη(itd)(i,tt)hetoactchuemcuelnattreadl local parameter update sent by clients in the vanilla update rule
+
+(3). The server does not need to know the speciﬁc form of local
+
+accumulation vector ai.
+
+B. Previous Algorithms as Special Cases
+
+Any previous algorithm whose accumulated local changes Δ(it) = −ηG(it)ai, a linear combination of local gradients, is subsumed by the above formulation, as shown below:
+
+m
+
+x(t+1,0) − x(t,0) =
+
+piΔ(it)
+
+i=1
+
+=
+
+m
+− pi
+i=1
+
+ai
+
+1
+
+·
+
+ηG(it)ai ai 1
+
+=−
+
+m
+pi ai 1
+i=1
+
+m
+η
+i=1
+
+τeff: effective local steps
+
+pi ai 1
+
+m i=1
+
+pi
+
+ai
+
+1
+
+wi: weight
+
+G(it)ai . ai 1
+di
+(7)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5238
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+Unlike the more general form (6), in (7), which subsumes the
+
+following previous methods, τeff and wi are implicitly ﬁxed by the choice of the local solver (i.e., the choice of ai).
+
+1) Vanilla SGD as Local Solver (FedAvg): In FEDAVG, the
+
+local solver is SGD such that ai = [1, 1, . . . , 1] ∈ Rτi and
+
+ai 1 = τi. As a consequence, the normalized gradient di
+
+is a simple wi = piτi/
+
+avm ie=r1agpeiτio.vTerhaτti
+
+iterations, τeff = is, the normalized
+
+m i=1
+
+pi
+
+τi
+
+,
+
+and
+
+gradients with
+
+more local steps will be implicitly assigned higher weights.
+
+2) Proximal SGD as Local Solver (FedProx): In FEDPROX,
+
+local SGD steps are corrected by a proximal term. It can be shown that ai = [(1 − α)τi−1, (1 − α)τi−2, . . . , (1 − α), 1] ∈ Rτi , where α = ημ and μ is a tunable parameter. In this case, we have ai 1 = [1 − (1 − α)τi ]/α and hence,
+
+1 τeff = α
+
+m
+
+pi[1 − (1 − α)τi ], wi =
+
+i=1
+
+pi[1 − (1
+
+m i=1
+
+pi[1
+
+−
+
+− α)τi ] (1 − α)τi
+
+]
+
+.
+
+(8)
+
+When α = 0, FEDPROX is equivalent to FEDAVG. As α = ημ
+
+increases, the wi in FEDPROX is more similar to pi, thus making
+
+the surrogate objective F (x) more consistent. However, a larger
+
+α corresponds to smaller τeff, which slows down convergence,
+
+as we discuss more in Section V.
+
+3) SGD With Decayed Learning Rate as Local Solver: Sup-
+
+pose the clients’ local learning rates are exponentially decayed,
+
+then we have ai across clients. As and wi ∝ pi(1 −
+
+aγ=riτei[s)1u/,l(γt1,iw,−.e.γh.i,a)γv. eiτCi−oa1m]i pw1arh=ienrg(e1wγ−iit≥hγiτti0h)e/c(ac1na−sveaγroiy)f
+
+FEDPROX (8), changing the values of γi has a similar effect as
+
+changing (1 − α).
+
+4) Momentum SGD as Local Solver: If we use momentum
+
+SGD where the local momentum buffers of active clients are
+
+reset to zero at the beginning of each round [17] due to the
+
+stateless nature of FL [3], then we have ai = [1 − ρτi , 1 − ρτi−1, . . . , 1 − ρ]/(1 − ρ), where ρ is the momentum factor, and
+
+ai 1 = [τi − ρ(1 − ρτi )/(1 − ρ)]/(1 − ρ). More generally, the new formulation (7) suggests that wi = pi
+whenever clients have different ai 1, which may be caused by imbalanced local updates (i.e., ai’s have different dimensions), or various local learning rate/momentum schedules (i.e., ai’s
+
+have different scales).
+
+V. CONVERGENCE ANALYSIS
+A. Main Results: Analysis for Smooth Non-Convex Functions
+In Theorem 1 and Theorem 2 below we provide a convergence analysis for the general update rule (6) and quantify the solution bias due to objective inconsistency. The analysis relies on Assumptions 1 and 2 used in the standard analysis of SGD [37] and Assumption 3 commonly used in the federated optimization literature [3], [11], [15], [21], [24], [38], [39] to capture the dissimilarities of local objectives.
+Assumption 1 (Smoothness): Each local objective function is Lipschitz smooth, that is, ∇Fi(x) − ∇Fi(y) ≤ L x − y , ∀x, y ∈ Rd, ∀i ∈ {1, 2, . . . , m}.
+Assumption 2 (Unbiased Gradient and Bounded Variance): The stochastic gradient at each client is an unbiased estimator of the local gradient: Eξ[gi(x|ξ)] = ∇Fi(x) where ξ represents a randomly sampled mini-batch from the local dataset Di, and has bounded variance Eξ[ gi(x|ξ) − ∇Fi(x) 2] ≤ σ2, ∀x ∈ Rd, ∀i ∈ {1, 2, . . . , m}, σ2 ≥ 0.
+
+Assumption 3 (Bounded Dissimilarity): For any sets eosβtaf2acnhtwsoetm iih=gβeh1r2,twst≥hi∇e{1nwF, wκii(2e≥x≥h)a0v0}2em i+=β1s2κ,u2c=.hIm i1f=,l1tκohwc2aati=l=fu0n1. c,m it=io1thnwesriaer∇e eiFdxiei(snxtti)cca2ol n≤to-
+
+Assumption 4 (Accumulation Vector): All elements in the
+accumulation vector ai(k), in which k ∈ [1, τi], ∀i, are upper bounded by Λ. Also, ai(k) p ≤ ai(k + 1) p for p = {1, 2}.
+One can easily validate that Assumption 4 holds for many
+
+common local sovlers, such as vanilla SGD, proximal SGD and momentum SGD. In all these special cases, we have Λ = 1. Under the above assumptions, our main theorem is stated as
+
+follows. Theorem 1 (Convergence to the Surrogate Objective F (x)’s
+
+Stationary Point): Under Assumptions 1 to 4, any federated
+
+optimization algorithm that follows the update rule (6), will
+
+converge to a stationary point of a surrogate objective F (x) =
+
+m i=1
+
+wiFi(x).
+
+More
+
+speciﬁcally,
+
+if
+
+the
+
+total
+
+communication
+
+rounds T is pre-determined and the learning rate η is small
+
+enough η =
+
+m/τ T
+
+where τ
+
+=
+
+1 m
+
+m i=1
+
+τi
+
+,
+
+then
+
+the
+
+optimiza-
+
+tion error mint∈[T ] E ∇F (x(t,0)) 2 will be bounded by:
+
+O √τ /τeff + O √Aσ2 + O mBσ2 + O mCκ2
+
+mτ T
+
+mτ T
+
+τT
+
+τT
+
+denoted by opt in (13)
+(9)
+
+where O swallows all constants (including L), and quantities
+
+A, B, C are deﬁned as follows:
+
+A
+
+=
+
+mτeff
+
+m i=1
+
+wi2 ai
+
+ai
+
+2 1
+
+2
+2,
+
+(10)
+
+m
+
+B=Λ
+
+wi(τi − 1)
+
+ai
+
+2 2
+
+/
+
+ai
+
+1,
+
+(11)
+
+i=1
+
+C = Λ2 miax{τi(τi − 1)}.
+
+(12)
+
+In Section VIII-B, we also provide another version of this the-
+
+orem that explicitly contains the local learning rate η. Moreover,
+
+since the surrogate objective F (x) and the original objective F (x) are just different linear combinations of the local functions,
+
+once the algorithm converges to a stationary point of F (x), one can also obtain some guarantees in terms of F (x), as given by Theorem 2 below.
+Theorem 2 (Convergence in Terms of the True Objective F (x)): Under the same conditions as Theorem 1, the minimal gradient norm of the true global objective function mint∈[T ] E ∇F (x(t,0)) 2 will be bounded by:
+
+2 χ2p w(β2 − 1) + 1 opt +
+
+2χ2p wκ2
+
+vanishing error term
+
+non-vanishing error due to obj. inconsistency
+(13)
+
+where opt denotes the vanishing optimization error given by (9) and χ2p w = m i=1(pi − wi)2/wi represents the chisquare divergence between vectors p = [p1, . . . , pm] and w = [w1, . . . , wm].
+Proof: Please refer to Appendix A-A.
+Discussion: Theorems 1 and 2 describe the convergence be-
+havior of a broad class of federated heterogeneous optimization algorithms. Observe that when p = w we have that χ2 = 0.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5239
+
+Fig. 4. Illustration on how the parameter α = ημ inﬂuences the convergence of FEDPROX. We set m = 30, pi = 1/m, τi ∼ N (20, 20). ‘Weight bias’ denotes the chi-square distance between p and w. ‘Slowdown’ and ‘Relative
+Variance’ quantify how the ﬁrst and the second terms in (9) change.
+
+Also, when all local functions are identical to each other, we have β2 = 1, κ2 = 0. Only in these two special cases, is
+
+there no objective inconsistency. For most other algorithms
+
+subsumed by the general update rule in (6), both wi and τeff are inﬂuenced by the choice of ai. When clients have different local progress (i.e., different ai vectors), previous algorithms will end up with a non-zero error ﬂoor χ2κ2, which does not
+
+vanish to 0 even with sufﬁciently small learning rate. In Ap-
+
+pendix A-B, we further construct a lower bound and show that
+
+limT →∞ mint∈[T ] ∇F (x(t,0)) 2 = Ω(χ2κ2), suggesting (13) is tight.
+
+Novel Insights Into the Convergence of FedProx and the Effect of μ: Recall that in FEDPROX ai = [(1 − α)τi−1, . . . , (1 −
+α), 1], where α = ημ. Accordingly, substituting the effective
+
+steps and aggregated weight, given by (8), into (9) and (13),
+
+we get the convergence guarantee for FEDPROX. Again, it has
+
+objective inconsistency because wi = pi. As we increase α, the weights wi come closer to pi and thus, the non-vanishing error χ2κ2 in (13) decreases (see blue curve in Fig. 4). However
+
+increasing α worsens the slowdown τ /τeff, which appears in the ﬁrst error term in (9) (see the red curve in Fig. 4). In the
+
+extreme case when α = 1, although FEDPROX achieves objective
+
+consistency, it has a signiﬁcantly slower convergence because
+
+τeff = 1 and the ﬁrst term in (9) is τ times larger than that with FEDAVG (eq. to α = 0).
+
+Theorem 1 also reveals that, in FEDPROX, there should exist a
+
+best value of α that balances all terms in (9). It can be shown that
+
+α = O(m and yields
+
+1 2
+
+/τ
+
+1 2
+
+T
+
+1 6
+
+)
+
+optimizes
+
+the
+
+erro√r bound
+
+(9)
+
+of
+
+a convergence rate of O(1/ mτ T + 1/T
+
+FEDPROX
+
+2 3
+
+)
+
+on
+
+the
+
+surrogate objective. This can serve as a guideline on setting α
+
+in practice.
+
+Linear Speedup Analysis: Another implication of Theorem
+
+1 is that when the communication rounds T is sufﬁciently
+
+large, then the convergence of the surrogate obje√ctive will be dominated by the ﬁrst two terms in (9), which is 1/ mτ T . This
+
+suggests that the algorithm only uses T /γ total rounds when
+
+using γ times more clients (i.e., achieving linear speedup) to
+
+reach the same error level.
+
+B. Extension: Analysis for Partial Client Participation
+In this subsection, we extend the general analysis to the case where only a random subset of clients participate into training at each round. Following previous works [11], [12], [15], [21], we assume the sampling scheme guarantees that the update rule (7)
+
+holds in expectation. This can be achieved by sampling with replacement from {1, 2, . . . , m} with probabilities {pi}, and averaging local updates from selected clients with equal weights.
+Speciﬁcally, we have
+
+x(t+1,0) − x(t,0) = 1 q
+
+q
+
+Δ(ljt)
+
+j=1
+
+(14)
+
+where q is the number of selected clients per round, and lj is
+
+a random index sampled from {1, 2, . . . , m} satisfying P (lj =
+
+i) = pi. Recall that pi = ni/n is the relative sample size at client
+
+i. One can directly validate that
+
+⎡
+
+⎤
+
+ES
+
+⎣
+
+1 q
+
+q
+
+m
+
+Δ(ljt)⎦ =
+
+piΔ(it)
+
+j=1
+
+i=1
+
+(15)
+
+where ES represents the expectation over random indices S = {l1, . . . , lq} at the current round. When the client sampling
+
+scheme satisﬁes (15), we can obtain the following theorem.
+
+Theorem 3: Under the same condition as in Theorem 1,
+
+suppose at each round, the server randomly selects q clients
+
+with replacement to perform local computation. Any federated
+
+optimization algorithms satisfying (14) and 15 converge to a sta-
+
+tionary point of a surrogate objective F (x) =
+
+m i=1
+
+wiFi(x).
+
+If we set η =
+
+q/τ T where τ = ES [
+
+q j=1
+
+τlj /q]
+
+=
+
+m i=1
+
+piτi
+
+is the average local update across clients, then the expected
+
+gradient norm mint∈[T ] E ∇F (x(t,0)) 2 is bounded as follows:
+
+O τ /τeff + O A σ2 + O q(Bσ2 + Cκ2) (16)
+
+qτ T
+
+qτ T
+
+τT
+
+where A = τeff
+
+m i=1
+
+wi2 pi
+
+ai ai
+
+2 2 2 1
+
+, B, C
+
+are
+
+deﬁned
+
+in
+
+(11)
+
+and
+
+(12)
+
+and O combines all other constants (including L).
+
+Proof: Please refer to Appendix A-C.
+
+Discussion: Comparing with the full client participation case,
+
+Theorem 3 has a similar form as Theorem 1. When the number
+
+of communication rounds T is sufﬁciently large, the conver-
+
+gence rate will be dominated by the ﬁrst two terms, which is
+
+O(1/ qτ T ). This suggests that in the case of client sampling,
+
+the algorithm can still achieve linear speedup in terms of the
+
+number of sampled clients.
+
+C. Extension: Analysis for Strongly Convex Functions
+
+Another beneﬁt of using our general theoretical analysis is that it can be easily extended to the strongly-convex case as a corollary. In particular, when the global objective is strongly convex, it satisﬁes the Polyak-Łojasiewicz (PL) condition, stated as follows:
+
+∇F (x) 2 ≥ 2c[F (x) − Finf]
+
+(17)
+
+where c is a positive constant. Under the PL condition, the
+
+convergence rate of federated optimization algorithms can be
+
+further improved. In particular, we have the following theorem.
+
+Theorem 4 (Convergence under PL Condition): When each
+
+local objective function is strongly convex with constant c,
+
+any federated optimization algorithm that follows the update
+
+rule (6) will converge to the minimum of a surrogate objective
+
+F (x) =
+
+m i=1
+
+wiFi(x).
+
+Speciﬁcally,
+
+if
+
+the
+
+client
+
+learning
+
+rate
+
+is set as η(t) = 6/[cτeff(t + γ)], where γ = L/(cν), ν > 0, then
+
+the optimization error F (x(T,0)) − Finf will converge to 0 at the
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5240
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+following rate:
+
+O
+
+L σ2A sc2 mT τ
+
++O
+
+L2 σ2B + κ2C s2c3 T 2τ 2
+
+.
+
+(18)
+
+where s = τeff/τ and A, B, C are constants as deﬁned in (10) to (12). Moreover, in order to achieve the above rate, τeff should be upper bounded by the following quantity:
+
+τe2ff
+
+≤
+
+648ν2(σ2B + κ2C) cL2[F (x(0,0)) − Finf] − 36νL2σ2
+
+(19)
+
+where ν > 0 is a constant. Proof: Please refer to Appendix A-D. Discussion: Theorem 4 shows that under the PL condition,
+the convergence rate of federated optimization algorithms is dominated by O(1/(mT τ )), which is the same as synchronous mini-batch SGD [37]. Similar to the non-convex results (Theorem 1), there is an additional error caused by performing local updates. The additional error decays to 0 at a faster rate O(1/T 2τ 2) and has limited inﬂuence on the error bound.
+Moreover, observe that the error bound (18) monotonically decreases when τeff becomes larger. However, τeff cannot be arbitrarily large. Given a set of local steps at clients {τi}, τeff has an upper bound as given in (19). Again, Theorem 4 not only applies to FEDAVG but also works for other federated optimization algorithms using proximal SGD, or momentum SGD, as the local solver.
+
+VI. FEDNOVA: PROPOSED FEDERATED NORMALIZED AVERAGING ALGORITHM
+
+Theorems 1 and 2 suggest an extremely simple solution to overcome the problem of objective inconsistency. When we set wi = pi in (6), then the second non-vanishing term χ2p wκ2 in (13) will just become zero. This simple intuition yields the following new algorithm:
+
+FEDNOVA :
+
+m
+
+x(t+1,0) − x(t,0) = −τe(ftf)
+
+pi · ηd(it)
+
+i=1
+
+(20)
+
+where
+
+d(it)
+
+=
+
+. G(it) a(it)
+a(it) 1
+
+The
+
+proposed
+
+algorithm
+
+is
+
+named
+
+fed-
+
+erated normalized averaging (FEDNOVA), because the normal-
+
+ized stochastic gradients di are averaged/aggregated instead
+
+of is
+
+the local changes vanilla SGD, then
+
+Δi ai
+
+= =
+
+−ηGiai. [1, 1, . . . ,
+
+When the local solver 1] ∈ Rτi and d(it) is a
+
+simple average over current round’s gradients. In order to
+
+be consistent with FEDAVG whose update rule is (7), one
+
+can simply set τe(ftf) =
+
+m i=1
+
+pi
+
+τi(t).
+
+Then,
+
+in
+
+this
+
+case,
+
+the
+
+update rule of FEDNOVA is equivalent to x(t+1,0) − x(t,0) =
+
+(
+
+m i=1
+
+pi
+
+τi(t))
+
+m i=1
+
+piΔ(it)/τi(t).
+
+Comparing
+
+to
+
+previous
+
+algo-
+
+rithm x(t+1,0) − x(t,0) =
+
+m i=1
+
+piΔ(it),
+
+each
+
+accumulative
+
+lo-
+
+cal change Δi in FEDNOVA is re-scaled by (
+
+m i=1
+
+piτi(t))/τi(t).
+
+This simple tweak in the aggregation weights eliminates in-
+
+consistency in the solution and gives better convergence than
+
+previous methods.
+
+Flexibility in Choosing Hyper-parameters and Local Solvers:
+
+Besides vanilla SGD, the new formulation of FEDNOVA naturally
+
+allows clients to choose various local solvers (i.e., client-side
+
+optimizer). As discussed in Section IV-A, the local solver can
+
+be any optimizers as long as the local model changes can be
+
+written as a linear combination of gradients.1 Examples include
+
+SGD with decayed local learning rate, SGD with proximal
+
+updates, SGD with local momentum, etc. Furthermore, the value
+
+of τeff is not necessarily to be controlled by the local solver
+
+as previous algorithms. For example, when using SGD with
+
+proximal updates, one of its default value
+
+can
+m i=1
+
+psiim[1p−ly(s1e−t ταeff)τ=i ]/α.m i=T1hpisiτci ainnshteealpd
+
+alleviate the slowdown problem discussed in Section V.
+
+Combination With Acceleration Techniques: If clients have
+
+additional communication bandwidth, they can use cross-client
+
+variance reduction techniques to further accelerate the train-
+
+ing [15], [16]. In this case, each local gradient step at the
+
+t-round will be corrected by
+
+m i=1
+
+pid(it−1)
+
+−
+
+d(it−1).
+
+That
+
+is,
+
+the local gradient at the k-th local step becomes gi(x(t,k)) +
+
+m i=1
+
+pid(it−1)
+
+−
+
+d(it−1).
+
+Besides,
+
+on
+
+the
+
+server
+
+side,
+
+one
+
+can
+
+also implement server momentum or adaptive server optimiz-
+
+ers [17], [23], [24], in which the aggregated normalized gradient
+
+−τeff
+
+m i=1
+
+ηpi
+
+di
+
+is
+
+used
+
+to
+
+update
+
+the
+
+server
+
+momentum
+
+buffer
+
+instead of directly updating the server model.
+
+Convergence Analysis: In FEDNOVA, the local solvers at
+
+clients do not necessarily need to be the same or ﬁxed across
+
+rounds. In the following theorem, we obtain strong convergence
+
+guarantee for FEDNOVA, even with arbitrarily time-varying local
+
+updates and client optimizers.
+
+Theorem 5 (Convergence of: FEDNOVA to a Consistent So-
+
+lution): Suppose that each client performs arbitrary number
+
+of local updates τi(t) using arbitrary gradient accumulation
+
+method ai(t), t ∈ [T ] per round. Under Assumptions 1 to 3, and
+
+local learning rate as η =
+
+m/(τˆT ), where τˆ =
+
+T −1 t=0
+
+τ
+
+(t)/T
+
+denotes the average local steps over all rounds at clients, then
+
+FEDN√OVA converges to a stationary point of F (x) in a rate of O(1/ mτˆT ). The detailed bound is the same as the right hand
+
+side of (9), except that τ , A, B, C are replaced by their average
+
+values over all rounds.
+
+The proof of Theorem 5 can be found in Appendix A-E. Using
+
+the same technique as Theorem 3, one can further generalize
+
+Theorem 5 to incorporate client sampling schemes.
+
+VII. EXPERIMENTAL RESULTS
+Experimental Setup: We evaluate all algorithms on two setups with non-IID data partitioning: (1) Logistic Regression on a Synthetic Federated Dataset: The dataset Synthetic(1,1) is originally constructed in [21]. The local dataset sizes ni, i ∈ [1, 30] follows a power law. (2) DNN trained on a Non-IID partitioned CIFAR-10 dataset: We train a VGG-11 [40] network on the CIFAR-10 dataset [41], which is partitioned across 16 clients using a Dirichlet distribution Dir16(0.1), as done in [42]. The original CIFAR-10 test set (without partitioning) is used to evaluate the generalization performance of the trained global model. The local learning rate η is decayed by a constant factor after ﬁnishing 50% and 75% of the communication rounds. The initial value of η is tuned separately for FEDAVG with different local solvers. When using the same solver, FEDNOVA uses the same η as FEDAVG to guarantee a fair comparison. On CIFAR-10, we run each experiment with 3 random seeds and report the average and standard deviation. Our code is available at here: https://github.com/JYWa/FedNova.
+
+1Adaptive optimization methods (such as Adam, AdaGrad) do not meet this criteria.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5241
+
+Fig. 5. Results on the synthetic dataset constructed in [21] under three different settings. Left: All clients perform Ei = 5 local epochs; Middle: Only C = 0.3 fraction of clients are randomly selected per round to perform Ei = 5 local epochs; Right: Only C = 0.3 fraction of clients are randomly selected per round to perform random and time-varying local epochs Ei(t) ∼ U (1, 5).
+
+TABLE I RESULTS COMPARING FEDAVG AND FEDNOVA WITH VARIOUS CLIENT OPTIMIZERS (I.E., LOCAL SOLVERS) TRAINED ON NON-IID CIFAR-10 DATASET. FEDPROX AND SCAFFOLD CORRESPOND TO FEDAVG WITH PROXIMAL SGD UPDATES AND CROSS-CLIENT VARIANCE-REDUCTION (VR), RESPECTIVELY
+
+3–7% higher test accuracy than vanilla SGD. This local momentum scheme can be further combined with server momentum [17], [23], [24]. When Ei(t) ∼ U (2, 5), the hybrid momentum scheme achieves test accuracy 81.15 ± 0.38% As a reference, using server momentum alone achieves 77.49 ± 0.25%.
+
+Synthetic Dataset Simulations: In Fig. 5, we observe that by
+
+simply changing wi to pi, FEDNOVA not only converges signiﬁcantly faster than FEDAVG but also achieves consistently the best
+
+performance under three different settings. Note that the only
+
+difference between FEDNOVA and FEDAVG is the aggregated
+
+weights when averaging the normalized gradients.
+
+Non-IID CIFAR-10 Experiments: In Table I we compare the
+
+performance of FEDNOVA and FEDAVG on non-IID CIFAR-
+
+10 with various client optimizers run for 100 communication
+
+rounds. When the client optimizer is SGD or SGD with momen-
+
+tum, simply changing the weights yields a 6–9% improvement
+
+on the test accuracy; When the client optimizer is proximal SGD,
+
+FEDAVG is equivalent to FEDPROX. By setting τeff =
+
+m i=1
+
+piτi
+
+and correcting the weights wi = pi while keeping ai same as
+
+FEDPROX, FedNova-Prox achieves about 10% higher test
+
+accuracy than FEDPROX. It turns out that FEDNOVA consis-
+
+tently converges faster than FEDAVG. When using variance-
+
+reduction methods such as SCAFFOLD (that requires doubled
+
+communication), FEDNOVA-based method preserves the same
+
+test accuracy. Furthermore, combining local momentum and
+
+variance-reduction can be easily achieved in FEDNOVA. It yields
+
+the highest test accuracy among all other local solvers. This
+
+kind of combination is non-trivial and has not appeared yet in
+
+the literature.
+
+Effectiveness of Local Momentum: From Table I, it is worth
+
+noting that using momentum SGD as the local solver is an
+
+effective way to improve the performance. It generally achieves
+
+VIII. DEFERRED PROOFS OF MAIN THEOREMS
+
+A. Proof of Lemma 1: Quadratic Case Analysis
+
+Here, we provide a general proof for arbitrary quadratic
+
+functions. Since FEDAVG can be treated as a special case of
+
+FEDPROX, we analyze the convergence of FEDPROX instead.
+
+Consider a setting where each local objective function is strongly
+
+convex and deﬁned as follows:
+
+Fi(x) =
+
+1x 2
+
+Hix
+
+−
+
+ei
+
+x
+
++
+
+1 2
+
+ei
+
+H −i 1ei
+
+≥
+
+0
+
+(21)
+
+where Hi ∈ Rd×d is an invertible matrix and ei ∈ Rd is an arbitrary vector. It is easy to show that the optimum of the i-th local function is x∗i = H−i 1ei. Without loss of generality, we assume the global objective function to be a weighted average
+
+across all local functions, that is
+
+F (x) =
+
+m
+
+1
+
+piFi(x)
+
+=
+
+x 2
+
+Hx − e
+
+x+ 1 2
+
+m
+
+piei
+
+H
+
+−1 i
+
+ei
+
+i=1
+
+i=1
+
+where H =
+
+m i=1
+
+piH
+
+i
+
+and
+
+e
+
+=
+
+m i=1
+
+piei.
+
+As
+
+a
+
+result,
+
+the
+
+global minimum is x∗ = H−1e. Now, let us study whether
+
+previous federated optimization algorithms can converge to this
+
+global minimum.
+
+The local update rule of FEDPROX for the i-th device can be
+
+written as follows:
+
+x(it,k+1) = x(it,k) − η H ix(it,k) − ei + μ(x(it,k) − x(t,0))
+
+= (I − ημI − ηHi)x(it,k) + ηei + ημx(t,0) (22) where x(it,k) denotes the local model parameters at the k-th local iteration after t communication rounds, η denotes the local learning rate and μ is a tunable hyper-parameter in FEDPROX. When μ = 0, the algorithm will reduce to FEDAVG. We omit the device index in x(t,0), since it is synchronized and the same across all devices.
+After minor rearranging of (22), we obtain
+x(it,k+1) − c(it) = (I − ημI − ηHi) x(it,k) − c(it) . (23)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5242
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+where c(it) = (Hi + μI)−1(ei + μx(t,0)). Then, after performing τi steps of local updates, the local model becomes
+x(it,τi) = (I − ημI − ηHi)τi x(t,0) − c(it) + c(it). (24)
+
+Subtracting x(t,0) on both sides and rearranging, it follows that
+
+x(it,τi) − x(t,0) = Ki ei − H ix(t,0)
+
+(25)
+
+where Ki = [I − (I − ημI − ηHi)τi ](Hi + μI)−1. In FEDPROX and FEDAVG, the server averages all local models
+according to the sample size
+
+m
+
+x(t+1,0) − x(t,0) =
+
+piKi ei − Hix(t,0) .
+
+i=1
+
+(26)
+
+Accordingly, we get the following update rule for the central model:
+
+m
+
+m
+
+x(t+1,0) = I − piKiHi x(t,0) + piKiei.
+
+i=1
+
+i=1
+
+(27)
+
+This is equivalent to
+
+m
+x(t+1,0) − x = I − piKiHi x(t,0) − x . (28)
+i=1
+
+where
+
+m
+
+−1 m
+
+x=
+
+pi K i H i
+
+piKiei .
+
+(29)
+
+i=1
+
+i=1
+
+After T communication rounds, one obtains
+
+m
+
+T
+
+x(T,0) = I − piKiHi x(t,0) − x + x. (30)
+
+i=1
+
+Accordingly, when I −
+
+m i=1
+
+piK
+
+i
+
+H
+
+i
+
+2 < 1,
+
+the
+
+iterates
+
+will converge to
+
+lim x(T,0) = x =
+T →∞
+
+m
+
+−1
+
+pi K i H i
+
+i=1
+
+m
+piKiei .
+i=1
+(31)
+
+Now let us focus on a concrete example where p1 = p2 = · · · = pm = 1/m, H1 = H2 = · · · = Hm = I and μ = 0. In this case, Ki = 1 − (1 − η)τi . As a result, we have
+
+lim x(T,0) =
+T →∞
+
+m i=1
+
+[1
+
+−
+
+(1
+
+−
+
+η
+
+m i=1
+
+[1
+
+−
+
+(1
+
+−
+
+)τi ] ei η)τi ]
+
+.
+
+(32)
+
+Furthermore, when the learning rate is sufﬁciently small (e.g.,
+
+can be achieved by gradually decaying the learning rate), ac-
+
+cording to L’Hôpital’s Rule, we obtain
+
+lim lim x(T,0) =
+η→0 T →∞
+
+m i=1
+
+τiei
+
+m i=1
+
+τi
+
+.
+
+(33)
+
+Here, we complete the proof of Lemma 1.
+
+B. Proof of Theorem 1: Convergence of Surrogate Objective
+
+For the ease of writing, let us deﬁne the following auxiliary
+
+variables:
+
+h(it)
+
+=
+
+1 ai
+
+τi −1
+ai,k ∇Fi (x(it,k) )
+k=0
+
+(34)
+
+where ai,k ≥ 0 is an arbitrary scalar, ai = [ai,0, . . . , ai,τi−1] , and ai = ai 1. One can show that E[d(it) − h(it)] = 0. In addition, since clients are independent of each other, we have
+
+E d(it) − h(it), d(jt) − h(jt) = 0, ∀i = j. According to the update rule and Lipschitz-smooth assump-
+
+tion, we have
+
+⎡
+
+⎤
+
+E[F (x(t+1,0))] − F (x(t,0)) ≤ τe2ffη2L E ⎣ 2
+
+m
+
+2
+
+wid(it) ⎦
+
+i=1
+
+− τeffη E
+
+T1
+
+m
+
+∇F (x(t,0)),
+
+wid(it)
+
+i=1
+
+(35)
+
+T2
+
+where the expectation is taken over mini-batches ξi(t,k), ∀i ∈ {1, 2, . . . , m}, k ∈ {0, 1, . . . , τi − 1}. Before diving into the
+
+detailed bounds for T1 and T2, we ﬁrst introduce a useful lemma.
+
+Lemma 2: Suppose {Ak}Tk=1 is a sequence of random matri-
+
+ces
+
+and
+
+E[Ak
+
+|A⎡k−1, Ak−2
+T
+
+,... 2⎤
+
+,
+
+A1]
+T
+
+=
+
+0,
+
+∀k.
+
+Then,
+
+E⎣
+
+Ak ⎦ =
+
+E
+
+Ak
+
+2 F
+
+.
+
+(36)
+
+k=1
+
+F
+
+k=1
+
+Proof:⎡
+T
+
+2⎤
+
+T
+
+E ⎣ Ak ⎦ = E
+
+k=1
+
+F
+
+k=1
+
+Ak
+
+2 F
+
+T
+
+T
+
++
+
+i=1 j=1,j=i
+
+× E Tr{Ai Aj}
+
+T
+=E
+k=1
+
+Ak
+
+2 F
+
+T
+
+T
+
++
+
+i=1 j=1,j=i
+
+× Tr{E Ai Aj } Assume i < j. Then, using the law of total expectation,
+E Ai Aj = E Ai E [Aj|Ai, . . . , A1] = 0. (37)
+
+1) Bounding the First Term in (35): For the First term on the
+
+RHS of (3⎡5), we have
+
+m
+
+T1 ≤ 2E ⎣
+
+wi d(it) − h(it)
+
+⎤⎡
+
+⎤
+
+2
+
+m
+
+2
+
+⎦ + 2E ⎣
+
+wih(it) ⎦
+
+i=1
+
+i=1
+
+m
+= 2 wi2E
+i=1
+
+d(it) − h(it) 2
+
+(38)
+
+⎡
+
+⎤
+
+m
+
+2
+
++ 2E ⎣
+
+wih(it) ⎦
+
+i=1
+
+(39)
+
+where (38) follows from the fact: a + b 2 ≤ 2 a 2 + 2 b 2
+
+and (39) uses the special property of d(it), h(it), that is, E d(it) − h(it), d(jt) − h(jt) = 0, ∀i = j. Then, let us expand the expression of d(it) and h(it), to obtain that
+
+T1 ≤
+
+m i=1
+
+2wi2 a2i
+
+τi −1
+[ai,k ]2 E
+k=0
+
+gi(x(it,k)) − ∇Fi(x(it,k)) 2
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5243
+
+⎡
+
+⎤
+
+m
+
+2
+
++ 2E ⎣
+
+wih(it) ⎦
+
+i=1
+
+⎡
+
+⎤
+
+≤
+
+2σ2
+
+m i=1
+
+wi2 ai
+
+ai
+
+2 1
+
+2
+
++ 2E ⎣
+
+m
+wih(it)
+i=1
+
+2
+⎦
+
+(40) (41)
+
+where (40) is derived using Lemma 2, and (41) follows Assumption 2.
+2) Bounding the Second Term in (35): For the second term on the right hand side (RHS) in (35), we have
+
+T2 = E
+
+m
+
+∇F (x(t,0)),
+
+wi d(it) − h(it)
+
+i=1
+
++E
+
+m
+
+∇F (x(t,0)),
+
+wih(it)
+
+i=1
+
+m
+
+= E ∇F (x(t,0)),
+
+wih(it)
+
+i=1
+
+⎡
+
+⎤
+
+=1 2
+
+∇F (x(t))
+
+2 + 1E⎣ 2
+
+m
+wih(it)
+i=1
+
+2
+⎦
+
+⎡
+
+⎤
+
+− 1E⎣ 2
+
+m
+
+∇F (x(t,0)) −
+
+wih(it)
+
+i=1
+
+2
+⎦
+
+(42) (43)
+(44)
+
+where the last equation uses the fact: 2 a, b = a 2 + b 2 − a − b 2.
+3) Intermediate Result: Substituting (44) and (41) back into (35) and assuming τeffηL ≤ 1/2, we have
+
+E F (x(t+1,0)) − F (x(t,0))
+
+ητeff
+
+≤ −1 2
+
+∇F (x(t,0))
+
+2
+
++
+
+τeffηLσ2
+
+m i=1
+
+wi2 ai
+
+ai
+
+2 1
+
+2 2
+
+⎡
+
+⎤
+
++
+
+1 2
+
+E
+
+⎣
+
+∇F (x(t,0)) −
+
+m
+
+wih(it)
+
+2
+⎦
+
+(45)
+
+i=1
+
+≤ −1 2
+
+∇F (x(t,0))
+
+2
+
++
+
+τeffηLσ2
+
+m i=1
+
+wi2 ai
+
+ai
+
+2 1
+
+2 2
+
++1 2
+
+m
+
+wiE
+
+∇Fi(x(t,0)) − h(it) 2
+
+(46)
+
+i=1
+
+where the last inequality and Jensen’s Inequality:
+
+uses
+
+the
+m i=1
+
+fact wizi
+
+F (x) 2≤
+
+=
+m i=1
+
+m i=1
+wi
+
+wiFi(x) zi 2. In
+
+order to bound the last term in (46), we can use the following
+
+lemma.
+
+Lemma 3: The difference between the locally averaged gra-
+
+dient and the server gradient ∇Fi(x(t,0)) can be bounded as follows:
+
+m
+wiE
+i=1
+
+∇Fi(x(t,0)) − h(it) 2
+
+≤ 1 E ∇F (x(t,0)) 2 + 3η2L2σ2B + 6η2L2κ2C (47) 2
+
+where B = Λ
+
+m i=1
+
+wi(τi
+
+−
+
+1)
+
+ai
+
+22/
+
+ai
+
+1, C = Λ2 maxi τi
+
+(τi − 1), and Λ denotes the upper bound of all elements in any
+
+accumulation vector ai. That is, Λ = maxi,s,k ai,s(k).
+
+Proof: Due to space limitations, we delegate the proof to
+
+Appendix A-F.
+
+4) Final Results: Substituting (47) back into (46), we have
+
+E F (x(t+1,0)) − F (x(t,0))
+
+ητeff
+
+≤ −1 4
+
+∇F (x(t,0))
+
+2
+
++
+
+τeffηLσ2
+
+m i=1
+
+wi2 ai
+
+ai
+
+2 1
+
+2 2
+
++ 3 η2L2σ2B + 3η2L2κ2C
+
+(48)
+
+2
+
+Taking the average across all rounds, we get
+
+1
+
+T −1
+E
+
+T
+
+t=0
+
+∇F (x(t,0)) 2
+
+4 F (x(0,0)) − Finf ≤
+
+ητeffT
+
+4ηLσ2A +
+m
+
++ 6η2L2σ2B + 12η2L2κ2C.
+
+where A = mτeff
+
+m i=1
+
+. wi2
+
+ai
+
+2 2
+
+ai
+
+2 1
+
+Since
+
+min
+
+∇F (x(t,0)) 2 ≤
+
+1 T
+
+T −1 t=0
+
+∇F (x(t,0)) 2, we have
+
+min E
+t∈[T ]
+
+∇F (x(t,0)) 2
+
+4 F (x(0,0)) − Finf ≤
+
+4ηLσ2A +
+
+ητeffT
+
+m
+
++ 6η2L2σ2B + 12η2L2κ2C. (49)
+
+5) Constraint on the Local Learning Rate: Here, let us summarize the constraints on the local learning rate:
+
+ηL ≤ 1 ,
+
+(50)
+
+2τeff
+
+4η2L2 max{
+i
+
+ai
+
+1(
+
+ai
+
+1 − ai,−1)} ≤
+
+1 2β2 + 1 .
+
+(51)
+
+For the second constraint, we can further tighten it as follows:
+
+4η2L2 max
+i
+
+ai
+
+2 1
+
+≤
+
+1 2β2 +
+
+1
+
+(52)
+
+That is,
+
+ηL ≤ 1 min
+
+1
+
+1
+
+,
+
+. (53)
+
+2
+
+maxi ai 1 2β2 + 1 τeff
+
+6) Further Optimizing the Bound: By setting η =
+
+m τT
+
+where τ
+
+=
+
+1 m
+
+m i=1
+
+τi,
+
+mint∈[T
+
+]
+
+E
+
+∇F (x(t,0))
+
+2 will be upper
+
+bounded by
+
+O √τ /τeff + O √Aσ2 + O mBσ2
+
+mτ T
+
+mτ T
+
+τT
+
++ O mCκ2 . τT
+
+Here, we complete the proof of Theorem 1.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5244
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+IX. CONCLUDING REMARKS
+In federated learning, the participating clients (e.g., IoT sensors, mobile devices) are typically highly heterogeneous, both in the size of their local datasets and in their computation speeds. Clients can also join and leave the training at any time according to their availabilities. Therefore, it is common that clients perform different amounts of works within one round of local computation. However, previous analyses of federated optimization algorithms have been limited to the homogeneous case where all clients have the same local steps, hyper-parameters, and client optimizers. In this paper, we have developed a novel theoretical framework to analyze the challenging heterogeneous setting. We have shown that original FEDAVG algorithm will converge to a stationary point of a mismatched objective function which can be arbitrarily different from the true objective. To the best of our knowledge, we have thus provided the ﬁrst fundamental understanding of how the convergence rate and bias in the ﬁnal solution of federated optimization algorithms are inﬂuenced by heterogeneity in clients’ local progress. The new framework naturally allows clients to have different local steps and local solvers, such as GD, SGD, SGD with momentum, proximal updates, etc. Inspired by the theoretical analysis, we have proposed FEDNOVA, which can automatically adjust the aggregated weights and effective local steps according to the local progress. We have validated the effectiveness of FEDNOVA both theoretically and empirically. On a non-IID version of the CIFAR-10 dataset, FEDNOVA generally achieves 6–9% higher test accuracy than FEDAVG. Future directions include extending the theoretical framework to adaptive optimization methods or gossip-based training methods.
+Future Directions: There are many open directions to extend this work. For example, the main theorems are based on Assumption 3. However, this assumption on dissimilarity among local objectives can be removed when using cross-client variancereduction techniques [15]. Besides, as illustrated by Theorem 2, the bias term is caused by improper weighting scheme as well as the differences between local objectives. While our proposed algorithm FEDNOVA corrects the weighting scheme, we believe algorithms that reduce the differences among clients’ local updates can also mitigate the objective inconsistency problem. Furthermore, our current algorithmic framework requires the local model changes to be a linear combination of gradients and cannot work for adaptive optimization methods. Given the popularity of Adam [43] and AdaGrad [44] on language-related training tasks, the adaptive variants of FEDNOVA could be a promising direction.
+APPENDIX PROOFS OF OTHER THEOREMS
+A. Proof of Theorem 2: Including Bias in the Error Bound
+Lemma 4: For any model parameter x, the difference between the gradients of F (x) and F (x) can be bounded as follows:
+∇F (x) − ∇F (x) 2 ≤ χ2p w (β2 − 1) ∇F (x) 2 + κ2
+where χ2p w denotes the chi-square distance between p and w, i.e., χ2p w = m i=1(pi − wi)2/wi.
+
+Proof: According to the deﬁnition of F (x) and F (x), we have
+
+∇F (x) − ∇F (x)
+
+m
+
+= (pi − wi)∇Fi(x)
+
+(54)
+
+i=1
+
+=
+
+m pi√− wi
+
+i=1
+
+wi
+
+√ · wi
+
+∇Fi(x) − ∇F (x)
+
+.
+
+(55)
+
+Applying Cauchy-Schwarz inequality, it follows that
+
+2
+∇F (x) − ∇F (x)
+
+≤ m (pi − wi)2
+
+i=1
+
+wi
+
+m
+
+2
+
+wi ∇Fi(x) − ∇F (x)
+
+i=1
+
+(56)
+
+≤ χ2p w (β2 − 1) ∇F (x) 2 + κ2 .
+
+(57)
+
+where the last inequality uses Assumption 3.
+
+Note that
+
+∇F (x) 2 ≤ 2
+
+2
+∇F (x) − ∇F (x) + 2
+
+2
+∇F (x)
+
+(58)
+
+≤ 2 χ2p w(β2 − 1) + 1
+
+2
+∇F (x)
+
++ 2χ2p wκ2.
+
+(59)
+
+As a result, we obtain
+
+1 T −1 ∇F (x(t,0)) 2 T t=0
+
+≤2
+
+χ2p w(β2 − 1) + 1
+
+1 T −1 T
+
+∇F (x(t,0)) 2 + 2χ2p wκ2
+
+t=0
+
+≤ 2 χ2p w(β2 − 1) + 1 opt + 2χ2p wκ2
+
+(60)
+
+where opt denotes the optimization error.
+
+B. Constructing a Lower Bound
+
+In this subsection, we are going to construct a lower bound
+
+of E ∇F (x(t,0)) 2, showing that (13) is tight and the non-
+
+vanishing error term in Theorem 2 is not an artifact of our
+
+analysis.
+
+Lemma 5: One can manually construct a strongly convex
+
+objective function such that FEDAVG with heterogeneous local
+
+updates cannot converge to its global optimum. In particular,
+
+the gradient norm of the objective function does not vanish as
+
+learning rate approaches to zero. We have the following lower
+
+bound:
+
+lim E
+T →∞
+
+∇F (x(T,0))
+
+2 = Ω(χ2p wκ2)
+
+(61)
+
+where χ2p w denotes the chi-square divergence between weight vectors and κ2 quantiﬁes the dissimilarities among local objec-
+
+tive functions and is deﬁned in Assumption 3.
+
+Proof: Suppose that there are only two clients with local
+
+objectives
+
+F1(x) =
+
+1 2
+
+(x
+
+−
+
+a)2
+
+and
+
+F2(x) =
+
+1 2
+
+(x
+
++
+
+a)2
+
+.
+
+The
+
+global
+
+objective
+
+is
+
+deﬁned
+
+as
+
+F (x)
+
+=
+
+1 2
+
+F1(x)
+
++
+
+1 2
+
+F2(x).
+
+For
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5245
+
+any set of weights w1, w2, w1 + w2 = 1, we deﬁne the surro-
+gate objective function as F (x) = w1F1(x) + w2F2(x). As a consequence, we have
+
+m
+wi
+
+∇Fi(x) − ∇F (x) 2 = 2w1w2a2
+
+(62)
+
+i=1
+
+Comparing with Assumption 3, we can deﬁne κ2 = 2w1w2a2 and β2 = 1 in this case. Furthermore, according to the deriva-
+
+tions in Section VIII-A, the iterate of FEDAVG can be written as
+
+follows:
+
+lim x(T,0) = τ1a − τ2a .
+
+(63)
+
+T →∞
+
+τ1 + τ2
+
+In this case, w1 = τ1/(τ1 + τ2), w2 = τ2/(τ1 + τ2). As a results, we have
+
+lim ∇F (x(T,0)) 2
+T →∞
+
+= lim 1 (x(T,0) − a) + 1 (x(T,0) + a) 2
+
+T →∞ 2
+
+2
+
+=
+
+τ1 − τ2
+
+2
+a2
+
+τ1 + τ2
+
+=
+
+(τ2 − τ1)2 κ2 2τ1τ2
+
+=
+
+Ω(χ2p
+
+w κ2 ).
+
+(64)
+
+where
+
+χ2p w =
+
+m i=1
+
+(pi
+
+−
+
+wi)2/wi
+
+=
+
+(w1
+
+−
+
+1/2)2/w1
+
++
+
+(w2 − 1/2)2/w2 = (τ2 − τ1)2/(2τ1τ2).
+
+C. Proof of Theorem 3
+
+The main part of the proof is nearly the same as the proof of Theorem 1, except for a few initial steps. According to the Lipschitz-smooth assumption, it follows that
+
+E F (x(t+1,0)) − F (x(t,0))
+
+⎡ ≤ E⎣
+
+∇F (x(t,0)), q Δ(ljt) q
+j=1
+
+⎤
+
+⎡
+
+⎦+L E⎣
+
+q
+
+Δ(ljt)
+
+2⎤ ⎦
+
+2
+
+q
+
+j=1
+
+T3
+
+T4
+
+(65)
+
+where the expectation is taken over randomly selected indices
+
+{lj} as well as mini-batches ξi(t,k), ∀i ∈ {1, 2, . . . , m}, k ∈ {0, 1, . . . , τi − 1}.
+
+For the ﬁrst term in (65), we can ﬁrst take the expectation over
+
+indices and obtain
+
+m
+
+T3 = E ∇F (x(t,0)),
+
+piΔ(it)
+
+(66)
+
+i=1
+
+m
+
+= − τeffηE ∇F (x(t,0)),
+
+wid(it)
+
+(67)
+
+i=1
+
+where τeff =
+
+m i=1
+
+pi
+
+ai
+
+1, wi = pi
+
+ai
+
+1/
+
+m i=1(pi ai 1).
+
+This term is exactly the same as the ﬁrst term in (35). We
+
+can directly reuse previous results in the proof of Theorem 1.
+
+Comparing with (44), we have
+
+⎡
+
+⎤
+
+T3 ≤
+
+−
+
+τeffη 2
+
+∇F (x(t)) 2 − τeffη E ⎣ 2
+
+m
+
+2
+
+wih(it) ⎦
+
+i=1
+
++
+
+τeffη 2
+
+m i=1
+
+wiE
+
+∇Fi(x(t,0)) − h(it) 2 .
+
+(68)
+
+For the second term in (65), we have
+
+⎡
+
+2⎤
+
+T4 = η2τe2ffE ⎣
+
+1 q
+
+q j=1
+
+wlj plj
+
+d(ljt)
+
+⎦
+
+⎡
+
+2⎤
+
+= η2τe2ffE ⎣
+
+1 q
+
+q j=1
+
+wlj plj
+
+h(ljt)
+
+⎦
+
+⎡
+
+2⎤
+
++ η2τe2ffE ⎣
+
+1 q
+
+q j=1
+
+wlj plj
+
+(d(ljt)
+
+−
+
+h(ljt))
+
+⎦
+
+⎡ ≤ η2τe2ff E ⎣
+
+1 q
+
+q j=1
+
+wlj plj
+
+h(ljt)
+
+2⎤
+
+⎦ + 1 m wi2σ2
+
+q
+i=1
+
+pi
+
+(69)
+
+(70)
+
+ai
+
+2 2
+
+ai
+
+2 1
+
+T5
+(71)
+
+where the last inequality follows Assumption 2. Additionally, for the term T5, we can bound it as follows:
+
+T5 ≤ 3E
+
+2
+
+1 q
+
+q j=1
+
+wlj plj
+
+(h(ljt)
+
+−
+
+∇Flj (x(t,0)))
+
++ 3E
+
+2
+
+1 q
+
+q j=1
+
+wlj plj
+
+∇Flj (x(t,0))
+
+−
+
+∇F (x(t,0))
+
++ 3 ∇F (x(t,0)) 2
+
+m
+≤ 3r wi
+
+h(it) − ∇Fi(x(t,0)) 2
+
+i=1
+
+rβ2 +3 1+
+
+∇F (x(t,0)) 2 + 3rκ2
+
+(72)
+
+q
+
+where r on the
+
+is deﬁned fact that
+
+as
+
+mm i=a1xpiiwwi/ip∇i.FTih/epide2riv≤atrion
+
+of (72)
+
+m i=1
+
+wi
+
+is based ∇Fi 2
+
+and Assumption 3. Substituting T3, T4, T5 into (65) and applying
+
+Lemma 3, one can complete the proof.
+
+D. Proof of Theorem 4
+
+Since each local objective is c-strongly convex, their weighted
+
+summation F (x) =
+
+m i=1
+
+wiFi
+
+(x)
+
+is
+
+also
+
+c-strongly
+
+convex
+
+and satisﬁes the PL condition. Substituting the PL condition
+
+into (48), we have
+
+E[F (x(t+1,0))] − F (x(t,0)) ητeff
+
+≤ − c[F (x(t,0)) − Finf] + ηLσ2A
+
+2
+
+m
+
++ 3 η2L2σ2B + 3η2L2κ2C.
+
+(73)
+
+2
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5246
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+After minor rearranging, we obtain
+
+E[F (x(t+1,0))] − Finf ≤
+
+1 − ητeffc 2
+
+[F (x(t,0)) − Finf]
+
++
+
+η2τeffLσ2A m
+
++
+
+3 2
+
+η3
+
+τeffL2
+
+σ2
+
+B
+
++ 3η3τeffL2κ2C.
+
+(74)
+
+For ease of writing, we deﬁne η(t) = η(t)τ , s = τeff/τ , D = sLσ2A/(τ m) and E = 3sL2σ2B/(2τ 2) + 3sL2κ2C/τ 2. Let us ﬁrst prove by induction that, for any t ≥ 0, E[F (x(t,0))] − Finf ≤ η(t)βD + [η(t)]2βE. We assume this holds for t > 0. According to (73), we have
+
+E[F (x(t+1,0))] − Finf
+
+≤ 1 − η(t)sc 2
+
+η(t)βD + [η(t)]2βE + [η(t)]2D + [η(t)]3E
+
+= β 1 − η(t)sc + η(t) η(t)D + [η(t)]2E .
+
+(75)
+
+2
+
+Let us set β
+
+=
+
+6 sc
+
+and η(t)
+
+=
+
+6 sc(t+γ)
+
+.
+
+After
+
+some
+
+manipulations,
+
+one can show that
+
+β 1 − η(t)sc + η(t) η(t) ≤ βη(t+1),
+
+(76)
+
+2
+
+β
+
+1 − η(t)sc 2
+
++ η(t)
+
+[η(t)]2
+
+≤
+
+216 s3c3
+
+(t
+
++
+
+1 1+
+
+γ)2
+
+= β[η(t+1)]2
+
+(77)
+
+Substituting (76) and (77) into (75), we have
+
+E[F (x(t+1,0))] − Finf ≤ βη(t+1)D + β[η(t+1)]2E. (78)
+
+When t = 0, all the hyper-parameters should satisfy
+
+F (x(0,0)) −
+
+Finf
+
+≤
+
+36 c2γ
+
+Lσ2A τeffm
+
+216 3L2σ2B 3L2κ2C
+
++ c3γ2
+
+2τe2ff + τe2ff
+
+Substituting the deﬁnition of A into (79),
+
+. (79)
+
+F (x(0,0)) − Finf
+
+≤
+
+36Lσ2 c2γ
+
+m i=1
+
+wi2 ai
+
+ai
+
+2 1
+
+2 2
+
+648L2(σ2B + κ2C)
+
++
+
+c3γ2τe2ff
+
+≤
+
+36Lσ2 c2γ
+
++
+
+648L2(σ2B + c3γ2τe2ff
+
+κ2 C ) .
+
+(80)
+
+After minor rearranging, we get the constraint on τeff as follows:
+
+τe2ff
+
+≤
+
+648L2(σ2B + κ2C) c3γ2[F (x(0,0)) − Finf] − 36cγLσ2
+
+(81)
+
+When we set γ = L/(νc), it follows that
+
+τe2ff
+
+≤
+
+648ν2(σ2B + κ2C) .
+cL2[F (x(0,0)) − Finf] − 36νL2σ2
+
+(82)
+
+After a total of T communication rounds,
+
+F (x(T,0)) − Finf
+
+≤
+
+36 sc2
+
+Lσ2A (T + γ)τ m
+
++
+
+216 s2c3(T + γ)2τ 2
+
+3L2σ2B + 3L2κ2C 2
+
+=O
+
+L σ2A sc2 mT τ
+
++O
+
+L2 σ2B + κ2C s2c3 T 2τ 2
+
+.
+
+(83)
+
+E. Proof of Theorem 5
+
+In the case of FEDNOVA, the aggregated weights wi equals to
+
+pi. Therefore, the surrogate objective F (x) =
+
+m i=1
+
+wiFi(x)
+
+is the same as the original objective function F (x) =
+
+m i=1
+
+piFi(x).
+
+We
+
+can
+
+directly
+
+reuse
+
+the
+
+intermediate
+
+results
+
+in the proof of Theorem 1. According to (48), for the t-th round,
+
+we have
+
+E[F (x(t+1,0))] − F (x(t,0))
+
+ητeff
+
+≤ −1
+
+∇F (x(t,0))
+
+2 ηLσ2A(t) +
+
+4
+
+m
+
++ 3 η2L2σ2B(t) + 3η2L2κ2C(t)
+
+(84)
+
+2
+
+where quantities A(t), B(t), C(t) have the same deﬁnitions as (10) to (12), except replacing ai with a(it). Then, taking the total expectation and averaging over all rounds, it follows that
+
+E[F (x(T,0))] − F (x(0,0))
+
+ητeffT
+
+≤−
+
+1
+
+T −1
+E
+
+∇F (x(t,0))
+
+2 ηLσ2A +
+
+4T t=0
+
+m
+
++ 3 η2L2σ2B + 3η2L2κ2C
+
+(85)
+
+2
+
+where A =
+
+T −1 t=0
+
+A(t) /T ,
+
+B
+
+=
+
+T −1 t=0
+
+B(t)/T
+
+,
+
+and
+
+C=
+
+T −1
+
+t=0
+
+C(t)/T . Finally, repeating the same procedure in the proof of
+
+Theorem 1, we complete the proof.
+
+F. Proof of Lemma 3
+
+Recall the deﬁnition of h(it), one can derive that
+
+E ∇Fi(x(t,0)) − h(it) 2
+
+⎡
+
+⎤
+
+= E⎣
+
+∇Fi(x(t,0))
+
+−
+
+1 ai
+
+τi −1
+ai,k ∇Fi (x(it,k) )
+k=0
+
+2
+⎦
+
+(86)
+
+⎡ = E⎣
+
+1 τi−1
+
+ai
+
+ai,k
+k=0
+
+∇Fi(x(t,0)) − ∇Fi(x(it,k))
+
+2⎤ ⎦ (87)
+
+≤ 1 τi−1 ai k=0
+
+ai,k E
+
+≤ L2 τi−1 ai k=0
+
+ai,k E
+
+∇Fi(x(t,0)) − ∇Fi(x(it,k)) 2 x(t,0) − x(it,k) 2
+
+(88) (89)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5247
+
+≤
+
+L2Λ
+
+τi −1
+E
+
+ai k=0
+
+x(t,0) − x(it,k) 2
+
+(90)
+
+where Λ denotes the upper bound of all elements in the
+
+accumulation vector, (88) uses Jensen’s Inequality again:
+
+m i=1
+
+wizi
+
+2≤
+
+m i=1
+
+wi
+
+zi
+
+2, and (89) follows Assumption
+
+1. Now, we turn to bounding the difference between the server
+
+model update
+
+x(t,0) and the local model rule and using the fact a
+
++x(ibt,k2).
+
+Plugging into ≤2 a 2+2
+
+the b2
+
+local ,
+
+E x(t,0) − x(it,k) 2
+
+⎡
+
+k−1
+
+≤ 2η2E ⎣
+
+ai,s(k) gi(x(it,s)) − ∇Fi(x(it,s))
+
+s=0
+
+⎡
+k−1
+
+2⎤
+
++ 2η2E ⎣
+
+ai,s(k)∇Fi(x(it,s)) ⎦
+
+s=0
+
+2⎤ ⎦ (91)
+(92)
+
+where the above inequalities uses the fact ai(k) ≤ ai(τi) = ai . As a result, we have
+
+1
+
+τi −1
+E
+
+ai 1 k=0
+
+x(t,0) − x(it,k) 2
+
+≤
+
+2η2σ2
+
+(τi
+
+− 1) ai
+
+ai
+1
+
+2 2
+
++ 2η2Λ(τi − 1) ai 1
+
+1
+
+τi −1
+E
+
+ai 1 k=0
+
+∇Fi(x(it,k)) 2 (100)
+
+In addition, we can bound the second term using the following inequality:
+
+E ∇Fi(x(it,k)) 2
+
+≤ 2E ∇Fi(x(it,k)) − ∇Fi(x(t,0)) 2 +2E ∇Fi(x(t,0)) 2
+
+Applying Lemma 2 to the ﬁrst term,
+
+E x(t,0) − x(it,k) 2
+
+⎡
+
+k−1
+
+k−1
+
+2⎤
+
+≤ 2η2σ2 [ai,s(k)]2 + 2η2E ⎣
+
+ai,s(k)∇Fi(x(it,s)) ⎦
+
+s=0
+
+s=0
+
+(93)
+
+k−1
+≤ 2η2σ2 [ai,s(k)]2
+s=0
+
+k−1
+
+k−1
+
++ 2η2
+
+ai,s(k)
+
+ai,s(k)E
+
+s=0
+
+s=0
+
+∇Fi(x(it,s)) 2
+
+k−1
+≤ 2η2σ2 [ai,s(k)]2
+s=0
+
+k−1
+
+τi −1
+
++ 2η2Λ
+
+ai,s(k)
+
+E
+
+s=0
+
+s=0
+
+∇Fi(x(it,s)) 2
+
+(94) (95)
+
+where (94) follows from Jensen’s Inequality, and (95) uses the fact ai,s(k) ≤ Λ. Note that
+
+τi−1 k−1
+
+τi−1
+
+[ai,s(k)]2 =
+
+ai(k)
+
+2 2
+
+k=0 s=0
+
+k=0
+
+(96)
+
+τi−1
+
+=
+
+ai(k)
+
+2 2
+
+≤
+
+(τi−1)
+
+ai
+
+2 2
+
+k=1
+
+(97)
+
+τi −1 k=0
+
+k−1
+[ai,s(k)]
+s=0
+
+τi −1
+
+=
+
+ai(k) 1
+
+k=0
+
+(98)
+
+τi −1
+
+=
+
+ai(k) 1 ≤ (τi − 1) ai 1 (99)
+
+k=1
+
+≤ 2L2E
+
+x(t,0) − x(it,k) 2 + 2E
+
+∇Fi(x(t,0)) 2 . (101)
+
+Substituting (101) into (95), we get
+
+1
+
+τi −1
+E
+
+ai 1 k=0
+
+x(t,0) − x(it,k) 2
+
+≤ 2η2σ2 (τi − 1)
+
+ai
+
+2 2
+
+ai 1
+
++ 4η2L2Λ(τi − 1) ai 1
+
+1
+
+τi −1
+E
+
+ai 1 k=0
+
++ 4η2Λτi(τi − 1)E ∇Fi(x(it,0)) 2
+
+x(t,0) − x(it,k) 2 (102)
+
+After minor rearranging, it follows that
+
+1
+
+τi −1
+E
+
+ai 1 k=0
+
+x(t,0) − x(it,k) 2
+
+≤
+
+2η2σ2 1 − 4η2L2Λ(τi − 1)
+
+ai
+
+(τi − 1) ai
+
+1
+
+ai 1
+
+2 2
+
++
+
+1
+
+−
+
+4η2Λτi(τi − 1) 4η2L2Λ(τi − 1)
+
+ai
+
+E
+1
+
+∇Fi(x(t,0)) 2 . (103)
+
+Note that ai 1 ≤ Λτi, we have
+
+L2Λ
+
+τi −1
+E
+
+ai 1 k=0
+
+x(t,0) − x(it,k) 2
+
+≤
+
+2η2L2Λσ2
+
+(τi − 1)
+
+1 − 4η2L2Λ2τi(τi − 1)
+
+ai
+
+ai
+1
+
+2 2
+
++
+
+1
+
+4η2L2Λ2τi(τi − 1) − 4η2L2Λ2τi(τi − 1)
+
+E
+
+∇Fi(x(t,0)) 2
+
+(104)
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+5248
+
+IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 69, 2021
+
+Deﬁne D = 4η2L2Λ2 maxi τi(τi − 1) < 1. We can simplify (104) as follows
+
+L2Λ τi−1 E ai k=0
+
+x(t,0) − x(it,k) 2
+
+≤
+
+2η2L2Λσ2 (τi − 1)
+
+1−D
+
+ai
+
+ai
+1
+
+2 2
+
++
+
+1
+
+D −D
+
+E
+
+∇Fi(x(t,0)) 2 . (105)
+
+Then, taking the average across all workers and applying Assumption 3, one can obtain
+
+1 2
+
+m i=1
+
+wiE
+
+∇Fi(x(t,0)) − h(it) 2
+
+≤
+
+Λη2L2σ2 1−D
+
+m i=1
+
+wi
+
+(τi
+
+− 1) ai
+
+ai
+1
+
+2 2
+
++
+
+D 2(1 −
+
+D)
+
+m i=1
+
+wiE
+
+∇Fi(x(t,0)) 2
+
+(106)
+
+≤
+
+Λη2L2σ2 1−D
+
+m i=1
+
+wi
+
+(τi
+
+− 1) ai
+
+ai
+1
+
+2 2
+
++
+
+Dβ 2(1 −
+
+2
+D)
+
+E
+
+∇F (x(t,0)) 2
+
+Dκ2 + 2(1 − D) .
+
+(107)
+
+If
+
+D≤
+
+1 2β 2 +1
+
+,
+
+then
+
+it
+
+follows
+
+that
+
+1 1−D
+
+≤
+
+1
+
++
+
+1 2β2
+
+≤
+
+3 2
+
+and
+
+Dβ2 1−D
+
+≤
+
+1 2
+
+.
+
+These
+
+facts
+
+can
+
+help
+
+us
+
+further
+
+simplify
+
+(107).
+
+We
+
+have
+
+m
+wiE
+
+∇Fi(x(t,0)) − h(it) 2
+
+i=1
+
+≤ 1 E ∇F (x(t,0)) 2 + 3 η2L2σ2B + 3η2L2κ2C (108)
+
+2
+
+2
+
+≤ 1 E ∇F (x(t,0)) 2 + 3η2L2σ2B + 6η2L2κ2C (109) 2
+
+where B = Λ
+
+m i=1
+
+wi(τi
+
+−
+
+1)
+
+ai
+
+2 2
+
+/
+
+ai
+
+1, C = Λ2 maxi τi
+
+(τi − 1).
+
+APPENDIX B
+EXPERIMENTAL SETTINGS
+Platform: All experiments in this paper are conducted on a cluster of 16 machines, each of which is equipped with one NVIDIA TitanX GPU. The machines communicate (i.e., transfer model parameters) with each other via Ethernet. We treat each machine as one client in the federated learning setting. The algorithms are implemented by PyTorch. We run each experiments for 3 times with different random seeds.
+Hyper-parameter Choices: On non-IID CIFAR10 dataset, we ﬁx the mini-batch size per client as 32. When clients use momentum SGD as the local solver, the momentum factor is 0.9; when clients use proximal SGD, the proximal parameter μ is selected from {0.0005, 0.001, 0.005, 0.01}. It turns out that when Ei = 2, μ = 0.005 is the best and when Ei(t) ∼ U (2, 5), μ = 0.001 is the best. The client learning rate η is tuned from {0.005, 0.01, 0.02, 0.05, 0.08} for FEDAVG with each local solver separately. When using the same local solver, FEDNOVA
+
+uses the same client learning rate as FEDAVG. Speciﬁcally, if the local solver is momentum SGD, then we set η = 0.02. In other cases, η = 0.05 consistently performs the best. On the synthetic dataset, the mini-batch size per client is 20 and the client learning rate is 0.02.
+ACKNOWLEDGMENT
+The authors thank Anit Kumar Sahu, Tian Li, Zachary Charles, Zachary Garrett, and Virginia Smith for helpful discussions.
+REFERENCES
+[1] J. Wang, Q. Liu, H. Liang, G. Joshi, and H. V. Poor, “Tackling the objective inconsistency problem in heterogeneous federated optimization,” Adv. Neural Inf. Process. Syst., vol. 33, pp. 7611–7623, 2020.
+[2] H. B. McMahan et al., “Communication-efﬁcient learning of deep networks from decentralized data,” in Proc. 20th Int. Conf. Artif. Intell. Statist., 2017, pp. 1273–1282.
+[3] P. Kairouz et al., “Advances and open problems in federated learning,” Foundations Trends Mach. Learn., vol. 14, no. 1–2, pp. 1–210, 2019, doi: 10.1561/2200000083.
+[4] W. Y. B. Lim et al., “Federated learning in mobile edge networks: A comprehensive survey,” IEEE Commun. Surveys Tuts., vol. 22, no. 3, pp. 2031–2063, Jul.–Sep. 2020.
+[5] M. Li et al., “Scaling distributed machine learning with the parameter server,” in Proc. 11th USENIX Symp. Operating Syst. Design Implementation, vol. 14, 2014, pp. 583–598.
+[6] A. Nedic´, A. Olshevsky, and M. G. Rabbat, “Network topology and communication-computation tradeoffs in decentralized optimization,” Proc. IEEE, vol. 106, no. 5, pp. 953–976, May 2018.
+[7] J. Wang and G. Joshi, “Cooperative SGD: A uniﬁed framework for the design and analysis of communication-efﬁcient SGD algorithms,” 2018, arXiv:1808.07576.
+[8] S. U. Stich, “Local SGD converges fast and communicates little,” in Proc. Int. Conf. Learn. Representations, 2019.
+[9] F. Zhou and G. Cong, “On the convergence properties of a k-step averaging stochastic gradient descent algorithm for nonconvex optimization,” in Proc. 27th Int. Joint Conf. Artif. Intell., 2018, pp. 3219–3227.
+[10] H. Yu, S. Yang, and S. Zhu, “Parallel restarted SGD with faster convergence and less communication: Demystifying why model averaging works for deep learning,” in Proc. AAAI Conf. Artif. Intell., 2019, pp. 5693–5700.
+[11] X. Li, K. Huang, W. Yang, S. Wang, and Z. Zhang, “On the convergence of FedAvg on non-IID data,” in Proc. Int. Conf. Learn. Representations, 2020. [Online]. Available: https://openreview.net/forum?id=HJxNAnVtDS
+[12] F. Haddadpour, M. M. Kamani, M. Mahdavi, and V. Cadambe, “Local SGD with periodic averaging: Tighter analysis and adaptive synchronization,” in Proc. Adv. Neural Inf. Process. Syst., 2019, pp. 11080–11092.
+[13] A. Khaled, K. Mishchenko, and P. Richtárik, “Tighter theory for local SGD on identical and heterogeneous data,” in Proc. 23rd Int. Conf. Artif. Intell. Statist., 2020, pp. 4519–4529.
+[14] J. Wang and G. Joshi, “Adaptive communication strategies to achieve the best error-runtime trade-off in local-update SGD,” in Proc. Conf. Mach. Learn. Syst., 2019, pp. 212–229.
+[15] S. P. Karimireddy, S. Kale, M. Mohri, S. J. Reddi, S. U. Stich, and A. T. Suresh, “SCAFFOLD: Stochastic controlled averaging for on-device federated learning,” in Proc. Int. Conf. Mach. Learn., 2020, pp. 5132–5143.
+[16] X. Liang, S. Shen, J. Liu, Z. Pan, E. Chen, and Y. Cheng, “Variance reduced local SGD with lower communication complexity,” 2019, arXiv:1912.12844.
+[17] J. Wang, V. Tantia, N. Ballas, and M. Rabbat, “SlowMo: Improving communication-efﬁcient distributed SGD with slow momentum,” in Proc. Int. Conf. Learn. Representations, 2020. [Online]. Available: https:// openreview.net/forum?id=SkxJ8REYPH
+[18] B. E. Woodworth, J. Wang, A. Smith, B. McMahan, and N. Srebro, “Graph oracle models, lower bounds, and gaps for parallel stochastic optimization,” in Proc. Adv. Neural Inf. Process. Syst., 2018, pp. 8496–8506.
+[19] A. Dieuleveut and K. K. Patel, “Communication trade-offs for local-SGD with large step size,” in Proc. Adv. Neural Inf. Process. Syst., 2019, pp. 13579–13590.
+[20] S. Dutta, G. Joshi, S. Ghosh, P. Dube, and P. Nagpurkar, “Slow and stale gradients can win the race: Error-runtime trade-offs in distributed SGD,” in Proc. 21st Int. Conf. Artif. Intell. Statist., 2018, pp. 803–812.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+
+WANG et al.: A NOVEL FRAMEWORK FOR THE ANALYSIS AND DESIGN OF HETEROGENEOUS FEDERATED LEARNING
+
+5249
+
+[21] T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, and V. Smith, “Federated optimization in heterogeneous networks,” in Proc. Conf. Mach. Learn. Syst., 2020, pp. 429–450.
+[22] C. Xie, S. Koyejo, and I. Gupta, “Asynchronous federated optimization,” 2019, arXiv:1903.03934.
+[23] T.-M. H. Hsu, H. Qi, and M. Brown, “Measuring the effects of nonidentical data distribution for federated visual classiﬁcation,” 2019, arXiv:1909.06335.
+[24] S. Reddi et al., “Adaptive federated optimization,” in Proc. Int. Conf. Learn. Representations, 2021.
+[25] A. Reisizadeh, A. Mokhtari, H. Hassani, A. Jadbabaie, and R. Pedarsani, “Fedpaq: A communication-efﬁcient federated learning method with periodic averaging and quantization,” in Proc. 23rd Int. Conf. Artif. Intell. Statist., 2020, pp. 2021–2031.
+[26] D. Basu, D. Data, C. Karakus, and S. Diggavi, “Qsparse-local-SGD: Distributed SGD with quantization, sparsiﬁcation and local computations,” in Proc. Adv. Neural Inf. Process. Syst., 2019, pp. 14668–14679.
+[27] H. Wang, S. Sievert, S. Liu, Z. Charles, D. Papailiopoulos, and S. Wright, “Atomo: Communication-efﬁcient learning via atomic sparsiﬁcation,” in Proc. Adv. Neural Inf. Process. Syst., 2018, pp. 9850–9861.
+[28] F. Sattler, S. Wiedemann, K.-R. Müller, and W. Samek, “Robust and communication-efﬁcient federated learning from non-IID data,” IEEE Trans. Neural Netw. Learn. Syst., vol. 31, no. 9, pp. 3400–3413, Sep. 2020.
+[29] Z. Li, D. Kovalev, X. Qian, and P. Richtárik, “Acceleration for compressed gradient descent in distributed and federated optimization,” in Proc. 37th Int. Conf. Mach. Learn., 2020, pp. 5895–5904.
+[30] F. Wu, S. He, Y. Yang, H. Wang, Z. Qu, and S. Guo, “On the convergence of quantized parallel restarted SGD for serverless learning,” 2020, arXiv:2004.09125.
+[31] N. Shlezinger, M. Chen, Y. C. Eldar, H. V. Poor, and S. Cui, “UVeQFed: Universal vector quantization for federated learning,” IEEE Trans. Signal Process., vol. 69, pp. 500–514, Dec. 2021.
+[32] T. Li, M. Sanjabi, and V. Smith, “Fair resource allocation in federated learning,” in Proc. Int. Conf. Learn. Representations, 2020.
+[33] M. Mohri, G. Sivek, and A. T. Suresh, “Agnostic federated learning,” in Proc. 36th Int. Conf. Mach. Learn., 2019, pp. 4615–4625.
+[34] D. P. Bertsekas, “Incremental gradient, subgradient, and proximal methods for convex optimization: A survey,” Optim. Mach. Learn., vol. 2010, no. 138, pp. 85–119, 2011.
+[35] D. Bajovic´, J. M. Moura, J. Xavier, and B. Sinopoli, “Distributed inference over directed networks: Performance limits and optimal design,” IEEE Trans. Signal Process., vol. 64, no. 13, pp. 3308–3323, Jul. 2016.
+[36] B. Johansson, M. Rabi, and M. Johansson, “A randomized incremental subgradient method for distributed optimization in networked systems,” SIAM J. Optim., vol. 20, no. 3, pp. 1157–1170, 2010.
+[37] L. Bottou, F. E. Curtis, and J. Nocedal, “Optimization methods for largescale machine learning,” SIAM Rev., vol. 60, no. 2, pp. 223–311, 2018.
+[38] F. Haddadpour and M. Mahdavi, “On the convergence of local descent methods in federated learning,” 2019, arXiv:1910.14425.
+[39] J. Wang, A. K. Sahu, Z. Yang, G. Joshi, and S. Kar, “MATCHA: Speeding up decentralized SGD via matching decomposition sampling,” 2019, arXiv:1905.09435.
+[40] K. Simonyan and A. Zisserman, “Very deep convolutional networks for large-scale image recognition,” 2014, arXiv:1409.1556.
+[41] A. Krizhevsky, “Learning multiple layers of features from tiny images,” Citeseer, Tech. Rep., 2009.
+[42] H. Wang, M. Yurochkin, Y. Sun, D. Papailiopoulos, and Y. Khazaeni, “Federated learning with matched averaging,” in Proc. Int. Conf. Learn. Representations, 2020.
+[43] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in Proc. Int. Conf. Learn. Representations, 2015.
+[44] J. Duchi, E. Hazan, and Y. Singer, “Adaptive subgradient methods for online learning and stochastic optimization,” J. Mach. Learn. Res., vol. 12, no. 7, pp. 2121–2159, 2011.
+Jianyu Wang received the B.E. degree in electronic engineering from Tsinghua University, Beijing, China, in 2017. He is currently working toward the Ph.D. degree with Carnegie Mellon University, Pittsburgh, PA, USA, advised by Professor Gauri Joshi. In 2020 and 2021, he was a Research Intern with Google Research and in 2019, with Facebook AI Research. His research interests include federated learning, distributed optimization, and systems for large-scale machine learning. His research has been supported by Qualcomm Ph.D. fellowship (2019).
+
+Qinghua Liu received the B.E. degree in electrical engineering and the B.S. degree in mathematics from Tsinghua University, Beijing, China, in 2018. He is currently working toward the Ph.D. degree with the Department of Electrical and Computer Engineering, Princeton University, Princeton, NJ, USA. His current research focuses on reinforcement learning.
+Hao Liang received the bachelor’s degree in optoelectrical information engineering from the University of Electronic Science and Technology of China, Chengdu, China, in 2018 and the master’s degree in electrical and computer engineering from Carnegie Mellon University, Pittsburgh, PA, USA, in 2020. He is currently working toward the Ph.D. degree with Rice University, Houston, TX, USA, majoring in electrical and computer engineering. His research interests include speech and image processing, and distributed optimization.
+Gauri Joshi (Member, IEEE) received the B.Tech and M.Tech degrees in electrical engineering from the Indian Institute of Technology (IIT) Bombay, Mumbai, India, in 2010 and the Ph.D. degre in EECS from the Massachusetts Institute of Technology, Cambridge, MA, USA, in 2016. She is currently an Assistant Professor with ECE Department, Carnegie Mellon University, Pittsburgh, PA, USA. From 2016 to 2017, she was a Research Staff Member with IBM T. J. Watson Research Center. Her current research interests include federated learning, distributed optimization, and coding theory. Her awards and honors include the NSF CAREER Award in 2021, the ACM Sigmetrics Best Paper Award in 2020, and the Institute Gold Medal of IIT Bombay in 2010.
+H. Vincent Poor (Fellow, IEEE) received the Ph.D. degree in EECS from Princeton University, Princeton, NJ, USA, in 1977. From 1977 to 1990, he was on the Faculty with the University of Illinois at UrbanaChampaign, Champaign, IL, USA. Since 1990, he has been on the Faculty with Princeton, where he is currently the Michael Henry Strater University Professor. During 2006–2016, he was the Dean of Princeton’s School of Engineering and Applied Science. He has also held visiting appointments at various other universities, including most recently with Berkeley and Cambridge. His research interests include information theory, machine learning and network science, and their applications in wireless networks, energy systems, and related ﬁelds. Among his publications in these areas is the forthcoming book Machine Learning and Wireless Communications (Cambridge University Press). He is a Member of the National Academy of Engineering and the National Academy of Sciences and is a Foreign Member of the Chinese Academy of Sciences, the Royal Society, and other national and international academies. He was the recipient of the IEEE Alexander Graham Bell Medal in 2017.
+
+Authorized licensed use limited to: Beijing Jiaotong University. Downloaded on September 07,2024 at 02:00:35 UTC from IEEE Xplore. Restrictions apply.
+

@@ -1,0 +1,425 @@
+Received October 7, 2020, accepted October 25, 2020, date of publication November 3, 2020, date of current version November 13, 2020. Digital Object Identifier 10.1109/ACCESS.2020.3035503
+Port Recommendation System for Alternative Container Port Destinations Using a Novel Neural Language-Based Algorithm
+QIANG MEI 1,2,3,4,5, QINYOU HU1, CHUN YANG1, HAILIN ZHENG1,5, AND ZHISHENG HU2
+1Merchant Marine College, Shanghai Maritime University, Shanghai 200210, China 2Navigation College, Jimei University, Xiamen 361021, China 3State Key Laboratory of Resources and Environmental Information System, Beijing 100101, China 4National-Local Joint Engineering Research Center for Marine Navigation Aids Services, Xiamen 361021, China 5School of Science, Digital Fujian Big Data Modeling and Intelligent Computing Institute, Jimei University, Xiamen 361021, China
+Corresponding author: Qinyou Hu (qyhu@shmtu.edu.cn)
+This work was supported in part by the National Natural Science Foundation of China under Grant 51879119 and Grant 71804059, in part by the Shanghai Science and Technology Committee Foundation under Grant 18DZ1206300, in part by the State Key Laboratory of Resources and Environmental Information Systems (2018), and in part by the Open Fund of Digital Fujian Big Data Modeling and Intelligent Computing Institute.
+
+ABSTRACT Shipping containers are tokens of multimodal international transportation and rapid logistics. Container deliveries are scheduled to satisfy rapidly changing requirements. Unpredictable increases in costs and unforeseeable events such as pandemics compel ship owners and managers to adopt risk minimization measures. This study addresses one issue: how to determine an alternative port of call from massive data to offer a realistic destination change recommendation for a container vessel. Recommendation algorithms have become ubiquitous and are used effectively in other ﬁelds, but there is no such model for the port of call selection or recommendation. Large scale automatic identiﬁcation system (AIS) data are readily available. We developed a computational framework based on a novel natural language programming algorithm that was tailored to support port recommendation rather than use a conventional adjacency matrix method. We mined large scale AIS data to construct sequential berth records for container vessels and mapped each port onto a vector in an embedded space. The natural language neural programming algorithm can suggest ports similar to the scheduled ports of call that were unable to offer service. The recommendations were validated with geo-analysis of sailing distance and could offer viable alternative ports to shipping managers.
+INDEX TERMS Container shipping, neural natural language programming algorithm, AIS, network embedding, port2vec, port recommendation.
+
+I. INTRODUCTION Shipping containers are a consequence of the modernization of transportation and logistics that began when the shipping industry entered the megaship era in 2007. In that year, Maersk Line companies began to use container ships with a carrying capacity of more than 10,000 twenty-foot equivalent units (TEUs) to beneﬁt from economies of scale. Today, to meet the demands of efﬁciency and environmental protection, even coal and grain shipments, which have always been shipped by bulk cargo vessels, are gradually becoming a part of the global logistics chain of container ships and rail transportation [1]. These trends, together with the retirement
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Zhixiong Peter Li .
+
+FIGURE 1. Network of global ship passages in 2018.
+and laying up of smaller older deep sea vessels, ensure that the proportion of megaships in the global container ship ﬂeet will continue to increase.
+Container ship routes constitute a maritime network (Figure 1). Scholars have conducted in-depth research into
+
+199970
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/ VOLUME 8, 2020
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+FIGURE 2. Personalized recommendations on a trip website.
+many aspects of container ship services. The spoke–hub transportation model for container ships has been optimized to ensure efﬁcient shipping operation and management [2], [3]. Reference [4] examined how to maximize a company’s beneﬁt, in terms of proﬁt and safety, from ship berth capacity and allocation in response to ship movement. Optimal routes were determined for cases of sailing time uncertainty [5] and inefﬁcient ﬂeet shipping practices [6]. Global warming has forced researchers to pay attention to the environmental effects of container ship emissions [7], [8]. Reference [9] proposed innovative design alternatives for marine container terminals to facilitate efﬁcient ship handling and container processing. Reference [10] modeled container operations to predict optimal cargo throughput for each docked ship. Reference [11] investigated container scanning systems to improve cargo monitoring.
+There are still unexplored areas of research into improving container ship services. The large proportion of megaships in the global container ship ﬂeet poses challenges to maritime administration. If there is a shipping disruption [12], perhaps due to a pandemic in some port [13], how can a good recommendation for alternative port berths for a vessel be created? How can we design and create a quantization index from big data for the destination berth of a vessel that will ensure the safety of shipping and the integrity of the logistics chain?
+Many optimization models of maritime networks have been proposed that use the complex network theory and origin–destination adjacency matrices to parameterize vessel size, sailing frequency, port berths and other characteristics. The nodes and adjacent links comprise spatial networks, or graphs, that reveal shipping patterns [14], [15], robustness [16], and even economic trends [17]. Thus port–port relations derived from origin–destination shipping data can be constructed to facilitate the mining of the inherent law.
+Personalized recommendation systems have developed rapidly since the 1990s; many recommendation systems are used in various business environments [18]. For example, e-shopping companies personalize online stores to direct customers to products (such as books, cameras, computers, points of interest) that are likely to be attractive (Figure 2). Recommendations are created using collaborative ﬁltering algorithms and machine learning [19], [20].
+As things stand, the choice of an alternative port depends primarily on the experience and knowledge of the captain of a ship, and there may in practice be little prior data analysis to inform the decision.
+In this article, we describe our research into providing alternative port recommendations using big data. A perfect
+VOLUME 8, 2020
+
+FIGURE 3. Mining synonyms for container ship’s shipping law.
+recommendation results from reliable correlation analysis that determines a spatial relationship, similar to the approach of spatially correlating road use in a trafﬁc study [21], [22]. Berth records are strong preference indicators that are useful for targeting an acceptable choice and provide accurate information that matches the needs of a vessel and its relationship with a port. This article describes how we determined similarities between ports to obtain the perfect recommendation.
+Reference [23] proposed a novel approach to quantifying vehicle interactions at road intersections that used natural language processing of large scale long distance route data. Shipping has similar semantic rules and the selection of a destination port for a container vessel depends on the nature of the port hinterland infrastructure. Shipping lines can always choose one or more ports from a number of ports having the same hinterland. Containers can then be distributed into this zone by land transportation (train and truck) or vessels of local shipping lines. These ports thus have many similarities, and one may be substituted for another. If port C1 is not fully operational for socioeconomic, weather or pandemic reasons, port C2 or port C3 could be a suitable alternative. A container shipping line schedule can be read semantically as a regular and ﬁxed document. Text that forms berth records is a sequence of words, with synonyms identiﬁed from the context of the central word (Figure 3). We used Port2vec, derived from word2vec, to transform interactions between ports, obtained from berth records, into vectors and used a high degree of similarity between port vectors to suggest one or more appropriate recommendations for an alternative port.
+The research consisted of the following major steps.
+1) STEP 1 We used the automatic identiﬁcation system (AIS) data, which were obtained from raw messages received by base stations throughout the world. The algorithm we created searched for detailed information, including time of arrival, time of departure, port name, ship type, and suchlike. The record was constructed from the basic AIS data, leveraging berth data. The text documents contained sequential berth records (Figure 4), which we then merged with the port of call records of all container ships throughout the world to form a training data set.
+199971
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+FIGURE 6. The workflow for computing recommendation results.
+
+FIGURE 4. Sequential berth records to training text.
+FIGURE 5. Embedding representation.
+2) STEP 2 In a shipping graph G = (V , E), V is a set of vertex points (nodes) representing ports, and E is a set of directed edges (links) representing shipping routes, which are relationships between nodes [24]. International ports create a large network with thousands of nodes containing many berths (Figure 1). Conventional maritime network analysis constructs adjacency matrices that identify bottlenecks. However, high computational complexity, low parallelizability and the inapplicability of machine learning methods lead to redundancy and noise [25]. In contrast to network relation representation, the use of embedding allows a port to be represented by a vector, and the similarity of vectors in a low dimensional vector space can form the basis of a port recommendation algorithm (Figure 5) [26].
+Ports with similar contexts were mapped to neighboring vectors in the embedding space. The port recommendation model was trained using a large scale dataset. We implemented an approach that embedded ports in sequence into a low dimensional vector space using a neural natural language processing model applied to a berthing time series. Thus, ports with similar contexts (i.e., ports at which vessels of the same type had previously berthed or were scheduled to berth) were mapped onto neighboring vectors in the embedding space and were identiﬁed as potential recommendations using geo-analysis.
+In our work, 200,000 berth records of container ships for 2018 were extracted from the data provided by AIS-equipped vessels throughout the world. Each berth port was considered to be a word and berth records were assembled as documents. The vector representation of each port was calculated from documents. The algorithm was trained by embedding technology.
+199972
+
+The real number vectors for each port in the database were created from textual geographic information by Port2vec. The port and text datasets were combined to form port–berth records. Relationships between ports were mined to identify similarities between vectors. The algorithm then presented similar vectors, which had been calculated using the geographical factors, as ﬁnal recommendation results. A ﬂowchart of the entire process is given in Figure 6.
+This article is structured as follows. Section I has given an overview of research into recommendation methods and a summary of our research method. Section II describes how we obtained vectors of ports and calculated similarities using the model. Section III describes how we mined the sequential data as training data from the AIS dataset. Section IV describes our data experiment and presents a discussion of the results. Our conclusions are presented for future research, in Section V.
+II. RESEARCH METHODOLOGY A. OVERVIEW This section outlines the principal tasks that must be completed to identify a substitute port. From a macro perspective, container vessels follow routes and have berth allocations that are ﬁxed and published as a part of their business contract, in contrast to the navigation rules for bulk cargo ships and tankers, and ports of call are related to each other in a sailing sequence.
+We can transform the linear programming transportation problem of container shipping into a natural language processing problem by mining words with high similarity and high relatedness from the published text. ImageNet object recognition and switchboard speech recognition have been extremely successful in neural network learning since 2012, and these learning methods have been introduced into natural language processing (NLP) [27], and we used it in this application. Word2vec has been used in many NLP applications. It is a template for a statistical language model that learns the probability functions of word sequences and calculates statistical properties of the words. In this study, each word in a text was represented by a single vector in a low dimensional space, and distances between words were calculated to indicate semantic relatedness in estimating similarity [28].
+Researchers now have access to different areas of perception to capture correlation information that is represented by this embedded language model. A novel method, the visually supervised word2vec model, has been developed to merge visual modality with natural language to obtain
+VOLUME 8, 2020
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+important relation words in knowledge acquisition [29]. The sound–word2vec model was developed to learn specialized word embedding in order to capture interest in sounds [30]; word2vec has also been used to capture meaningful relationships in natural music [31]. Linguistic cues from video clips with spatiotemporal features were used to capture discriminative visual features using action–word2vec [32]. The methods have improved to the extent that we ﬁnd it practical to identify internal relationships by mining semantic associations.
+We used similar techniques to ﬁnd human behaviors that inﬂuenced port selection, and used mining to develop port recommendations for ships. Figs. 3 and 5 give an outline of the method we used. We can include data for the hinterland because the behavior of a container ship captain in choosing a port is similar to the semantic search of synonyms in natural language. The use of an adjacency matrix is computationally intensive and not conducive to measuring the node similarity in conventional port–relation expression, hence in the embedding approach, we associated each port with a vector representation. Thus, similarities can be measured using a vector cosine calculation.
+B. STATISTICAL LANGUAGE MODEL COMPUTATION An NLP approach leverages the word order in text documents, explicitly modeling the assumption that nearby words in a word sequence are statistically more likely to be interrelated than distant words. Vocabulary size may become immense in practical applications, and recently developed NLP models evaluate the statistical properties of words and the relations between them.
+NLP tasks such as machine translation and information extraction require that a probability be assigned to individual words in a sequence. Conventional n-gram methods use sentences that consist of words w1, w2,. . . , wn−1 in a sequence and create an n-gram Markov model of order n − 1 that determines the probability of a word appearing based on the previous n−1 words [33]. The advantage of an n-gram model is that it contains all the information provided by the ﬁrst n−1 words. These words strongly constrain the nth word. The disadvantage of this model is that it needs a considerable amount of training text to determine the parameters of the model. As we know, there are plenty of ports available for training. When n is large, the parameter space of the model becomes large. We introduced a method of learning distributed representation for words to avoid high dimensionality and to obtain semantic neighbors in a low dimension [34].
+NLP modeling in this study included low dimensional distributed embedding of words using a neural network. We constructed the objective function F(w, Context(w)), which consists of a word w and its context Context(w). In contrast to the n-gram model, this method does not retain all probability values. We used a continuous bag-of-words model (CBOW) to construct F(w, Context(w)). A CBOW model works well and requires less computing time since it has only three layers: input layer, hidden layer, and output layer (Figure 7) [35].
+VOLUME 8, 2020
+
+FIGURE 7. Continuous bag-of-words model.
+
+The one-hot representation we used associates all words
+
+of the port with a single vector expression. Natural language
+
+models usually represent each word as a feature vector of
+
+the same length as the word count of the dictionary. The
+
+vector contains a single 1, corresponding to the position of
+
+the word in the dictionary, and all other entries are 0. One-hot
+
+representation of the large number of ports and berths across
+
+the world would require vectors of great length and introduce
+
+severe data sparsity [36]. However, using only this method
+
+isolates words and prevents the expression of words that play
+
+no part in representing the relationship.
+
+The input consisted of each context word vector with one-
+
+hot representation. The transposition of output vector was
+
+y = (yw,1, yw,2, . . . , yw,N ), and each element was the predicted probability of each word from the corpus appearing
+
+as the central word. Then the ﬁnal probability of the central
+
+word wi, given surrounding words Context(wi), was given by the Softmax function:
+
+eyw,iw
+
+p(wi|Context(wi)) =
+
+N i=1
+
+eyw,i
+
+(1)
+
+where iw is word i in the dictionary [37].
+
+C. TRAINING PORT VECTORS AND CALCULATING SIMILARITIES BETWEEN VECTORS
+
+The model samples phrases (groups of words) depending on the size of the window by using a sliding window. The following diagram illustrates the process. The purple box contains the central word, and the words in the yellow box are context words.
+Data are sampled through the sliding window until the training data have been completely parsed and the ﬁnal training of the model is completed. When a set of context words was input, the vector produced in the output layer contained the prediction probabilities for all words in the corpus. We expect that the probability of the occurrence of the middle word is the highest and that the probability of the occurrence of other words is as small as possible. When we construct the objective function, we expect that the probability of the occurrence of positive samples is the greatest and that of negative samples is the least. The objective function is:
+
+F(w, Context(w)) = σ (xw θ ω)
+
+[1 − σ (xw θ u)] (2)
+
+u∈NEG(w)
+
+199973
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+where xw is the word vector sum of Context(w), NEG(w) is the set of negative central words in the sample w, θ i is the
+coefﬁcient vector for any word of i which is w or belongs to NEG(w) in the corpus, σ (ϕ) is the Sigmoid function that is
+the activation function of the model coefﬁcient vector:
+
+yi
+
+=
+
+σ (ϕ)
+
+=
+
+1
+
+1 + e−ϕ
+
+(3)
+
+and σ (xw θ i) is the probability of word i calculated. The training was accelerated, using negative sampling by
+stochastic gradient descent. In order to facilitate derivative
+calculation, the logarithm of the objective function was taken:
+
+L=
+
+{Lw(i) · log[σ (xw θ i)]
+
+w∈C i∈{w}∪NEG(w)
+
++[1 − Lw(i)]log[σ (xw θ i)]} (4)
+
+where
+
+Lw(i) = 1 where word_i ← w
+
+(5)
+
+0 where word_i ← NEG(w)
+
+Both θ i and v(w˜ ) are constantly updated by the gradient descent calculation:
+
+∂L ∂θi
+
+= Lw(i)[1 − σ (xw θ i)]xw − [1 − Lw(i)]σ (xw θ i)xw
+
+= [Lw(x) − σ (xwθ i)]xw
+
+(6)
+
+θi
+
+:=
+
+θi
+
++η
+
+·
+
+∂L ∂θi
+
+·
+
+xw
+
+(7)
+
+∂L ∂ xw
+
+= [Lw(i) − σ (xw θ i)]θ i
+
+(8)
+
+v(w˜ )
+
+:=
+
+v(w˜ )
+
++
+
+η
+
+i∈{w}∪NEG(w)
+
+∂L ∂ xw
+
+,
+
+w˜ ∈ Context(w) (9)
+
+When the optimal parameter set θ ∗ of θ i has been deter-
+
+mined by optimization, p(w|Context(w)) is given by F(w, Context(w)); η is the default learning rate, 0.025; v(w˜ ) is
+
+updated constantly; and L is calculated by gradient descent.
+
+Each vector v(w˜ ) becomes stable in the hidden layer which
+
+will be input cosine similarity calculation [38].
+
+In summary, embedded representations of words in a vector
+
+space are used to give a measure of the similarity of words
+
+in text sentences, based on the assumption that words that
+
+appear frequently in a document and co-occurring words
+
+within the same context are semantically similar.
+
+The similarity between ports in terms of berths was mea-
+
+sured by the cosine similarity cos(θ) of vectors calculated in
+
+the hidden layer; two vectors for port a and port b are similar
+
+when:
+
+Cos Sim(a, b) = cos(θ) =
+
+n i=1
+
+aibi
+
+n i=1
+
+a2i
+
+n i=1
+
+b2i
+
+(10)
+
+where ai and bi are the elements of port vectors a and b. Vectors with similar contexts have larger cosine values when ports have similar neighboring contexts.
+
+199974
+
+TABLE 1. Description of automatic information system parameters.
+FIGURE 8. Choosing central words with the sliding window.
+Our Port2vec model was trained by the Python package gensim of word2vec. The model was: Model = gensim.models.Word2Vec
+(documents, dimension, window) where documents are text sentences that contain the berth port sequences used to determine the similarity; dimension is the vector length, with the value set to 200; and window is the set of words surrounding the central word that form the context of the central word for training, with the value set to 5 [23].
+III. CONVERTING SEQUENTIAL TRAINING DATA FROM AIS DATA The berth records of container ships that were used as input data for the Port2vec model originated from AIS. AIS uses transponders and GPS receivers to transmit and receive static and dynamic vessel and voyage data between other vessels and ground stations. There is a wealth of AIS data, which is used for collision avoidance, marine trafﬁc management, and trade analysis of the maritime business. AIS parameters used in this study are given in Table 1.
+In this section, we describe how we used port information to provide data based recommendations, including the neural NLP models that are fundamental to our port recommendation system. AIS vessel data tuples and port–berth tuples were the basis of shipping characteristic representation (Figure 8). Data derived from AIS constituted the ship data tuples (Table 1). The port–berth tuples contained information about ports and berths. Each port was artiﬁcially delimited by an irregular polygonal boundary.
+The relevant procedure was as follows.
+1) STEP 1 AIS data tuples, which contain static vessel information and dynamic data such as position, velocity, and heading, were
+VOLUME 8, 2020
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+obtained from navigation information. Port–berth tuples contain port attributes. Tuples were deﬁned as follows.
+The AIS vessel data tuple was deﬁned as:
+
+Ati = (mi, li, wi, vti , pti , cti , dit )
+
+(11)
+
+where Ati is the tuple for vessel i at time t, mi is the unique
+identiﬁcation of vessel i, li is the length of the vessel, wi is the beam of the vessel, vti is the vessel speed at location pti , cti is the heading, and dit is the vessel draft.
+The port–berth tuple was deﬁned as:
+
+Ti = (fi, bi, ni)
+
+(12)
+
+where Ti is the tuple of port i; fi is the database key for port i; bi is an irregular polygon representing the boundary of port; and ni is the name of port i.
+
+2) STEP 2
+In a large port, ship speed is only 9–15 km/h in the fairway, and arrival or departure takes nearly one hour. We set 30 minutes as the interval for the observation window of a vessel position in the AIS data to moderate computer resource use during queries. For data recorded within the interval, we compared ports and berths, screened out vessels that had latitude and longitude values located within the port boundary, and compared vessel characteristics to derive the speciﬁc characteristics of the destination port of call.
+
+3) STEP 3 We created a description of the characteristics of arrivals, departures, and berthing for a port using the following process.
+Deﬁne the boundary of port y as by in the sampling period t. The function contains(by, px ) shows that vessel x was located within the polygonal port boundary by. The set of all ships in port y at time t, Rty, was deﬁned as:
+Rty = {Mmsix |contains(by, px ) ∧ tx > t − t ∧ tx ≤ t ∧ vx ≤ v} (13)
+At time t + t, the set of all vessels in port y was deﬁned as:
+Rty+ t = {Mmsix |contains(by, px ) ∧ tx > t ∧ tx ≤ t + t ∧vx ≤ v} (14)
+Two other conditions for deriving characteristics were deﬁned. The timestep t was the sampling time of 30 min and an increment v of 1 km/h was used for vessel speed, which may be affected by wind and current when the vessel is moored in a harbor.
+The heading rate can be used as a reference point because it does not vary when vessels are moored. The sampling time for this parameter was set to 30 minutes.
+If the set of vessels that reach or leave port y during the interval from time t to time t + t is Dty+ t , then Dty+ t = Rty+ t − Rty shows the arrival or departure of one or more vessels.
+
+VOLUME 8, 2020
+
+FIGURE 9. Sailing and berthing of container ships.
+
+The arrival time of a vessel allows us to quickly extract data for ships that arrive at a port or berth, such as arrival frequency, docking records, and similar information. The extremely large quantity of AIS data makes it impossible to monitor the positional information of every ship at any time. Thus, data snapshots were used to extract the arrival and departure time and berth details of ships by sampling historical AIS data at intervals and combining snapshot data with AIS data tuples and port–berth tuples.
+We obtained ship position information from AIS data, deriving port and port boundaries and screening out vessels that were outside port boundaries by latitude and longitude. The remaining data were compared with the characteristics of vessels arriving at the port to obtain the characteristics of vessels departing from the port. The characteristics of all berthing behavior were extracted and assembled to form a sequential berth record for our training data:
+Portberth_seq = {Port1, Port2, Port3, . . . , Portn} (15)
+The sequential words were extracted as the training text in Figure 4 and input to the gesim package.
+
+IV. EXPERIMENTAL RESULTS AND RECOMMENDATION EXPLANATION This section demonstrates the operation of the Port2Vec recommendation model. The experimental AIS data were obtained from hiﬂeet.com. The proportion of ships with deadweight >50,000 tonnes was 43.56%, showing that port facilities are very adaptable in terms of ship size (Figure 10).
+We chose Shanghai, the largest container ship port in the world in terms of throughput, and a typical regional port in China; Singapore, a global hub port in the Malacca Strait; and Hamburg, the third largest container ship hub in Europe, to test our method of determining the similarity between ports and creating recommendations for alternative destination ports for vessels. The geographical factor we set was the sailing distance from the chosen port to backup ports based on sailing cost. The function for a recommendation of port i was calculated as:
+
+Ri
+
+=
+
+Si δi
+
+(16)
+
+where Si is the similarity calculated by the Port2vec algorithm and δi is the attenuation coefﬁcient of sailing distance. The recommendation value of the backup port is Ri.
+The ports of Zhangjiagang, Nantong, Ningbo, and
+Zhoushan are located in the Yangtze River delta along the
+
+199975
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+FIGURE 10. Registration and deadweight distributions of data.
+
+FIGURE 12. Location and recommendation values to Singapore of alternative ports.
+
+FIGURE 11. Location and recommendation values to Shanghai of alternative ports.
+economic belt on China’s mainland coastline. Zhangjiagang has 16 berths, with an annual throughput capacity of more than 60 million tonnes. Nantong has 24 public berths above 1000 tonnes, with a maximum berthing capacity of 200,000 tonnes. These two river ports can be used by any vessel as alternatives to Shanghai (Figure 11).
+199976
+
+Ningbo and Zhoushan are the top two recommended ports for the period 1995–2015. Chinese hub ports associated with the Silk Road have grown from two (Hongkong and Shanghai) to four (Shanghai, Shenzhen, Ningbo, and Hongkong) due to their relative centrality in the complex port network [39]. The set of shipping lines using Ningbo overlaps greatly with the set of those using Shanghai. Qingdao and Kobe are determined to be similar ports because they both handle megaships and both are hubs of international land freight networks.
+Likewise, Singapore and Hamburg (Figure 12 and Figure 13) are similar, beneﬁting from the volume of shipping that passes through the Malacca Strait or the North Sea by an ability to forward containers across a continent. Our analysis also supports the view that China’s investment in developing Melaka Gateway as a backup port for Singapore is a reasonable assurance of trade security.
+Melaka Gateway as a backup port for Singapore is a reasonable assurance of trade security.
+Our Port2vec analysis and related geographical analysis enabled us to select six container ship ports, most of which are in the top 20 ports of world, to offer data based recommendations to maritime management: Lianyungang, Xiamen, Hongkong, and Tianjin in China, Los Angeles in the United States and Inchon in South Korea. As we acknowledge, if theses ports were inactive due to a pandemic, there would be great ﬁnancial losses. The top ﬁve recommendations of alternatives to each of these ports are given in Table 2.
+VOLUME 8, 2020
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+our research are summarized as follows: Port2vec can identify relevant similarities between container ship ports; and geographical analysis supports the effectiveness of the methodology.
+This recommendation technology can be used only for container ports because it leverages sequences of berth records by treating them as textual sentences. In subsequent research, we intend to improve the approach to provide recommendations for other types of shipping.
+
+ACKNOWLEDGMENT This article was successfully completed under the guidance of Qinyou Hu and Chun Yang. Dr. Hailin Zheng provided great help in the translation of the paper. Zhisheng Hu offered great support in data processing. Thanks a lot for Dr. Peghoty’s helping them understanding fundamentals of word2vec and Dr. Wu’s advice of grammar.
+
+FIGURE 13. Location and recommendation values to Hamburg of alternative ports.
+TABLE 2. Top five recommendations for selected main spots.
+The results presented in Table 2 show that the ports with a high recommendation value have similar connections to internal transportation networks and are export-focused. The computational framework we developed will help shipping managers to choose alternative destination ports effectively, especially in a period of epidemic. This work can also help us to detect communities of port clusters in the future. V. CONCLUSION We used a novel approach to calculate the similarity using word embedding. This study demonstrates for the ﬁrst time that Port2vec technology, derived from word2vec, can be used effectively to provide port recommendations in shipping and maritime applications. The key points in
+
+REFERENCES
+[1] P. Helo, H. Paukku, and T. Sairanen, ‘‘Containership cargo proﬁles, cargo systems, and stowage capacity: Key performance indicators,’’ Maritime Econ. Logistics, pp. 1–21, Apr. 2018, doi: 10.1057/s41278-018-0106-z.
+[2] H. B. Bendall and A. F. Stent, ‘‘A scheduling model for a high speed containership service: A hub and spoke short-sea application,’’ Int. J. maritime Econ., vol. 3, no. 3, pp. 262–277, Sep. 2001, doi: 10.1057/palgrave.ijme.9100018.
+[3] L. Q. Yang, ‘‘Scheduling model of feeder line multi-hull container ships based on hub-and-spoke network,’’ Chin. J. Manag. Sci., vol. 23, pp. 860–864, 2015.
+[4] H.-A. Lu and W.-H. Mu, ‘‘A slot reallocation model for containership schedule adjustment,’’ Maritime Policy Manage., vol. 43, no. 1, pp. 136–157, Apr. 2015, doi: 10.1080/03088839.2015. 1037371.
+[5] K. Kepaptsoglou, G. Fountas, and M. G. Karlaftis, ‘‘Weather impact on containership routing in closed seas: A chance-constraint optimization approach,’’ Transp. Res. C, Emerg. Technol., vol. 55, pp. 139–155, Jun. 2015, doi: 10.1016/j.trc.2015.01.027.
+[6] K. Fagerholt, ‘‘Designing optimal routes in a liner shipping problem,’’ Maritime Policy Manage., vol. 31, no. 4, pp. 259–268, Oct. 2004.
+[7] Q. Meng, Y. Du, and Y. Wang, ‘‘Shipping log data based container ship fuel efﬁciency modeling,’’ Transp. Res. B, Methodol., vol. 83, pp. 207–229, Jan. 2016, doi: 10.1016/j.trb.2015.11.007.
+[8] H. Agrawal, W. A. Welch, S. Henningsen, J. W. Miller, and D. R. Cocker, ‘‘Emissions from main propulsion engine on container ship at sea,’’ J. Geophys. Res., vol. 115, no. D23, p. 115, Dec. 2010, doi: 10.1029/2009JD013346.
+[9] A. Imai, E. Nishimura, and S. Papadimitriou, ‘‘Marine container terminal conﬁgurations for efﬁcient handling of mega-containerships,’’ Transp. Res. E, Logistics Transp. Rev., vol. 49, no. 1, pp. 141–158, Jan. 2013, doi: 10.1016/j.tre.2012.07.006.
+[10] L. B. Chen, D. Q. Zhang, S. J. Li, and G. Pan, ‘‘Port sensing computation based on maritime big data,’’ (in Chinese), J. Geo-Inf. Sci., vol. 18, no. 11, pp. 1485–1493, Nov. 2016. [Online]. Available: https://en.cnki.com.cn/Article_en/CJFDTotal-DQXX201611007.htm
+[11] J. Obhodas, D. Sudac, V. Valkovic, M. Baricevic, A. Franulović, B. Perot, C. Carasco, M. Alain, R. Anne-Cecile, and W. El Kanawati, ‘‘Analysis of containerized cargo in the ship container terminal,’’ Nucl. Instrum. Methods Phys. Res. A, Accel. Spectrom. Detect. Assoc. Equip., vol. 619, nos. 1–3, pp. 460–466, Jul. 2010, doi: 10.1016/j.nima.2010. 01.017.
+[12] Lusa. Port of Lisbon Dock Workers Begin Two-Week Overtime Strike. Accessed: May 24, 2018. [Online]. Available: https://www. theportugalnews.com/news/port-of-lisbon-dock-workers-begin-twoweek-overtime-strike/45708
+
+VOLUME 8, 2020
+
+199977
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+
+[13] T. Tsang and T. Lam, ‘‘SARS: Public health measures in Hong Kong,’’ Respirology, vol. 8, no. s1, pp. S46–S48, Nov. 2003, doi: 10.1046/j.14401843.2003.00524.x.
+[14] P. Peng, Y. Yang, S. Cheng, F. Lu, and Z. Yuan, ‘‘Hub-and-spoke structure: Characterizing the global crude oil transport network with mass vessel trajectories,’’ Energy, vol. 168, pp. 966–974, Feb. 2019, doi: 10.1016/j.energy.2018.11.049.
+[15] N. Mou, C. Liu, L. Zhang, X. Fu, Y. Xie, Y. Li, and P. Peng, ‘‘Spatial pattern and regional relevance analysis of the maritime silk road shipping network,’’ Sustainability, vol. 10, no. 4, p. 977, Mar. 2018, doi: 10.3390/su10040977.
+[16] P. Peng, S. Cheng, J. Chen, M. Liao, L. Wu, X. Liu, and F. Lu, ‘‘A ﬁne-grained perspective on the robustness of global cargo ship transportation networks,’’ J. Geographical Sci., vol. 28, no. 7, pp. 881–889, May 2018, doi: 10.1007/s11442-018-1511-z.
+[17] H. Yu, Z. Fang, F. Lu, A. T. Murray, H. Zhang, P. Peng, Q. Mei, and J. Chen, ‘‘Impact of oil price ﬂuctuations on tanker maritime network structure and trafﬁc ﬂow changes,’’ Appl. Energy, vol. 237, pp. 390–403, Mar. 2019, doi: 10.1016/j.apenergy.2019.01.011.
+[18] F. Ricci, L. Rokach, and B. Shapira, Recommender Systems Handbook. Accessed: Oct. 2010. [Online]. Available: https://www.researchgate. net/publication/227268858_Recommender_Systems_Handbook
+[19] A. L. Deng, Y. Y. Zhu, and B. L. Shi, ‘‘A collaborative ﬁltering recommendation algorithm based on item rating prediction,’’ J. Softw., vol. 14, no. 9, pp. 54–65, Sep. 2003.
+[20] A. M. Elkahky, Y. Song, and X. D. He, ‘‘A multi-view deep learning approach for cross domain user modeling in recommendation systems,’’ presented 24th Int. Conf. World Wide Web, May 2015. [Online]. Available: https://www.researchgate.net/publication/304417829_A_Multi-View_ Deep_Learning_Approach_for_Cross_Domain_User_Modeling_in_ Recommendation_Systems
+[21] Y.-S. Jeong, Y.-J. Byon, M. M. Castro-Neto, and S. M. Easa, ‘‘Supervised weighting-online learning algorithm for short-term trafﬁc ﬂow prediction,’’ IEEE Trans. Intell. Transp. Syst., vol. 14, no. 4, pp. 1700–1707, Dec. 2013, doi: 10.1109/TITS.2013. 2267735.
+[22] G. Fusco, C. Colombaroni, L. Comelli, and N. Isaenko, ‘‘Shortterm trafﬁc predictions on large urban trafﬁc networks: Applications of network-based machine learning models and dynamic trafﬁc assignment models,’’ presented at the MT-ITS, Jul. 2015. [Online]. Available: https://www.researchgate.net/publication/282124847_Shortterm_trafﬁc_predictions_on_large_urban_trafﬁc_networks_Applications _of_network-based_machine_learning_models_and_dynamic_trafﬁc_ assignment_models
+[23] K. Liu, S. Gao, P. Qiu, X. Liu, B. Yan, and F. Lu, ‘‘Road2 Vec: Measuring trafﬁc interactions in urban road system from massive travel routes,’’ ISPRS Int. J. Geo-Inf., vol. 6, no. 11, p. 321, Oct. 2017, doi: 10.3390/ijgi6110321.
+[24] H. Yu, Z. Fang, G. Peng, and M. Feng, ‘‘Revealing the linkage network dynamic structures of chinese maritime ports through automatic information system data,’’ Sustainability, vol. 9, no. 10, p. 1913, Oct. 2017, doi: 10.3390/su9101913.
+[25] P. Cui, X. Wang, J. Pei, and W. Zhu, ‘‘A survey on network embedding,’’ IEEE Trans. Knowl. Data Eng., vol. 31, no. 5, pp. 833–852, May 2019, doi: 10.1109/TKDE.2018.2849727.
+[26] M. Grbovic, V. Radosavljevic, N. Djuric, N. Bhamidipati, J. Savla, V. Bhagwan, and D. Sharp, ‘‘E-commerce in your inbox: Product recommendations at scale,’’ in Proc. 21th ACM SIGKDD Int. Conf. Knowl. Discovery Data Mining (KDD), Boston, MA, USA, 2015, pp. 1809–1818.
+[27] M. Zhou, N. Duan, S. Liu, and H.-Y. Shum, ‘‘Progress in neural NLP: Modeling, learning, and reasoning,’’ Engineering, vol. 6, no. 3, pp. 275–290, Mar. 2020, doi: 10.1016/j.eng.2019.12.014.
+[28] T. Mikolov, K. Chen, G. S. Corrado, and J. Dean, ‘‘Efﬁcient estimation of word representations in vector space,’’ presented at the Int. Conf. Learn. Represent., Jan. 2013. [Online]. Available: https://www. researchgate.net/publication/234131319_Efﬁcient_Estimation_of_Word_ Representations_in_Vector_Space
+[29] X. Wang, Y. Du, X. Li, F. Cao, and C. Su, ‘‘Embedded representation of relation words with visual supervision,’’ in Proc. 3rd IEEE Int. Conf. Robotic Comput. (IRC), Naples, Italy, Feb. 2019, pp. 409–412, doi: 10.1109/IRC.2019.00075.
+
+[30] A. Vijayakumar, R. Vedantam, and D. Parikh, ‘‘Sound-Word2 Vec: Learning word representations grounded in sounds,’’ in Proc. Conf. Empirical Methods Natural Lang. Process., Copenhagen, Denmark, 2017, pp. 920–925, doi: 10.18653/v1/D17-1096.
+[31] C.-H. Chuan, K. Agres, and D. Herremans, ‘‘From context to concept: Exploring semantic relationships in music with word2vec,’’ Neural Comput. Appl., vol. 32, no. 4, pp. 1023–1036, Feb. 2020, doi: 10.1007/s00521018-3923-1.
+[32] M. Hahn, A. Silva, and J. M. Rehg, ‘‘Action2Vec: A crossmodal embedding approach to action learning,’’ Jan. 2019, arXiv:1901.00484. [Online]. Available: https://arxiv.org/abs/1901.00484
+[33] P. F. Brown, V. J. Della Pietra, P. V. Desouza, J. C. Lai, and R. L. Mercer, ‘‘Class-based n-gram models of natural language,’’ Comput. Linguist., vol. 18, no. 4, pp. 467–479, Jan. 1992.
+[34] T. Mikolov, ‘‘Distributed representations of words and phrases and their compositionality,’’ presented at the Adv. Neur. Inf. Process. Sys., Oct. 2013. [Online]. Available: https://www.researchgate.net/ publication/257882504_Distributed_Representations_of_Words_and_ Phrases_and_their_Compositionality
+[35] Y. Bengio, R. Ducharme, P. Vincent, and C. Janvin, ‘‘A neural probabilistic language model,’’ J. Mach. Learn. Res., vol. 3, pp. 1137–1155, Feb. 2003.
+[36] F. Sun, ‘‘A survey on distributed word representation,’’ Chin. J. Comput., vol. 42, no. 7, pp. 1605–1625, Jul. 2019.
+[37] J. Lilleberg, Y. Zhu, and Y. Q. Zhang, ‘‘Support vector machines and word2vec for text classiﬁcation with semantic features,’’ presented at the IEEE 14th ICCI CC, Jul. 2015. [Online]. Available: https://ieeexplore.ieee.org/document/7259377
+[38] Y. Goldberg and O. Levy, ‘‘word2vec Explained: Deriving Mikolov et al.’s negative-sampling word-embedding method,’’ Feb. 2014, arXiv:1402.3722. [Online]. Available: https://arxiv.org/abs/1402. 3722
+[39] L. H. Wang and Y. Zhu, ‘‘The evolution of China’s international maritime network based on the ’21st century maritime silk road,’’’ ACTA Geogr. Sinica, vol. 72, no. 12, pp. 2265–2280, Dec. 2017, doi: 10.11821/dlxb201712011.
+QIANG MEI received the M.S. degree from Shanghai Maritime University (SMU), Shanghai, China, in 2013, where he is currently pursuing the Ph.D. degree with the Merchant Marine College, aiming at transportation intelligence. He is a member of Jimei University and the National-Local Joint Engineering Research Center for Marine Navigation Aids Services. His research interests include data mining of AIS and deep learning.
+QINYOU HU was born in August 1974. He received the Ph.D. degree in computer software and theory from Fudan University, in 2003. In 2005, he went to the Royal Melbourne University of Technology, Australia, for half a year to conduct a postdoctoral research. He is currently a Professor with Shanghai Maritime University, the Assistant Dean of the School of Commerce and Shipping, the Director of the Department of Navigation, the Director of the Maritime Intelligent Information Processing in Shanghai Key Subject Vehicle Application Engineering Leader, the International Editorial Board of the Journal of Gdynia Maritime University, Poland, and a Journal Reviewer of International Journal on Marine Navigation and Safety of Sea Transportation.
+
+199978
+
+VOLUME 8, 2020
+
+Q. Mei et al.: Port Recommendation System for Alternative Container Port Destinations
+CHUN YANG received the M.S. degree from Shanghai Maritime University (SMU), Shanghai, China. He is currently a Teacher with the Merchant Marine College, SMU. He is also involved in applying new technologies to AIS computing technology. His research interests include data mining and machine learning.
+HAILIN ZHENG received the M.S. degree from Shanghai Maritime University (SMU), Shanghai, China, in 2012, where he is currently pursuing the Ph.D. degree with the Merchant Marine College. He is also involved in applying new technologies to AIS computing technology and database. His research interests include model of transportation and machine learning.
+
+ZHISHENG HU is currently pursuing the degree with Jimei University. His major is navigation and he is working on the graduation project with Qiang Mei. His research interests include model of transportation and data processing.
+
+VOLUME 8, 2020
+
+199979
+
